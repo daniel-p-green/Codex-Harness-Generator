@@ -1,0 +1,41 @@
+# ============================================
+# Claude Environment Creator - .gitignore
+# ============================================
+
+# ----- OS artifacts -----
+.DS_Store
+Thumbs.db
+Desktop.ini
+._*
+
+# ----- Editor / IDE files -----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ----- Python -----
+__pycache__/
+*.pyc
+*.pyo
+.eggs/
+*.egg-info/
+*.egg
+
+# ----- Node -----
+node_modules/
+
+# ----- Environment / secrets -----
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# ----- Build artifacts -----
+dist/
+build/
+
+# ----- Archived development artifacts -----
+Docs/_archive/

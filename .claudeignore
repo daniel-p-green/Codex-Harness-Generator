@@ -1,0 +1,18 @@
+# Claude Environment Creator - Context Exclusions
+#
+# These files are excluded from automatic context loading.
+# Agents load what they need on demand via the Task tool.
+# This keeps the orchestrator context lean per CLAUDE.md guidelines.
+
+# Development artifacts (archived)
+Docs/_archive/
+
+# Large reference docs (loaded on demand by agents, not orchestrator)
+Docs/Research/*.md
+Docs/AgentGuidelines/Topics/*.md
+Docs/AgentPlaybooks/*.md
+Docs/Templates/**/*.md
+
+# PDF files
+*.pdf
+
