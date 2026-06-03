@@ -6,6 +6,8 @@
 
 A *harness* is a complete Claude Code setup for a project: `CLAUDE.md` + rules + specialized agents + slash-command skills + memory + scoped permissions + self-learning. Normally you hand-craft all of that over days and still end up with contradictions, bloat, and broken references. The Harness Generator interviews you (or takes a preset), then builds the whole thing -- coherent, validated, and immediately usable.
 
+[![Tutorial Video](https://img.youtube.com/vi/0R3JPNTEljU/0.jpg)](https://www.youtube.com/watch?v=0R3JPNTEljU)
+
 ## Quick Start
 
 ```bash
