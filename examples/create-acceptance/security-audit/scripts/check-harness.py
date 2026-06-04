@@ -128,13 +128,13 @@ def main() -> int:
     require_terms(
         "NEXT_TASK.md",
         "next task trial",
-        ["pick the task", "run the loop", "record-task-trial.py", "run-harness-evals.py --min-successes 1", "export-public-usage-report.py", "evidence boundary", "privacy-review", "limitations"],
+        ["pick the task", "run the loop", "record-task-trial.py", "run-harness-evals.py --min-successes 1", "export-public-usage-report.py", "pilot or usage-record slug", "evidence boundary", "privacy-review", "limitations"],
         issues,
     )
     require_terms(
         "Docs/GETTING_STARTED.md",
         "getting started",
-        ["first useful task loop", "verification menu", "evidence commands", "record-task-trial.py", "run-harness-evals.py", "privacy review", "limitations"],
+        ["first useful task loop", "verification menu", "evidence commands", "record-task-trial.py", "run-harness-evals.py", "pilot slug", "privacy review", "limitations"],
         issues,
     )
     require_terms(
@@ -152,7 +152,7 @@ def main() -> int:
     require_terms(
         "Docs/Environment/TASK_TRIALS.md",
         "task trials",
-        ["outcome labels", "evidence", "verification", "privacy review", "limitations", "record-task-trial.py", "summarize-task-trials.py", "run-harness-evals.py", "export-public-usage-report.py"],
+        ["outcome labels", "evidence", "verification", "privacy review", "limitations", "record-task-trial.py", "summarize-task-trials.py", "run-harness-evals.py", "export-public-usage-report.py", "pilot slug"],
         issues,
     )
     require_terms(

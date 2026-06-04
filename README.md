@@ -151,8 +151,8 @@ replacement. What is proven today:
 - `scripts/beta_status.py` and `codex-harness beta-status` write
   `Docs/Environment/BETA_STATUS.md`, a one-page operator dashboard that combines
   beta-exit usage gaps, live public pilot queue state, the next maintainer
-  action, and the strict `doctor --beta-exit` result without treating status as
-  evidence.
+  action, per-issue waiting or conversion-ready details, and the strict
+  `doctor --beta-exit` result without treating status as evidence.
 - `scripts/export_pilot_campaign.py` and `codex-harness pilot-campaign` write
   `Docs/Environment/PILOT_CAMPAIGN.md`, a shareable external-pilot campaign
   plan derived from the current usage gaps, including a projection for the
@@ -698,8 +698,9 @@ into issue comments after completing a task. `pilot-github-sync` writes
 `pilot-next-action` writes `Docs/Environment/PILOT_NEXT_ACTION.md` and prints
 the single next maintainer command from that same live readiness check.
 `beta-status` writes `Docs/Environment/BETA_STATUS.md`, combining the current
-usage evidence gap, live pilot queue, next action, and strict beta-exit doctor
-state without treating waiting pilots as proof.
+usage evidence gap, live pilot queue, per-issue waiting or conversion-ready
+details, next action, and strict beta-exit doctor state without treating waiting
+pilots as proof.
 The `Usage Evidence Lint` GitHub Action runs the same lint-only importer path on
 public usage issues and reporter comments, updating one marker-managed issue
 comment plus a `usage-evidence:needs-input` or
@@ -833,7 +834,7 @@ Common subcommands:
 | `pilot-next-action` | `pilot_next_action.py` | Summarizes live pilot GitHub issue readiness into the single next maintainer command without counting the action as usage proof. |
 | `usage-from-github-issue` | `usage_from_github_issue.py` | Fetches a completed public GitHub issue with `gh`, optionally includes reporter comments, then lints, previews, or converts it through the same privacy-checked usage-record importer. |
 | `beta-exit-audit` | `beta_exit_audit.py` | Writes a non-gating audit of beta-exit readiness and remaining evidence gaps. |
-| `beta-status` | `beta_status.py` | Writes one operator dashboard for beta-exit evidence gaps, live pilot queue state, the selected next action, and strict beta-exit doctor readiness. |
+| `beta-status` | `beta_status.py` | Writes one operator dashboard for beta-exit evidence gaps, live pilot queue state, per-issue waiting or conversion-ready detail, the selected next action, and strict beta-exit doctor readiness. |
 | `proof-next` | `proof_next.py` | Writes the next beta-exit proof actions and candidate coverage projection from current usage gaps without counting the plan as evidence. |
 | `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record; infers the slug from the issue body when present, and supports `--lint-only`, `--no-write`, or `--pilot-record-dir` for linked pilot conversion. |
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |

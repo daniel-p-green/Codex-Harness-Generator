@@ -81,6 +81,11 @@ def genesis_field(label: str, fallback: str) -> str:
     return fallback
 
 
+def safe_slug(value: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+    return slug or "generated-codex-harness"
+
+
 def run_eval(min_successes: int) -> dict:
     completed = subprocess.run(
         [sys.executable, "scripts/run-harness-evals.py", "--min-successes", str(min_successes), "--json"],
@@ -123,8 +128,10 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict]:
 
     domain = args.domain or genesis_field("Domain", "unspecified domain")
     harness_label = args.harness_label or genesis_field("Project", "generated Codex harness")
+    slug = safe_slug(args.slug or harness_label)
     reject_sensitive("domain", domain)
     reject_sensitive("harness label", harness_label)
+    reject_sensitive("slug", slug)
 
     evidence = bullet_lines(entry["evidence"])
     evidence.append(f"- Copied-harness eval report status: {eval_payload.get('status', 'unknown').upper()}.")
@@ -134,6 +141,10 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict]:
     limitations.append("- One copied-harness task trial; not longitudinal proof or broad adoption evidence.")
 
     lines = [
+        "### Pilot or usage-record slug",
+        "",
+        slug,
+        "",
         "### Domain or project type",
         "",
         domain,
@@ -188,6 +199,7 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict]:
         "status": "pass",
         "task": entry["task"],
         "outcome": entry["outcome"],
+        "slug": slug,
         "domain": domain,
         "harness_label": harness_label,
         "eval_status": eval_payload.get("status"),
@@ -202,6 +214,7 @@ def output_path(value: str) -> Path:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", default=REPORT_PATH.as_posix(), help="Markdown report path")
+    parser.add_argument("--slug", help="Public-safe pilot or usage-record slug; defaults to the generated harness label")
     parser.add_argument("--domain", help="Public-safe domain override")
     parser.add_argument("--harness-label", help="Public-safe harness label override")
     parser.add_argument("--source-type", choices=["external", "multi-project", "self-dogfood"], default="external")

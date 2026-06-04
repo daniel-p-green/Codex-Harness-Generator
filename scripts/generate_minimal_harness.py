@@ -712,10 +712,11 @@ Run the copied-harness eval report:
 python scripts/run-harness-evals.py
 ```
 
-After a successful real task trial, export a public-safe usage report draft:
+After a successful real task trial, export a public-safe usage report draft.
+Use the matching pilot slug when one exists:
 
 ```bash
-python scripts/export-public-usage-report.py --out Docs/Environment/PUBLIC_USAGE_REPORT.md
+python scripts/export-public-usage-report.py --slug "public-safe-usage-slug" --out Docs/Environment/PUBLIC_USAGE_REPORT.md
 ```
 
 If this harness came from the public generator and the task is safe to describe,
@@ -754,8 +755,8 @@ private repository names, raw logs, or irreversible production actions.
    missing verification.
 5. Record the trial with `python scripts/record-task-trial.py`.
 6. Run `python scripts/run-harness-evals.py --min-successes 1`.
-7. Export `Docs/Environment/PUBLIC_USAGE_REPORT.md` with
-   `python scripts/export-public-usage-report.py --out Docs/Environment/PUBLIC_USAGE_REPORT.md`.
+7. Export `Docs/Environment/PUBLIC_USAGE_REPORT.md` with the matching pilot or usage-record slug:
+   `python scripts/export-public-usage-report.py --slug "public-safe-usage-slug" --out Docs/Environment/PUBLIC_USAGE_REPORT.md`.
 
 ## Copyable Record Command
 
@@ -874,10 +875,11 @@ Run the copied-harness eval summary with:
 python scripts/run-harness-evals.py
 ```
 
-Export a public-safe usage report draft after at least one successful real task:
+Export a public-safe usage report draft after at least one successful real task.
+Use the matching pilot slug when one exists:
 
 ```bash
-python scripts/export-public-usage-report.py --out Docs/Environment/PUBLIC_USAGE_REPORT.md
+python scripts/export-public-usage-report.py --slug "public-safe-usage-slug" --out Docs/Environment/PUBLIC_USAGE_REPORT.md
 ```
 
 ## Outcome Labels
@@ -1614,6 +1616,11 @@ def genesis_field(label: str, fallback: str) -> str:
     return fallback
 
 
+def safe_slug(value: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+    return slug or "generated-codex-harness"
+
+
 def run_eval(min_successes: int) -> dict:
     completed = subprocess.run(
         [sys.executable, "scripts/run-harness-evals.py", "--min-successes", str(min_successes), "--json"],
@@ -1656,8 +1663,10 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict]:
 
     domain = args.domain or genesis_field("Domain", "unspecified domain")
     harness_label = args.harness_label or genesis_field("Project", "generated Codex harness")
+    slug = safe_slug(args.slug or harness_label)
     reject_sensitive("domain", domain)
     reject_sensitive("harness label", harness_label)
+    reject_sensitive("slug", slug)
 
     evidence = bullet_lines(entry["evidence"])
     evidence.append(f"- Copied-harness eval report status: {eval_payload.get('status', 'unknown').upper()}.")
@@ -1667,6 +1676,10 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict]:
     limitations.append("- One copied-harness task trial; not longitudinal proof or broad adoption evidence.")
 
     lines = [
+        "### Pilot or usage-record slug",
+        "",
+        slug,
+        "",
         "### Domain or project type",
         "",
         domain,
@@ -1721,6 +1734,7 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict]:
         "status": "pass",
         "task": entry["task"],
         "outcome": entry["outcome"],
+        "slug": slug,
         "domain": domain,
         "harness_label": harness_label,
         "eval_status": eval_payload.get("status"),
@@ -1735,6 +1749,7 @@ def output_path(value: str) -> Path:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", default=REPORT_PATH.as_posix(), help="Markdown report path")
+    parser.add_argument("--slug", help="Public-safe pilot or usage-record slug; defaults to the generated harness label")
     parser.add_argument("--domain", help="Public-safe domain override")
     parser.add_argument("--harness-label", help="Public-safe harness label override")
     parser.add_argument("--source-type", choices=["external", "multi-project", "self-dogfood"], default="external")
@@ -1911,13 +1926,13 @@ def main() -> int:
     require_terms(
         "NEXT_TASK.md",
         "next task trial",
-        ["pick the task", "run the loop", "record-task-trial.py", "run-harness-evals.py --min-successes 1", "export-public-usage-report.py", "evidence boundary", "privacy-review", "limitations"],
+        ["pick the task", "run the loop", "record-task-trial.py", "run-harness-evals.py --min-successes 1", "export-public-usage-report.py", "pilot or usage-record slug", "evidence boundary", "privacy-review", "limitations"],
         issues,
     )
     require_terms(
         "Docs/GETTING_STARTED.md",
         "getting started",
-        ["first useful task loop", "verification menu", "evidence commands", "record-task-trial.py", "run-harness-evals.py", "privacy review", "limitations"],
+        ["first useful task loop", "verification menu", "evidence commands", "record-task-trial.py", "run-harness-evals.py", "pilot slug", "privacy review", "limitations"],
         issues,
     )
     require_terms(
@@ -1935,7 +1950,7 @@ def main() -> int:
     require_terms(
         "Docs/Environment/TASK_TRIALS.md",
         "task trials",
-        ["outcome labels", "evidence", "verification", "privacy review", "limitations", "record-task-trial.py", "summarize-task-trials.py", "run-harness-evals.py", "export-public-usage-report.py"],
+        ["outcome labels", "evidence", "verification", "privacy review", "limitations", "record-task-trial.py", "summarize-task-trials.py", "run-harness-evals.py", "export-public-usage-report.py", "pilot slug"],
         issues,
     )
     require_terms(

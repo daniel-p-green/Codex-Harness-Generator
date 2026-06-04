@@ -668,6 +668,8 @@ class GeneratedHarnessContractTests(unittest.TestCase):
                 "scripts/export-public-usage-report.py",
                 "--out",
                 "Docs/Environment/PUBLIC_USAGE_REPORT.md",
+                "--slug",
+                "usage-proof-smoke",
                 "--json",
             ],
             cwd=target,
@@ -680,8 +682,11 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         payload = json.loads(completed.stdout)
         self.assertEqual("pass", payload["status"], payload)
         self.assertEqual("TODO audit", payload["task"])
+        self.assertEqual("usage-proof-smoke", payload["slug"])
         self.assertEqual("Docs/Environment/PUBLIC_USAGE_REPORT.md", payload["path"])
         report = (target / "Docs/Environment/PUBLIC_USAGE_REPORT.md").read_text(encoding="utf-8")
+        self.assertIn("### Pilot or usage-record slug", report)
+        self.assertIn("usage-proof-smoke", report)
         self.assertIn("### Domain or project type", report)
         self.assertIn("### Generated harness profile or label", report)
         self.assertIn("### Evidence type", report)
@@ -844,6 +849,7 @@ class GeneratedHarnessContractTests(unittest.TestCase):
             self.assertIn("## Evidence Commands", getting_started)
             self.assertIn("python scripts/record-task-trial.py", getting_started)
             self.assertIn("python scripts/run-harness-evals.py", getting_started)
+            self.assertIn("--slug \"public-safe-usage-slug\"", getting_started)
             self.assertIn("privacy review", getting_started.lower())
             self.assertIn("limitations", getting_started.lower())
             next_task = (target / "NEXT_TASK.md").read_text(encoding="utf-8")
@@ -852,10 +858,12 @@ class GeneratedHarnessContractTests(unittest.TestCase):
             self.assertIn("python scripts/record-task-trial.py", next_task)
             self.assertIn("python scripts/run-harness-evals.py --min-successes 1", next_task)
             self.assertIn("python scripts/export-public-usage-report.py", next_task)
+            self.assertIn("pilot or usage-record slug", next_task)
             self.assertIn("--privacy-review", next_task)
             self.assertIn("## Evidence Boundary", next_task)
             task_trials = (target / "Docs/Environment/TASK_TRIALS.md").read_text(encoding="utf-8")
             self.assertIn("--limitations", task_trials)
+            self.assertIn("--slug \"public-safe-usage-slug\"", task_trials)
 
     def test_refresh_deterministic_examples_outputs_valid_harnesses(self):
         with tempfile.TemporaryDirectory() as temp_dir:

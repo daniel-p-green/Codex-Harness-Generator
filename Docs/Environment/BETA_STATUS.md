@@ -1,6 +1,6 @@
 # Beta Status
 
-Generated: 2026-06-04T23:32:08Z
+Generated: 2026-06-04T23:39:29Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 
@@ -31,6 +31,45 @@ Missing fields across waiting issues:
 - `privacy_review`: 3
 - `task_summary`: 3
 - `verification`: 3
+
+## Waiting Issues
+
+### llm-app-pilot
+
+- Issue: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3
+- Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
+- Reporter replies: 0
+- Reminder due: `false`
+- Next reminder at: `2026-06-07T19:38:17Z`
+- Maintainer follow-up posted: `true`
+- Maintainer follow-up: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3#issuecomment-4625495059
+- Follow-up file: `Docs/Environment/pilot-github-followups/llm-app-pilot-followup.md`
+
+### security-audit-pilot
+
+- Issue: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1
+- Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
+- Reporter replies: 0
+- Reminder due: `false`
+- Next reminder at: `2026-06-07T19:38:18Z`
+- Maintainer follow-up posted: `true`
+- Maintainer follow-up: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1#issuecomment-4625495203
+- Follow-up file: `Docs/Environment/pilot-github-followups/security-audit-pilot-followup.md`
+
+### customer-support-pilot
+
+- Issue: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2
+- Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
+- Reporter replies: 0
+- Reminder due: `false`
+- Next reminder at: `2026-06-07T19:38:19Z`
+- Maintainer follow-up posted: `true`
+- Maintainer follow-up: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2#issuecomment-4625495326
+- Follow-up file: `Docs/Environment/pilot-github-followups/customer-support-pilot-followup.md`
+
+## Conversion Ready Issues
+
+- none
 
 ## Next Action
 

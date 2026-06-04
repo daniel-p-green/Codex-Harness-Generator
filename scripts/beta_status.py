@@ -123,6 +123,8 @@ def build_payload(
         "pilot_readiness": pilot_payload["readiness"],
         "pilot_summary": pilot_payload["summary"],
         "operator_queue": pilot_payload["operator_queue"],
+        "waiting_followups": pilot_payload.get("waiting_followups", []),
+        "conversion_ready": pilot_payload.get("conversion_ready", []),
         "next_action": pilot_payload["next_action"],
         "doctor": {
             "status": doctor_payload["status"],
@@ -174,6 +176,65 @@ def write_report(path: Path, payload: dict) -> None:
             f"- `{field}`: {count}"
             for field, count in payload["operator_queue"]["missing_field_counts"].items()
         )
+    else:
+        lines.append("- none")
+    lines.extend(
+        [
+            "",
+            "## Waiting Issues",
+            "",
+        ]
+    )
+    if payload["waiting_followups"]:
+        for item in payload["waiting_followups"]:
+            reporter_replies = item.get("reporter_replies", {})
+            maintainer_comment = item.get("maintainer_followup_comment", {})
+            lines.extend(
+                [
+                    f"### {item['slug']}",
+                    "",
+                    f"- Issue: {item.get('issue_url') or 'none'}",
+                    f"- Missing fields: {', '.join(item.get('missing_fields', [])) or 'none'}",
+                    f"- Reporter replies: {reporter_replies.get('count', 0)}",
+                    f"- Reminder due: `{str(item.get('reminder_due', False)).lower()}`",
+                    f"- Next reminder at: `{item.get('next_reminder_at') or 'none'}`",
+                    f"- Maintainer follow-up posted: `{str(item.get('maintainer_followup_posted', False)).lower()}`",
+                    f"- Maintainer follow-up: {maintainer_comment.get('url') or 'none'}",
+                    f"- Follow-up file: `{item.get('followup_file') or 'none'}`",
+                    "",
+                ]
+            )
+    else:
+        lines.append("- none")
+        lines.append("")
+    lines.extend(
+        [
+            "## Conversion Ready Issues",
+            "",
+        ]
+    )
+    if payload["conversion_ready"]:
+        for item in payload["conversion_ready"]:
+            lines.extend(
+                [
+                    f"### {item['slug']}",
+                    "",
+                    f"- Issue: {item.get('issue_url') or 'none'}",
+                    "",
+                    "Preview before writing:",
+                    "",
+                    "```bash",
+                    item.get("preview_command", ""),
+                    "```",
+                    "",
+                    "Convert after preview passes:",
+                    "",
+                    "```bash",
+                    item.get("convert_command", ""),
+                    "```",
+                    "",
+                ]
+            )
     else:
         lines.append("- none")
     action = payload["next_action"]
