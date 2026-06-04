@@ -26,7 +26,7 @@ the stated scope, not more.
 | Official OpenAI source citations have a freshness check. | `scripts/check_source_freshness.py`, `Docs/Environment/SOURCE_FRESHNESS.md`, `Docs/Environment/SOURCE_FRESHNESS.json` | `python scripts/check_source_freshness.py` | Maintainers can verify cited `developers.openai.com` docs are reachable and trigger semantic review when official sources move or disappear. |
 | Core local guidance has a semantic drift signal. | `scripts/check_semantic_alignment.py`, `Docs/Environment/SEMANTIC_ALIGNMENT.md`, `Docs/Environment/SEMANTIC_ALIGNMENT.json` | `python scripts/check_semantic_alignment.py` | Maintainers can verify that local guidance and official OpenAI docs still share the named concepts this repo depends on: AGENTS.md loading, permissions, subagents, skills, and config model controls. |
 | Real usage evidence has a privacy-checked capture path. | `scripts/record_usage_case.py`, `scripts/validate_usage_records.py`, `Docs/Environment/USAGE_RECORDS.md`, `tests/test_record_usage_case.py`, `tests/test_validate_usage_records.py` | `python scripts/validate_usage_records.py && python -m unittest tests.test_record_usage_case tests.test_validate_usage_records -q` | Maintainers can record and validate synthetic, sanitized, or private-summary usage records while rejecting obvious secrets, credentials, email addresses, local machine paths, malformed JSON, filename/slug mismatches, weak non-synthetic records, and empty required fields. |
-| Non-synthetic product-proof claims have an explicit failing threshold until evidence exists. | `scripts/validate_usage_records.py`, `Docs/Environment/USAGE_RECORDS.md` | `python scripts/validate_usage_records.py --min-records 1 --require-non-synthetic --require-success` | Maintainers can distinguish "the usage-record lane is healthy" from "real-world usage proof exists"; the stricter command intentionally fails until a successful sanitized or private-summary usage record is checked in. |
+| Non-synthetic product-proof claims have an explicit threshold. | `scripts/validate_usage_records.py`, `Docs/Environment/USAGE_RECORDS.md`, `Docs/Environment/usage-records/` | `python scripts/validate_usage_records.py --min-records 1 --require-non-synthetic --require-success` | Maintainers can distinguish "the usage-record lane is healthy" from "real-world usage proof exists"; the current checked-in evidence proves one sanitized self-dogfood success, not broad external adoption. |
 | The standard release gate is CI-safe and offline. | `scripts/run_evals.py`, `.github/workflows/evals.yml` | `python scripts/run_evals.py` | Static port checks, fixture evals, offline smokes, deterministic generation, checked-in deterministic/create-acceptance/live-create examples, unit/mutation tests, and compile checks pass without authenticated live services. |
 | Authenticated local live smoke works through Codex CLI. | `scripts/smoke_generated_harness.py`, `scripts/run_evals.py --codex-live` | `python scripts/run_evals.py --codex-live` | On a machine with authenticated Codex CLI, checked-in create-acceptance examples can be loaded through non-interactive `codex exec`. |
 
@@ -65,9 +65,8 @@ python scripts/run_evals.py --codex-live --codex-live-profile all
 
 - Add more live examples for specialized or higher-risk domains as new public-safe
   synthetic briefs become available.
-- Add non-synthetic real-world usage records using the privacy-checked recorder
-  once safe to publish or summarize, then pass
-  `python scripts/validate_usage_records.py --min-records 1
-  --require-non-synthetic --require-success`.
+- Add more non-synthetic real-world usage records using the privacy-checked
+  recorder, especially external or multi-project records beyond the current
+  sanitized self-dogfood evidence.
 - Deepen semantic drift checks beyond concept presence when stable
   machine-readable official-doc metadata is available.

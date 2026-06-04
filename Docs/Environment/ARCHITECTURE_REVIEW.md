@@ -61,7 +61,8 @@ transcript.
   against official OpenAI docs and records a review signal.
 - Real usage evidence: a privacy-checked usage-record workflow now exists, and
   stricter validation flags can require successful non-synthetic records before
-  maintainers make real-world usage claims.
+  maintainers make real-world usage claims. The first checked-in record is
+  sanitized self-dogfood evidence from this public repo's Codex work.
 - Claim calibration: README language now describes utility and limits without
   implying deterministic perfection.
 
@@ -71,10 +72,9 @@ transcript.
   synthetic briefs are available; security audit, legal research, financial
   modeling, hiring pipeline, and customer support now have public-safe task-trial
   fixtures.
-- Add actual non-synthetic usage records through the privacy-checked recorder
-  once safe summaries are available, then require them with
-  `python scripts/validate_usage_records.py --min-records 1
-  --require-non-synthetic --require-success`.
+- Add additional non-synthetic usage records through the privacy-checked
+  recorder, especially external or multi-project records beyond the current
+  self-dogfood evidence.
 - Extend high-risk domain guardrail mutations as new bundled domains are added
   or official Codex safety guidance changes.
 - Expand semantic drift checks from concept presence toward deeper schema-aware

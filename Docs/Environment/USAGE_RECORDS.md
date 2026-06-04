@@ -9,15 +9,15 @@ secrets, personal data, proprietary source, or local machine paths.
 
 | Total | Synthetic | Sanitized | Private Summary | Non-Synthetic | Success | Partial | Failed | Inconclusive |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 1 | 0 | 1 | 0 | 1 | 1 | 0 | 0 | 0 |
 
-Product-proof status: no non-synthetic usage records yet
+Product-proof status: non-synthetic usage evidence present
 
 ## Records
 
 | Generated | Slug | Domain | Outcome | Evidence Type | Verification Count |
 |---|---|---|---|---|---:|
-|  |  |  |  |  | 0 |
+| 2026-06-04T06:12:20Z | `dogfood-high-risk-proof-suite` | Codex harness generation | success | sanitized | 2 |
 
 ## Scope
 

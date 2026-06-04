@@ -68,17 +68,22 @@ replacement. What is proven today:
   `Docs/Environment/usage-records/`, and `scripts/validate_usage_records.py`
   can enforce stricter non-synthetic proof thresholds when making real-world
   usage claims.
+- `Docs/Environment/usage-records/` includes a first sanitized self-dogfood
+  usage record from this public repo's Codex work. It is useful evidence, but
+  not yet external or longitudinal adoption proof.
 
 What still needs product proof:
 
-- Real use of generated harnesses on real Codex tasks over time, recorded as
-  sanitized or private-summary usage evidence.
+- More real use of generated harnesses on real Codex tasks over time, especially
+  external or multi-project usage, recorded as sanitized or private-summary
+  evidence.
 - More live examples for specialized domains as new public-safe briefs become
   available.
 
-Until those real-world usage records exist, treat the eval suite, golden
-fixtures, deterministic examples, and synthetic live examples as strong product
-proof, not a guarantee that every future `/create` run will be ideal.
+Until broader real-world usage records exist, treat the eval suite, golden
+fixtures, deterministic examples, synthetic live examples, and self-dogfood
+usage evidence as strong product proof, not a guarantee that every future
+`/create` run will be ideal.
 
 For a claim-by-claim evidence map, see
 `Docs/Environment/PROOF_MATRIX.md`.
