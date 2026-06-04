@@ -234,6 +234,7 @@ def check_required_paths(root: Path, findings: list[Finding]) -> None:
         ".agents/skills",
         "scripts/check-harness.py",
         "scripts/record-improvement.py",
+        "scripts/record-task-trial.py",
         "Docs/GETTING_STARTED.md",
         "Docs/Environment/MANIFEST.md",
         "Docs/Environment/GENESIS.md",
@@ -241,6 +242,7 @@ def check_required_paths(root: Path, findings: list[Finding]) -> None:
         "Docs/Environment/ASSUMPTIONS.md",
         "Docs/Environment/EVAL_PLAN.md",
         "Docs/Environment/IMPROVEMENT_LOG.md",
+        "Docs/Environment/TASK_TRIALS.md",
         "Docs/Environment/VALIDATION_REPORT.md",
         "Docs/Environment/SOURCE_MAP.md",
     ]
@@ -516,6 +518,16 @@ def check_docs(root: Path, findings: list[Finding]) -> None:
         for phrase in ["friction", "evidence", "user correction", "verification after update", "record-improvement.py"]:
             if phrase not in text:
                 add(findings, "improvement_log", "maintainability", "warn", "Docs/Environment/IMPROVEMENT_LOG.md", f"Improvement log should mention {phrase}.")
+
+    task_trials = root / "Docs/Environment/TASK_TRIALS.md"
+    if task_trials.exists():
+        text = read_text(task_trials).lower()
+        for phrase in ["outcome labels", "entry template", "review rule"]:
+            if phrase not in text:
+                add(findings, "task_trials", "maintainability", "warn", "Docs/Environment/TASK_TRIALS.md", f"Task trials should include {phrase}.")
+        for phrase in ["evidence", "verification", "privacy review", "limitations", "record-task-trial.py"]:
+            if phrase not in text:
+                add(findings, "task_trials", "maintainability", "warn", "Docs/Environment/TASK_TRIALS.md", f"Task trials should mention {phrase}.")
 
 
 def check_manifest(root: Path, findings: list[Finding]) -> None:

@@ -33,6 +33,7 @@
 - Docs/Environment/MANIFEST.md
 - Docs/Environment/EVAL_PLAN.md
 - Docs/Environment/IMPROVEMENT_LOG.md
+- Docs/Environment/TASK_TRIALS.md
 - Docs/Environment/ASSUMPTIONS.md
 - Docs/Environment/SOURCE_MAP.md
 - Docs/Environment/VALIDATION_REPORT.md
@@ -40,3 +41,4 @@
 - Docs/Environment/LIVE_CREATE_CAPTURE.md
 - scripts/check-harness.py
 - scripts/record-improvement.py
+- scripts/record-task-trial.py

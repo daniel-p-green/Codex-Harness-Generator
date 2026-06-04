@@ -21,6 +21,7 @@ REQUIRED_PATHS = [
     ".agents/skills",
     "scripts/check-harness.py",
     "scripts/record-improvement.py",
+    "scripts/record-task-trial.py",
     "Docs/GETTING_STARTED.md",
     "Docs/Environment/GENESIS.md",
     "Docs/Environment/ARCHITECTURE.md",
@@ -28,6 +29,7 @@ REQUIRED_PATHS = [
     "Docs/Environment/MANIFEST.md",
     "Docs/Environment/EVAL_PLAN.md",
     "Docs/Environment/IMPROVEMENT_LOG.md",
+    "Docs/Environment/TASK_TRIALS.md",
     "Docs/Environment/SOURCE_MAP.md",
     "Docs/Environment/VALIDATION_REPORT.md",
 ]
@@ -127,6 +129,12 @@ def main() -> int:
         "Docs/Environment/IMPROVEMENT_LOG.md",
         "improvement log",
         ["categories", "seed patterns", "entry template", "update rule", "friction", "evidence", "user correction", "verification after update", "record-improvement.py"],
+        issues,
+    )
+    require_terms(
+        "Docs/Environment/TASK_TRIALS.md",
+        "task trials",
+        ["outcome labels", "evidence", "verification", "privacy review", "limitations", "record-task-trial.py"],
         issues,
     )
     require_terms(

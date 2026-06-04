@@ -38,5 +38,7 @@ Every generated handoff file below was created for `temporary synthetic target`.
 - Docs/Environment/LIVE_CREATE_CAPTURE.md
 - scripts/check-harness.py
 - scripts/record-improvement.py
+- scripts/record-task-trial.py
 - Docs/Environment/EVAL_PLAN.md
 - Docs/Environment/IMPROVEMENT_LOG.md
+- Docs/Environment/TASK_TRIALS.md

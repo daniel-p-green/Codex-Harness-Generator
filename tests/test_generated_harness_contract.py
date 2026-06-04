@@ -180,6 +180,17 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertNotEqual(0, payload["returncode"])
         self.assertTrue(any("improvement log should mention" in issue for issue in payload["issues"]), payload)
 
+    def test_local_harness_check_fails_for_weak_task_trials(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        (target / "Docs/Environment/TASK_TRIALS.md").write_text("# Task Trials\n\n- Later.\n", encoding="utf-8")
+
+        payload = self.run_local_check(target)
+
+        self.assertEqual("fail", payload["status"], payload)
+        self.assertNotEqual(0, payload["returncode"])
+        self.assertTrue(any("task trials should mention" in issue for issue in payload["issues"]), payload)
+
     def test_local_harness_check_fails_for_stale_manifest_reference(self):
         temp_dir, target = self.copy_fixture()
         self.addCleanup(temp_dir.cleanup)
@@ -254,6 +265,71 @@ class GeneratedHarnessContractTests(unittest.TestCase):
 
         self.assertNotEqual(0, completed.returncode)
         self.assertIn("Unsupported category", completed.stderr + completed.stdout)
+
+    def test_record_task_trial_script_appends_structured_entry(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "scripts/record-task-trial.py",
+                "--date",
+                "2026-06-04",
+                "--task",
+                "TODO audit",
+                "--outcome",
+                "success",
+                "--evidence",
+                "Docs/Environment/EVAL_PLAN.md and generated TODO report were inspected.",
+                "--verification",
+                "python scripts/check-harness.py",
+                "--privacy-review",
+                "Public-safe synthetic task only.",
+                "--harness-helped",
+                "AGENTS.md pointed Codex to verification before final response.",
+                "--limitations",
+                "One local task trial.",
+            ],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+        text = (target / "Docs/Environment/TASK_TRIALS.md").read_text(encoding="utf-8")
+        self.assertIn("### 2026-06-04 - SUCCESS - TODO audit", text)
+        self.assertIn("- Outcome: success", text)
+        self.assertIn("- Privacy review: Public-safe synthetic task only.", text)
+
+    def test_record_task_trial_script_rejects_unknown_outcome(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "scripts/record-task-trial.py",
+                "--task",
+                "TODO audit",
+                "--outcome",
+                "maybe",
+                "--evidence",
+                "A report was written.",
+                "--verification",
+                "python scripts/check-harness.py",
+                "--privacy-review",
+                "Public-safe synthetic task only.",
+            ],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertNotEqual(0, completed.returncode)
+        self.assertIn("Unsupported outcome", completed.stderr + completed.stdout)
 
     def test_codex_live_smoke_uses_non_interactive_exec(self):
         completed = subprocess.CompletedProcess(args=[], returncode=0, stdout="OK\n", stderr="")
@@ -456,6 +532,15 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertEqual("fail", result["status"])
         self.assert_has_check(result, "required_path")
 
+    def test_missing_record_task_trial_script_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        (target / "scripts/record-task-trial.py").unlink()
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"])
+        self.assert_has_check(result, "required_path")
+
     def test_missing_eval_plan_fails(self):
         temp_dir, target = self.copy_fixture()
         self.addCleanup(temp_dir.cleanup)
@@ -486,6 +571,15 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertEqual("fail", result["status"])
         self.assert_has_check(result, "required_path")
 
+    def test_missing_task_trials_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        (target / "Docs/Environment/TASK_TRIALS.md").unlink()
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"])
+        self.assert_has_check(result, "required_path")
+
     def test_weak_improvement_log_warns(self):
         temp_dir, target = self.copy_fixture()
         self.addCleanup(temp_dir.cleanup)
@@ -497,6 +591,18 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertGreater(result["warning_count"], 0, result)
         self.assertLess(result["score"], 100, result)
         self.assert_has_check(result, "improvement_log")
+
+    def test_weak_task_trials_warns(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        task_trials = target / "Docs/Environment/TASK_TRIALS.md"
+        task_trials.write_text("# Task Trials\n\n- Record work eventually.\n", encoding="utf-8")
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("pass", result["status"], result)
+        self.assertGreater(result["warning_count"], 0, result)
+        self.assertLess(result["score"], 100, result)
+        self.assert_has_check(result, "task_trials")
 
     def test_missing_assumptions_ledger_fails(self):
         temp_dir, target = self.copy_fixture()

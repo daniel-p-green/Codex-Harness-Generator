@@ -101,4 +101,6 @@ User inclination: lean simple. Status: Auto-confirmed (preset mode).
 - AGENTS.md line target: 200
 - Docs/Environment/EVAL_PLAN.md
 - Docs/Environment/IMPROVEMENT_LOG.md
+- Docs/Environment/TASK_TRIALS.md
 - scripts/record-improvement.py
+- scripts/record-task-trial.py

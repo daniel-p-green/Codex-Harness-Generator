@@ -26,4 +26,10 @@ When a repeated issue appears, record it in the local improvement log:
 python scripts/record-improvement.py --category CHECK_GAP --task "short task" --friction "what went wrong" --evidence "file or command evidence"
 ```
 
+After a meaningful Codex task, record a task trial:
+
+```bash
+python scripts/record-task-trial.py --task "short task" --outcome success --evidence "artifact or file inspected" --verification "command or review completed" --privacy-review "public-safe summary only"
+```
+
 Generated: 2026-06-04

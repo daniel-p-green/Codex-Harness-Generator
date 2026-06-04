@@ -16,5 +16,7 @@ Each demo capture includes:
 - `AGENTS.md` for the primary generated Codex instruction surface.
 - `Docs/Environment/DEMO_CAPTURE.md` for the short reviewer walkthrough.
 - `scripts/check-harness.py` for copied-harness local validation.
+- `Docs/Environment/TASK_TRIALS.md` and `scripts/record-task-trial.py` for
+  recording task outcome evidence after use.
 
 Demo captures are product walkthrough evidence, not external adoption proof.

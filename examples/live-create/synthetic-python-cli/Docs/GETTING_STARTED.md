@@ -26,3 +26,10 @@ Use the smallest meaningful command for the task. To verify behavior changes, ru
 ## Cost And Context
 
 The harness uses medium reasoning by default and enables agent teams only as an available mode for larger future investigations. For this small CLI, direct sequential work should usually be enough.
+
+After a meaningful Codex task, record a task trial:
+
+```bash
+python scripts/record-task-trial.py --task "short task" --outcome success --evidence "artifact or file inspected" --verification "command or review completed" --privacy-review "public-safe summary only"
+```
+

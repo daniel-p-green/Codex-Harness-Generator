@@ -42,3 +42,10 @@ This balanced setup uses higher reasoning for research/review and medium effort 
 ## How It Improves
 
 Repeated misses should be recorded in `Docs/_working/retro/`. Run `/update` when patterns accumulate so the harness can improve without adding unnecessary complexity.
+
+After a meaningful Codex task, record a task trial:
+
+```bash
+python scripts/record-task-trial.py --task "short task" --outcome success --evidence "artifact or file inspected" --verification "command or review completed" --privacy-review "public-safe summary only"
+```
+

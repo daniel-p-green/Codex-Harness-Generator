@@ -13,3 +13,10 @@ only.
 
 The permission profile allows workspace edits while denying secrets, tokens,
 credentials, `.env` files, and private keys.
+
+After a meaningful Codex task, record a task trial:
+
+```bash
+python scripts/record-task-trial.py --task "short task" --outcome success --evidence "artifact or file inspected" --verification "command or review completed" --privacy-review "public-safe summary only"
+```
+

@@ -12,6 +12,7 @@ one health-check skill, scoped permissions, and scenario-analysis rules.
 - .agents/skills/health-check/SKILL.md
 - scripts/check-harness.py
 - scripts/record-improvement.py
+- scripts/record-task-trial.py
 - Docs/GETTING_STARTED.md
 - Docs/Environment/GENESIS.md
 - Docs/Environment/ARCHITECTURE.md
@@ -19,6 +20,7 @@ one health-check skill, scoped permissions, and scenario-analysis rules.
 - Docs/Environment/MANIFEST.md
 - Docs/Environment/EVAL_PLAN.md
 - Docs/Environment/IMPROVEMENT_LOG.md
+- Docs/Environment/TASK_TRIALS.md
 - Docs/Environment/SOURCE_MAP.md
 - Docs/Environment/VALIDATION_REPORT.md
 - Docs/Environment/CREATION_CONTEXT.md
