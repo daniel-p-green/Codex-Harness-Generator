@@ -38,6 +38,8 @@ SOURCE_URLS = [
     "https://developers.openai.com/codex/permissions",
 ]
 
+CREATION_CONTEXT_PATH = Path("Docs") / "Environment" / "CREATION_CONTEXT.md"
+
 PROFILES = {
     "software-development": Profile(
         slug="software-development",
@@ -143,8 +145,17 @@ def write(path: Path, text: str) -> None:
     path.write_text(text.strip() + "\n", encoding="utf-8")
 
 
-def ensure_target(target: Path, force: bool) -> None:
+def only_contains_creation_context(target: Path) -> bool:
+    files = [path.relative_to(target) for path in target.rglob("*") if path.is_file()]
+    if not files:
+        return True
+    return files == [CREATION_CONTEXT_PATH]
+
+
+def ensure_target(target: Path, force: bool, allow_creation_context: bool = False) -> None:
     if target.exists() and any(target.iterdir()):
+        if allow_creation_context and only_contains_creation_context(target):
+            return
         if not force:
             raise SystemExit(f"Target is not empty. Re-run with --force to replace it: {target}")
         shutil.rmtree(target)
@@ -165,6 +176,7 @@ def generate(
     profile_slug: str,
     force: bool,
     generated_date: str | None = None,
+    allow_creation_context: bool = False,
 ) -> None:
     profile = PROFILES.get(profile_slug)
     if not profile:
@@ -172,7 +184,7 @@ def generate(
         raise SystemExit(f"Unsupported --profile {profile_slug!r}. Supported profiles: {supported}")
 
     resolved_project_name = project_name or profile.default_project_name
-    ensure_target(target, force)
+    ensure_target(target, force, allow_creation_context)
     generated_at = generated_date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     write(
@@ -391,6 +403,8 @@ scoped permissions, compact core rules, and environment records.
         "Docs/Environment/SOURCE_MAP.md",
         "Docs/Environment/VALIDATION_REPORT.md",
     ]
+    if (target / CREATION_CONTEXT_PATH).exists():
+        manifest_entries.append("Docs/Environment/CREATION_CONTEXT.md")
     write(target / "Docs/Environment/MANIFEST.md", "# Manifest\n\n" + "\n".join(f"- {entry}" for entry in manifest_entries))
 
     write(target / "Docs/Environment/SOURCE_MAP.md", "# Source Map\n\n" + "\n".join(f"- {url}" for url in SOURCE_URLS))
@@ -424,6 +438,7 @@ def main() -> int:
     parser.add_argument("--profile", default="software-development", help="Deterministic profile to generate")
     parser.add_argument("--project-name", help="Human-readable project name")
     parser.add_argument("--generated-date", help="Override generated date for reproducible examples")
+    parser.add_argument("--allow-creation-context", action="store_true", help="Allow an existing target that only contains Docs/Environment/CREATION_CONTEXT.md")
     parser.add_argument("--force", action="store_true", help="Replace target if it already contains files")
     parser.add_argument("--list-profiles", action="store_true", help="List deterministic profiles and exit")
     args = parser.parse_args()
@@ -434,7 +449,14 @@ def main() -> int:
     if not args.target:
         parser.error("target is required unless --list-profiles is used")
 
-    generate(Path(args.target).resolve(), args.project_name, args.profile, args.force, args.generated_date)
+    generate(
+        Path(args.target).resolve(),
+        args.project_name,
+        args.profile,
+        args.force,
+        args.generated_date,
+        args.allow_creation_context,
+    )
     print(f"Generated minimal Codex harness at {Path(args.target).resolve()}")
     return 0
 

@@ -33,6 +33,9 @@ replacement. What is proven today:
 - `scripts/simulate_create_trigger.py` proves the deterministic `/create`
   preflight handoff by writing `Docs/Environment/CREATION_CONTEXT.md` for fresh,
   existing, hub, and resume scenarios.
+- `scripts/run_create_acceptance.py` stitches the trigger and preset generator
+  together in one target, preserving `CREATION_CONTEXT.md`, writing a complete
+  harness, and adding `CREATE_ACCEPTANCE_REPORT.md`.
 - Generated harnesses are required to include architecture, assumptions, source
   mapping, manifests, and validation reports.
 
@@ -136,6 +139,19 @@ python scripts/simulate_create_trigger.py /tmp/codex-create-trigger-example \
 This writes `Docs/Environment/CREATION_CONTEXT.md`, the artifact the orchestrator
 uses before profile selection, architecture, generation, and validation.
 
+To run the deterministic preset `/create` acceptance flow end to end:
+
+```bash
+python scripts/run_create_acceptance.py /tmp/codex-create-acceptance \
+  --profile software-development \
+  --project-type "Python CLI" \
+  --notes "release gate acceptance"
+```
+
+This writes the trigger context, generates the preset harness into the same
+target, evaluates it, smoke-checks it, and records
+`Docs/Environment/CREATE_ACCEPTANCE_REPORT.md`.
+
 ## Commands
 
 | Command | What it does |
@@ -220,6 +236,7 @@ This runs:
 - Deterministic profile generation, evaluation, and smoke checks.
 - Checked-in deterministic example evaluation and smoke checks.
 - `/create` trigger contract tests for CREATION_CONTEXT.md handoff scenarios.
+- Deterministic preset `/create` acceptance flow with final eval and smoke.
 - Contract and mutation tests.
 - Python compile checks.
 

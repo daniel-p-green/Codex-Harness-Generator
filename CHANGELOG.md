@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Added `scripts/eval_deterministic_profiles.py` so the release gate explicitly generates, evaluates, and smokes every deterministic profile.
 - Added `scripts/refresh_deterministic_examples.py` and checked-in deterministic example harnesses for each supported profile.
 - Added `scripts/simulate_create_trigger.py` and contract tests for the deterministic `/create` preflight handoff artifact.
+- Added `scripts/run_create_acceptance.py` for a deterministic preset `/create` acceptance flow that preserves trigger context, generates a harness, evaluates it, smokes it, and writes an acceptance report.
 
 ### Changed
 
