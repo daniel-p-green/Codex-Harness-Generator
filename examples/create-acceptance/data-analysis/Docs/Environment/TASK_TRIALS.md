@@ -8,7 +8,7 @@ ideas from repeated friction.
 Append entries manually or with:
 
 ```bash
-python scripts/record-task-trial.py --task "short task" --outcome success --evidence "artifact or file inspected" --verification "command or review completed" --privacy-review "public-safe summary only"
+python scripts/record-task-trial.py --task "short task" --outcome success --evidence "artifact or file inspected" --verification "command or review completed" --privacy-review "public-safe summary only" --limitations "one task, not longitudinal proof"
 ```
 
 Summarize recorded trials with:

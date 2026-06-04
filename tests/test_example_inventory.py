@@ -31,6 +31,7 @@ class ExampleInventoryTests(unittest.TestCase):
         self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
         payload = json.loads(completed.stdout)
         self.assertEqual("pass", payload["status"], payload)
+        self.assertEqual(5, payload["fixture_count"], payload)
         self.assertEqual(20, payload["profile_count"], payload)
         self.assertEqual(4, payload["brief_example_count"], payload)
         self.assertEqual(0, payload["failure_count"], payload)
@@ -55,6 +56,32 @@ class ExampleInventoryTests(unittest.TestCase):
         self.assertIn("profile_directory", checks)
         self.assertIn("root_entry", checks)
         self.assertIn("required_path", checks)
+
+    def test_inventory_rejects_stale_generated_recorder_contract(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            target = Path(temp_dir) / "example"
+            recorder = target / "scripts" / "record-task-trial.py"
+            task_trials = target / "Docs" / "Environment" / "TASK_TRIALS.md"
+            getting_started = target / "Docs" / "GETTING_STARTED.md"
+            recorder.parent.mkdir(parents=True)
+            task_trials.parent.mkdir(parents=True)
+            getting_started.parent.mkdir(parents=True, exist_ok=True)
+            recorder.write_text(
+                "parser.add_argument(\"--limitations\", default=\"\")\n"
+                "f\"- Limitations: {args.limitations or 'none stated'}\"\n",
+                encoding="utf-8",
+            )
+            task_trials.write_text("Record task trials without the new field.\n", encoding="utf-8")
+            getting_started.write_text("Record task trials without the new field.\n", encoding="utf-8")
+
+            failures = check_example_inventory.check_generated_contract("examples/test", target)
+
+        checks = {failure.check for failure in failures}
+        messages = "\n".join(failure.message for failure in failures)
+        self.assertEqual({"generated_contract"}, checks)
+        self.assertIn("missing contract snippet", messages)
+        self.assertIn("stale snippet", messages)
+        self.assertIn("--limitations field", messages)
 
 
 if __name__ == "__main__":

@@ -14,9 +14,17 @@ from refresh_brief_acceptance_examples import BRIEF_EXAMPLES
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+FIXTURE_ROOT = REPO_ROOT / "tests" / "fixtures" / "generated_harnesses"
 DETERMINISTIC_EXAMPLE_ROOT = REPO_ROOT / "examples" / "deterministic"
 CREATE_ACCEPTANCE_EXAMPLE_ROOT = REPO_ROOT / "examples" / "create-acceptance"
 BRIEF_ACCEPTANCE_EXAMPLE_ROOT = REPO_ROOT / "examples" / "brief-acceptance"
+FIXTURE_PROFILES = (
+    "knowledge-work-basic",
+    "multi-area-hub",
+    "nontechnical-user-basic",
+    "security-audit-basic",
+    "software-dev-basic",
+)
 
 REQUIRED_HARNESS_PATHS = (
     "AGENTS.md",
@@ -51,6 +59,19 @@ CREATE_ACCEPTANCE_REQUIRED_PATHS = (
 
 BRIEF_ACCEPTANCE_REQUIRED_PATHS = CREATE_ACCEPTANCE_REQUIRED_PATHS + (
     "Docs/Environment/PROFILE_SELECTION.md",
+)
+
+RECORDER_REQUIRED_SNIPPETS = (
+    "import json",
+    "def append_entry(args: argparse.Namespace) -> tuple[Path, dict[str, str]]:",
+    'parser.add_argument("--limitations", required=True',
+    'parser.add_argument("--json", action="store_true"',
+    'json.dumps({"status": "pass"',
+)
+
+RECORDER_FORBIDDEN_SNIPPETS = (
+    "args.limitations or 'none stated'",
+    'parser.add_argument("--limitations", default=""',
 )
 
 
@@ -166,6 +187,52 @@ def check_root(root: Path, expected_profiles: tuple[str, ...], required_paths: t
                         message="Required checked-in generated example path is missing.",
                     )
                 )
+        failures.extend(check_generated_contract(root_label, target))
+
+    return failures
+
+
+def check_generated_contract(root_label: str, target: Path) -> list[InventoryFailure]:
+    failures: list[InventoryFailure] = []
+    recorder_path = target / "scripts" / "record-task-trial.py"
+    task_trials_path = target / "Docs" / "Environment" / "TASK_TRIALS.md"
+    getting_started_path = target / "Docs" / "GETTING_STARTED.md"
+
+    if recorder_path.exists():
+        recorder = recorder_path.read_text(encoding="utf-8")
+        for snippet in RECORDER_REQUIRED_SNIPPETS:
+            if snippet not in recorder:
+                failures.append(
+                    InventoryFailure(
+                        root=root_label,
+                        check="generated_contract",
+                        path=rel(recorder_path),
+                        message=f"Generated task-trial recorder is missing contract snippet: {snippet}",
+                    )
+                )
+        for snippet in RECORDER_FORBIDDEN_SNIPPETS:
+            if snippet in recorder:
+                failures.append(
+                    InventoryFailure(
+                        root=root_label,
+                        check="generated_contract",
+                        path=rel(recorder_path),
+                        message=f"Generated task-trial recorder still contains stale snippet: {snippet}",
+                    )
+                )
+
+    for doc_path in (task_trials_path, getting_started_path):
+        if doc_path.exists():
+            doc = doc_path.read_text(encoding="utf-8")
+            if "--limitations" not in doc:
+                failures.append(
+                    InventoryFailure(
+                        root=root_label,
+                        check="generated_contract",
+                        path=rel(doc_path),
+                        message="Generated task-trial docs must show the required --limitations field.",
+                    )
+                )
 
     return failures
 
@@ -173,6 +240,7 @@ def check_root(root: Path, expected_profiles: tuple[str, ...], required_paths: t
 def check_inventory() -> dict:
     profiles = tuple(sorted(PROFILES))
     brief_examples = tuple(example.slug for example in BRIEF_EXAMPLES)
+    fixture_failures = check_root(FIXTURE_ROOT, FIXTURE_PROFILES, REQUIRED_HARNESS_PATHS)
     deterministic_failures = check_root(DETERMINISTIC_EXAMPLE_ROOT, profiles, REQUIRED_HARNESS_PATHS)
     create_failures = check_root(
         CREATE_ACCEPTANCE_EXAMPLE_ROOT,
@@ -184,12 +252,14 @@ def check_inventory() -> dict:
         brief_examples,
         REQUIRED_HARNESS_PATHS + BRIEF_ACCEPTANCE_REQUIRED_PATHS,
     )
-    failures = deterministic_failures + create_failures + brief_failures
+    failures = fixture_failures + deterministic_failures + create_failures + brief_failures
     return {
         "status": "pass" if not failures else "fail",
+        "fixture_count": len(FIXTURE_PROFILES),
         "profile_count": len(profiles),
         "brief_example_count": len(brief_examples),
         "roots": [
+            rel(FIXTURE_ROOT),
             rel(DETERMINISTIC_EXAMPLE_ROOT),
             rel(CREATE_ACCEPTANCE_EXAMPLE_ROOT),
             rel(BRIEF_ACCEPTANCE_EXAMPLE_ROOT),

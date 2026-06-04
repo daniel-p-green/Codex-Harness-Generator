@@ -499,6 +499,8 @@ class GeneratedHarnessContractTests(unittest.TestCase):
                 "python scripts/check-harness.py",
                 "--privacy-review",
                 "Public-safe synthetic task only.",
+                "--limitations",
+                "One local task trial.",
             ],
             cwd=target,
             text=True,
