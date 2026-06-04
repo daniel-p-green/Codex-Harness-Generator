@@ -1,0 +1,37 @@
+model = "gpt-5.5-codex"
+model_reasoning_effort = "medium"
+model_verbosity = "medium"
+approval_policy = "on-request"
+default_permissions = "project_workspace"
+
+[env]
+CODEX_EXPERIMENTAL_AGENT_TEAMS = "1"
+CODEX_AUTOCOMPACT_PCT_OVERRIDE = "90"
+
+[permissions.project_workspace.filesystem]
+glob_scan_max_depth = 6
+
+[permissions.project_workspace.filesystem.":workspace_roots"]
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"**/*secret*" = "deny"
+"**/*token*" = "deny"
+"**/*credential*" = "deny"
+"**/*.pem" = "deny"
+"**/*.key" = "deny"
+"**/Docs/_working/**" = "allow"
+
+[permissions.project_workspace.network]
+"enabled" = false
+
+[agents.markdown-auditor]
+config_file = "agents/markdown-auditor.toml"
+
+[agents.summary-writer]
+config_file = "agents/summary-writer.toml"
+
+[[skills.config]]
+path = "../.agents/skills/audit-todos"
+
+[[skills.config]]
+path = "../.agents/skills/write-cleanup-summary"

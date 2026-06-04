@@ -13,12 +13,16 @@ Each captured example must include `Docs/Environment/CREATION_CONTEXT.md`; that
 file is the trigger handoff artifact that distinguishes a `/create` pipeline
 capture from a generic generated harness.
 
+See `INDEX.md` for the checked-in capture matrix.
+
 Use the capture helper to package a generated target:
 
 ```bash
 python scripts/capture_live_create_example.py /tmp/codex-live-target \
   --capture-name synthetic-python-cli \
   --project-brief "Synthetic Python CLI utility for local file cleanup" \
+  --project-type "Python CLI" \
+  --notes "public-safe live-create capture" \
   --source-label "temporary synthetic target" \
   --force
 ```
@@ -29,6 +33,8 @@ To launch an authenticated Codex CLI run first, add `--run-codex`:
 python scripts/capture_live_create_example.py /tmp/codex-live-target \
   --capture-name synthetic-python-cli \
   --project-brief "Synthetic Python CLI utility for local file cleanup" \
+  --project-type "Python CLI" \
+  --notes "public-safe live-create capture" \
   --source-label "temporary synthetic target" \
   --run-codex \
   --force

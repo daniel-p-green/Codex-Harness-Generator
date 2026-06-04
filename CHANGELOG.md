@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Added `Docs/Environment/PROOF_MATRIX.md` to map public claims to evidence artifacts, commands, proven scope, and remaining product-proof gaps.
 - Added `scripts/capture_live_create_example.py` and `examples/live-create/README.md` for sanitized live `/create` capture packaging.
 - Added a checked-in sanitized live `/create` capture and offline eval/smoke coverage for live-create examples.
+- Added three checked-in sanitized live `/create` captures covering knowledge work, Python CLI, and data analysis.
 
 ### Changed
 

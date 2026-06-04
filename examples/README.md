@@ -12,7 +12,8 @@ This directory contains checked-in example generated environments.
   `python scripts/refresh_create_acceptance_examples.py`.
 - `live-create/` is reserved for sanitized examples from live, model-mediated
   `/create` runs. Package them with
-  `python scripts/capture_live_create_example.py`.
+  `python scripts/capture_live_create_example.py`; see
+  `live-create/INDEX.md` for checked-in captures.
 
 For fast local examples without waiting on the full model-mediated path, use the
 deterministic profile generator:

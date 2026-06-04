@@ -1,0 +1,9 @@
+Docs/_working/
+data/raw/*.csv
+data/processed/*.csv
+reports/weekly/*.tmp
+*.log
+.DS_Store
+__pycache__/
+.pytest_cache/
+

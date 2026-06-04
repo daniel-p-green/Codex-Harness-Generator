@@ -64,6 +64,8 @@ class LiveCreateCaptureTests(unittest.TestCase):
                 captured="2026-06-04T12:00:00Z",
                 source_label="temporary synthetic target",
                 allow_missing_creation_context=False,
+                project_type="Python CLI",
+                notes="synthetic live-create capture test",
             )
 
             capture = output_root / "synthetic-cleanup-cli"
@@ -71,6 +73,8 @@ class LiveCreateCaptureTests(unittest.TestCase):
             self.assertTrue((capture / "AGENTS.md").is_file())
             self.assertFalse((capture / ".env").exists())
             self.assertFalse((capture / "Docs/_working").exists())
+            architecture = (capture / "Docs/Environment/ARCHITECTURE.md").read_text(encoding="utf-8")
+            self.assertNotIn("Docs/_working/", architecture)
             report = capture / "Docs/Environment/LIVE_CREATE_CAPTURE.md"
             self.assertTrue(report.is_file())
             report_text = report.read_text(encoding="utf-8")
@@ -84,6 +88,7 @@ class LiveCreateCaptureTests(unittest.TestCase):
             self.assertNotIn(" from /", context_text)
             manifest = (capture / "Docs/Environment/MANIFEST.md").read_text(encoding="utf-8")
             self.assertIn("- Docs/Environment/LIVE_CREATE_CAPTURE.md", manifest)
+            self.assertNotIn("Docs/_working/", manifest)
 
     def test_run_codex_create_uses_constrained_non_interactive_command(self):
         completed = subprocess.CompletedProcess(args=[], returncode=0, stdout="created\n", stderr="")
@@ -94,6 +99,9 @@ class LiveCreateCaptureTests(unittest.TestCase):
                 result = capture_live_create_example.run_codex_create(
                     target=target,
                     project_brief="Synthetic docs workspace",
+                    project_type="Knowledge work",
+                    notes="public-safe docs capture",
+                    source_label="temporary synthetic target",
                     timeout=60,
                     model="gpt-5.5-codex",
                 )
@@ -117,6 +125,9 @@ class LiveCreateCaptureTests(unittest.TestCase):
         self.assertIn("CREATION_CONTEXT.md", prompt)
         self.assertIn("generate_minimal_harness.py", prompt)
         self.assertIn("Synthetic docs workspace", prompt)
+        self.assertIn("--project-type 'Knowledge work'", prompt)
+        self.assertIn("--notes 'public-safe docs capture'", prompt)
+        self.assertIn("--target-label 'temporary synthetic target'", prompt)
 
 
 if __name__ == "__main__":

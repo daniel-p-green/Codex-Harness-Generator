@@ -1,0 +1,53 @@
+model = "gpt-5"
+model_reasoning_effort = "medium"
+model_verbosity = "medium"
+approval_policy = "on-request"
+default_permissions = "synthetic_workspace"
+
+[features]
+hooks = true
+
+[permissions.synthetic_workspace]
+[permissions.synthetic_workspace.filesystem]
+glob_scan_max_depth = 6
+[permissions.synthetic_workspace.filesystem.":workspace_roots"]
+"**/.env*" = "deny"
+"**/*secret*" = "deny"
+"**/*token*" = "deny"
+"**/*credential*" = "deny"
+"**/*.pem" = "deny"
+"**/*.key" = "deny"
+"Docs/_working/**" = "allow"
+"data/**" = "allow"
+"reports/**" = "allow"
+"*.md" = "allow"
+".codex/**" = "allow"
+".agents/**" = "allow"
+
+[[hooks.InstructionsLoaded]]
+command = "python .codex/hooks/self_learning_check.py"
+
+[agents.csv-quality-analyst]
+config_file = "agents/csv-quality-analyst.toml"
+
+[agents.weekly-metrics-summarizer]
+config_file = "agents/weekly-metrics-summarizer.toml"
+
+[agents.report-note-writer]
+config_file = "agents/report-note-writer.toml"
+
+[[skills.config]]
+path = "../.agents/skills/data-quality-check"
+
+[[skills.config]]
+path = "../.agents/skills/summarize-week"
+
+[[skills.config]]
+path = "../.agents/skills/chart-notes"
+
+[[skills.config]]
+path = "../.agents/skills/state-save"
+
+[[skills.config]]
+path = "../.agents/skills/state-load"
+

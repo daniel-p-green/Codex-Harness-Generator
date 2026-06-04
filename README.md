@@ -42,16 +42,17 @@ replacement. What is proven today:
   mapping, manifests, and validation reports.
 - `scripts/capture_live_create_example.py` provides a repeatable packaging path
   for sanitized live `/create` outputs.
+- `examples/live-create/` contains three sanitized live model-mediated `/create`
+  captures: knowledge work, Python CLI, and data analysis.
 
 What still needs product proof:
 
-- Several fresh live `/create` runs in temporary projects.
-- Checked-in public example harnesses from the full `/create` flow, beyond
-  deterministic profile scaffolds.
-- Real use of generated harnesses on real Codex tasks.
+- Real use of generated harnesses on real Codex tasks over time.
+- More live examples for specialized or higher-risk domains.
 
-Until those live examples exist, treat the eval suite and golden fixtures as
-structural proof, not end-to-end product proof.
+Until those real-world usage records exist, treat the eval suite, golden
+fixtures, deterministic examples, and synthetic live examples as strong product
+proof, not a guarantee that every future `/create` run will be ideal.
 
 For a claim-by-claim evidence map, see
 `Docs/Environment/PROOF_MATRIX.md`.
@@ -173,6 +174,8 @@ To package a sanitized live `/create` output after it has passed eval and smoke:
 python scripts/capture_live_create_example.py /tmp/codex-live-target \
   --capture-name synthetic-python-cli \
   --project-brief "Synthetic Python CLI utility for local file cleanup" \
+  --project-type "Python CLI" \
+  --notes "public-safe live-create capture" \
   --source-label "temporary synthetic target" \
   --force
 ```

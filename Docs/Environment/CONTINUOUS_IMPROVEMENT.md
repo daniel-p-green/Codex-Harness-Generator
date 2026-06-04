@@ -45,6 +45,8 @@ For public product-proof examples, capture only sanitized live `/create` outputs
 python scripts/capture_live_create_example.py /tmp/codex-live-target \
   --capture-name synthetic-python-cli \
   --project-brief "Synthetic Python CLI utility for local file cleanup" \
+  --project-type "Python CLI" \
+  --notes "public-safe live-create capture" \
   --source-label "temporary synthetic target" \
   --run-codex \
   --force

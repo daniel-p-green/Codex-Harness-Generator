@@ -34,7 +34,10 @@ class RunEvalsTests(unittest.TestCase):
     def test_live_create_example_paths_include_checked_in_captures(self):
         paths = run_evals.live_create_example_paths()
 
+        self.assertGreaterEqual(len(paths), 3)
         self.assertTrue(any(path.endswith("examples/live-create/synthetic-markdown-notes") for path in paths))
+        self.assertTrue(any(path.endswith("examples/live-create/synthetic-python-cli") for path in paths))
+        self.assertTrue(any(path.endswith("examples/live-create/synthetic-data-review") for path in paths))
 
 
 if __name__ == "__main__":

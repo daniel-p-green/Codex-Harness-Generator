@@ -1,0 +1,16 @@
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+*.pyc
+.env
+.env.*
+*.pem
+*.key
+Docs/_working/
+cleanup-summary*.md
