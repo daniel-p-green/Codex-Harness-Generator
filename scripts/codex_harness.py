@@ -557,6 +557,8 @@ def build_command(args: argparse.Namespace) -> list[str]:
         command = []
         if args.record_dir:
             command.extend(["--record-dir", args.record_dir])
+        if args.usage_record_dir:
+            command.extend(["--usage-record-dir", args.usage_record_dir])
         if args.report:
             command.extend(["--report", args.report])
         if args.no_write:
@@ -569,6 +571,8 @@ def build_command(args: argparse.Namespace) -> list[str]:
         command = ["--update", args.slug, "--status", args.status]
         if args.record_dir:
             command.extend(["--record-dir", args.record_dir])
+        if args.usage_record_dir:
+            command.extend(["--usage-record-dir", args.usage_record_dir])
         if args.report:
             command.extend(["--report", args.report])
         if args.notes:
@@ -1072,6 +1076,7 @@ def make_parser() -> argparse.ArgumentParser:
 
     pilot_board = subparsers.add_parser("pilot-board", help="Summarize prepared pilot tracking records")
     pilot_board.add_argument("--record-dir", help="Directory where prepared pilot JSON records are read")
+    pilot_board.add_argument("--usage-record-dir", help="Directory where converted usage record JSON files are read")
     pilot_board.add_argument("--report", help="Pilot board Markdown path")
     pilot_board.add_argument("--no-write", action="store_true", help="Do not write the Markdown board")
     pilot_board.add_argument("--json", action="store_true", help="Emit JSON payload")
@@ -1080,6 +1085,7 @@ def make_parser() -> argparse.ArgumentParser:
     pilot_update.add_argument("slug", help="Pilot record slug")
     pilot_update.add_argument("--status", choices=["completed", "converted", "dropped", "invited", "prepared"], required=True)
     pilot_update.add_argument("--record-dir", help="Directory where prepared pilot JSON records are read")
+    pilot_update.add_argument("--usage-record-dir", help="Directory where converted usage record JSON files are read")
     pilot_update.add_argument("--report", help="Pilot board Markdown path")
     pilot_update.add_argument("--notes", help="Public-safe status update note")
     pilot_update.add_argument("--usage-record", help="Usage record slug or path required when --status converted")

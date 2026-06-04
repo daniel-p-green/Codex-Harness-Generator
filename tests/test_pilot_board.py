@@ -44,6 +44,30 @@ class PilotBoardTests(unittest.TestCase):
             "claim_boundary": "Preparing the next pilot is not usage proof until converted into a checked usage record.",
         }
 
+    def usage_record(self, slug: str = "llm-app-pilot") -> dict:
+        return {
+            "slug": slug,
+            "title": "LLM app pilot",
+            "generated": "2026-06-04T14:00:00Z",
+            "domain": "LLM app",
+            "harness_path": "public pilot harness",
+            "task_summary": "Reporter completed one privacy-safe LLM app pilot task.",
+            "outcome": "success",
+            "evidence_type": "sanitized",
+            "source_type": "external",
+            "generation_path": "installed-quickstart",
+            "evidence": ["public-safe artifact reviewed", "local eval report passed"],
+            "verification": ["task trial recorded", "privacy review completed"],
+            "privacy_review": "Public-safe summary only; no secrets, personal data, private paths, proprietary source, or raw logs.",
+            "limitations": ["Single external pilot task."],
+        }
+
+    def write_usage_record(self, root: Path, payload: dict | None = None) -> Path:
+        record = payload or self.usage_record()
+        path = root / f"{record['slug']}.json"
+        path.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+        return path
+
     def test_build_record_from_prepared_pilot_payload(self):
         record = pilot_board.build_record(self.pilot_payload(), notes="sent to reporter")
 
@@ -120,9 +144,14 @@ class PilotBoardTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 pilot_board.update_record_file(record_dir, "llm-app-pilot", "converted")
 
-    def test_update_record_file_allows_converted_with_usage_record(self):
+    def test_update_record_file_allows_converted_with_valid_usage_record(self):
         with tempfile.TemporaryDirectory() as temp_dir:
-            record_dir = Path(temp_dir)
+            root = Path(temp_dir)
+            record_dir = root / "pilot-records"
+            usage_record_dir = root / "usage-records"
+            record_dir.mkdir()
+            usage_record_dir.mkdir()
+            self.write_usage_record(usage_record_dir)
             record = pilot_board.build_record(self.pilot_payload(), status="completed")
             (record_dir / "llm-app-pilot.json").write_text(json.dumps(record) + "\n", encoding="utf-8")
 
@@ -130,16 +159,54 @@ class PilotBoardTests(unittest.TestCase):
                 record_dir,
                 "llm-app-pilot",
                 "converted",
-                usage_record="Docs/Environment/usage-records/llm-app-pilot.json",
+                usage_record="llm-app-pilot",
                 updated="2026-06-04T14:00:00Z",
+                usage_record_dir=usage_record_dir,
             )
-            payload = pilot_board.build_payload(record_dir)
+            payload = pilot_board.build_payload(record_dir, usage_record_dir=usage_record_dir)
             updated_record = payload["records"][0]
 
         self.assertEqual("pass", payload["status"])
         self.assertEqual("pilot-funnel-clear", payload["readiness"])
+        self.assertEqual(1, payload["summary"]["converted_validated"])
         self.assertEqual("converted", updated_record["status"])
-        self.assertEqual("Docs/Environment/usage-records/llm-app-pilot.json", updated_record["usage_record"])
+        self.assertEqual("llm-app-pilot", updated_record["usage_record"])
+        self.assertIn("llm-app-pilot.json", updated_record["_validated_usage_record"])
+
+    def test_build_payload_fails_converted_pilot_with_missing_usage_record(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            record_dir = root / "pilot-records"
+            usage_record_dir = root / "usage-records"
+            record_dir.mkdir()
+            usage_record_dir.mkdir()
+            record = pilot_board.build_record(self.pilot_payload(), status="converted")
+            record["usage_record"] = "missing-usage"
+            (record_dir / "llm-app-pilot.json").write_text(json.dumps(record) + "\n", encoding="utf-8")
+
+            payload = pilot_board.build_payload(record_dir, usage_record_dir=usage_record_dir)
+
+        self.assertEqual("fail", payload["status"])
+        self.assertTrue(any("usage_record not found" in error for error in payload["errors"]))
+
+    def test_build_payload_fails_converted_pilot_with_mismatched_usage_record(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            record_dir = root / "pilot-records"
+            usage_record_dir = root / "usage-records"
+            record_dir.mkdir()
+            usage_record_dir.mkdir()
+            usage = self.usage_record()
+            usage["domain"] = "security audit"
+            self.write_usage_record(usage_record_dir, usage)
+            record = pilot_board.build_record(self.pilot_payload(), status="converted")
+            record["usage_record"] = "llm-app-pilot"
+            (record_dir / "llm-app-pilot.json").write_text(json.dumps(record) + "\n", encoding="utf-8")
+
+            payload = pilot_board.build_payload(record_dir, usage_record_dir=usage_record_dir)
+
+        self.assertEqual("fail", payload["status"])
+        self.assertTrue(any("domain mismatch" in error for error in payload["errors"]))
 
     def test_write_report_outputs_board_boundary(self):
         with tempfile.TemporaryDirectory() as temp_dir:

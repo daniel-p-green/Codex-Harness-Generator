@@ -1,6 +1,6 @@
 # Pilot Board
 
-Generated: 2026-06-04T13:09:42Z
+Generated: 2026-06-04T13:15:52Z
 Status: PASS
 Readiness: no-pilots-prepared
 
@@ -11,6 +11,7 @@ Pilot-board records track outreach and completion state only; they are not usage
 - Total pilot records: 0
 - Pending outreach or reporter work: 0
 - Completed but not converted: 0
+- Converted with validated usage records: 0
 - External or multi-project pilots: 0
 - Installed brief-based generation pilots: 0
 - Distinct domains: 0

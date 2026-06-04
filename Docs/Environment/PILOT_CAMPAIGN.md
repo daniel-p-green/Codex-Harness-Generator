@@ -1,6 +1,6 @@
 # External Pilot Campaign
 
-Generated: 2026-06-04T13:09:42Z
+Generated: 2026-06-04T13:15:52Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 

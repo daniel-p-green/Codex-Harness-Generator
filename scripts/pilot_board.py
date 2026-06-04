@@ -8,6 +8,9 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from validate_usage_records import DEFAULT_RECORD_DIR as DEFAULT_USAGE_RECORD_DIR
+from validate_usage_records import validate_record_file
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_RECORD_DIR = REPO_ROOT / "Docs" / "Environment" / "pilot-records"
@@ -63,6 +66,59 @@ def write_record(path: Path, record: dict, force: bool = False) -> dict:
     return {"status": "pass", "path": path.as_posix()}
 
 
+def unique_paths(paths: list[Path]) -> list[Path]:
+    seen = set()
+    unique = []
+    for path in paths:
+        key = path.as_posix()
+        if key not in seen:
+            seen.add(key)
+            unique.append(path)
+    return unique
+
+
+def usage_record_candidates(usage_record_dir: Path, value: str) -> list[Path]:
+    if not value.strip():
+        return []
+    raw = Path(value)
+    if raw.is_absolute():
+        return [raw]
+    if raw.suffix == ".json" or len(raw.parts) > 1:
+        return unique_paths([REPO_ROOT / raw, usage_record_dir / raw.name])
+    return unique_paths([usage_record_dir / f"{value}.json", usage_record_dir / value])
+
+
+def resolve_usage_record_path(usage_record_dir: Path, value: str) -> Path | None:
+    for candidate in usage_record_candidates(usage_record_dir, value):
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def validate_converted_usage_record(record: dict, path: Path, usage_record_dir: Path) -> tuple[list[str], str]:
+    if record.get("status") != "converted":
+        return [], ""
+    usage_record = str(record.get("usage_record", "")).strip()
+    resolved = resolve_usage_record_path(usage_record_dir, usage_record)
+    if not resolved:
+        return [f"{path.name}: converted usage_record not found: {usage_record}"], ""
+
+    validation = validate_record_file(resolved)
+    if validation["status"] != "pass":
+        return [f"{path.name}: converted usage_record is invalid: {validation['error']}"], resolved.as_posix()
+
+    payload = json.loads(resolved.read_text(encoding="utf-8"))
+    errors = []
+    for field in ("domain", "source_type", "generation_path"):
+        pilot_value = str(record.get(field, "")).strip().casefold()
+        usage_value = str(payload.get(field, "")).strip().casefold()
+        if pilot_value != usage_value:
+            errors.append(
+                f"{path.name}: converted usage_record {field} mismatch: pilot={record.get(field)!r} usage={payload.get(field)!r}"
+            )
+    return errors, resolved.as_posix()
+
+
 def read_record(path: Path) -> dict:
     if not path.exists():
         raise SystemExit(f"Pilot record does not exist: {path.as_posix()}")
@@ -108,12 +164,17 @@ def update_record_file(
     notes: str = "",
     usage_record: str = "",
     updated: str | None = None,
+    usage_record_dir: Path = DEFAULT_USAGE_RECORD_DIR,
 ) -> dict:
     path = default_record_path(record_dir, slug)
     record = update_record(read_record(path), status, notes=notes, usage_record=usage_record, updated=updated)
     errors = validate_record(record, path)
+    conversion_errors, usage_record_path = validate_converted_usage_record(record, path, usage_record_dir)
+    errors.extend(conversion_errors)
     if errors:
         raise SystemExit("Updated pilot record is invalid: " + "; ".join(errors))
+    if usage_record_path:
+        record["validated_usage_record"] = usage_record_path
     path.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return {"status": "pass", "path": path.as_posix(), "record": record}
 
@@ -147,7 +208,7 @@ def validate_record(record: dict, path: Path) -> list[str]:
     return errors
 
 
-def load_records(record_dir: Path) -> tuple[list[dict], list[str]]:
+def load_records(record_dir: Path, usage_record_dir: Path = DEFAULT_USAGE_RECORD_DIR) -> tuple[list[dict], list[str]]:
     records = []
     errors = []
     if not record_dir.exists():
@@ -160,6 +221,10 @@ def load_records(record_dir: Path) -> tuple[list[dict], list[str]]:
             continue
         record["_path"] = path.as_posix()
         errors.extend(validate_record(record, path))
+        conversion_errors, usage_record_path = validate_converted_usage_record(record, path, usage_record_dir)
+        errors.extend(conversion_errors)
+        if usage_record_path:
+            record["_validated_usage_record"] = usage_record_path
         records.append(record)
     return records, errors
 
@@ -176,6 +241,7 @@ def summarize(records: list[dict]) -> dict:
         "statuses": status_counts,
         "pending": status_counts["prepared"] + status_counts["invited"],
         "completed_not_converted": status_counts["completed"],
+        "converted_validated": sum(1 for record in records if record.get("status") == "converted" and record.get("_validated_usage_record")),
         "external_or_multi_project": sum(
             1 for record in records if record.get("source_type") in {"external", "multi-project"}
         ),
@@ -187,8 +253,8 @@ def summarize(records: list[dict]) -> dict:
     }
 
 
-def build_payload(record_dir: Path) -> dict:
-    records, errors = load_records(record_dir)
+def build_payload(record_dir: Path, usage_record_dir: Path = DEFAULT_USAGE_RECORD_DIR) -> dict:
+    records, errors = load_records(record_dir, usage_record_dir=usage_record_dir)
     summary = summarize(records)
     status = "pass" if not errors else "fail"
     if summary["total"] == 0:
@@ -204,6 +270,7 @@ def build_payload(record_dir: Path) -> dict:
         "status": status,
         "readiness": readiness,
         "record_dir": record_dir.as_posix(),
+        "usage_record_dir": usage_record_dir.as_posix(),
         "summary": summary,
         "records": records,
         "errors": errors,
@@ -227,6 +294,7 @@ def write_report(path: Path, payload: dict) -> None:
         f"- Total pilot records: {summary['total']}",
         f"- Pending outreach or reporter work: {summary['pending']}",
         f"- Completed but not converted: {summary['completed_not_converted']}",
+        f"- Converted with validated usage records: {summary['converted_validated']}",
         f"- External or multi-project pilots: {summary['external_or_multi_project']}",
         f"- Installed brief-based generation pilots: {summary['installed_brief_generation']}",
         f"- Distinct domains: {summary['distinct_domains']}",
@@ -262,6 +330,7 @@ def write_report(path: Path, payload: dict) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--record-dir", default=DEFAULT_RECORD_DIR.as_posix())
+    parser.add_argument("--usage-record-dir", default=DEFAULT_USAGE_RECORD_DIR.as_posix())
     parser.add_argument("--report", default=DEFAULT_REPORT.as_posix())
     parser.add_argument("--update", help="Pilot slug to update before writing the board")
     parser.add_argument("--status", choices=sorted(ALLOWED_STATUSES), help="New status for --update")
@@ -274,6 +343,7 @@ def main() -> int:
 
     update_payload = None
     record_dir = Path(args.record_dir)
+    usage_record_dir = Path(args.usage_record_dir)
     if args.update:
         if not args.status:
             raise SystemExit("--status is required with --update.")
@@ -284,9 +354,10 @@ def main() -> int:
             notes=args.notes,
             usage_record=args.usage_record,
             updated=args.updated,
+            usage_record_dir=usage_record_dir,
         )
 
-    payload = build_payload(record_dir)
+    payload = build_payload(record_dir, usage_record_dir=usage_record_dir)
     if update_payload:
         payload["update"] = update_payload
     if not args.no_write:
