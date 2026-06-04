@@ -157,7 +157,7 @@ class PilotGithubSyncTests(unittest.TestCase):
             self.write_pilot_record(root)
 
             payload = sync_pilot_github_issues.build_payload(
-                self.args(root),
+                self.args(root, repo="example/repo", gh_bin="/tmp/fake-gh"),
                 fetch_issue=lambda *args, **kwargs: self.github_payload(),
             )
 
@@ -168,6 +168,8 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertEqual("waiting-for-reporter", record["readiness"])
         self.assertIn("outcome", record["missing_fields"])
         self.assertIn("usage-from-github-issue https://github.com/example/repo/issues/42", record["commands"]["convert"])
+        self.assertIn("--repo example/repo", record["commands"]["convert"])
+        self.assertIn("--gh-bin /tmp/fake-gh", record["commands"]["convert"])
         self.assertIn("Please reply with the missing public-safe sections", record["reporter_followup"])
         self.assertIn("### Evidence", record["reporter_followup"])
         self.assertIn("at least two public-safe bullets", record["reporter_followup"])
@@ -190,6 +192,53 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertEqual([], record["missing_fields"])
         self.assertEqual(1, record["github_issue"]["comment_count"])
         self.assertIn("No reporter follow-up needed", record["reporter_followup"])
+
+    def test_conversion_ready_issue_can_be_converted_and_updates_pilot_board(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_pilot_record(root)
+            github_payload = self.github_payload(comments=[{"body": COMPLETION_COMMENT}])
+
+            sync_payload = sync_pilot_github_issues.build_payload(
+                self.args(root),
+                fetch_issue=lambda *args, **kwargs: github_payload,
+            )
+            convert_payload = sync_pilot_github_issues.usage_from_github_issue.build_payload(
+                argparse.Namespace(
+                    issue=sync_payload["records"][0]["issue_url"],
+                    repo=None,
+                    gh_bin="gh",
+                    include_comments=True,
+                    slug=None,
+                    title=None,
+                    harness_label=None,
+                    source_type=None,
+                    generation_path=None,
+                    generated="2026-06-04T00:00:00Z",
+                    record_dir=(root / "usage-records").as_posix(),
+                    report=(root / "USAGE_RECORDS.md").as_posix(),
+                    pilot_record_dir=(root / "pilot-records").as_posix(),
+                    pilot_board_report=(root / "PILOT_BOARD.md").as_posix(),
+                    pilot_notes="converted after pilot GitHub sync",
+                    force=False,
+                    lint_only=False,
+                    no_write=False,
+                    json=True,
+                ),
+                github_payload=github_payload,
+            )
+            usage_record = root / "usage-records" / "llm-app-pilot.json"
+            usage_record_exists = usage_record.exists()
+            pilot_record = json.loads((root / "pilot-records" / "llm-app-pilot.json").read_text(encoding="utf-8"))
+
+        self.assertEqual("conversion-ready", sync_payload["readiness"], sync_payload)
+        self.assertEqual("pass", convert_payload["status"], convert_payload)
+        self.assertTrue(convert_payload["written"])
+        self.assertTrue(usage_record_exists)
+        self.assertEqual("llm-app-pilot", convert_payload["record"]["slug"])
+        self.assertEqual("converted", pilot_record["status"])
+        self.assertEqual("llm-app-pilot", pilot_record["usage_record"])
+        self.assertEqual("pass", convert_payload["pilot_update"]["board_status"])
 
     def test_write_report_includes_claim_boundary_and_commands(self):
         with tempfile.TemporaryDirectory() as temp_dir:

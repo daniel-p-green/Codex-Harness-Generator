@@ -86,6 +86,10 @@ def conversion_command(issue_url: str, args: argparse.Namespace, *, lint_only: b
         "--pilot-board-report",
         args.pilot_board_report,
     ]
+    if args.repo:
+        parts.extend(["--repo", args.repo])
+    if args.gh_bin and args.gh_bin != "gh":
+        parts.extend(["--gh-bin", args.gh_bin])
     if lint_only:
         parts.append("--lint-only")
     if no_write:
