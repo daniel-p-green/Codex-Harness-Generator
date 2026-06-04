@@ -237,6 +237,75 @@ Only public-safe summary evidence was shared; no private names, local paths, cre
         self.assertEqual(1, payload["github_issue"]["comment_count"])
         self.assertTrue(payload["github_issue"]["comments_included"])
 
+    def test_include_comments_can_ingest_reporter_reply_template_headings(self):
+        incomplete_body = ISSUE_BODY.replace("success", "_no response_")
+        incomplete_body = incomplete_body.replace(
+            "The generated harness helped organize prompts, evals, and source-grounded review steps.",
+            "_no response_",
+        )
+        incomplete_body = incomplete_body.replace(
+            "- Generated AGENTS.md matched the project shape.\n- The harness made verification steps explicit.",
+            "_no response_",
+        )
+        incomplete_body = incomplete_body.replace(
+            "- Ran the generated smoke check successfully.\n- Completed one real task using the generated reviewer guidance.",
+            "_no response_",
+        )
+        incomplete_body = incomplete_body.replace(
+            "Removed private repo names, local paths, customer details, credentials, and raw logs.",
+            "_no response_",
+        )
+        incomplete_body = incomplete_body.replace("- One project and one task.", "_no response_")
+        completion_comment = """### Reporter reply template
+
+#### Outcome
+
+success
+
+#### Public-safe task summary
+
+The reporter used the copied reply template after completing one privacy-safe task.
+
+#### Evidence
+
+- The generated harness made the task acceptance criteria clear.
+- The generated checklist exposed one missing verification step.
+
+#### Verification performed
+
+- Ran the generated smoke check.
+- Compared the output against the generated harness instructions.
+
+#### Privacy review
+
+Only public-safe summary evidence was shared; no private names, local paths, credentials, raw logs, or private transcripts.
+
+#### Limitations
+
+- One reporter comment and one task.
+"""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_matching_pilot_record(root)
+
+            payload = usage_from_github_issue.build_payload(
+                self.args(root, include_comments=True, no_write=True),
+                github_payload=self.github_payload(
+                    body=incomplete_body,
+                    comments=[{"body": completion_comment, "url": "https://github.com/example/repo/issues/12#issuecomment-1"}],
+                ),
+            )
+
+        self.assertEqual("pass", payload["status"], payload)
+        self.assertFalse(payload["written"])
+        self.assertEqual(
+            "The reporter used the copied reply template after completing one privacy-safe task.",
+            payload["record"]["task_summary"],
+        )
+        self.assertEqual(2, len(payload["record"]["evidence"]))
+        self.assertEqual(2, len(payload["record"]["verification"]))
+        self.assertEqual(1, payload["github_issue"]["comment_count"])
+
     def test_include_comments_ignores_maintainer_followup_comments(self):
         incomplete_body = ISSUE_BODY.replace("success", "_no response_")
         incomplete_body = incomplete_body.replace(

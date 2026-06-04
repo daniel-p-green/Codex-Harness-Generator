@@ -6,12 +6,22 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = REPO_ROOT / "scripts" / "format_usage_lint_comment.py"
+USAGE_FROM_ISSUE_SCRIPT = REPO_ROOT / "scripts" / "usage_from_issue.py"
+
+if str(REPO_ROOT / "scripts") not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 spec = importlib.util.spec_from_file_location("format_usage_lint_comment", SCRIPT)
 format_usage_lint_comment = importlib.util.module_from_spec(spec)
 assert spec.loader is not None
 sys.modules[spec.name] = format_usage_lint_comment
 spec.loader.exec_module(format_usage_lint_comment)
+
+usage_spec = importlib.util.spec_from_file_location("usage_from_issue", USAGE_FROM_ISSUE_SCRIPT)
+usage_from_issue = importlib.util.module_from_spec(usage_spec)
+assert usage_spec.loader is not None
+sys.modules[usage_spec.name] = usage_from_issue
+usage_spec.loader.exec_module(usage_from_issue)
 
 
 class FormatUsageLintCommentTests(unittest.TestCase):
@@ -66,10 +76,20 @@ class FormatUsageLintCommentTests(unittest.TestCase):
         self.assertIn("Privacy boundary", comment)
         self.assertIn("Reporter reply template", comment)
         self.assertIn("Copy this into a new issue comment", comment)
-        self.assertIn("#### Outcome", comment)
+        self.assertIn("### Outcome", comment)
         self.assertIn("Use `success`, `partial`, `failed`, or `inconclusive`.", comment)
-        self.assertIn("#### Evidence", comment)
+        self.assertIn("### Evidence", comment)
         self.assertIn("Add at least two public-safe bullets", comment)
+
+    def test_reporter_reply_template_matches_usage_issue_importer_headings(self):
+        missing_fields = ["outcome", "task_summary", "evidence", "verification", "privacy_review", "limitations"]
+        template = "\n".join(format_usage_lint_comment.reply_template_lines(missing_fields))
+
+        sections = usage_from_issue.parse_issue_sections(template)
+
+        for field in missing_fields:
+            self.assertIn(field, sections)
+            self.assertTrue(sections[field].strip())
 
 
 if __name__ == "__main__":

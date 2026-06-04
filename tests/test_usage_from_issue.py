@@ -123,6 +123,62 @@ class UsageFromIssueTests(unittest.TestCase):
             usage_from_issue.parse_items(sections["evidence"]),
         )
 
+    def test_parse_issue_sections_accepts_nested_reporter_reply_headings(self):
+        body = """### Reporter reply template
+
+Copy this into a new issue comment and replace each guidance line with your public-safe result:
+
+#### Outcome
+
+success
+
+#### Public-safe task summary
+
+The reporter completed one public-safe Codex harness task.
+
+#### Evidence
+
+- The generated harness kept the task checklist explicit.
+- The generated review notes matched the project goal.
+
+#### Verification performed
+
+- Ran the generated smoke check.
+- Reviewed the final output against the generated AGENTS.md.
+
+#### Privacy review
+
+The report excludes secrets, personal data, private paths, proprietary source, raw logs, and raw private transcripts.
+
+#### Limitations
+
+- One reporter comment and one task.
+"""
+
+        sections = usage_from_issue.parse_issue_sections(body)
+
+        self.assertEqual("success", sections["outcome"])
+        self.assertEqual(
+            "The reporter completed one public-safe Codex harness task.",
+            sections["task_summary"],
+        )
+        self.assertEqual(
+            (
+                "The generated harness kept the task checklist explicit.",
+                "The generated review notes matched the project goal.",
+            ),
+            usage_from_issue.parse_items(sections["evidence"]),
+        )
+        self.assertEqual(
+            (
+                "Ran the generated smoke check.",
+                "Reviewed the final output against the generated AGENTS.md.",
+            ),
+            usage_from_issue.parse_items(sections["verification"]),
+        )
+        self.assertIn("private transcripts", sections["privacy_review"])
+        self.assertEqual(("One reporter comment and one task.",), usage_from_issue.parse_items(sections["limitations"]))
+
     def test_parse_items_keeps_wrapped_markdown_bullets_together(self):
         value = """- First evidence item wraps onto
   a continuation line.

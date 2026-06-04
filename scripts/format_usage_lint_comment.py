@@ -67,7 +67,7 @@ def reply_template_lines(missing_fields: list[str]) -> list[str]:
         guidance = FIELD_GUIDANCE.get(field, "Add a public-safe value for this field.")
         lines.extend(
             [
-                f"#### {label}",
+                f"### {label}",
                 "",
                 guidance,
                 "",

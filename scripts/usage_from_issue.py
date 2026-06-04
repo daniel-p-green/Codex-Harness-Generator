@@ -91,7 +91,7 @@ def parse_issue_sections(text: str) -> dict[str, str]:
     sections: dict[str, list[str]] = {}
     current_key: str | None = None
     for line in text.splitlines():
-        heading = re.match(r"^###\s+(.+?)\s*$", line)
+        heading = re.match(r"^#{3,4}\s+(.+?)\s*$", line)
         if heading:
             key = LABEL_MAP.get(normalize_label(heading.group(1)))
             current_key = key
