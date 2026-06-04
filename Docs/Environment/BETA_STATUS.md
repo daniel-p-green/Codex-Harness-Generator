@@ -1,6 +1,6 @@
 # Beta Status
 
-Generated: 2026-06-04T23:39:29Z
+Generated: 2026-06-04T23:50:19Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 
@@ -8,10 +8,10 @@ This status report is an operator dashboard. It is not usage proof; only convert
 
 ## Evidence Gap
 
-- Usage records: 2 total; 3 still needed
+- Usage records: 5 total; 0 still needed
 - External or multi-project records: 0 current; 3 still needed
-- Distinct domains: 1 current; 3 still needed
-- Installed brief-based generation records: 0 current; 2 still needed
+- Distinct domains: 4 current; 0 still needed
+- Installed brief-based generation records: 3 current; 0 still needed
 
 ## Pilot Queue
 

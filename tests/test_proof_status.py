@@ -411,7 +411,7 @@ Status: PASS
         self.assertEqual(1, status)
         self.assertIn("Mode: beta-exit", text)
         self.assertIn("Readiness: Missing beta-exit evidence", text)
-        self.assertIn("requires at least 5", text)
+        self.assertIn("requires at least 3 external or multi-project usage record", text)
 
 
 if __name__ == "__main__":

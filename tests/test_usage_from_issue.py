@@ -73,6 +73,10 @@ ISSUE_BODY_WITH_SLUG = """### Pilot or usage-record slug
 
 external-llm-app
 
+### Usage-record title
+
+External LLM app report
+
 """ + ISSUE_BODY
 
 
@@ -109,6 +113,7 @@ class UsageFromIssueTests(unittest.TestCase):
         sections = usage_from_issue.parse_issue_sections(ISSUE_BODY_WITH_SLUG)
 
         self.assertEqual("external-llm-app", sections["pilot_slug"])
+        self.assertEqual("External LLM app report", sections["title"])
         self.assertEqual("LLM app", sections["domain"])
         self.assertEqual("llm-app profile", sections["harness_label"])
         self.assertEqual("private-summary", sections["evidence_type"])
@@ -255,6 +260,61 @@ _no response_
             self.assertTrue((record_dir / "external-llm-app.json").is_file())
             self.assertIn("external-llm-app", report.read_text(encoding="utf-8"))
             self.assertIsNone(payload["pilot_update"])
+
+    def test_usage_from_issue_accepts_title_from_issue_body(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            issue = temp_path / "issue.md"
+            issue.write_text(ISSUE_BODY_WITH_SLUG, encoding="utf-8")
+
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    SCRIPT.as_posix(),
+                    issue.as_posix(),
+                    "--record-dir",
+                    (temp_path / "records").as_posix(),
+                    "--no-write",
+                    "--json",
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+            payload = json.loads(completed.stdout)
+            self.assertEqual("pass", payload["status"])
+            self.assertEqual("external-llm-app", payload["record"]["slug"])
+            self.assertEqual("External LLM app report", payload["record"]["title"])
+
+    def test_usage_from_issue_lint_accepts_title_from_issue_body(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            issue = temp_path / "issue.md"
+            issue.write_text(ISSUE_BODY_WITH_SLUG, encoding="utf-8")
+
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    SCRIPT.as_posix(),
+                    issue.as_posix(),
+                    "--lint-only",
+                    "--json",
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+            payload = json.loads(completed.stdout)
+            self.assertEqual("pass", payload["status"])
+            self.assertEqual("conversion-ready", payload["readiness"])
+            self.assertEqual("External LLM app report", payload["title"])
+            self.assertIn("title", payload["inferred_fields"])
 
     def test_usage_from_issue_can_convert_matching_pilot_record(self):
         with tempfile.TemporaryDirectory() as temp_dir:

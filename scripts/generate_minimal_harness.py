@@ -716,7 +716,7 @@ After a successful real task trial, export a public-safe usage report draft.
 Use the matching pilot slug when one exists:
 
 ```bash
-python scripts/export-public-usage-report.py --slug "public-safe-usage-slug" --out Docs/Environment/PUBLIC_USAGE_REPORT.md
+python scripts/export-public-usage-report.py --title "Public-safe usage title" --slug "public-safe-usage-slug" --out Docs/Environment/PUBLIC_USAGE_REPORT.md
 ```
 
 If this harness came from the public generator and the task is safe to describe,
@@ -755,8 +755,8 @@ private repository names, raw logs, or irreversible production actions.
    missing verification.
 5. Record the trial with `python scripts/record-task-trial.py`.
 6. Run `python scripts/run-harness-evals.py --min-successes 1`.
-7. Export `Docs/Environment/PUBLIC_USAGE_REPORT.md` with the matching pilot or usage-record slug:
-   `python scripts/export-public-usage-report.py --slug "public-safe-usage-slug" --out Docs/Environment/PUBLIC_USAGE_REPORT.md`.
+7. Export `Docs/Environment/PUBLIC_USAGE_REPORT.md` with a public-safe title and the matching pilot or usage-record slug:
+   `python scripts/export-public-usage-report.py --title "Public-safe usage title" --slug "public-safe-usage-slug" --out Docs/Environment/PUBLIC_USAGE_REPORT.md`.
 
 ## Copyable Record Command
 
@@ -879,7 +879,7 @@ Export a public-safe usage report draft after at least one successful real task.
 Use the matching pilot slug when one exists:
 
 ```bash
-python scripts/export-public-usage-report.py --slug "public-safe-usage-slug" --out Docs/Environment/PUBLIC_USAGE_REPORT.md
+python scripts/export-public-usage-report.py --title "Public-safe usage title" --slug "public-safe-usage-slug" --out Docs/Environment/PUBLIC_USAGE_REPORT.md
 ```
 
 ## Outcome Labels
@@ -1664,9 +1664,11 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict]:
     domain = args.domain or genesis_field("Domain", "unspecified domain")
     harness_label = args.harness_label or genesis_field("Project", "generated Codex harness")
     slug = safe_slug(args.slug or harness_label)
+    title = args.title or f"{entry['task']} usage report"
     reject_sensitive("domain", domain)
     reject_sensitive("harness label", harness_label)
     reject_sensitive("slug", slug)
+    reject_sensitive("title", title)
 
     evidence = bullet_lines(entry["evidence"])
     evidence.append(f"- Copied-harness eval report status: {eval_payload.get('status', 'unknown').upper()}.")
@@ -1679,6 +1681,10 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict]:
         "### Pilot or usage-record slug",
         "",
         slug,
+        "",
+        "### Usage-record title",
+        "",
+        title,
         "",
         "### Domain or project type",
         "",
@@ -1735,6 +1741,7 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict]:
         "task": entry["task"],
         "outcome": entry["outcome"],
         "slug": slug,
+        "title": title,
         "domain": domain,
         "harness_label": harness_label,
         "eval_status": eval_payload.get("status"),
@@ -1750,6 +1757,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", default=REPORT_PATH.as_posix(), help="Markdown report path")
     parser.add_argument("--slug", help="Public-safe pilot or usage-record slug; defaults to the generated harness label")
+    parser.add_argument("--title", help="Public-safe usage-record title; defaults to the latest success task summary")
     parser.add_argument("--domain", help="Public-safe domain override")
     parser.add_argument("--harness-label", help="Public-safe harness label override")
     parser.add_argument("--source-type", choices=["external", "multi-project", "self-dogfood"], default="external")

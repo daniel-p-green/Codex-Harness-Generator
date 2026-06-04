@@ -129,9 +129,11 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict]:
     domain = args.domain or genesis_field("Domain", "unspecified domain")
     harness_label = args.harness_label or genesis_field("Project", "generated Codex harness")
     slug = safe_slug(args.slug or harness_label)
+    title = args.title or f"{entry['task']} usage report"
     reject_sensitive("domain", domain)
     reject_sensitive("harness label", harness_label)
     reject_sensitive("slug", slug)
+    reject_sensitive("title", title)
 
     evidence = bullet_lines(entry["evidence"])
     evidence.append(f"- Copied-harness eval report status: {eval_payload.get('status', 'unknown').upper()}.")
@@ -144,6 +146,10 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict]:
         "### Pilot or usage-record slug",
         "",
         slug,
+        "",
+        "### Usage-record title",
+        "",
+        title,
         "",
         "### Domain or project type",
         "",
@@ -200,6 +206,7 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict]:
         "task": entry["task"],
         "outcome": entry["outcome"],
         "slug": slug,
+        "title": title,
         "domain": domain,
         "harness_label": harness_label,
         "eval_status": eval_payload.get("status"),
@@ -215,6 +222,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", default=REPORT_PATH.as_posix(), help="Markdown report path")
     parser.add_argument("--slug", help="Public-safe pilot or usage-record slug; defaults to the generated harness label")
+    parser.add_argument("--title", help="Public-safe usage-record title; defaults to the latest success task summary")
     parser.add_argument("--domain", help="Public-safe domain override")
     parser.add_argument("--harness-label", help="Public-safe harness label override")
     parser.add_argument("--source-type", choices=["external", "multi-project", "self-dogfood"], default="external")

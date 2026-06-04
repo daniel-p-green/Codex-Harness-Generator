@@ -9,7 +9,7 @@ secrets, personal data, proprietary source, or local machine paths.
 
 | Total | Non-Synthetic | Success | External/Multi-Project | Distinct Domains | Installed Brief Generation |
 |---:|---:|---:|---:|---:|---:|
-| 2 | 2 | 2 | 0 | 1 | 0 |
+| 5 | 5 | 5 | 0 | 4 | 3 |
 
 Product-proof status: non-synthetic usage evidence present
 
@@ -17,6 +17,9 @@ Product-proof status: non-synthetic usage evidence present
 
 | Generated | Slug | Domain | Source | Generation Path | Outcome | Evidence Type | Verification Count |
 |---|---|---|---|---|---|---|---:|
+| 2026-06-04T23:46:44Z | `dogfood-installed-security-audit` | Security audit | self-dogfood | installed-init-brief | success | sanitized | 4 |
+| 2026-06-04T23:46:24Z | `dogfood-installed-api-design` | API design | self-dogfood | installed-init-brief | success | sanitized | 4 |
+| 2026-06-04T23:46:24Z | `dogfood-installed-data-analysis` | Data analysis | self-dogfood | installed-init-brief | success | sanitized | 4 |
 | 2026-06-04T07:00:16Z | `dogfood-brief-fast-path` | Codex harness generation | self-dogfood | repo-dogfood | success | sanitized | 2 |
 | 2026-06-04T06:12:20Z | `dogfood-high-risk-proof-suite` | Codex harness generation | self-dogfood | repo-dogfood | success | sanitized | 2 |
 

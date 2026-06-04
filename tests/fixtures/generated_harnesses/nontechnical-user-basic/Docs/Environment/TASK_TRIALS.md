@@ -27,7 +27,7 @@ Export a public-safe usage report draft after at least one successful real task.
 Use the matching pilot slug when one exists:
 
 ```bash
-python scripts/export-public-usage-report.py --slug "public-safe-usage-slug" --out Docs/Environment/PUBLIC_USAGE_REPORT.md
+python scripts/export-public-usage-report.py --title "Public-safe usage title" --slug "public-safe-usage-slug" --out Docs/Environment/PUBLIC_USAGE_REPORT.md
 ```
 
 ## Outcome Labels

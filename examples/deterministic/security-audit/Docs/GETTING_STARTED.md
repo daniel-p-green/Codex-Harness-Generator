@@ -86,7 +86,7 @@ After a successful real task trial, export a public-safe usage report draft.
 Use the matching pilot slug when one exists:
 
 ```bash
-python scripts/export-public-usage-report.py --slug "public-safe-usage-slug" --out Docs/Environment/PUBLIC_USAGE_REPORT.md
+python scripts/export-public-usage-report.py --title "Public-safe usage title" --slug "public-safe-usage-slug" --out Docs/Environment/PUBLIC_USAGE_REPORT.md
 ```
 
 If this harness came from the public generator and the task is safe to describe,

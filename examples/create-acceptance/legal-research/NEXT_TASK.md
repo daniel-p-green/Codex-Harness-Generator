@@ -25,8 +25,8 @@ private repository names, raw logs, or irreversible production actions.
    missing verification.
 5. Record the trial with `python scripts/record-task-trial.py`.
 6. Run `python scripts/run-harness-evals.py --min-successes 1`.
-7. Export `Docs/Environment/PUBLIC_USAGE_REPORT.md` with the matching pilot or usage-record slug:
-   `python scripts/export-public-usage-report.py --slug "public-safe-usage-slug" --out Docs/Environment/PUBLIC_USAGE_REPORT.md`.
+7. Export `Docs/Environment/PUBLIC_USAGE_REPORT.md` with a public-safe title and the matching pilot or usage-record slug:
+   `python scripts/export-public-usage-report.py --title "Public-safe usage title" --slug "public-safe-usage-slug" --out Docs/Environment/PUBLIC_USAGE_REPORT.md`.
 
 ## Copyable Record Command
 

@@ -670,6 +670,8 @@ class GeneratedHarnessContractTests(unittest.TestCase):
                 "Docs/Environment/PUBLIC_USAGE_REPORT.md",
                 "--slug",
                 "usage-proof-smoke",
+                "--title",
+                "Usage proof smoke",
                 "--json",
             ],
             cwd=target,
@@ -683,10 +685,13 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertEqual("pass", payload["status"], payload)
         self.assertEqual("TODO audit", payload["task"])
         self.assertEqual("usage-proof-smoke", payload["slug"])
+        self.assertEqual("Usage proof smoke", payload["title"])
         self.assertEqual("Docs/Environment/PUBLIC_USAGE_REPORT.md", payload["path"])
         report = (target / "Docs/Environment/PUBLIC_USAGE_REPORT.md").read_text(encoding="utf-8")
         self.assertIn("### Pilot or usage-record slug", report)
         self.assertIn("usage-proof-smoke", report)
+        self.assertIn("### Usage-record title", report)
+        self.assertIn("Usage proof smoke", report)
         self.assertIn("### Domain or project type", report)
         self.assertIn("### Generated harness profile or label", report)
         self.assertIn("### Evidence type", report)
@@ -695,6 +700,26 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertIn("TODO audit", report)
         self.assertIn("Copied-harness eval report status: PASS", report)
         self.assertIn("not longitudinal proof", report)
+
+        lint = subprocess.run(
+            [
+                sys.executable,
+                "scripts/usage_from_issue.py",
+                (target / "Docs/Environment/PUBLIC_USAGE_REPORT.md").as_posix(),
+                "--lint-only",
+                "--json",
+            ],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(0, lint.returncode, lint.stdout + lint.stderr)
+        lint_payload = json.loads(lint.stdout)
+        self.assertEqual("conversion-ready", lint_payload["readiness"])
+        self.assertEqual("usage-proof-smoke", lint_payload["slug"])
+        self.assertEqual("Usage proof smoke", lint_payload["title"])
 
     def test_export_public_usage_report_fails_without_success_trial(self):
         temp_dir, target = self.copy_fixture()

@@ -1,0 +1,29 @@
+{
+  "slug": "dogfood-installed-api-design",
+  "title": "Installed CLI API design harness",
+  "generated": "2026-06-04T23:46:24Z",
+  "domain": "API design",
+  "harness_path": "installed CLI API design harness",
+  "task_summary": "Generated an API design harness with the installed CLI, recorded one public-safe endpoint-review task, and ran local harness evals.",
+  "outcome": "success",
+  "evidence_type": "sanitized",
+  "source_type": "self-dogfood",
+  "generation_path": "installed-init-brief",
+  "evidence": [
+    "Generated harness local eval report status: PASS.",
+    "Recorded task-trial outcomes: success=1",
+    "Task trial `Review a public-safe API endpoint contract and name missing verification checks` recorded as success: Recorded a public-safe endpoint contract review task against the installed CLI generated harness.",
+    "Installed console script generated the harness from a brief and selected the api-design profile with passing acceptance checks."
+  ],
+  "verification": [
+    "Copied harness local eval checks: improvements=pass, local_check=pass, task_trials=pass",
+    "Complete task-trial records reviewed: 1.",
+    "Task trial `Review a public-safe API endpoint contract and name missing verification checks` verification: Ran check-harness.py before the task and run-harness-evals.py with one required success afterward.",
+    "Installed CLI generation, check-harness.py, record-task-trial.py, and run-harness-evals.py --min-successes 1 completed successfully."
+  ],
+  "privacy_review": "Public-safe self-dogfood evidence only; generated harness task used synthetic API design material with no private source, credentials, personal data, or local paths.",
+  "limitations": [
+    "Single installed-CLI self-dogfood run; not external adoption evidence.",
+    "Installed-CLI self-dogfood record from a synthetic public-safe task, not external adoption evidence."
+  ]
+}

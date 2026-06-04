@@ -31,6 +31,10 @@ from record_usage_case import (
 
 
 LABEL_MAP = {
+    "title": "title",
+    "usage title": "title",
+    "usage record title": "title",
+    "usage-record title": "title",
     "pilot slug": "pilot_slug",
     "pilot or usage-record slug": "pilot_slug",
     "pilot or usage record slug": "pilot_slug",
@@ -161,6 +165,21 @@ def resolve_slug(args: argparse.Namespace, *, required: bool = True) -> bool:
     return False
 
 
+def resolve_title(args: argparse.Namespace) -> bool:
+    args.issue_defaults_applied = []
+    if args.title:
+        args.title = clean_value(args.title)
+        return True
+    sections = parse_issue_sections(issue_body_text(args))
+    issue_title = clean_value(sections.get("title", ""))
+    if issue_title:
+        args.title = issue_title
+        args.issue_defaults_applied.append("title")
+        return True
+    args.title = None
+    return False
+
+
 def apply_pilot_defaults(args: argparse.Namespace) -> dict | None:
     args.pilot_defaults_applied = []
     if not args.pilot_record_dir:
@@ -196,7 +215,7 @@ def apply_standalone_defaults(args: argparse.Namespace) -> None:
 def require_metadata(args: argparse.Namespace) -> None:
     if not args.title:
         raise SystemExit(
-            "Missing required metadata: --title. Provide it directly or use --pilot-record-dir with a matching prepared pilot."
+            "Missing required metadata: --title, issue field 'Usage-record title', or matching prepared pilot title."
         )
 
 
@@ -251,7 +270,8 @@ def lint_issue_payload(args: argparse.Namespace) -> dict:
     if sensitive_findings:
         errors.append("Sensitive text detected: " + ", ".join(sensitive_findings))
 
-    inferred_fields = list(getattr(args, "pilot_defaults_applied", []))
+    inferred_fields = list(getattr(args, "issue_defaults_applied", []))
+    inferred_fields.extend(getattr(args, "pilot_defaults_applied", []))
     if clean_value(sections.get("harness_label", "")) == "" and getattr(args, "pilot_harness_label", ""):
         inferred_fields.append("harness_label")
 
@@ -346,6 +366,7 @@ def main() -> int:
     args = parser.parse_args()
 
     resolve_slug(args, required=not args.lint_only)
+    resolve_title(args)
     apply_pilot_defaults(args)
     apply_standalone_defaults(args)
     if args.lint_only:
