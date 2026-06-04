@@ -55,6 +55,8 @@ def write_report(path: Path, payload: dict) -> None:
         "This campaign packet turns the current beta-exit evidence gaps into",
         "concrete external or multi-project pilot asks. It is an evidence",
         "collection plan, not adoption proof.",
+        "Use `codex-harness prepare-next-pilot <target>` to prepare the first",
+        "suggested pilot directly from the current gaps.",
         "",
         "## Current Evidence Gap",
         "",

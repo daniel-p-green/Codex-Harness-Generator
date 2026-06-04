@@ -42,6 +42,9 @@ Already proven:
 - External pilot packs that give prospective reporters a one-task checklist,
   public-safe evidence boundary, maintainer commands, and optional issue-body
   draft before external usage conversion.
+- Gap-selected pilot preparation through `codex-harness prepare-next-pilot`,
+  so maintainers can turn the highest-priority current usage gap into a
+  generated pilot harness and evidence kit without copying generated commands.
 - Checked-in deterministic, create-acceptance, brief-acceptance, and live-create
   examples.
 - Privacy-checked usage-record validation.
@@ -67,7 +70,8 @@ The project can stop calling itself a beta only when all of these are true:
 - At least 3 records are from external or multi-project usage, not self-dogfood.
 - At least 4 different domains are represented across those records.
 - At least 2 records used installed brief-based generation:
-  `codex-harness quickstart` or `codex-harness init --brief`.
+  `codex-harness prepare-pilot`, `codex-harness prepare-next-pilot`,
+  `codex-harness quickstart`, or `codex-harness init --brief`.
 - `python scripts/codex_harness.py proof-status --beta-exit` passes.
 - `python scripts/codex_harness.py gate` passes on CI and locally.
 - `python scripts/codex_harness.py source-freshness` and
@@ -92,8 +96,9 @@ The project can stop calling itself a beta only when all of these are true:
    `codex-harness usage-from-issue` to convert the issue body into the
    checked-in usage record. Run `codex-harness usage-gaps` after each record to
    pick the next pilot profile, source type, and generation path by the largest
-   remaining beta-exit gap, then run `codex-harness pilot-campaign` when a
-   shareable outreach packet is useful.
+   remaining beta-exit gap. Use `codex-harness prepare-next-pilot` to prepare
+   that next suggested pilot directly, then run `codex-harness pilot-campaign`
+   when a shareable outreach packet is useful.
 
 2. Add more public-safe live examples.
    Prioritize domains where the generated harness has high-risk boundaries:

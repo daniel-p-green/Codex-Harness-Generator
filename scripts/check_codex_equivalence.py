@@ -98,9 +98,10 @@ CAPABILITIES = [
             "Docs/Environment/USAGE_GAPS.md",
             "Docs/Environment/PILOT_CAMPAIGN.md",
             "scripts/prepare_pilot.py",
+            "scripts/prepare_next_pilot.py",
             "scripts/record_usage_case.py",
         ],
-        "commands": ["codex-harness prepare-pilot <target>", "codex-harness usage-validate", "codex-harness usage-gaps", "codex-harness pilot-campaign"],
+        "commands": ["codex-harness prepare-pilot <target>", "codex-harness prepare-next-pilot [target]", "codex-harness usage-validate", "codex-harness usage-gaps", "codex-harness pilot-campaign"],
     },
     {
         "name": "Release proof",

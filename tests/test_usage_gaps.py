@@ -63,6 +63,10 @@ class UsageGapsTests(unittest.TestCase):
         self.assertEqual("llm-app", result["suggested_pilots"][0]["profile"])
         self.assertEqual("external", result["suggested_pilots"][0]["source_type"])
         self.assertEqual("installed-quickstart", result["suggested_pilots"][0]["generation_path"])
+        self.assertEqual("/tmp/codex-llm-app-pilot", result["suggested_pilots"][0]["target"])
+        self.assertEqual("LLM App Workspace Pilot", result["suggested_pilots"][0]["project_name"])
+        self.assertEqual("llm-app-pilot", result["suggested_pilots"][0]["slug"])
+        self.assertEqual("LLM app pilot", result["suggested_pilots"][0]["title"])
         self.assertIn("codex-harness prepare-pilot", result["suggested_pilots"][0]["commands"][0])
         self.assertIn("--domain \"LLM app\"", result["suggested_pilots"][0]["commands"][0])
 

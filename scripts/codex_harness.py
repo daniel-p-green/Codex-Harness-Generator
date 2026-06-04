@@ -149,6 +149,66 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("prepare_pilot.py", command)
 
+    if args.command == "prepare-next-pilot":
+        command = []
+        if args.target:
+            command.append(args.target)
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.index is not None:
+            command.extend(["--index", str(args.index)])
+        if args.brief:
+            command.extend(["--brief", args.brief])
+        if args.project_name:
+            command.extend(["--project-name", args.project_name])
+        if args.notes:
+            command.extend(["--notes", args.notes])
+        if args.domain:
+            command.extend(["--domain", args.domain])
+        if args.slug:
+            command.extend(["--slug", args.slug])
+        if args.title:
+            command.extend(["--title", args.title])
+        if args.source_type:
+            command.extend(["--source-type", args.source_type])
+        if args.generation_path:
+            command.extend(["--generation-path", args.generation_path])
+        if args.harness_label:
+            command.extend(["--harness-label", args.harness_label])
+        if args.out:
+            command.extend(["--out", args.out])
+        if args.issue_out:
+            command.extend(["--issue-out", args.issue_out])
+        if args.min_successes is not None:
+            command.extend(["--min-successes", str(args.min_successes)])
+        if args.min_score is not None:
+            command.extend(["--min-score", str(args.min_score)])
+        if args.target_label:
+            command.extend(["--target-label", args.target_label])
+        if args.limit is not None:
+            command.extend(["--limit", str(args.limit)])
+        if args.allow_low_confidence:
+            command.append("--allow-low-confidence")
+        if args.generated_date:
+            command.extend(["--generated-date", args.generated_date])
+        if args.created:
+            command.extend(["--created", args.created])
+        if args.generated:
+            command.extend(["--generated", args.generated])
+        if args.min_records is not None:
+            command.extend(["--min-records", str(args.min_records)])
+        if args.min_external_or_multi_project is not None:
+            command.extend(["--min-external-or-multi-project", str(args.min_external_or_multi_project)])
+        if args.min_domains is not None:
+            command.extend(["--min-domains", str(args.min_domains)])
+        if args.min_installed_init_brief is not None:
+            command.extend(["--min-installed-init-brief", str(args.min_installed_init_brief)])
+        if args.force:
+            command.append("--force")
+        if args.json:
+            command.append("--json")
+        return python_script("prepare_next_pilot.py", command)
+
     if args.command == "profile":
         command = ["--profile", args.profile]
         if args.json:
@@ -702,6 +762,49 @@ def make_parser() -> argparse.ArgumentParser:
     prepare_pilot.add_argument("--force", action="store_true", help="Replace target if it already contains files")
     prepare_pilot.add_argument("--json", action="store_true", help="Emit JSON payload")
 
+    prepare_next_pilot = subparsers.add_parser("prepare-next-pilot", help="Prepare the next pilot from usage evidence gaps")
+    prepare_next_pilot.add_argument("target", nargs="?", help="Override generated pilot harness target directory")
+    prepare_next_pilot.add_argument("--record-dir", help="Directory where usage record JSON files are read")
+    prepare_next_pilot.add_argument("--index", type=int, help="1-based suggested pilot index from usage-gaps")
+    prepare_next_pilot.add_argument("--brief", help="Override selected pilot brief")
+    prepare_next_pilot.add_argument("--project-name", help="Override selected pilot project name")
+    prepare_next_pilot.add_argument("--notes", help="Notes for creation context")
+    prepare_next_pilot.add_argument("--domain", help="Override selected pilot domain")
+    prepare_next_pilot.add_argument("--slug", help="Override selected pilot usage-record slug")
+    prepare_next_pilot.add_argument("--title", help="Override selected pilot usage-record title")
+    prepare_next_pilot.add_argument("--source-type", choices=["external", "multi-project", "self-dogfood"], help="Override selected pilot source type")
+    prepare_next_pilot.add_argument(
+        "--generation-path",
+        choices=[
+            "adoption-plan",
+            "installed-init-brief",
+            "installed-init-from-project",
+            "installed-quickstart",
+            "live-create",
+            "manual-migration",
+            "repo-dogfood",
+            "unknown",
+        ],
+        help="Override selected pilot generation path",
+    )
+    prepare_next_pilot.add_argument("--harness-label", help="Public-safe harness label")
+    prepare_next_pilot.add_argument("--out", help="Pilot pack path")
+    prepare_next_pilot.add_argument("--issue-out", help="Issue-body draft path")
+    prepare_next_pilot.add_argument("--min-successes", type=int, help="Minimum passing success task trials expected for the later pilot")
+    prepare_next_pilot.add_argument("--min-score", type=int, help="Minimum generated harness validation score")
+    prepare_next_pilot.add_argument("--target-label", help="Override target path written inside CREATION_CONTEXT.md")
+    prepare_next_pilot.add_argument("--limit", type=int, help="Number of profile recommendations to record")
+    prepare_next_pilot.add_argument("--allow-low-confidence", action="store_true", help="Allow generation when no profile scores above zero")
+    prepare_next_pilot.add_argument("--generated-date", help="Stable generated date for generated docs")
+    prepare_next_pilot.add_argument("--created", help="Stable created timestamp for CREATION_CONTEXT.md")
+    prepare_next_pilot.add_argument("--generated", help="UTC timestamp for pilot metadata")
+    prepare_next_pilot.add_argument("--min-records", type=int, help="Target valid usage records")
+    prepare_next_pilot.add_argument("--min-external-or-multi-project", type=int, help="Target external or multi-project records")
+    prepare_next_pilot.add_argument("--min-domains", type=int, help="Target distinct domains")
+    prepare_next_pilot.add_argument("--min-installed-init-brief", type=int, help="Target records generated via installed brief-based generation")
+    prepare_next_pilot.add_argument("--force", action="store_true", help="Replace target if it already contains files")
+    prepare_next_pilot.add_argument("--json", action="store_true", help="Emit JSON payload")
+
     profile = subparsers.add_parser("profile", help="Describe one deterministic starter profile")
     profile.add_argument("profile", help="Profile slug")
     profile.add_argument("--json", action="store_true", help="Emit profile JSON")
@@ -917,7 +1020,7 @@ def make_parser() -> argparse.ArgumentParser:
     pilot_campaign.add_argument("--min-records", type=int, help="Target valid usage records")
     pilot_campaign.add_argument("--min-external-or-multi-project", type=int, help="Target external or multi-project records")
     pilot_campaign.add_argument("--min-domains", type=int, help="Target distinct domains")
-    pilot_campaign.add_argument("--min-installed-init-brief", type=int, help="Target records generated via installed init --brief or quickstart")
+    pilot_campaign.add_argument("--min-installed-init-brief", type=int, help="Target records generated via installed brief-based generation")
     pilot_campaign.add_argument("--no-write", action="store_true", help="Do not write the Markdown campaign")
     pilot_campaign.add_argument("--json", action="store_true", help="Emit JSON payload")
 
@@ -955,7 +1058,7 @@ def make_parser() -> argparse.ArgumentParser:
     usage_validate.add_argument("--require-success", action="store_true", help="Fail unless at least one successful usage record exists")
     usage_validate.add_argument("--min-external-or-multi-project", type=int, help="Minimum external or multi-project usage records")
     usage_validate.add_argument("--min-domains", type=int, help="Minimum distinct usage domains")
-    usage_validate.add_argument("--min-installed-init-brief", type=int, help="Minimum usage records generated via installed init --brief or quickstart")
+    usage_validate.add_argument("--min-installed-init-brief", type=int, help="Minimum usage records generated via installed brief-based generation")
     usage_validate.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     usage_gaps = subparsers.add_parser("usage-gaps", help="Report remaining beta-exit usage evidence gaps")
@@ -964,7 +1067,7 @@ def make_parser() -> argparse.ArgumentParser:
     usage_gaps.add_argument("--min-records", type=int, help="Target valid usage records")
     usage_gaps.add_argument("--min-external-or-multi-project", type=int, help="Target external or multi-project records")
     usage_gaps.add_argument("--min-domains", type=int, help="Target distinct domains")
-    usage_gaps.add_argument("--min-installed-init-brief", type=int, help="Target records generated via installed init --brief or quickstart")
+    usage_gaps.add_argument("--min-installed-init-brief", type=int, help="Target records generated via installed brief-based generation")
     usage_gaps.add_argument("--no-write", action="store_true", help="Do not write the Markdown report")
     usage_gaps.add_argument("--json", action="store_true", help="Emit JSON payload")
 
@@ -974,7 +1077,7 @@ def make_parser() -> argparse.ArgumentParser:
     proof_status.add_argument("--min-usage-records", type=int, help="Minimum valid usage records required")
     proof_status.add_argument("--min-external-or-multi-project", type=int, help="Minimum external or multi-project usage records")
     proof_status.add_argument("--min-domains", type=int, help="Minimum distinct usage domains")
-    proof_status.add_argument("--min-installed-init-brief", type=int, help="Minimum usage records generated via installed init --brief or quickstart")
+    proof_status.add_argument("--min-installed-init-brief", type=int, help="Minimum usage records generated via installed brief-based generation")
     proof_status.add_argument("--record-dir", help="Directory where usage record JSON files are read")
     proof_status.add_argument("--report", help="Proof-status Markdown report path")
     proof_status.add_argument("--no-write", action="store_true", help="Do not rewrite PROOF_STATUS.md")

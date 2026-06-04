@@ -57,6 +57,7 @@ def build_payload() -> dict:
         generated = temp_root / "generated"
         quickstart_generated = temp_root / "quickstart-generated"
         pilot_generated = temp_root / "pilot-generated"
+        next_pilot_generated = temp_root / "next-pilot-generated"
         inspected_generated = temp_root / "inspected-generated"
         demo_generated = temp_root / "demo-generated"
         adoption_report = temp_root / "ADOPTION_PLAN.md"
@@ -69,6 +70,8 @@ def build_payload() -> dict:
         pilot_issue = temp_root / "EXTERNAL_USAGE_ISSUE_DRAFT.md"
         prepared_pilot_pack = temp_root / "PREPARED_EXTERNAL_PILOT_PACK.md"
         prepared_pilot_issue = temp_root / "PREPARED_EXTERNAL_USAGE_ISSUE_DRAFT.md"
+        next_pilot_pack = temp_root / "NEXT_EXTERNAL_PILOT_PACK.md"
+        next_pilot_issue = temp_root / "NEXT_EXTERNAL_USAGE_ISSUE_DRAFT.md"
         usage_records = temp_root / "usage-records"
         usage_report = temp_root / "USAGE_RECORDS.md"
         usage_gaps_report = temp_root / "USAGE_GAPS.md"
@@ -402,6 +405,22 @@ def build_payload() -> dict:
                     usage_records.as_posix(),
                     "--report",
                     usage_report.as_posix(),
+                    "--force",
+                    "--json",
+                ],
+            ),
+            (
+                "prepare_next_pilot",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "prepare-next-pilot",
+                    next_pilot_generated.as_posix(),
+                    "--record-dir",
+                    usage_records.as_posix(),
+                    "--out",
+                    next_pilot_pack.as_posix(),
+                    "--issue-out",
+                    next_pilot_issue.as_posix(),
                     "--force",
                     "--json",
                 ],

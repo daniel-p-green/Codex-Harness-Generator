@@ -135,6 +135,9 @@ replacement. What is proven today:
   brief-based quickstart generation with an external pilot pack and issue-body
   draft, so the next beta-exit pilot can be prepared with one command before a
   reporter runs a real task.
+- `scripts/prepare_next_pilot.py` and `codex-harness prepare-next-pilot`
+  select the next recommended pilot from current usage gaps and prepare that
+  generated harness, pack, and issue draft without copy-pasting a long command.
 - `scripts/usage_from_harness.py` and `codex-harness usage-from-harness`
   convert a generated harness's local eval report and task trials into a
   privacy-checked usage record.
@@ -531,8 +534,9 @@ python scripts/codex_harness.py usage-validate \
 ```
 
 The `--min-installed-init-brief` flag is retained for compatibility; it now
-counts installed brief-based generation records from either `codex-harness
-quickstart` or `codex-harness init --brief`.
+counts installed brief-based generation records from `codex-harness
+prepare-next-pilot`, `codex-harness prepare-pilot`, `codex-harness quickstart`,
+or `codex-harness init --brief`.
 
 Summarize the checked-in product-proof package:
 
@@ -582,6 +586,7 @@ Common subcommands:
 |---|---|---|
 | `quickstart <target>` | `run_quickstart.py` | Generates from a brief, validates the harness, runs the copied local eval, and writes `QUICKSTART_REPORT.md`. |
 | `prepare-pilot <target>` | `prepare_pilot.py` | Generates and validates a pilot harness from a brief, then writes an external pilot pack and issue-body draft for the reporter. |
+| `prepare-next-pilot [target]` | `prepare_next_pilot.py` | Selects a suggested pilot from current usage gaps and prepares its generated harness plus evidence kit. |
 | `init <target>` | `generate_minimal_harness.py` or `run_brief_acceptance.py` | One-command starter path; add `--brief` to recommend a profile and record `PROFILE_SELECTION.md`. |
 | `init <target> --from-project <path>` | `run_inspected_acceptance.py` | Inspects project metadata, generates through deterministic acceptance, and records `PROJECT_INSPECTION.md`. |
 | `profiles` | `generate_minimal_harness.py --list-profiles` or `profile_catalog.py` | Shows supported deterministic starters; add `--details` or `--json` for a chooser-friendly catalog. |

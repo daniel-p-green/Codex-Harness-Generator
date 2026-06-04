@@ -44,6 +44,7 @@ class DoctorTests(unittest.TestCase):
                 {"name": "usage_from_harness", "status": "pass"},
                 {"name": "usage_from_issue_preview", "status": "pass"},
                 {"name": "usage_from_issue", "status": "pass"},
+                {"name": "prepare_next_pilot", "status": "pass"},
                 {"name": "usage_gaps", "status": "pass"},
                 {"name": "pilot_campaign", "status": "pass"},
                 {"name": "migration_audit", "status": "pass"},
@@ -102,6 +103,7 @@ class DoctorTests(unittest.TestCase):
         self.assertIn("usage_from_harness=pass", install_check["detail"])
         self.assertIn("usage_from_issue_preview=pass", install_check["detail"])
         self.assertIn("usage_from_issue=pass", install_check["detail"])
+        self.assertIn("prepare_next_pilot=pass", install_check["detail"])
         self.assertIn("usage_gaps=pass", install_check["detail"])
         self.assertIn("pilot_campaign=pass", install_check["detail"])
         self.assertIn("migration_audit=pass", install_check["detail"])

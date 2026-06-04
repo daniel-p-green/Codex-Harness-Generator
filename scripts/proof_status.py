@@ -144,6 +144,7 @@ def check_installable_cli() -> tuple[dict, dict]:
     usage_from_harness_step = next((step for step in payload["steps"] if step["name"] == "usage_from_harness"), {})
     usage_from_issue_preview_step = next((step for step in payload["steps"] if step["name"] == "usage_from_issue_preview"), {})
     usage_from_issue_step = next((step for step in payload["steps"] if step["name"] == "usage_from_issue"), {})
+    prepare_next_pilot_step = next((step for step in payload["steps"] if step["name"] == "prepare_next_pilot"), {})
     usage_gaps_step = next((step for step in payload["steps"] if step["name"] == "usage_gaps"), {})
     pilot_campaign_step = next((step for step in payload["steps"] if step["name"] == "pilot_campaign"), {})
     migration_step = next((step for step in payload["steps"] if step["name"] == "migration_audit"), {})
@@ -151,7 +152,7 @@ def check_installable_cli() -> tuple[dict, dict]:
     if failed:
         detail = f"failed at {failed['name']}"
     else:
-        detail = "profiles={profiles} doctor={doctor_status} init={init_status} quickstart={quickstart_status} prepare_pilot={prepare_pilot_status} init_from_project={init_from_project_status} demo_capture={demo_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} equivalence={equivalence_status} local_eval={local_eval_status} public_usage_report={public_usage_report_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue_preview={usage_from_issue_preview_status} usage_from_issue={usage_from_issue_status} usage_gaps={usage_gaps_status} pilot_campaign={pilot_campaign_status} migration_audit={migration_status} eval={eval_status}".format(
+        detail = "profiles={profiles} doctor={doctor_status} init={init_status} quickstart={quickstart_status} prepare_pilot={prepare_pilot_status} init_from_project={init_from_project_status} demo_capture={demo_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} equivalence={equivalence_status} local_eval={local_eval_status} public_usage_report={public_usage_report_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue_preview={usage_from_issue_preview_status} usage_from_issue={usage_from_issue_status} prepare_next_pilot={prepare_next_pilot_status} usage_gaps={usage_gaps_status} pilot_campaign={pilot_campaign_status} migration_audit={migration_status} eval={eval_status}".format(
             profiles=profile_step.get("profile_count", "unknown"),
             doctor_status=doctor_step.get("status", "unknown"),
             init_status=init_step.get("status", "unknown"),
@@ -170,6 +171,7 @@ def check_installable_cli() -> tuple[dict, dict]:
             usage_from_harness_status=usage_from_harness_step.get("status", "unknown"),
             usage_from_issue_preview_status=usage_from_issue_preview_step.get("status", "unknown"),
             usage_from_issue_status=usage_from_issue_step.get("status", "unknown"),
+            prepare_next_pilot_status=prepare_next_pilot_step.get("status", "unknown"),
             usage_gaps_status=usage_gaps_step.get("status", "unknown"),
             pilot_campaign_status=pilot_campaign_step.get("status", "unknown"),
             migration_status=migration_step.get("status", "unknown"),
@@ -328,7 +330,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--min-usage-records", type=int, help="Minimum valid usage records required")
     parser.add_argument("--min-external-or-multi-project", type=int, help="Minimum external or multi-project usage records")
     parser.add_argument("--min-domains", type=int, help="Minimum distinct usage domains")
-    parser.add_argument("--min-installed-init-brief", type=int, help="Minimum usage records generated via installed init --brief or quickstart")
+    parser.add_argument("--min-installed-init-brief", type=int, help="Minimum usage records generated via installed brief-based generation")
     parser.add_argument("--record-dir", default=DEFAULT_RECORD_DIR.as_posix())
     parser.add_argument("--report", default=DEFAULT_REPORT.as_posix())
     parser.add_argument("--no-write", action="store_true", help="Do not write PROOF_STATUS.md")

@@ -152,7 +152,7 @@ def main() -> int:
     parser.add_argument("--require-success", action="store_true", help="Fail unless at least one successful usage record exists")
     parser.add_argument("--min-external-or-multi-project", type=int, default=0, help="Minimum external or multi-project usage records")
     parser.add_argument("--min-domains", type=int, default=0, help="Minimum distinct usage domains")
-    parser.add_argument("--min-installed-init-brief", type=int, default=0, help="Minimum usage records generated via installed init --brief or quickstart")
+    parser.add_argument("--min-installed-init-brief", type=int, default=0, help="Minimum usage records generated via installed brief-based generation")
     parser.add_argument("--json", action="store_true", help="Emit JSON")
     args = parser.parse_args()
 
