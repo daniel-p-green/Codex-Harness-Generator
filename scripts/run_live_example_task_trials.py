@@ -185,6 +185,29 @@ citations to section labels, open questions, and a clear `not legal advice`
 boundary. Do not invent statutes, cases, deadlines, parties, or legal standards.
 Verify the report file exists before replying.""",
     ),
+    TaskTrial(
+        name="financial-modeling-synthetic-scenarios",
+        example="synthetic-financial-modeling",
+        seed_files=(
+            (
+                "inputs/scenario_assumptions.csv",
+                """scenario,revenue,expenses,discount_rate,notes
+base,1000000,720000,0.10,steady renewal case
+upside,1180000,760000,0.10,higher conversion case
+downside,820000,700000,0.12,slower pipeline case
+""",
+            ),
+        ),
+        expected_file="reports/financial-scenario-note.md",
+        expected_terms=("not financial advice", "base", "downside"),
+        prompt="""Inspect `inputs/scenario_assumptions.csv` and use this
+generated financial modeling harness to write
+`reports/financial-scenario-note.md`. Include source scope, metric definitions,
+base/upside/downside scenario summary, operating profit calculation,
+assumptions, sensitivity notes, risk and uncertainty notes, and a clear `not
+financial advice` boundary. Do not invent market data, valuations, securities,
+or recommendations. Verify the report file exists before replying.""",
+    ),
 )
 
 

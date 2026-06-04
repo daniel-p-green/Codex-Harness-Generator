@@ -68,8 +68,8 @@ transcript.
 ## Remaining Opportunities
 
 - Expand live sample-generation examples into more high-risk domains once safe
-  synthetic briefs are available; security audit and legal research now have
-  public-safe task-trial fixtures.
+  synthetic briefs are available; security audit, legal research, and financial
+  modeling now have public-safe task-trial fixtures.
 - Add actual non-synthetic usage records through the privacy-checked recorder
   once safe summaries are available.
 - Extend high-risk domain guardrail mutations as new bundled domains are added

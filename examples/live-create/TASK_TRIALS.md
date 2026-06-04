@@ -1,6 +1,6 @@
 # Live Example Task Trials
 
-Generated: 2026-06-04T05:25:45Z
+Generated: 2026-06-04T05:41:52Z
 Status: PASS
 
 These trials copy checked-in live-create examples to a temporary
@@ -14,6 +14,7 @@ verify that each generated harness produces the expected output file.
 | `data-review-weekly-summary` | `synthetic-data-review` | PASS | `reports/weekly/2026-05-25-summary.md` |
 | `security-review-synthetic-code` | `synthetic-security-audit` | PASS | `reports/security-review.md` |
 | `legal-research-synthetic-policy` | `synthetic-legal-research` | PASS | `reports/legal-research-note.md` |
+| `financial-modeling-synthetic-scenarios` | `synthetic-financial-modeling` | PASS | `reports/financial-scenario-note.md` |
 
 ## Scope
 
