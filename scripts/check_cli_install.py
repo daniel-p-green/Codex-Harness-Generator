@@ -65,6 +65,7 @@ def build_payload() -> dict:
         pilot_issue = temp_root / "EXTERNAL_USAGE_ISSUE_DRAFT.md"
         usage_records = temp_root / "usage-records"
         usage_report = temp_root / "USAGE_RECORDS.md"
+        usage_gaps_report = temp_root / "USAGE_GAPS.md"
         issue_body = temp_root / "external-usage-issue.md"
         issue_body.write_text(
             "\n".join(
@@ -311,6 +312,18 @@ def build_payload() -> dict:
                     "--report",
                     usage_report.as_posix(),
                     "--force",
+                    "--json",
+                ],
+            ),
+            (
+                "usage_gaps",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "usage-gaps",
+                    "--record-dir",
+                    usage_records.as_posix(),
+                    "--report",
+                    usage_gaps_report.as_posix(),
                     "--json",
                 ],
             ),

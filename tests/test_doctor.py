@@ -39,6 +39,7 @@ class DoctorTests(unittest.TestCase):
                 {"name": "pilot_pack", "status": "pass"},
                 {"name": "usage_from_harness", "status": "pass"},
                 {"name": "usage_from_issue", "status": "pass"},
+                {"name": "usage_gaps", "status": "pass"},
                 {"name": "migration_audit", "status": "pass"},
                 {"name": "eval", "status": "pass"},
             ],
@@ -90,6 +91,7 @@ class DoctorTests(unittest.TestCase):
         self.assertIn("pilot_pack=pass", install_check["detail"])
         self.assertIn("usage_from_harness=pass", install_check["detail"])
         self.assertIn("usage_from_issue=pass", install_check["detail"])
+        self.assertIn("usage_gaps=pass", install_check["detail"])
         self.assertIn("migration_audit=pass", install_check["detail"])
         self.assertIn("installable_cli", [check["name"] for check in payload["checks"]])
 

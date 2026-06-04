@@ -109,6 +109,9 @@ replacement. What is proven today:
   `Docs/Environment/usage-records/`, and `scripts/validate_usage_records.py`
   can enforce stricter non-synthetic, external/multi-project, domain-coverage,
   and installed-generation proof thresholds when making real-world usage claims.
+- `scripts/usage_gaps.py` and `codex-harness usage-gaps` write
+  `Docs/Environment/USAGE_GAPS.md`, a concrete list of the remaining beta-exit
+  evidence gaps.
 - `scripts/usage_from_harness.py` and `codex-harness usage-from-harness`
   convert a generated harness's local eval report and task trials into a
   privacy-checked usage record.
@@ -448,6 +451,12 @@ Validate checked-in usage records before release:
 python scripts/codex_harness.py usage-validate
 ```
 
+Report what beta-exit usage evidence is still missing:
+
+```bash
+python scripts/codex_harness.py usage-gaps
+```
+
 To collect privacy-safe evidence from outside this repository, use the
 **External usage report** GitHub issue template and
 `Docs/Environment/EXTERNAL_USAGE_EVIDENCE.md`.
@@ -549,6 +558,7 @@ Common subcommands:
 | `pilot-pack <path>` | `export_pilot_pack.py` | Writes an external pilot guide and optional GitHub issue-body draft for one privacy-safe generated-harness trial. |
 | `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record. |
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
+| `usage-gaps` | `usage_gaps.py` | Reports remaining beta-exit usage evidence gaps and writes `Docs/Environment/USAGE_GAPS.md`. |
 | `proof-status` | `proof_status.py` | Summarizes checked-in proof readiness, live task-trial coverage, and usage evidence. |
 | `doctor` | `doctor.py` | Runs a fast local readiness check and prints the next useful commands. |
 | `snapshot` | `record_eval_snapshot.py` | Records an eval trend snapshot. |

@@ -880,6 +880,49 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_usage_gaps_delegates_to_gap_report(self):
+        command, _ = self.run_cli(
+            [
+                "usage-gaps",
+                "--record-dir",
+                "/tmp/records",
+                "--report",
+                "/tmp/USAGE_GAPS.md",
+                "--min-records",
+                "5",
+                "--min-external-or-multi-project",
+                "3",
+                "--min-domains",
+                "4",
+                "--min-installed-init-brief",
+                "2",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/usage_gaps.py",
+                "--record-dir",
+                "/tmp/records",
+                "--report",
+                "/tmp/USAGE_GAPS.md",
+                "--min-records",
+                "5",
+                "--min-external-or-multi-project",
+                "3",
+                "--min-domains",
+                "4",
+                "--min-installed-init-brief",
+                "2",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
     def test_proof_status_delegates_to_status_script(self):
         command, _ = self.run_cli(
             [

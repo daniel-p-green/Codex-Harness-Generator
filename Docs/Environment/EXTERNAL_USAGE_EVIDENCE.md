@@ -112,6 +112,7 @@ python scripts/codex_harness.py usage-record \
 Then verify:
 
 ```bash
+python scripts/codex_harness.py usage-gaps
 python scripts/codex_harness.py usage-validate \
   --min-records 3 \
   --require-non-synthetic \

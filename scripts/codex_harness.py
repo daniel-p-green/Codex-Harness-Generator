@@ -430,6 +430,26 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("validate_usage_records.py", command)
 
+    if args.command == "usage-gaps":
+        command = []
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.report:
+            command.extend(["--report", args.report])
+        if args.min_records is not None:
+            command.extend(["--min-records", str(args.min_records)])
+        if args.min_external_or_multi_project is not None:
+            command.extend(["--min-external-or-multi-project", str(args.min_external_or_multi_project)])
+        if args.min_domains is not None:
+            command.extend(["--min-domains", str(args.min_domains)])
+        if args.min_installed_init_brief is not None:
+            command.extend(["--min-installed-init-brief", str(args.min_installed_init_brief)])
+        if args.no_write:
+            command.append("--no-write")
+        if args.json:
+            command.append("--json")
+        return python_script("usage_gaps.py", command)
+
     if args.command == "proof-status":
         command = []
         if args.min_live_trials is not None:
@@ -735,6 +755,16 @@ def make_parser() -> argparse.ArgumentParser:
     usage_validate.add_argument("--min-domains", type=int, help="Minimum distinct usage domains")
     usage_validate.add_argument("--min-installed-init-brief", type=int, help="Minimum usage records generated via installed init --brief")
     usage_validate.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    usage_gaps = subparsers.add_parser("usage-gaps", help="Report remaining beta-exit usage evidence gaps")
+    usage_gaps.add_argument("--record-dir", help="Directory where usage record JSON files are read")
+    usage_gaps.add_argument("--report", help="Usage-gaps Markdown report path")
+    usage_gaps.add_argument("--min-records", type=int, help="Target valid usage records")
+    usage_gaps.add_argument("--min-external-or-multi-project", type=int, help="Target external or multi-project records")
+    usage_gaps.add_argument("--min-domains", type=int, help="Target distinct domains")
+    usage_gaps.add_argument("--min-installed-init-brief", type=int, help="Target records generated via installed init --brief")
+    usage_gaps.add_argument("--no-write", action="store_true", help="Do not write the Markdown report")
+    usage_gaps.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     proof_status = subparsers.add_parser("proof-status", help="Summarize checked-in product-proof readiness")
     proof_status.add_argument("--min-live-trials", type=int, help="Minimum passing live task trials required")
