@@ -26,6 +26,7 @@ Already proven:
 - Checked-in deterministic, create-acceptance, brief-acceptance, and live-create
   examples.
 - Privacy-checked usage-record validation.
+- Copied-harness evidence conversion into privacy-checked usage records.
 - External usage-report intake.
 - Short deterministic demo capture through `codex-harness demo-capture`.
 
@@ -54,7 +55,9 @@ The project can stop calling itself a beta only when all of these are true:
 
 1. Add external usage records.
    Use `.github/ISSUE_TEMPLATE/external-usage-report.yml` and
-   `Docs/Environment/EXTERNAL_USAGE_EVIDENCE.md`.
+   `Docs/Environment/EXTERNAL_USAGE_EVIDENCE.md`. When a generated harness has
+   local task trials, use `codex-harness usage-from-harness` to draft the
+   privacy-checked record from copied-harness evidence.
 
 2. Add more public-safe live examples.
    Prioritize domains where the generated harness has high-risk boundaries:

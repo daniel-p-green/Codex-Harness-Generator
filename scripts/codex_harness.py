@@ -238,6 +238,44 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("record_usage_case.py", command)
 
+    if args.command == "usage-from-harness":
+        command = [
+            args.harness,
+            "--slug",
+            args.slug,
+            "--title",
+            args.title,
+            "--domain",
+            args.domain,
+            "--evidence-type",
+            args.evidence_type,
+            "--privacy-review",
+            args.privacy_review,
+        ]
+        if args.harness_label:
+            command.extend(["--harness-label", args.harness_label])
+        if args.task_summary:
+            command.extend(["--task-summary", args.task_summary])
+        if args.outcome:
+            command.extend(["--outcome", args.outcome])
+        for evidence in args.evidence:
+            command.extend(["--evidence", evidence])
+        for verification in args.verification:
+            command.extend(["--verification", verification])
+        for limitation in args.limitation:
+            command.extend(["--limitation", limitation])
+        if args.generated:
+            command.extend(["--generated", args.generated])
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.report:
+            command.extend(["--report", args.report])
+        if args.force:
+            command.append("--force")
+        if args.json:
+            command.append("--json")
+        return python_script("usage_from_harness.py", command)
+
     if args.command == "usage-validate":
         command = []
         if args.record_dir:
@@ -412,6 +450,25 @@ def make_parser() -> argparse.ArgumentParser:
     usage.add_argument("--report", help="Usage-record Markdown report path")
     usage.add_argument("--force", action="store_true", help="Replace existing record with same slug")
     usage.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    usage_from_harness = subparsers.add_parser("usage-from-harness", help="Create usage evidence from a generated harness's local reports")
+    usage_from_harness.add_argument("harness", help="Generated harness directory")
+    usage_from_harness.add_argument("--slug", required=True, help="Stable record slug")
+    usage_from_harness.add_argument("--title", required=True, help="Short record title")
+    usage_from_harness.add_argument("--domain", required=True, help="Usage domain")
+    usage_from_harness.add_argument("--harness-label", help="Public-safe harness path label")
+    usage_from_harness.add_argument("--task-summary", help="Public-safe task summary")
+    usage_from_harness.add_argument("--outcome", choices=["failed", "inconclusive", "partial", "success"], help="Override derived outcome")
+    usage_from_harness.add_argument("--evidence-type", choices=["private-summary", "sanitized", "synthetic"], required=True)
+    usage_from_harness.add_argument("--evidence", action="append", default=[], help="Additional public-safe evidence item; repeatable")
+    usage_from_harness.add_argument("--verification", action="append", default=[], help="Additional verification item; repeatable")
+    usage_from_harness.add_argument("--privacy-review", required=True, help="Public-safe privacy review note")
+    usage_from_harness.add_argument("--limitation", action="append", default=[], help="Additional limitation; repeatable")
+    usage_from_harness.add_argument("--generated", help="UTC timestamp override")
+    usage_from_harness.add_argument("--record-dir", help="Directory where usage record JSON files are written")
+    usage_from_harness.add_argument("--report", help="Usage-record Markdown report path")
+    usage_from_harness.add_argument("--force", action="store_true", help="Replace existing record with same slug")
+    usage_from_harness.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     usage_validate = subparsers.add_parser("usage-validate", help="Validate checked-in generated-harness usage evidence")
     usage_validate.add_argument("--record-dir", help="Directory where usage record JSON files are read")

@@ -98,6 +98,9 @@ replacement. What is proven today:
   `Docs/Environment/usage-records/`, and `scripts/validate_usage_records.py`
   can enforce stricter non-synthetic proof thresholds when making real-world
   usage claims.
+- `scripts/usage_from_harness.py` and `codex-harness usage-from-harness`
+  convert a generated harness's local eval report and task trials into a
+  privacy-checked usage record.
 - `Docs/Environment/usage-records/` includes sanitized self-dogfood usage
   records from this public repo's Codex work. They are useful evidence, but not
   yet external or longitudinal adoption proof.
@@ -343,6 +346,22 @@ python scripts/codex_harness.py usage-record \
   --limitation "Raw project files are private."
 ```
 
+After recording task trials in a copied generated harness, refresh its local
+eval report and create a usage record from that local evidence:
+
+```bash
+python scripts/codex_harness.py local-eval /tmp/codex-rag-harness
+python scripts/codex_harness.py usage-from-harness /tmp/codex-rag-harness \
+  --slug rag-harness-trial \
+  --title "RAG harness trial" \
+  --domain "LLM app" \
+  --harness-label "RAG harness private repo" \
+  --evidence-type private-summary \
+  --privacy-review "Private-summary evidence only; no secrets, personal data, private repository names, or raw logs." \
+  --limitation "Single private task trial, not longitudinal proof" \
+  --json
+```
+
 Validate checked-in usage records before release:
 
 ```bash
@@ -425,6 +444,7 @@ Common subcommands:
 | `source-freshness` | `check_source_freshness.py` | Confirms official OpenAI source URLs are reachable. |
 | `semantic-alignment` | `check_semantic_alignment.py` | Checks local guidance against official Codex doc concepts. |
 | `usage-record` | `record_usage_case.py` | Records sanitized generated-harness usage evidence. |
+| `usage-from-harness` | `usage_from_harness.py` | Converts copied-harness task trials and eval reports into a privacy-checked usage record. |
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
 | `proof-status` | `proof_status.py` | Summarizes checked-in proof readiness, live task-trial coverage, and usage evidence. |
 | `doctor` | `doctor.py` | Runs a fast local readiness check and prints the next useful commands. |

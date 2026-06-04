@@ -133,6 +133,13 @@ def record_path(record_dir: Path, slug: str) -> Path:
     return record_dir / f"{slug}.json"
 
 
+def display_path(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(REPO_ROOT).as_posix()
+    except ValueError:
+        return path.name
+
+
 def write_record(record_dir: Path, record: UsageRecord, force: bool = False) -> Path:
     validate_record(record)
     record_dir.mkdir(parents=True, exist_ok=True)
@@ -260,11 +267,11 @@ def main() -> int:
     write_report(Path(args.report), records)
 
     if args.json:
-        print(json.dumps({**record.to_dict(), "path": path.as_posix(), "report": args.report}, indent=2))
+        print(json.dumps({**record.to_dict(), "path": display_path(path), "report": display_path(Path(args.report))}, indent=2))
     else:
         print(f"Usage record: {record.outcome.upper()}")
-        print(f"- record: {path}")
-        print(f"- report: {args.report}")
+        print(f"- record: {display_path(path)}")
+        print(f"- report: {display_path(Path(args.report))}")
     return 0
 
 

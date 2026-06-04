@@ -480,6 +480,83 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_usage_from_harness_delegates_to_bridge_script(self):
+        command, _ = self.run_cli(
+            [
+                "usage-from-harness",
+                "/tmp/harness",
+                "--slug",
+                "demo",
+                "--title",
+                "Demo",
+                "--domain",
+                "software",
+                "--harness-label",
+                "public harness label",
+                "--task-summary",
+                "Public-safe task.",
+                "--outcome",
+                "success",
+                "--evidence-type",
+                "synthetic",
+                "--evidence",
+                "extra evidence",
+                "--verification",
+                "extra verification",
+                "--privacy-review",
+                "Synthetic only.",
+                "--limitation",
+                "One task.",
+                "--generated",
+                "2026-06-04T00:00:00Z",
+                "--record-dir",
+                "/tmp/records",
+                "--report",
+                "/tmp/USAGE_RECORDS.md",
+                "--force",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/usage_from_harness.py",
+                "/tmp/harness",
+                "--slug",
+                "demo",
+                "--title",
+                "Demo",
+                "--domain",
+                "software",
+                "--evidence-type",
+                "synthetic",
+                "--privacy-review",
+                "Synthetic only.",
+                "--harness-label",
+                "public harness label",
+                "--task-summary",
+                "Public-safe task.",
+                "--outcome",
+                "success",
+                "--evidence",
+                "extra evidence",
+                "--verification",
+                "extra verification",
+                "--limitation",
+                "One task.",
+                "--generated",
+                "2026-06-04T00:00:00Z",
+                "--record-dir",
+                "/tmp/records",
+                "--report",
+                "/tmp/USAGE_RECORDS.md",
+                "--force",
+                "--json",
+            ],
+            command,
+        )
+
     def test_usage_validate_delegates_to_validator(self):
         command, _ = self.run_cli(
             [

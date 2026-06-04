@@ -56,6 +56,8 @@ def build_payload() -> dict:
         venv = temp_root / "venv"
         generated = temp_root / "generated"
         demo_generated = temp_root / "demo-generated"
+        usage_records = temp_root / "usage-records"
+        usage_report = temp_root / "USAGE_RECORDS.md"
 
         commands = [
             ("create_venv", [sys.executable, "-m", "venv", "--system-site-packages", venv.as_posix()]),
@@ -104,7 +106,52 @@ def build_payload() -> dict:
                 ],
             ),
             ("validate", [(venv / "bin" / "codex-harness").as_posix(), "validate", generated.as_posix(), "--json"]),
-            ("local_eval", [(venv / "bin" / "codex-harness").as_posix(), "local-eval", generated.as_posix(), "--json", "--no-write"]),
+            (
+                "record_task_trial",
+                [
+                    (venv / "bin" / "python").as_posix(),
+                    (generated / "scripts" / "record-task-trial.py").as_posix(),
+                    "--task",
+                    "install smoke generated-harness task",
+                    "--outcome",
+                    "success",
+                    "--evidence",
+                    "public-safe install smoke artifact",
+                    "--verification",
+                    "codex-harness validate and local-eval",
+                    "--privacy-review",
+                    "synthetic install-smoke evidence only",
+                    "--limitations",
+                    "single synthetic install smoke",
+                ],
+            ),
+            ("local_eval", [(venv / "bin" / "codex-harness").as_posix(), "local-eval", generated.as_posix(), "--json"]),
+            (
+                "usage_from_harness",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "usage-from-harness",
+                    generated.as_posix(),
+                    "--slug",
+                    "install-smoke",
+                    "--title",
+                    "Install smoke generated harness",
+                    "--domain",
+                    "install smoke",
+                    "--harness-label",
+                    "install-smoke generated harness",
+                    "--evidence-type",
+                    "synthetic",
+                    "--privacy-review",
+                    "synthetic install-smoke evidence only",
+                    "--record-dir",
+                    usage_records.as_posix(),
+                    "--report",
+                    usage_report.as_posix(),
+                    "--force",
+                    "--json",
+                ],
+            ),
             ("migration_audit", [(venv / "bin" / "codex-harness").as_posix(), "migration-audit", generated.as_posix(), "--json"]),
             ("eval", [(venv / "bin" / "codex-harness").as_posix(), "eval", generated.as_posix()]),
         ]
