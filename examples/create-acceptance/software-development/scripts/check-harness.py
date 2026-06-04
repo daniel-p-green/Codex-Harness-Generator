@@ -124,6 +124,12 @@ def main() -> int:
     check_manifest_references(issues)
 
     require_terms(
+        "Docs/GETTING_STARTED.md",
+        "getting started",
+        ["first useful task loop", "verification menu", "evidence commands", "record-task-trial.py", "run-harness-evals.py", "privacy review", "limitations"],
+        issues,
+    )
+    require_terms(
         "Docs/Environment/EVAL_PLAN.md",
         "eval plan",
         ["success criteria", "smoke checks", "acceptance checks", "reviewer check", "regression checks", "inspect", "verify", "risk"],

@@ -112,6 +112,9 @@ replacement. What is proven today:
 - `scripts/usage_from_harness.py` and `codex-harness usage-from-harness`
   convert a generated harness's local eval report and task trials into a
   privacy-checked usage record.
+- Generated `Docs/GETTING_STARTED.md` files now include a first useful task
+  loop, profile-specific verification menu, task-trial recording command, local
+  eval command, and privacy-safe reporting boundary.
 - `scripts/export_evidence_packet.py` and `codex-harness evidence-packet`
   write a public-safe Markdown packet from a copied harness's local eval report
   and task trials before maintainers decide whether a usage record is justified.

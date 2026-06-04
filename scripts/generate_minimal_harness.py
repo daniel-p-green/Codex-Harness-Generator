@@ -629,6 +629,97 @@ leads with bugs, regressions, privacy/safety issues, and missing tests or checks
 """
 
 
+def getting_started(profile: Profile, generated_at: str) -> str:
+    verification = "\n".join(f"- {item}" for item in profile.verification)
+    return f"""
+# Getting Started
+
+Open Codex in this project and ask for a small verified task. This harness
+expects the assistant to inspect files before editing, avoid secrets, and verify
+work with the narrowest meaningful check.
+
+## First Checks
+
+1. Run `/health-check` to verify the harness structure.
+{numbered_list(profile.first_tasks, start=2)}
+
+The permission profile allows workspace edits while denying secrets, tokens,
+credentials, private keys, and `.env` files.
+
+You can also run the local smoke check without the generator repo:
+
+```bash
+python scripts/check-harness.py
+```
+
+## First Useful Task Loop
+
+Use this loop for the first real {profile.domain} task so the harness produces
+evidence, not just a successful setup check.
+
+1. Pick a small task with a visible artifact, file change, or source-backed
+   answer.
+2. Ask Codex to inspect the relevant files and state the planned verification
+   before it edits or summarizes.
+3. Complete the task, then run the narrowest meaningful check.
+4. Ask the reviewer to inspect correctness, privacy, safety, regressions, and
+   missing verification before finalizing.
+5. Record the result in `Docs/Environment/TASK_TRIALS.md`.
+6. Run the copied-harness eval report and decide whether any repeated friction
+   belongs in `Docs/Environment/IMPROVEMENT_LOG.md`.
+
+Good first-task evidence is concrete: a changed file, generated report, command
+output, source comparison, or reviewer finding. Do not record raw secrets,
+personal data, private repository names, email addresses, local machine paths,
+customer data, candidate data, proprietary source, or raw private logs.
+
+## Verification Menu
+
+Start with the checks below, then add project-specific commands to
+`Docs/Environment/EVAL_PLAN.md` after the first useful task.
+
+{verification}
+
+## Evidence Commands
+
+When a repeated issue appears, record it in the local improvement log:
+
+```bash
+python scripts/record-improvement.py --category CHECK_GAP --task "short task" --friction "what went wrong" --evidence "file or command evidence"
+```
+
+After a meaningful Codex task, record a task trial:
+
+```bash
+python scripts/record-task-trial.py --task "short task" --outcome success --evidence "artifact or file inspected" --verification "command or review completed" --privacy-review "public-safe summary only" --limitations "one task, not longitudinal proof"
+```
+
+Then summarize task-trial outcomes:
+
+```bash
+python scripts/summarize-task-trials.py
+```
+
+Summarize the improvement backlog:
+
+```bash
+python scripts/summarize-improvements.py
+```
+
+Run the copied-harness eval report:
+
+```bash
+python scripts/run-harness-evals.py
+```
+
+If this harness came from the public generator and the task is safe to describe,
+share only the local eval summary, task-trial summary, privacy review, and
+limitations. Keep raw private evidence out of public reports.
+
+Generated: {generated_at}
+"""
+
+
 def improvement_log(profile: Profile) -> str:
     return f"""
 # Improvement Log
@@ -1486,6 +1577,12 @@ def main() -> int:
     check_manifest_references(issues)
 
     require_terms(
+        "Docs/GETTING_STARTED.md",
+        "getting started",
+        ["first useful task loop", "verification menu", "evidence commands", "record-task-trial.py", "run-harness-evals.py", "privacy review", "limitations"],
+        issues,
+    )
+    require_terms(
         "Docs/Environment/EVAL_PLAN.md",
         "eval plan",
         ["success criteria", "smoke checks", "acceptance checks", "reviewer check", "regression checks", "inspect", "verify", "risk"],
@@ -1721,59 +1818,7 @@ Validate the generated harness and report failures before suggesting fixes.
 
     write(
         target / "Docs/GETTING_STARTED.md",
-        f"""
-# Getting Started
-
-Open Codex in this project and ask for a small verified task. This
-harness expects the assistant to inspect files before editing, avoid secrets, and
-verify work with the narrowest meaningful check.
-
-## First Checks
-
-1. Run `/health-check` to verify the harness structure.
-{numbered_list(profile.first_tasks, start=2)}
-
-The permission profile allows workspace edits while denying secrets, tokens,
-credentials, private keys, and `.env` files.
-
-You can also run the local smoke check without the generator repo:
-
-```bash
-python scripts/check-harness.py
-```
-
-When a repeated issue appears, record it in the local improvement log:
-
-```bash
-python scripts/record-improvement.py --category CHECK_GAP --task "short task" --friction "what went wrong" --evidence "file or command evidence"
-```
-
-After a meaningful Codex task, record a task trial:
-
-```bash
-python scripts/record-task-trial.py --task "short task" --outcome success --evidence "artifact or file inspected" --verification "command or review completed" --privacy-review "public-safe summary only"
-```
-
-Then summarize task-trial outcomes:
-
-```bash
-python scripts/summarize-task-trials.py
-```
-
-Summarize the improvement backlog:
-
-```bash
-python scripts/summarize-improvements.py
-```
-
-Run the copied-harness eval report:
-
-```bash
-python scripts/run-harness-evals.py
-```
-
-Generated: {generated_at}
-""",
+        getting_started(profile, generated_at),
     )
 
     write(

@@ -1,8 +1,8 @@
 # Getting Started
 
-Open Codex in this project and ask for a small verified task. This
-harness expects the assistant to inspect files before editing, avoid secrets, and
-verify work with the narrowest meaningful check.
+Open Codex in this project and ask for a small verified task. This harness
+expects the assistant to inspect files before editing, avoid secrets, and verify
+work with the narrowest meaningful check.
 
 ## First Checks
 
@@ -20,6 +20,38 @@ You can also run the local smoke check without the generator repo:
 python scripts/check-harness.py
 ```
 
+## First Useful Task Loop
+
+Use this loop for the first real DevOps and infrastructure task so the harness produces
+evidence, not just a successful setup check.
+
+1. Pick a small task with a visible artifact, file change, or source-backed
+   answer.
+2. Ask Codex to inspect the relevant files and state the planned verification
+   before it edits or summarizes.
+3. Complete the task, then run the narrowest meaningful check.
+4. Ask the reviewer to inspect correctness, privacy, safety, regressions, and
+   missing verification before finalizing.
+5. Record the result in `Docs/Environment/TASK_TRIALS.md`.
+6. Run the copied-harness eval report and decide whether any repeated friction
+   belongs in `Docs/Environment/IMPROVEMENT_LOG.md`.
+
+Good first-task evidence is concrete: a changed file, generated report, command
+output, source comparison, or reviewer finding. Do not record raw secrets,
+personal data, private repository names, email addresses, local machine paths,
+customer data, candidate data, proprietary source, or raw private logs.
+
+## Verification Menu
+
+Start with the checks below, then add project-specific commands to
+`Docs/Environment/EVAL_PLAN.md` after the first useful task.
+
+- Prefer dry-run, plan, lint, or validation commands before applying changes.
+- Inspect target environment names before editing deployment files.
+- Document rollback steps and commands that were not run.
+
+## Evidence Commands
+
 When a repeated issue appears, record it in the local improvement log:
 
 ```bash
@@ -29,7 +61,7 @@ python scripts/record-improvement.py --category CHECK_GAP --task "short task" --
 After a meaningful Codex task, record a task trial:
 
 ```bash
-python scripts/record-task-trial.py --task "short task" --outcome success --evidence "artifact or file inspected" --verification "command or review completed" --privacy-review "public-safe summary only"
+python scripts/record-task-trial.py --task "short task" --outcome success --evidence "artifact or file inspected" --verification "command or review completed" --privacy-review "public-safe summary only" --limitations "one task, not longitudinal proof"
 ```
 
 Then summarize task-trial outcomes:
@@ -49,5 +81,9 @@ Run the copied-harness eval report:
 ```bash
 python scripts/run-harness-evals.py
 ```
+
+If this harness came from the public generator and the task is safe to describe,
+share only the local eval summary, task-trial summary, privacy review, and
+limitations. Keep raw private evidence out of public reports.
 
 Generated: 2026-06-04

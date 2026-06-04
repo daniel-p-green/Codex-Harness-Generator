@@ -653,6 +653,13 @@ class GeneratedHarnessContractTests(unittest.TestCase):
             self.assertEqual(0, generate.returncode, generate.stdout + generate.stderr)
             getting_started = (target / "Docs/GETTING_STARTED.md").read_text(encoding="utf-8")
             self.assertIn("Generated: 2026-06-04", getting_started)
+            self.assertIn("## First Useful Task Loop", getting_started)
+            self.assertIn("## Verification Menu", getting_started)
+            self.assertIn("## Evidence Commands", getting_started)
+            self.assertIn("python scripts/record-task-trial.py", getting_started)
+            self.assertIn("python scripts/run-harness-evals.py", getting_started)
+            self.assertIn("privacy review", getting_started.lower())
+            self.assertIn("limitations", getting_started.lower())
 
     def test_refresh_deterministic_examples_outputs_valid_harnesses(self):
         with tempfile.TemporaryDirectory() as temp_dir:

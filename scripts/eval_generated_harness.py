@@ -479,7 +479,18 @@ def check_docs(root: Path, findings: list[Finding]) -> None:
     getting_started = root / "Docs/GETTING_STARTED.md"
     if getting_started.exists():
         text = read_text(getting_started).lower()
-        for phrase in ["codex", "verify", "permission"]:
+        for phrase in [
+            "codex",
+            "verify",
+            "permission",
+            "first useful task loop",
+            "verification menu",
+            "evidence commands",
+            "record-task-trial.py",
+            "run-harness-evals.py",
+            "privacy review",
+            "limitations",
+        ]:
             if phrase not in text:
                 add(findings, "getting_started", "user_clarity", "warn", "Docs/GETTING_STARTED.md", f"Getting started guide should mention {phrase}.")
 
