@@ -50,6 +50,10 @@ transcript.
 - Hidden assumptions: generated harnesses now require
   `Docs/Environment/ASSUMPTIONS.md`, and the evaluator warns when it lacks
   assumptions, limits, or verification steps.
+- Weak project-level evals: generated harnesses now require
+  `Docs/Environment/EVAL_PLAN.md`, and the evaluator warns when the plan lacks
+  success criteria, smoke checks, acceptance checks, reviewer checks, regression
+  checks, or explicit verification/risk language.
 - Stale manifests: the generated-harness evaluator now fails when
   `Docs/Environment/MANIFEST.md` lists files that do not exist.
 - Fixture coverage: golden fixtures now include assumptions ledgers, and tests

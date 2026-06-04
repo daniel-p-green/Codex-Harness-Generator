@@ -15,6 +15,8 @@ Already proven:
 - 20 deterministic starter profiles.
 - Brief-driven `codex-harness init --brief`.
 - Non-editable install smoke for the public CLI.
+- Generated harness eval plans with smoke, acceptance, reviewer, and regression
+  checks.
 - Checked-in deterministic, create-acceptance, brief-acceptance, and live-create
   examples.
 - Privacy-checked usage-record validation.

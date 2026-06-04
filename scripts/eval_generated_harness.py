@@ -238,6 +238,7 @@ def check_required_paths(root: Path, findings: list[Finding]) -> None:
         "Docs/Environment/GENESIS.md",
         "Docs/Environment/ARCHITECTURE.md",
         "Docs/Environment/ASSUMPTIONS.md",
+        "Docs/Environment/EVAL_PLAN.md",
         "Docs/Environment/VALIDATION_REPORT.md",
         "Docs/Environment/SOURCE_MAP.md",
     ]
@@ -493,6 +494,16 @@ def check_docs(root: Path, findings: list[Finding]) -> None:
         for phrase in ["assumption", "limit", "verify"]:
             if phrase not in text:
                 add(findings, "assumptions", "maintainability", "warn", "Docs/Environment/ASSUMPTIONS.md", f"Assumptions ledger should mention {phrase}.")
+
+    eval_plan = root / "Docs/Environment/EVAL_PLAN.md"
+    if eval_plan.exists():
+        text = read_text(eval_plan).lower()
+        for phrase in ["success criteria", "smoke checks", "acceptance checks", "reviewer check", "regression checks"]:
+            if phrase not in text:
+                add(findings, "eval_plan", "user_clarity", "warn", "Docs/Environment/EVAL_PLAN.md", f"Eval plan should include {phrase}.")
+        for phrase in ["inspect", "verify", "reviewer", "risk"]:
+            if phrase not in text:
+                add(findings, "eval_plan", "user_clarity", "warn", "Docs/Environment/EVAL_PLAN.md", f"Eval plan should mention {phrase}.")
 
 
 def check_manifest(root: Path, findings: list[Finding]) -> None:

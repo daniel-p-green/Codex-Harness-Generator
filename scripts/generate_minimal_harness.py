@@ -586,6 +586,49 @@ def optional_section(title: str, items: tuple[str, ...]) -> str:
     return f"\n## {title}\n\n{bullet_list(items)}\n"
 
 
+def eval_plan(profile: Profile) -> str:
+    return f"""
+# Eval Plan
+
+This plan defines the first project-specific checks to run after the generated
+Codex harness is copied into a real workspace. It complements the structural
+health check in `scripts/check-harness.py`.
+
+## Success Criteria
+
+- Codex inspects the relevant files before editing or summarizing.
+- Codex follows the {profile.domain} verification rules in `AGENTS.md`.
+- The reviewer agent catches correctness, privacy, safety, regression, and
+  missing-verification risks before work is called done.
+- The final response names any skipped checks, missing data, unresolved
+  assumptions, or remaining risk.
+
+## Smoke Checks
+
+{numbered_list(profile.first_tasks)}
+
+## Acceptance Checks
+
+Use these checks to verify task work before calling it done:
+
+{bullet_list(profile.verification)}
+
+## Reviewer Check
+
+Ask Codex to run the reviewer on one non-trivial completed task. The review
+passes only if it cites the files, commands, or source artifacts it inspected and
+leads with bugs, regressions, privacy/safety issues, and missing tests or checks.
+
+## Regression Checks
+
+- Re-run `python scripts/check-harness.py` after modifying harness files.
+- Re-run the narrowest project command used for the task after changing source
+  or deliverable files.
+- Update this eval plan when the project adds a new test runner, build command,
+  external service, compliance requirement, or recurring failure mode.
+"""
+
+
 def local_check_script() -> str:
     return r'''#!/usr/bin/env python3
 """Local smoke check for a generated Codex harness."""
@@ -614,6 +657,7 @@ REQUIRED_PATHS = [
     "Docs/Environment/ARCHITECTURE.md",
     "Docs/Environment/ASSUMPTIONS.md",
     "Docs/Environment/MANIFEST.md",
+    "Docs/Environment/EVAL_PLAN.md",
     "Docs/Environment/SOURCE_MAP.md",
     "Docs/Environment/VALIDATION_REPORT.md",
 ]
@@ -934,6 +978,7 @@ scoped permissions, compact core rules, and environment records.
 - Docs/Environment/ARCHITECTURE.md
 - Docs/Environment/ASSUMPTIONS.md
 - Docs/Environment/MANIFEST.md
+- Docs/Environment/EVAL_PLAN.md
 - Docs/Environment/SOURCE_MAP.md
 - Docs/Environment/VALIDATION_REPORT.md
 """,
@@ -964,12 +1009,15 @@ scoped permissions, compact core rules, and environment records.
         "Docs/Environment/ARCHITECTURE.md",
         "Docs/Environment/ASSUMPTIONS.md",
         "Docs/Environment/MANIFEST.md",
+        "Docs/Environment/EVAL_PLAN.md",
         "Docs/Environment/SOURCE_MAP.md",
         "Docs/Environment/VALIDATION_REPORT.md",
     ]
     if (target / CREATION_CONTEXT_PATH).exists():
         manifest_entries.append("Docs/Environment/CREATION_CONTEXT.md")
     write(target / "Docs/Environment/MANIFEST.md", "# Manifest\n\n" + "\n".join(f"- {entry}" for entry in manifest_entries))
+
+    write(target / "Docs/Environment/EVAL_PLAN.md", eval_plan(profile))
 
     write(target / "Docs/Environment/SOURCE_MAP.md", "# Source Map\n\n" + "\n".join(f"- {url}" for url in SOURCE_URLS))
 

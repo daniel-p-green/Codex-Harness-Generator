@@ -42,6 +42,9 @@ replacement. What is proven today:
   bundled domain preset.
 - Generated harnesses are required to include architecture, assumptions, source
   mapping, manifests, and validation reports.
+- Generated harnesses include `Docs/Environment/EVAL_PLAN.md`, a portable
+  project-specific eval plan with success criteria, smoke checks, acceptance
+  checks, reviewer checks, and regression checks.
 - Generated harnesses include `scripts/check-harness.py`, a local smoke check
   that can run without this generator repo.
 - `scripts/capture_live_create_example.py` provides a repeatable packaging path

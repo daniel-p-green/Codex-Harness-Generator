@@ -7,3 +7,4 @@
 - .agents/skills/health-check/SKILL.md
 - scripts/check-harness.py
 - Docs/Environment/ASSUMPTIONS.md
+- Docs/Environment/EVAL_PLAN.md

@@ -1,0 +1,42 @@
+# Eval Plan
+
+This plan defines the first project-specific checks to run after the generated
+Codex harness is copied into a real workspace. It complements the structural
+health check in `scripts/check-harness.py`.
+
+## Success Criteria
+
+- Codex inspects the relevant files before editing or summarizing.
+- Codex follows the financial modeling verification rules in `AGENTS.md`.
+- The reviewer agent catches correctness, privacy, safety, regression, and
+  missing-verification risks before work is called done.
+- The final response names any skipped checks, missing data, unresolved
+  assumptions, or remaining risk.
+
+## Smoke Checks
+
+1. Ask Codex to map assumptions, tabs, reports, and metric definitions.
+2. Ask for one source-backed scenario note.
+3. Ask the reviewer to inspect calculations and advice-boundary risks.
+
+## Acceptance Checks
+
+Use these checks to verify task work before calling it done:
+
+- Check formulas, assumptions, scenario labels, and source files before changing outputs.
+- Separate base, upside, downside, sensitivity, risk, uncertainty, and limits.
+- State decision support only; do not provide financial or investment advice.
+
+## Reviewer Check
+
+Ask Codex to run the reviewer on one non-trivial completed task. The review
+passes only if it cites the files, commands, or source artifacts it inspected and
+leads with bugs, regressions, privacy/safety issues, and missing tests or checks.
+
+## Regression Checks
+
+- Re-run `python scripts/check-harness.py` after modifying harness files.
+- Re-run the narrowest project command used for the task after changing source
+  or deliverable files.
+- Update this eval plan when the project adds a new test runner, build command,
+  external service, compliance requirement, or recurring failure mode.

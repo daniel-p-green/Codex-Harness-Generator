@@ -99,3 +99,4 @@ User inclination: lean simple. Status: Auto-confirmed (preset mode).
 - RTK recommendation level: mention
 - Agent consolidation notes: standard roster retained
 - AGENTS.md line target: 200
+- Docs/Environment/EVAL_PLAN.md
