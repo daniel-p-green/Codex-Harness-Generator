@@ -9,7 +9,7 @@ import shlex
 from collections import Counter
 from pathlib import Path
 
-from profile_catalog import PROFILES, recommendation_payload
+from profile_catalog import PROFILE_HINTS, PROFILES, recommendation_payload
 
 
 DEFAULT_IGNORE_DIRS = {
@@ -29,6 +29,16 @@ DEFAULT_IGNORE_DIRS = {
 }
 DEFAULT_IGNORE_FILES = {
     ".DS_Store",
+}
+
+MAX_TEXT_SIGNAL_BYTES = 12_000
+TEXT_SIGNAL_SUFFIXES = {
+    ".json",
+    ".md",
+    ".toml",
+    ".txt",
+    ".yaml",
+    ".yml",
 }
 
 CONFIG_SIGNALS = {
@@ -129,6 +139,10 @@ EXTENSION_PROFILE_BOOSTS = {
     ".ts": {"software-development": 8},
 }
 
+KNOWN_PROFILE_TERMS = tuple(
+    sorted({term for terms in PROFILE_HINTS.values() for term in terms}, key=lambda term: (len(term), term))
+)
+
 
 def should_skip(path: Path, root: Path) -> bool:
     try:
@@ -149,6 +163,25 @@ def is_config_signal(relative: Path) -> bool:
     return len(relative.parts) <= 2
 
 
+def extract_known_terms(text: str) -> list[str]:
+    normalized = text.lower().replace("_", " ").replace("-", " ")
+    matches = []
+    for term in KNOWN_PROFILE_TERMS:
+        if term.lower() in normalized:
+            matches.append(term)
+    return sorted(set(matches))
+
+
+def read_text_signal_terms(path: Path) -> list[str]:
+    if path.suffix.lower() not in TEXT_SIGNAL_SUFFIXES:
+        return []
+    try:
+        text = path.read_bytes()[:MAX_TEXT_SIGNAL_BYTES].decode("utf-8", errors="ignore")
+    except OSError:
+        return []
+    return extract_known_terms(text)
+
+
 def scan_project(root: Path, max_files: int) -> dict:
     if not root.exists():
         raise SystemExit(f"Project path does not exist: {root}")
@@ -162,6 +195,7 @@ def scan_project(root: Path, max_files: int) -> dict:
     extensions: Counter[str] = Counter()
     config_files: list[str] = []
     directories: set[str] = set()
+    content_terms: set[str] = set()
     sample_files: list[str] = []
 
     for path in sorted(root.rglob("*")):
@@ -180,6 +214,8 @@ def scan_project(root: Path, max_files: int) -> dict:
             truncated = True
             break
         relative = path.relative_to(root).as_posix()
+        content_terms.update(extract_known_terms(relative))
+        content_terms.update(read_text_signal_terms(path))
         if len(sample_files) < 12:
             sample_files.append(relative)
         name = path.name
@@ -195,6 +231,7 @@ def scan_project(root: Path, max_files: int) -> dict:
         "truncated": truncated,
         "config_files": sorted(config_files),
         "directories": sorted(directories),
+        "content_terms": sorted(content_terms),
         "extensions": dict(sorted(extensions.items(), key=lambda item: (-item[1], item[0]))[:12]),
         "sample_files": sample_files,
     }
@@ -207,6 +244,8 @@ def build_brief(scan: dict) -> str:
     for directory in scan["directories"]:
         terms.append(DIRECTORY_SIGNALS.get(directory, directory))
         terms.append(SIGNAL_TERMS.get(directory, ""))
+    if scan["content_terms"]:
+        terms.append("project signals " + " ".join(scan["content_terms"]))
     for extension, count in scan["extensions"].items():
         signal = EXTENSION_SIGNALS.get(extension, extension)
         terms.append(f"{signal} ({count})")
@@ -262,6 +301,7 @@ def build_payload(path: Path, max_files: int, limit: int) -> dict:
         "signals": {
             "config_files": scan["config_files"],
             "directories": scan["directories"],
+            "content_terms": scan["content_terms"],
             "extensions": scan["extensions"],
             "sample_files": scan["sample_files"],
         },
@@ -285,6 +325,7 @@ def format_payload(payload: dict) -> str:
     for label, values in (
         ("Config files", signals["config_files"]),
         ("Directories", signals["directories"]),
+        ("Content terms", signals["content_terms"]),
     ):
         lines.append(f"- {label}: {', '.join(values) if values else 'none detected'}")
     extension_summary = ", ".join(f"{key}={value}" for key, value in signals["extensions"].items())

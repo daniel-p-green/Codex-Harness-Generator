@@ -53,6 +53,33 @@ class InspectProjectTests(unittest.TestCase):
         self.assertTrue(all(temp_dir.name not in item for item in payload["signals"]["sample_files"]))
         self.assertNotIn(temp_dir.name, json.dumps(payload))
 
+    def test_build_payload_recommends_llm_app_from_thin_readme_and_path_signals(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(temp_dir.cleanup)
+        root = Path(temp_dir.name) / "existing-rag-app"
+        (root / "src").mkdir(parents=True)
+        (root / "evals").mkdir()
+        (root / "README.md").write_text(
+            "# Existing RAG App\n\nPrototype app for retrieval quality experiments.\n",
+            encoding="utf-8",
+        )
+        (root / "src" / "app.py").write_text(
+            "def answer(query):\n    return {\"query\": query, \"sources\": []}\n",
+            encoding="utf-8",
+        )
+        (root / "evals" / "rag_checks.json").write_text(
+            "{\"checks\": [\"source attribution\", \"retrieval precision\"]}\n",
+            encoding="utf-8",
+        )
+
+        payload = inspect_project.build_payload(root, max_files=100, limit=3)
+
+        self.assertEqual("pass", payload["status"])
+        self.assertEqual("llm-app", payload["recommended_profile"])
+        self.assertIn("rag", payload["signals"]["content_terms"])
+        self.assertIn("retrieval", payload["signals"]["content_terms"])
+        self.assertNotIn("Prototype app", json.dumps(payload))
+
     def test_inspect_project_cli_emits_json(self):
         temp_dir, root = self.make_project()
         self.addCleanup(temp_dir.cleanup)

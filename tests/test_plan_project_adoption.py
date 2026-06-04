@@ -60,6 +60,43 @@ class PlanProjectAdoptionTests(unittest.TestCase):
         self.assertTrue(any(check["command"] == "python scripts/check-harness.py" for check in payload["post_adoption_checks"]))
         self.assertNotIn(temp_dir.name, json.dumps(payload))
 
+    def test_build_payload_uses_readme_and_path_signals_for_thin_llm_project(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(temp_dir.cleanup)
+        root = Path(temp_dir.name) / "existing-rag-app"
+        (root / "src").mkdir(parents=True)
+        (root / "evals").mkdir()
+        (root / "README.md").write_text(
+            "# Existing RAG App\n\nPrototype app for retrieval quality experiments.\n",
+            encoding="utf-8",
+        )
+        (root / "src" / "app.py").write_text(
+            "def answer(query):\n    return {\"query\": query, \"sources\": []}\n",
+            encoding="utf-8",
+        )
+        (root / "evals" / "rag_checks.json").write_text(
+            "{\"checks\": [\"source attribution\", \"retrieval precision\"]}\n",
+            encoding="utf-8",
+        )
+
+        payload = plan_project_adoption.build_payload(
+            project=root,
+            profile=None,
+            project_name="Existing RAG App",
+            harness=None,
+            blueprint_out=None,
+            force_blueprint=False,
+            max_files=100,
+            limit=3,
+            generated_date="2026-06-04",
+            source_label="temp existing RAG app",
+        )
+
+        self.assertEqual("pass", payload["status"])
+        self.assertEqual("llm-app", payload["profile"])
+        self.assertEqual("metadata inspection", payload["selection_source"])
+        self.assertNotIn("Prototype app", json.dumps(payload))
+
     def test_write_report_lists_conflicts_and_privacy_boundary(self):
         temp_dir, root = self.make_project()
         self.addCleanup(temp_dir.cleanup)
