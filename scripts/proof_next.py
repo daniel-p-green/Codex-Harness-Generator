@@ -40,6 +40,111 @@ def build_prepare_next_command(pilot: dict, args: argparse.Namespace) -> str:
     return " ".join(parts)
 
 
+def quoted(value: object) -> str:
+    return json.dumps(str(value))
+
+
+def pilot_value(pilot: dict, key: str, fallback: str = "") -> str:
+    value = pilot.get(key)
+    if value is None:
+        return fallback
+    return str(value)
+
+
+def pilot_harness_label(pilot: dict) -> str:
+    return pilot_value(pilot, "harness_label", pilot_value(pilot, "project_name", pilot_value(pilot, "title")))
+
+
+def build_usage_from_harness_command(pilot: dict, args: argparse.Namespace, *, no_write: bool) -> str:
+    parts = [
+        "codex-harness",
+        "usage-from-harness",
+        "<generated-harness>",
+        "--slug",
+        pilot_value(pilot, "slug"),
+        "--title",
+        quoted(pilot_value(pilot, "title")),
+        "--domain",
+        quoted(pilot_value(pilot, "domain")),
+        "--harness-label",
+        quoted(pilot_harness_label(pilot)),
+        "--evidence-type",
+        "private-summary",
+        "--source-type",
+        pilot_value(pilot, "source_type", "external"),
+        "--generation-path",
+        pilot_value(pilot, "generation_path", "installed-quickstart"),
+        "--privacy-review",
+        quoted("Reporter confirmed public-safe private-summary evidence only."),
+        "--record-dir",
+        args.record_dir,
+        "--report",
+        args.usage_report,
+        "--pilot-record-dir",
+        args.pilot_record_dir,
+        "--pilot-board-report",
+        args.pilot_board_report,
+    ]
+    if no_write:
+        parts.append("--no-write")
+    parts.append("--json")
+    return " ".join(parts)
+
+
+def build_usage_from_issue_command(pilot: dict, args: argparse.Namespace, *, no_write: bool) -> str:
+    parts = [
+        "codex-harness",
+        "usage-from-issue",
+        "<completed-issue.md>",
+        "--slug",
+        pilot_value(pilot, "slug"),
+        "--title",
+        quoted(pilot_value(pilot, "title")),
+        "--record-dir",
+        args.record_dir,
+        "--report",
+        args.usage_report,
+        "--pilot-record-dir",
+        args.pilot_record_dir,
+        "--pilot-board-report",
+        args.pilot_board_report,
+    ]
+    if no_write:
+        parts.append("--no-write")
+    parts.append("--json")
+    return " ".join(parts)
+
+
+def build_conversion_commands(pilot: dict, args: argparse.Namespace) -> list[dict]:
+    return [
+        {
+            "name": "preview copied-harness evidence",
+            "command": build_usage_from_harness_command(pilot, args, no_write=True),
+            "purpose": (
+                "validate the generated harness's local eval and task-trial evidence without writing a usage record "
+                "or mutating the pilot board"
+            ),
+        },
+        {
+            "name": "convert copied-harness evidence",
+            "command": build_usage_from_harness_command(pilot, args, no_write=False),
+            "purpose": "write the checked usage record and convert the matching pilot after preview output is reviewed",
+        },
+        {
+            "name": "preview issue evidence",
+            "command": build_usage_from_issue_command(pilot, args, no_write=True),
+            "purpose": (
+                "validate a completed reporter issue body without writing a usage record or mutating the pilot board"
+            ),
+        },
+        {
+            "name": "convert issue evidence",
+            "command": build_usage_from_issue_command(pilot, args, no_write=False),
+            "purpose": "write the checked usage record and convert the matching pilot after preview output is reviewed",
+        },
+    ]
+
+
 def active_pilot_for_next(gaps_payload: dict, board_payload: dict) -> dict | None:
     next_pilot = (gaps_payload.get("suggested_pilots") or [None])[0]
     if not next_pilot:
@@ -89,22 +194,7 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
                     "purpose": "record outreach after the pilot pack is sent to a reporter",
                 }
             )
-        commands.append(
-            {
-                "name": "convert completed evidence",
-                "command": (
-                    "codex-harness usage-from-issue <completed-issue.md> "
-                    f"--slug {active_pilot['slug']} "
-                    f"--title {json.dumps(active_pilot['title'])} "
-                    f"--record-dir {args.record_dir} "
-                    f"--report {args.usage_report} "
-                    f"--pilot-record-dir {args.pilot_record_dir} "
-                    f"--pilot-board-report {args.pilot_board_report} "
-                    "--json"
-                ),
-                "purpose": "convert a completed reporter issue into checked usage evidence and update the pilot board",
-            }
-        )
+        commands.extend(build_conversion_commands(active_pilot, args))
     elif pilots:
         pilot = pilots[0]
         commands.extend(
@@ -124,22 +214,9 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
                     ),
                     "purpose": "verify the prepared pilot is tracked but not counted as usage proof",
                 },
-                {
-                    "name": "convert completed evidence",
-                    "command": (
-                        "codex-harness usage-from-issue <completed-issue.md> "
-                        f"--slug {pilot['slug']} "
-                        f"--title {json.dumps(pilot['title'])} "
-                        f"--record-dir {args.record_dir} "
-                        f"--report {args.usage_report} "
-                        f"--pilot-record-dir {args.pilot_record_dir} "
-                        f"--pilot-board-report {args.pilot_board_report} "
-                        "--json"
-                    ),
-                    "purpose": "convert a completed reporter issue into checked usage evidence and update the pilot board",
-                },
             ]
         )
+        commands.extend(build_conversion_commands(pilot, args))
     commands.extend(
         [
             {

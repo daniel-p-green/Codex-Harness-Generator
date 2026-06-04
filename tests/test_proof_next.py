@@ -96,6 +96,9 @@ class ProofNextTests(unittest.TestCase):
         self.assertTrue(any("codex-harness prepare-next-pilot /tmp/next-pilot" in command for command in commands))
         self.assertTrue(any("codex-harness pilot-board" in command for command in commands))
         self.assertTrue(any("codex-harness usage-from-issue" in command for command in commands))
+        self.assertTrue(any("codex-harness usage-from-harness <generated-harness>" in command for command in commands))
+        self.assertTrue(any("usage-from-issue <completed-issue.md>" in command and "--no-write --json" in command for command in commands))
+        self.assertTrue(any("usage-from-harness <generated-harness>" in command and "--no-write --json" in command for command in commands))
         self.assertTrue(any("codex-harness proof-status --beta-exit" in command for command in commands))
         self.assertIn("does not itself prove", payload["claim_boundary"])
         self.assertIsNone(payload["active_pilot"])
@@ -117,6 +120,9 @@ class ProofNextTests(unittest.TestCase):
         self.assertFalse(any("prepare-next-pilot" in command for command in commands))
         self.assertTrue(any("pilot-update llm-app-pilot --status invited" in command for command in commands))
         self.assertTrue(any("usage-from-issue <completed-issue.md> --slug llm-app-pilot" in command for command in commands))
+        self.assertTrue(any("usage-from-harness <generated-harness> --slug llm-app-pilot" in command for command in commands))
+        self.assertTrue(any("usage-from-issue <completed-issue.md>" in command and "--no-write --json" in command for command in commands))
+        self.assertTrue(any("usage-from-harness <generated-harness>" in command and "--no-write --json" in command for command in commands))
 
     def test_write_report_includes_next_pilot_and_claim_boundary(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -132,7 +138,9 @@ class ProofNextTests(unittest.TestCase):
         self.assertIn("# Proof Next Actions", text)
         self.assertIn("## Next Pilot", text)
         self.assertIn("codex-harness prepare-next-pilot", text)
+        self.assertIn("codex-harness usage-from-harness", text)
         self.assertIn("codex-harness usage-from-issue", text)
+        self.assertIn("--no-write --json", text)
         self.assertIn("This does not prove", text)
 
     def test_write_report_names_active_pilot_when_present(self):
