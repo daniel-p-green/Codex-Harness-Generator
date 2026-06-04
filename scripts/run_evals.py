@@ -15,6 +15,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 FIXTURE_ROOT = REPO_ROOT / "tests" / "fixtures" / "generated_harnesses"
 DETERMINISTIC_EXAMPLE_ROOT = REPO_ROOT / "examples" / "deterministic"
 CREATE_ACCEPTANCE_EXAMPLE_ROOT = REPO_ROOT / "examples" / "create-acceptance"
+LIVE_CREATE_EXAMPLE_ROOT = REPO_ROOT / "examples" / "live-create"
 
 
 def run_step(name: str, command: list[str]) -> dict:
@@ -63,6 +64,16 @@ def create_acceptance_example_paths() -> list[str]:
     ]
 
 
+def live_create_example_paths() -> list[str]:
+    if not LIVE_CREATE_EXAMPLE_ROOT.exists():
+        return []
+    return [
+        path.as_posix()
+        for path in sorted(LIVE_CREATE_EXAMPLE_ROOT.iterdir())
+        if path.is_dir()
+    ]
+
+
 def create_acceptance_live_paths(profile: str) -> list[str]:
     paths = create_acceptance_example_paths()
     if profile == "all":
@@ -82,6 +93,7 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as temp_dir:
         create_acceptance_target = Path(temp_dir) / "create-acceptance"
         live_paths = create_acceptance_live_paths(args.codex_live_profile)
+        live_create_paths = live_create_example_paths()
         if args.codex_live and not live_paths:
             parser.error(f"No checked-in create-acceptance example found for --codex-live-profile {args.codex_live_profile!r}")
         steps = [
@@ -135,6 +147,20 @@ def main() -> int:
             *(
                 [
                     run_step(
+                        "live_create_example_eval",
+                        [python, "scripts/eval_generated_harness.py", "--json", *live_create_paths],
+                    ),
+                    run_step(
+                        "live_create_example_smoke",
+                        [python, "scripts/smoke_generated_harness.py", "--json", *live_create_paths],
+                    ),
+                ]
+                if live_create_paths
+                else []
+            ),
+            *(
+                [
+                    run_step(
                         "create_acceptance_example_codex_live_smoke",
                         [
                             python,
@@ -160,6 +186,7 @@ def main() -> int:
                     python,
                     "-m",
                     "py_compile",
+                    "scripts/capture_live_create_example.py",
                     "scripts/eval_codex_port.py",
                     "scripts/eval_deterministic_profiles.py",
                     "scripts/eval_generated_harness.py",

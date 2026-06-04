@@ -1,0 +1,38 @@
+# Generated Harness Manifest
+
+Every generated handoff file below was created for `temporary synthetic target`.
+
+- `AGENTS.md`
+- `.codex/config.toml`
+- `.gitignore`
+- `.codex/rules/00-orchestrator.md`
+- `.codex/rules/01-autonomy.md`
+- `.codex/rules/02-context-management.md`
+- `.codex/rules/03-error-handling.md`
+- `.codex/rules/04-self-learning.md`
+- `.codex/agents/researcher.toml`
+- `.codex/agents/drafter.toml`
+- `.codex/agents/reviewer.toml`
+- `.agents/skills/state-save/SKILL.md`
+- `.agents/skills/state-load/SKILL.md`
+- `.agents/skills/update/SKILL.md`
+- `.agents/skills/health-check/SKILL.md`
+- `.agents/skills/process-inbox/SKILL.md`
+- `Docs/index.md`
+- `Docs/Areas/meeting-notes.md`
+- `Docs/Areas/project-planning.md`
+- `Docs/Decisions/index.md`
+- `Inbox/README.md`
+- `Outbox/README.md`
+- `Docs/GETTING_STARTED.md`
+- `Docs/Environment/CREATION_CONTEXT.md`
+- `Docs/Environment/GENESIS.md`
+- `Docs/Environment/ARCHITECTURE.md`
+- `Docs/Environment/VERSION.md`
+- `Docs/Environment/MANIFEST.md`
+- `Docs/Environment/ASSUMPTIONS.md`
+- `Docs/Environment/SOURCE_MAP.md`
+- `Docs/Environment/VALIDATION_REPORT.md`
+- `Docs/Environment/GENERATION_PROGRESS.md`
+- `README.md`
+- Docs/Environment/LIVE_CREATE_CAPTURE.md

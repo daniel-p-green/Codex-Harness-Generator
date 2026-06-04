@@ -1,0 +1,85 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+model_verbosity = "medium"
+approval_policy = "on-request"
+default_permissions = "synthetic-docs"
+
+[features]
+multi_agent = true
+memories = true
+apps = true
+hooks = true
+
+[permissions.synthetic-docs]
+description = "Workspace write access for synthetic documentation, with sensitive files denied and network access limited."
+extends = ":workspace"
+
+[permissions.synthetic-docs.filesystem]
+glob_scan_max_depth = 4
+
+[permissions.synthetic-docs.filesystem.":workspace_roots"]
+"." = "write"
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"**/secrets/**" = "deny"
+"**/*secret*" = "deny"
+"**/*token*" = "deny"
+"**/*credential*" = "deny"
+"**/*.pem" = "deny"
+"**/*.key" = "deny"
+"Docs/_working/**" = "write"
+"Inbox/**" = "write"
+"Outbox/**" = "write"
+
+[permissions.synthetic-docs.network]
+enabled = true
+mode = "limited"
+
+[permissions.synthetic-docs.network.domains]
+"developers.openai.com" = "allow"
+"docs.github.com" = "allow"
+
+[agents]
+max_threads = 3
+max_depth = 1
+job_max_runtime_seconds = 1200
+
+[agents.researcher]
+description = "Synthesizes evidence across synthetic notes and plans."
+config_file = "agents/researcher.toml"
+
+[agents.drafter]
+description = "Drafts and edits synthetic documentation artifacts."
+config_file = "agents/drafter.toml"
+
+[agents.reviewer]
+description = "Reviews documentation for accuracy, consistency, and public safety."
+config_file = "agents/reviewer.toml"
+
+[[skills.config]]
+path = "../.agents/skills/state-save"
+enabled = true
+
+[[skills.config]]
+path = "../.agents/skills/state-load"
+enabled = true
+
+[[skills.config]]
+path = "../.agents/skills/update"
+enabled = true
+
+[[skills.config]]
+path = "../.agents/skills/health-check"
+enabled = true
+
+[[skills.config]]
+path = "../.agents/skills/process-inbox"
+enabled = true
+
+[hooks.InstructionsLoaded]
+command = "sh -c 'count=$(find Docs/_working/retro -type f -name \"*.md\" 2>/dev/null | wc -l | tr -d \" \"); if [ \"$count\" -ge 5 ]; then echo \"Retro notes are accumulating; consider /update.\"; fi'"
+
+[hooks.PreCompact]
+command = "sh -c 'mkdir -p Docs/_working/state && date -u +%Y-%m-%dT%H:%M:%SZ >> Docs/_working/state/SESSION_CONTEXT.md'"

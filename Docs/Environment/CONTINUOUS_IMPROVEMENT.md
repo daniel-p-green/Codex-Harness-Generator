@@ -39,6 +39,23 @@ non-interactive and should not start the Codex TUI. By default it adds one live
 smoke check against `examples/create-acceptance/software-development`; use
 `--codex-live-profile all` for the full checked-in create-acceptance matrix.
 
+For public product-proof examples, capture only sanitized live `/create` outputs:
+
+```bash
+python scripts/capture_live_create_example.py /tmp/codex-live-target \
+  --capture-name synthetic-python-cli \
+  --project-brief "Synthetic Python CLI utility for local file cleanup" \
+  --source-label "temporary synthetic target" \
+  --run-codex \
+  --force
+```
+
+Review the generated `Docs/Environment/LIVE_CREATE_CAPTURE.md` before committing
+the capture under `examples/live-create/`. The capture helper requires
+`Docs/Environment/CREATION_CONTEXT.md` by default; use
+`--allow-missing-creation-context` only for explicitly labeled non-`/create`
+experiments that should not be treated as product proof.
+
 ## Fixture Coverage
 
 The current golden fixtures cover:

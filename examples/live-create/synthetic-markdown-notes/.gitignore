@@ -1,0 +1,5 @@
+Docs/_working/
+Outbox/*.docx
+Outbox/*.pdf
+*.tmp
+.DS_Store

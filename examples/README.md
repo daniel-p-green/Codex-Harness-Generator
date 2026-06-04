@@ -10,8 +10,9 @@ This directory contains checked-in example generated environments.
   snapshot with `CREATION_CONTEXT.md`, generated harness files, and
   `CREATE_ACCEPTANCE_REPORT.md`. Refresh it with
   `python scripts/refresh_create_acceptance_examples.py`.
-- Richer examples from live `/create` runs should be added separately when they
-  are available.
+- `live-create/` is reserved for sanitized examples from live, model-mediated
+  `/create` runs. Package them with
+  `python scripts/capture_live_create_example.py`.
 
 For fast local examples without waiting on the full model-mediated path, use the
 deterministic profile generator:

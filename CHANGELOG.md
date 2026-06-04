@@ -25,6 +25,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Added `scripts/refresh_create_acceptance_examples.py` and a checked-in deterministic preset `/create` acceptance example.
 - Added optional `python scripts/run_evals.py --codex-live` support for authenticated local Codex CLI live smoke checks.
 - Added `Docs/Environment/PROOF_MATRIX.md` to map public claims to evidence artifacts, commands, proven scope, and remaining product-proof gaps.
+- Added `scripts/capture_live_create_example.py` and `examples/live-create/README.md` for sanitized live `/create` capture packaging.
+- Added a checked-in sanitized live `/create` capture and offline eval/smoke coverage for live-create examples.
 
 ### Changed
 

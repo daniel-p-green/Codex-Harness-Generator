@@ -31,6 +31,11 @@ class RunEvalsTests(unittest.TestCase):
     def test_create_acceptance_live_paths_missing_profile(self):
         self.assertEqual([], run_evals.create_acceptance_live_paths("missing-profile"))
 
+    def test_live_create_example_paths_include_checked_in_captures(self):
+        paths = run_evals.live_create_example_paths()
+
+        self.assertTrue(any(path.endswith("examples/live-create/synthetic-markdown-notes") for path in paths))
+
 
 if __name__ == "__main__":
     unittest.main()

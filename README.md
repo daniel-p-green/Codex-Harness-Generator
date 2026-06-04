@@ -40,12 +40,14 @@ replacement. What is proven today:
   deterministic preset `/create` acceptance flow for every supported profile.
 - Generated harnesses are required to include architecture, assumptions, source
   mapping, manifests, and validation reports.
+- `scripts/capture_live_create_example.py` provides a repeatable packaging path
+  for sanitized live `/create` outputs.
 
 What still needs product proof:
 
 - Several fresh live `/create` runs in temporary projects.
-- Public example harnesses from the full `/create` flow, beyond deterministic
-  profile scaffolds.
+- Checked-in public example harnesses from the full `/create` flow, beyond
+  deterministic profile scaffolds.
 - Real use of generated harnesses on real Codex tasks.
 
 Until those live examples exist, treat the eval suite and golden fixtures as
@@ -165,6 +167,19 @@ python scripts/refresh_create_acceptance_examples.py
 python scripts/run_evals.py
 ```
 
+To package a sanitized live `/create` output after it has passed eval and smoke:
+
+```bash
+python scripts/capture_live_create_example.py /tmp/codex-live-target \
+  --capture-name synthetic-python-cli \
+  --project-brief "Synthetic Python CLI utility for local file cleanup" \
+  --source-label "temporary synthetic target" \
+  --force
+```
+
+The capture helper requires `Docs/Environment/CREATION_CONTEXT.md` by default so
+live examples prove the `/create` handoff, not just a valid generated harness.
+
 ## Commands
 
 | Command | What it does |
@@ -251,6 +266,9 @@ This runs:
 - `/create` trigger contract tests for CREATION_CONTEXT.md handoff scenarios.
 - Deterministic preset `/create` acceptance flow with final eval and smoke.
 - Checked-in create-acceptance example evaluation and smoke checks.
+- Checked-in live-create example evaluation and smoke checks when live captures
+  exist.
+- Live-create capture helper tests.
 - Contract and mutation tests.
 - Python compile checks.
 
