@@ -1,0 +1,59 @@
+name: Feature request
+description: Suggest a profile, workflow, proof check, or generator improvement.
+title: "[feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the problem and the smallest useful improvement. Please keep examples public-safe.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - new profile or domain
+        - init or generation flow
+        - generated harness quality
+        - eval, smoke, or proof gate
+        - installable CLI
+        - documentation
+        - external usage evidence
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is hard, missing, confusing, or risky today?
+      placeholder: It is hard to generate a useful harness for ...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed improvement
+      description: What should change?
+      placeholder: Add a profile or generator path that ...
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence or example
+      description: Public-safe evidence, examples, or acceptance criteria.
+      placeholder: |
+        - Example brief:
+        - Expected generated files or guardrails:
+        - How we would verify it:
+    validations:
+      required: false
+  - type: textarea
+    id: privacy
+    attributes:
+      label: Privacy review
+      description: Confirm the request contains no secrets, personal data, proprietary source, private paths, or raw logs.
+      placeholder: This request uses public-safe examples only.
+    validations:
+      required: true

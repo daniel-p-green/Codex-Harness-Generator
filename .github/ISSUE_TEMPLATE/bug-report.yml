@@ -1,0 +1,78 @@
+name: Bug report
+description: Report a reproducible problem with the generator, CLI, docs, or generated harness output.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Codex Harness Generator.
+
+        Do not include secrets, credentials, API keys, customer data, candidate data, proprietary source, private repository names, local machine paths, or raw private logs. Redacted command output is welcome.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - installable CLI
+        - init or generation
+        - profile recommendation
+        - generated harness quality
+        - eval or smoke gate
+        - documentation
+        - GitHub workflow
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What went wrong?
+      placeholder: The installed codex-harness command failed when running init with a brief.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Use public-safe commands and paths.
+      placeholder: |
+        1. Run `python -m pip install -e .`
+        2. Run `codex-harness init /tmp/example --brief "..."`
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: The command should generate a harness and report eval/smoke status.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include redacted output only.
+      placeholder: The command exited with ...
+    validations:
+      required: true
+  - type: textarea
+    id: checks
+    attributes:
+      label: Checks run
+      description: Paste public-safe results from relevant checks.
+      placeholder: |
+        - `python scripts/codex_harness.py gate`
+        - `python scripts/check_cli_install.py`
+    validations:
+      required: false
+  - type: textarea
+    id: privacy
+    attributes:
+      label: Privacy review
+      description: Confirm what you removed or redacted.
+      placeholder: Removed private repo names, local paths, secrets, and raw logs.
+    validations:
+      required: true

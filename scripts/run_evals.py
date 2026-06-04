@@ -272,6 +272,7 @@ def main() -> int:
                     "tests/test_live_example_task_trials.py",
                     "tests/test_proof_status.py",
                     "tests/test_profile_catalog.py",
+                    "tests/test_project_support_files.py",
                     "tests/test_record_eval_snapshot.py",
                     "tests/test_record_usage_case.py",
                     "tests/test_run_evals.py",

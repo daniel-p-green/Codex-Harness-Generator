@@ -111,11 +111,13 @@ Good contributions include:
 
 ### 5. Report Issues
 
-File issues for:
+File issues with the GitHub issue templates for:
+
 - Generated environments that don't work correctly
 - Missing or incorrect best practices
 - Intake questions that confuse users
 - Validation checks that produce false positives/negatives
+- External usage evidence
 
 Include: what you expected, what happened, which profile you used, and the generated VALIDATION_REPORT.md if available.
 
@@ -188,9 +190,8 @@ The environment-validator agent runs the full validation checklist automatically
 
 ## Roadmap
 
-Planned enhancements:
-
-- **Demo recording**: Record a terminal session (~2 minutes) showing the `/create` flow from profile selection through generated environment walkthrough. An [asciinema](https://asciinema.org/) recording or animated GIF both work well for this.
+See `Docs/Environment/ROADMAP.md` for beta exit criteria, near-term product
+proof work, and issue-intake guidance.
 
 ## Code of Conduct
 

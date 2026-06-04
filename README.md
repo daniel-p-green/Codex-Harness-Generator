@@ -94,7 +94,8 @@ usage evidence as strong product proof, not a guarantee that every future
 `/create` run will be ideal.
 
 For a claim-by-claim evidence map, see
-`Docs/Environment/PROOF_MATRIX.md`.
+`Docs/Environment/PROOF_MATRIX.md`. For beta exit criteria and near-term
+milestones, see `Docs/Environment/ROADMAP.md`.
 
 ## Why this exists
 
