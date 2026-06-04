@@ -110,6 +110,44 @@ harness to write `reports/weekly/2026-05-25-summary.md`. Include row count,
 columns, week-over-week changes, and chart-ready notes. Do not invent metric
 definitions. Verify the report file exists before replying.""",
     ),
+    TaskTrial(
+        name="security-review-synthetic-code",
+        example="synthetic-security-audit",
+        seed_files=(
+            (
+                "src/demo_app.py",
+                '''"""Synthetic vulnerable demo app for public-safe review."""
+
+import os
+import sqlite3
+
+DEMO_API_KEY = "fake-demo-key-not-real"
+
+
+def find_user(name):
+    connection = sqlite3.connect("demo.db")
+    query = f"select id, email from users where name = '{name}'"
+    return connection.execute(query).fetchall()
+
+
+def read_report(report_name):
+    base = "reports/public"
+    path = os.path.join(base, report_name)
+    with open(path, encoding="utf-8") as handle:
+        return handle.read()
+''',
+            ),
+        ),
+        expected_file="reports/security-review.md",
+        expected_terms=("SQL injection", "hardcoded", "path traversal"),
+        prompt="""Inspect `src/demo_app.py` and use this generated security
+audit harness to write `reports/security-review.md`. Include exactly these
+finding titles when supported by the file: `SQL injection`, `hardcoded API key`,
+and `path traversal`. For each finding include severity, affected path,
+evidence, why it matters, safe remediation, and verification skipped because no
+active testing is authorized. Do not run exploit code or scanners. Verify the
+report file exists before replying.""",
+    ),
 )
 
 

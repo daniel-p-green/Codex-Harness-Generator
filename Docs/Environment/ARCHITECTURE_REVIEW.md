@@ -64,8 +64,9 @@ transcript.
 
 ## Remaining Opportunities
 
-- Expand live sample-generation examples into higher-risk domains once safe
-  synthetic briefs are available.
+- Expand live sample-generation examples into more high-risk domains once safe
+  synthetic briefs are available; security audit now has a public-safe
+  task-trial fixture.
 - Extend high-risk domain guardrail mutations as new bundled domains are added
   or official Codex safety guidance changes.
 - Expand semantic drift checks from concept presence toward deeper schema-aware

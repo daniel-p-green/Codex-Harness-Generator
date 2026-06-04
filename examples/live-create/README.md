@@ -1,17 +1,20 @@
 # Live Create Examples
 
-This directory is reserved for sanitized examples from live, model-mediated
-`/create` runs. These examples should only be checked in after the generated
-target passes both:
+This directory contains sanitized examples from live, model-mediated `/create`
+runs plus explicitly labeled public-safe high-risk fixtures used by the same
+task-trial runner. Examples should only be checked in after the generated target
+or curated fixture passes both:
 
 ```bash
 python scripts/eval_generated_harness.py <target>
 python scripts/smoke_generated_harness.py <target>
 ```
 
-Each captured example must include `Docs/Environment/CREATION_CONTEXT.md`; that
-file is the trigger handoff artifact that distinguishes a `/create` pipeline
-capture from a generic generated harness.
+Each example must include `Docs/Environment/CREATION_CONTEXT.md`. For live
+captures, that file is the trigger handoff artifact that distinguishes a
+`/create` pipeline capture from a generic generated harness. For curated
+high-risk fixtures, it records the public-safe task-trial scope and must not
+claim real model-mediated capture.
 
 See `INDEX.md` for the checked-in capture matrix.
 

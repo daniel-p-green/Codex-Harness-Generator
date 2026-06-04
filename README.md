@@ -42,8 +42,9 @@ replacement. What is proven today:
   mapping, manifests, and validation reports.
 - `scripts/capture_live_create_example.py` provides a repeatable packaging path
   for sanitized live `/create` outputs.
-- `examples/live-create/` contains three sanitized live model-mediated `/create`
-  captures: knowledge work, Python CLI, and data analysis.
+- `examples/live-create/` contains sanitized live model-mediated `/create`
+  captures for knowledge work, Python CLI, and data analysis, plus a curated
+  public-safe high-risk security-audit task-trial fixture.
 - `scripts/run_live_example_task_trials.py` runs authenticated Codex task trials
   against temporary copies of those generated harnesses and verifies concrete
   output files.
@@ -64,7 +65,8 @@ replacement. What is proven today:
 What still needs product proof:
 
 - Real use of generated harnesses on real Codex tasks over time.
-- More live examples for specialized or higher-risk domains.
+- More live examples for specialized or higher-risk domains beyond the current
+  public-safe security-audit fixture.
 
 Until those real-world usage records exist, treat the eval suite, golden
 fixtures, deterministic examples, and synthetic live examples as strong product
