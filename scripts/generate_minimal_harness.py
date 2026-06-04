@@ -800,7 +800,7 @@ ideas from repeated friction.
 Append entries manually or with:
 
 ```bash
-python scripts/record-task-trial.py --task "short task" --outcome success --evidence "artifact or file inspected" --verification "command or review completed" --privacy-review "public-safe summary only"
+python scripts/record-task-trial.py --task "short task" --outcome success --evidence "artifact or file inspected" --verification "command or review completed" --privacy-review "public-safe summary only" --limitations "one task, not longitudinal proof"
 ```
 
 Summarize recorded trials with:
@@ -949,6 +949,7 @@ def record_task_trial_script() -> str:
 from __future__ import annotations
 
 import argparse
+import json
 import re
 from datetime import date
 from pathlib import Path
@@ -978,7 +979,7 @@ def ensure_entries_section(text: str) -> str:
     return text.rstrip() + "\n\n## Entries\n\n"
 
 
-def append_entry(args: argparse.Namespace) -> Path:
+def append_entry(args: argparse.Namespace) -> tuple[Path, dict[str, str]]:
     if args.outcome not in VALID_OUTCOMES:
         raise SystemExit(f"Unsupported outcome: {args.outcome}. Choose one of: {', '.join(sorted(VALID_OUTCOMES))}")
     for label in ["task", "evidence", "verification", "privacy_review", "harness_helped", "limitations"]:
@@ -989,21 +990,31 @@ def append_entry(args: argparse.Namespace) -> Path:
     text = TASK_TRIALS_PATH.read_text(encoding="utf-8") if TASK_TRIALS_PATH.exists() else "# Task Trials\n"
     text = ensure_entries_section(text)
     entry_date = args.date or date.today().isoformat()
+    entry = {
+        "date": entry_date,
+        "task": args.task,
+        "outcome": args.outcome,
+        "evidence": args.evidence,
+        "verification": args.verification,
+        "privacy_review": args.privacy_review,
+        "harness_helped": args.harness_helped or "not stated",
+        "limitations": args.limitations,
+    }
     lines = [
         f"### {entry_date} - {args.outcome.upper()} - {args.task}",
         "",
-        f"- Task: {args.task}",
-        f"- Outcome: {args.outcome}",
-        f"- Evidence: {args.evidence}",
-        f"- Verification: {args.verification}",
-        f"- Privacy review: {args.privacy_review}",
-        f"- Harness helped: {args.harness_helped or 'not stated'}",
-        f"- Limitations: {args.limitations or 'none stated'}",
+        f"- Task: {entry['task']}",
+        f"- Outcome: {entry['outcome']}",
+        f"- Evidence: {entry['evidence']}",
+        f"- Verification: {entry['verification']}",
+        f"- Privacy review: {entry['privacy_review']}",
+        f"- Harness helped: {entry['harness_helped']}",
+        f"- Limitations: {entry['limitations']}",
         "",
     ]
     TASK_TRIALS_PATH.parent.mkdir(parents=True, exist_ok=True)
     TASK_TRIALS_PATH.write_text(text + "\n".join(lines), encoding="utf-8")
-    return TASK_TRIALS_PATH
+    return TASK_TRIALS_PATH, entry
 
 
 def main() -> int:
@@ -1014,12 +1025,16 @@ def main() -> int:
     parser.add_argument("--verification", required=True, help="Check, command, review, or inspection that verified the outcome")
     parser.add_argument("--privacy-review", required=True, dest="privacy_review", help="Public-safe privacy review")
     parser.add_argument("--harness-helped", default="", dest="harness_helped", help="How the harness helped, if known")
-    parser.add_argument("--limitations", default="", help="Known limits of this trial")
+    parser.add_argument("--limitations", required=True, help="Known limits of this trial")
     parser.add_argument("--date", default="", help="YYYY-MM-DD override for deterministic records")
+    parser.add_argument("--json", action="store_true", help="Emit JSON payload")
     args = parser.parse_args()
 
-    path = append_entry(args)
-    print(f"Recorded task trial in {path.relative_to(ROOT).as_posix()}")
+    path, entry = append_entry(args)
+    if args.json:
+        print(json.dumps({"status": "pass", "path": path.relative_to(ROOT).as_posix(), "entry": entry}, indent=2))
+    else:
+        print(f"Recorded task trial in {path.relative_to(ROOT).as_posix()}")
     return 0
 
 

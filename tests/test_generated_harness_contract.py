@@ -96,6 +96,28 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         shutil.copytree(FIXTURES_ROOT / name, target)
         return temp_dir, target
 
+    def generate_harness(self, *extra_args: str) -> tuple[tempfile.TemporaryDirectory, Path]:
+        temp_dir = tempfile.TemporaryDirectory()
+        target = Path(temp_dir.name) / "generated"
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "scripts/generate_minimal_harness.py",
+                target.as_posix(),
+                "--generated-date",
+                "2026-06-04",
+                *extra_args,
+            ],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        if completed.returncode != 0:
+            temp_dir.cleanup()
+        self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+        return temp_dir, target
+
     def assert_has_check(self, result: dict, check: str) -> None:
         checks = {finding["check"] for finding in result["findings"]}
         self.assertIn(check, checks, result)
@@ -394,6 +416,71 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertIn("- Outcome: success", text)
         self.assertIn("- Privacy review: Public-safe synthetic task only.", text)
 
+    def test_generated_task_trial_recorder_requires_limitations(self):
+        temp_dir, target = self.generate_harness()
+        self.addCleanup(temp_dir.cleanup)
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "scripts/record-task-trial.py",
+                "--task",
+                "TODO audit",
+                "--outcome",
+                "success",
+                "--evidence",
+                "Generated TODO report was inspected.",
+                "--verification",
+                "python scripts/check-harness.py",
+                "--privacy-review",
+                "Public-safe synthetic task only.",
+            ],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertNotEqual(0, completed.returncode)
+        self.assertIn("--limitations", completed.stderr + completed.stdout)
+
+    def test_generated_task_trial_recorder_emits_json_payload(self):
+        temp_dir, target = self.generate_harness()
+        self.addCleanup(temp_dir.cleanup)
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "scripts/record-task-trial.py",
+                "--date",
+                "2026-06-04",
+                "--task",
+                "TODO audit",
+                "--outcome",
+                "success",
+                "--evidence",
+                "Generated TODO report was inspected.",
+                "--verification",
+                "python scripts/check-harness.py",
+                "--privacy-review",
+                "Public-safe synthetic task only.",
+                "--limitations",
+                "One local task trial.",
+                "--json",
+            ],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+        payload = json.loads(completed.stdout)
+        self.assertEqual("pass", payload["status"])
+        self.assertEqual("Docs/Environment/TASK_TRIALS.md", payload["path"])
+        self.assertEqual("TODO audit", payload["entry"]["task"])
+        self.assertEqual("One local task trial.", payload["entry"]["limitations"])
+
     def test_record_task_trial_script_rejects_unknown_outcome(self):
         temp_dir, target = self.copy_fixture()
         self.addCleanup(temp_dir.cleanup)
@@ -660,6 +747,8 @@ class GeneratedHarnessContractTests(unittest.TestCase):
             self.assertIn("python scripts/run-harness-evals.py", getting_started)
             self.assertIn("privacy review", getting_started.lower())
             self.assertIn("limitations", getting_started.lower())
+            task_trials = (target / "Docs/Environment/TASK_TRIALS.md").read_text(encoding="utf-8")
+            self.assertIn("--limitations", task_trials)
 
     def test_refresh_deterministic_examples_outputs_valid_harnesses(self):
         with tempfile.TemporaryDirectory() as temp_dir:
