@@ -629,6 +629,61 @@ leads with bugs, regressions, privacy/safety issues, and missing tests or checks
 """
 
 
+def improvement_log(profile: Profile) -> str:
+    return f"""
+# Improvement Log
+
+Use this log to turn repeated Codex friction into small, verified harness
+updates. Do not rewrite the harness from a single annoyance; wait for a repeated
+pattern or a clear correction from the user.
+
+## Categories
+
+| Category | Use when | Candidate update |
+|---|---|---|
+| CHECK_GAP | Codex could not find a runnable check or used the wrong one. | Update `Docs/Environment/EVAL_PLAN.md` or `AGENTS.md` verification rules. |
+| ROUTING_CORRECTION | The user corrected which files, workflow, or reviewer path mattered. | Update `AGENTS.md`, `.codex/rules/core.md`, or reviewer focus. |
+| PERMISSION_FRICTION | A needed safe command, path, or domain was blocked. | Update `.codex/config.toml` only after confirming scope and risk. |
+| SOURCE_FIDELITY | Codex summarized, edited, or claimed beyond available source evidence. | Add stronger source-check language to `AGENTS.md` or the eval plan. |
+| DOMAIN_RISK | A {profile.domain} risk was missed or under-explained. | Add a domain guardrail, reviewer instruction, or acceptance check. |
+
+## Seed Patterns
+
+- [PATTERN] Missing project command: if two tasks lack a clear runnable check,
+  add the real command to `Docs/Environment/EVAL_PLAN.md`.
+- [PATTERN] Reviewer too late: if review happens after final reporting, update
+  `AGENTS.md` or `.codex/rules/core.md` to route non-trivial work to reviewer
+  before final response.
+- [PATTERN] Permission mismatch: if the same safe local path or command is
+  blocked twice, document the scope here before changing `.codex/config.toml`.
+
+## Entry Template
+
+```text
+Date:
+Category:
+Task:
+Observed friction:
+Evidence:
+User correction, if any:
+Candidate harness update:
+Verification after update:
+Status: open | proposed | applied | rejected
+```
+
+## Update Rule
+
+Only apply a harness update when the entry has evidence and the proposed change
+directly addresses the friction. After an update, run:
+
+```bash
+python scripts/check-harness.py
+```
+
+Then run the relevant check from `Docs/Environment/EVAL_PLAN.md`.
+"""
+
+
 def local_check_script() -> str:
     return r'''#!/usr/bin/env python3
 """Local smoke check for a generated Codex harness."""
@@ -658,6 +713,7 @@ REQUIRED_PATHS = [
     "Docs/Environment/ASSUMPTIONS.md",
     "Docs/Environment/MANIFEST.md",
     "Docs/Environment/EVAL_PLAN.md",
+    "Docs/Environment/IMPROVEMENT_LOG.md",
     "Docs/Environment/SOURCE_MAP.md",
     "Docs/Environment/VALIDATION_REPORT.md",
 ]
@@ -801,6 +857,8 @@ editing, run the narrowest meaningful check, and report any skipped verification
 - Run tests when they exist; otherwise use source checks, dry runs, or the
   narrowest runnable command.
 - Use the reviewer for non-trivial changes before calling work done.
+- Record repeated workflow friction in `Docs/Environment/IMPROVEMENT_LOG.md`
+  before changing harness behavior.
 
 ## Verification
 
@@ -895,8 +953,9 @@ active and save state before context gets crowded.
 Error handling: fail loud when commands fail, inputs are missing, or verification
 cannot be completed.
 
-Self-learning: write retro notes for repeated issues and update the harness only
-after validated patterns emerge.
+Self-learning: write repeated friction and user corrections to
+`Docs/Environment/IMPROVEMENT_LOG.md`; update the harness only after validated
+patterns emerge.
 """,
     )
 
@@ -979,6 +1038,7 @@ scoped permissions, compact core rules, and environment records.
 - Docs/Environment/ASSUMPTIONS.md
 - Docs/Environment/MANIFEST.md
 - Docs/Environment/EVAL_PLAN.md
+- Docs/Environment/IMPROVEMENT_LOG.md
 - Docs/Environment/SOURCE_MAP.md
 - Docs/Environment/VALIDATION_REPORT.md
 """,
@@ -1010,6 +1070,7 @@ scoped permissions, compact core rules, and environment records.
         "Docs/Environment/ASSUMPTIONS.md",
         "Docs/Environment/MANIFEST.md",
         "Docs/Environment/EVAL_PLAN.md",
+        "Docs/Environment/IMPROVEMENT_LOG.md",
         "Docs/Environment/SOURCE_MAP.md",
         "Docs/Environment/VALIDATION_REPORT.md",
     ]
@@ -1018,6 +1079,8 @@ scoped permissions, compact core rules, and environment records.
     write(target / "Docs/Environment/MANIFEST.md", "# Manifest\n\n" + "\n".join(f"- {entry}" for entry in manifest_entries))
 
     write(target / "Docs/Environment/EVAL_PLAN.md", eval_plan(profile))
+
+    write(target / "Docs/Environment/IMPROVEMENT_LOG.md", improvement_log(profile))
 
     write(target / "Docs/Environment/SOURCE_MAP.md", "# Source Map\n\n" + "\n".join(f"- {url}" for url in SOURCE_URLS))
 

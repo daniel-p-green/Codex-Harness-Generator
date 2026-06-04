@@ -357,6 +357,27 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertLess(result["score"], 100, result)
         self.assert_has_check(result, "eval_plan")
 
+    def test_missing_improvement_log_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        (target / "Docs/Environment/IMPROVEMENT_LOG.md").unlink()
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"])
+        self.assert_has_check(result, "required_path")
+
+    def test_weak_improvement_log_warns(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        improvement_log = target / "Docs/Environment/IMPROVEMENT_LOG.md"
+        improvement_log.write_text("# Improvement Log\n\n- Write ideas here.\n", encoding="utf-8")
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("pass", result["status"], result)
+        self.assertGreater(result["warning_count"], 0, result)
+        self.assertLess(result["score"], 100, result)
+        self.assert_has_check(result, "improvement_log")
+
     def test_missing_assumptions_ledger_fails(self):
         temp_dir, target = self.copy_fixture()
         self.addCleanup(temp_dir.cleanup)

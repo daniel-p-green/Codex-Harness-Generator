@@ -239,6 +239,7 @@ def check_required_paths(root: Path, findings: list[Finding]) -> None:
         "Docs/Environment/ARCHITECTURE.md",
         "Docs/Environment/ASSUMPTIONS.md",
         "Docs/Environment/EVAL_PLAN.md",
+        "Docs/Environment/IMPROVEMENT_LOG.md",
         "Docs/Environment/VALIDATION_REPORT.md",
         "Docs/Environment/SOURCE_MAP.md",
     ]
@@ -504,6 +505,16 @@ def check_docs(root: Path, findings: list[Finding]) -> None:
         for phrase in ["inspect", "verify", "reviewer", "risk"]:
             if phrase not in text:
                 add(findings, "eval_plan", "user_clarity", "warn", "Docs/Environment/EVAL_PLAN.md", f"Eval plan should mention {phrase}.")
+
+    improvement_log = root / "Docs/Environment/IMPROVEMENT_LOG.md"
+    if improvement_log.exists():
+        text = read_text(improvement_log).lower()
+        for phrase in ["categories", "seed patterns", "entry template", "update rule"]:
+            if phrase not in text:
+                add(findings, "improvement_log", "maintainability", "warn", "Docs/Environment/IMPROVEMENT_LOG.md", f"Improvement log should include {phrase}.")
+        for phrase in ["friction", "evidence", "user correction", "verification after update"]:
+            if phrase not in text:
+                add(findings, "improvement_log", "maintainability", "warn", "Docs/Environment/IMPROVEMENT_LOG.md", f"Improvement log should mention {phrase}.")
 
 
 def check_manifest(root: Path, findings: list[Finding]) -> None:

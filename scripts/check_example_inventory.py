@@ -32,6 +32,7 @@ REQUIRED_HARNESS_PATHS = (
     "Docs/Environment/ASSUMPTIONS.md",
     "Docs/Environment/MANIFEST.md",
     "Docs/Environment/EVAL_PLAN.md",
+    "Docs/Environment/IMPROVEMENT_LOG.md",
     "Docs/Environment/SOURCE_MAP.md",
     "Docs/Environment/VALIDATION_REPORT.md",
 )

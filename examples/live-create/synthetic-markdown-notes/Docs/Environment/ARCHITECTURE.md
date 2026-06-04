@@ -96,3 +96,4 @@ Status: Auto-confirmed (preset mode)
 
 Use workspace write with sensitive recursive deny rules for `.env`, secrets, tokens, credentials, private keys, and certificates. Network is limited to official Codex/OpenAI and GitHub documentation domains.
 - Docs/Environment/EVAL_PLAN.md
+- Docs/Environment/IMPROVEMENT_LOG.md

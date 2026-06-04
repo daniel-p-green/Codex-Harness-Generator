@@ -54,6 +54,10 @@ transcript.
   `Docs/Environment/EVAL_PLAN.md`, and the evaluator warns when the plan lacks
   success criteria, smoke checks, acceptance checks, reviewer checks, regression
   checks, or explicit verification/risk language.
+- Thin self-improvement loop: generated harnesses now require
+  `Docs/Environment/IMPROVEMENT_LOG.md`, with friction categories, seed
+  patterns, an entry template, and an update rule that ties changes back to
+  evidence and verification.
 - Stale manifests: the generated-harness evaluator now fails when
   `Docs/Environment/MANIFEST.md` lists files that do not exist.
 - Fixture coverage: golden fixtures now include assumptions ledgers, and tests

@@ -16,5 +16,6 @@ active and save state before context gets crowded.
 Error handling: fail loud when commands fail, inputs are missing, or verification
 cannot be completed.
 
-Self-learning: write retro notes for repeated issues and update the harness only
-after validated patterns emerge.
+Self-learning: write repeated friction and user corrections to
+`Docs/Environment/IMPROVEMENT_LOG.md`; update the harness only after validated
+patterns emerge.

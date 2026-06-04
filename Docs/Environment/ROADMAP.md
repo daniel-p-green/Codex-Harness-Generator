@@ -17,6 +17,8 @@ Already proven:
 - Non-editable install smoke for the public CLI.
 - Generated harness eval plans with smoke, acceptance, reviewer, and regression
   checks.
+- Generated harness improvement logs that convert repeated friction and user
+  corrections into evidence-backed harness updates.
 - Checked-in deterministic, create-acceptance, brief-acceptance, and live-create
   examples.
 - Privacy-checked usage-record validation.

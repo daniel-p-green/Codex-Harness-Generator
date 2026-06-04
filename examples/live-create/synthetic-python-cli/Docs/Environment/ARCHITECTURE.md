@@ -51,3 +51,4 @@
 4. Infrastructure: permissions, ignore rules, working-memory folders.
 5. Documentation: manifest, assumptions, source map, validation report.
 - Docs/Environment/EVAL_PLAN.md
+- Docs/Environment/IMPROVEMENT_LOG.md

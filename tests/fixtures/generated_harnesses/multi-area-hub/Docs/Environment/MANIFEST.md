@@ -8,3 +8,4 @@
 - scripts/check-harness.py
 - Docs/Environment/ASSUMPTIONS.md
 - Docs/Environment/EVAL_PLAN.md
+- Docs/Environment/IMPROVEMENT_LOG.md

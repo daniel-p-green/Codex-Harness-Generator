@@ -13,6 +13,8 @@ editing, run the narrowest meaningful check, and report any skipped verification
 - Run tests when they exist; otherwise use source checks, dry runs, or the
   narrowest runnable command.
 - Use the reviewer for non-trivial changes before calling work done.
+- Record repeated workflow friction in `Docs/Environment/IMPROVEMENT_LOG.md`
+  before changing harness behavior.
 
 ## Verification
 

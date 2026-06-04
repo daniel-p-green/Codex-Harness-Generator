@@ -45,6 +45,9 @@ replacement. What is proven today:
 - Generated harnesses include `Docs/Environment/EVAL_PLAN.md`, a portable
   project-specific eval plan with success criteria, smoke checks, acceptance
   checks, reviewer checks, and regression checks.
+- Generated harnesses include `Docs/Environment/IMPROVEMENT_LOG.md`, a tracked
+  loop for converting repeated friction and user corrections into small,
+  evidence-backed harness updates.
 - Generated harnesses include `scripts/check-harness.py`, a local smoke check
   that can run without this generator repo.
 - `scripts/capture_live_create_example.py` provides a repeatable packaging path
