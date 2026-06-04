@@ -126,6 +126,10 @@ def main() -> int:
                 [python, "scripts/eval_deterministic_profiles.py", "--json"],
             ),
             run_step(
+                "installable_cli_smoke",
+                [python, "scripts/check_cli_install.py", "--json"],
+            ),
+            run_step(
                 "checked_in_example_inventory",
                 [python, "scripts/check_example_inventory.py", "--json"],
             ),
@@ -236,6 +240,7 @@ def main() -> int:
                     "scripts/codex_harness.py",
                     "scripts/capture_live_create_example.py",
                     "scripts/check_example_inventory.py",
+                    "scripts/check_cli_install.py",
                     "scripts/eval_codex_port.py",
                     "scripts/eval_deterministic_profiles.py",
                     "scripts/eval_generated_harness.py",
@@ -254,6 +259,7 @@ def main() -> int:
                     "scripts/simulate_create_trigger.py",
                     "scripts/smoke_generated_harness.py",
                     "scripts/validate_usage_records.py",
+                    "tests/test_cli_install.py",
                     "tests/test_create_acceptance.py",
                     "tests/test_brief_acceptance.py",
                     "tests/test_brief_acceptance_examples.py",

@@ -21,6 +21,8 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Check installable CLI
+        run: python scripts/check_cli_install.py
+
       - name: Run eval gate
         run: python scripts/run_evals.py
-

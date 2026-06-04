@@ -42,7 +42,7 @@ TEXT_SUFFIXES = {
     ".zsh",
 }
 
-SKIP_DIRS = {".git", "__pycache__", ".pytest_cache"}
+SKIP_DIRS = {".git", "__pycache__", ".pytest_cache", ".eggs", "build", "dist"}
 SKIP_FORBIDDEN_TEXT_PATHS = {
     "scripts/eval_codex_port.py",
     "scripts/eval_generated_harness.py",

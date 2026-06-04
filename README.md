@@ -58,6 +58,8 @@ replacement. What is proven today:
 - `scripts/codex_harness.py` gives users one thin local entry point for
   profile listing, profile descriptions, generation, acceptance, eval, smoke,
   gate, live-trial, source-freshness, and snapshot workflows.
+- `pyproject.toml` exposes that wrapper as an installable `codex-harness`
+  console command, and the release gate smokes the non-editable install path.
 - `scripts/record_eval_snapshot.py` records eval-gate snapshots under
   `Docs/Environment/eval-history/` and updates `Docs/Environment/EVAL_TRENDS.md`.
 - `scripts/check_source_freshness.py` verifies official OpenAI documentation

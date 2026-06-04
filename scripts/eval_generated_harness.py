@@ -59,7 +59,7 @@ TEXT_SUFFIXES = {
     ".yml",
     ".zsh",
 }
-SKIP_DIRS = {".git", "__pycache__", ".pytest_cache"}
+SKIP_DIRS = {".git", "__pycache__", ".pytest_cache", ".eggs", "build", "dist"}
 
 FORBIDDEN_TEXT = [
     (r"\bClaude\b", "Claude naming remains"),
