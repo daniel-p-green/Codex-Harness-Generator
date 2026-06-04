@@ -39,3 +39,4 @@
 - Docs/Environment/VERSION.md
 - Docs/Environment/LIVE_CREATE_CAPTURE.md
 - scripts/check-harness.py
+- scripts/record-improvement.py

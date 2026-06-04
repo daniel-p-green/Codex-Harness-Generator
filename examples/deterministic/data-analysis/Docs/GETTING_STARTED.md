@@ -20,4 +20,10 @@ You can also run the local smoke check without the generator repo:
 python scripts/check-harness.py
 ```
 
+When a repeated issue appears, record it in the local improvement log:
+
+```bash
+python scripts/record-improvement.py --category CHECK_GAP --task "short task" --friction "what went wrong" --evidence "file or command evidence"
+```
+
 Generated: 2026-06-04

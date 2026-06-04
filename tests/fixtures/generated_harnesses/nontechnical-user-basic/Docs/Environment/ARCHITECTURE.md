@@ -4,3 +4,4 @@ Single-project harness with one reviewer agent, one health-check skill, scoped p
 
 - Docs/Environment/EVAL_PLAN.md
 - Docs/Environment/IMPROVEMENT_LOG.md
+- scripts/record-improvement.py

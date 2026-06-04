@@ -233,6 +233,7 @@ def check_required_paths(root: Path, findings: list[Finding]) -> None:
         ".codex/rules",
         ".agents/skills",
         "scripts/check-harness.py",
+        "scripts/record-improvement.py",
         "Docs/GETTING_STARTED.md",
         "Docs/Environment/MANIFEST.md",
         "Docs/Environment/GENESIS.md",
@@ -512,7 +513,7 @@ def check_docs(root: Path, findings: list[Finding]) -> None:
         for phrase in ["categories", "seed patterns", "entry template", "update rule"]:
             if phrase not in text:
                 add(findings, "improvement_log", "maintainability", "warn", "Docs/Environment/IMPROVEMENT_LOG.md", f"Improvement log should include {phrase}.")
-        for phrase in ["friction", "evidence", "user correction", "verification after update"]:
+        for phrase in ["friction", "evidence", "user correction", "verification after update", "record-improvement.py"]:
             if phrase not in text:
                 add(findings, "improvement_log", "maintainability", "warn", "Docs/Environment/IMPROVEMENT_LOG.md", f"Improvement log should mention {phrase}.")
 

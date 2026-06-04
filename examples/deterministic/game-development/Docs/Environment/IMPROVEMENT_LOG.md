@@ -4,6 +4,12 @@ Use this log to turn repeated Codex friction into small, verified harness
 updates. Do not rewrite the harness from a single annoyance; wait for a repeated
 pattern or a clear correction from the user.
 
+Append entries manually or with:
+
+```bash
+python scripts/record-improvement.py --category CHECK_GAP --task "short task" --friction "what went wrong" --evidence "file or command evidence"
+```
+
 ## Categories
 
 | Category | Use when | Candidate update |

@@ -20,6 +20,7 @@ REQUIRED_PATHS = [
     ".codex/rules",
     ".agents/skills",
     "scripts/check-harness.py",
+    "scripts/record-improvement.py",
     "Docs/GETTING_STARTED.md",
     "Docs/Environment/GENESIS.md",
     "Docs/Environment/ARCHITECTURE.md",
@@ -125,7 +126,7 @@ def main() -> int:
     require_terms(
         "Docs/Environment/IMPROVEMENT_LOG.md",
         "improvement log",
-        ["categories", "seed patterns", "entry template", "update rule", "friction", "evidence", "user correction", "verification after update"],
+        ["categories", "seed patterns", "entry template", "update rule", "friction", "evidence", "user correction", "verification after update", "record-improvement.py"],
         issues,
     )
     require_terms(

@@ -192,6 +192,69 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertNotEqual(0, payload["returncode"])
         self.assertTrue(any("manifest references missing path" in issue for issue in payload["issues"]), payload)
 
+    def test_record_improvement_script_appends_structured_entry(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "scripts/record-improvement.py",
+                "--date",
+                "2026-06-04",
+                "--category",
+                "CHECK_GAP",
+                "--task",
+                "CLI smoke",
+                "--friction",
+                "Codex could not find the runnable command.",
+                "--evidence",
+                "Docs/Environment/EVAL_PLAN.md lacked the project command.",
+                "--candidate-update",
+                "Add the command to the eval plan.",
+                "--verification",
+                "python scripts/check-harness.py",
+                "--status",
+                "proposed",
+            ],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+        text = (target / "Docs/Environment/IMPROVEMENT_LOG.md").read_text(encoding="utf-8")
+        self.assertIn("### 2026-06-04 - CHECK_GAP - CLI smoke", text)
+        self.assertIn("- Candidate harness update: Add the command to the eval plan.", text)
+        self.assertIn("- Status: proposed", text)
+
+    def test_record_improvement_script_rejects_unknown_category(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "scripts/record-improvement.py",
+                "--category",
+                "IDEA",
+                "--task",
+                "CLI smoke",
+                "--friction",
+                "Something was confusing.",
+                "--evidence",
+                "No command was documented.",
+            ],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertNotEqual(0, completed.returncode)
+        self.assertIn("Unsupported category", completed.stderr + completed.stdout)
+
     def test_codex_live_smoke_uses_non_interactive_exec(self):
         completed = subprocess.CompletedProcess(args=[], returncode=0, stdout="OK\n", stderr="")
         with patch.object(smoke_generated_harness.shutil, "which", return_value="/usr/local/bin/codex"):
@@ -379,6 +442,15 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         temp_dir, target = self.copy_fixture()
         self.addCleanup(temp_dir.cleanup)
         (target / "scripts/check-harness.py").unlink()
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"])
+        self.assert_has_check(result, "required_path")
+
+    def test_missing_record_improvement_script_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        (target / "scripts/record-improvement.py").unlink()
 
         result = eval_generated_harness.evaluate(target)
         self.assertEqual("fail", result["status"])
