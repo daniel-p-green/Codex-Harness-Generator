@@ -38,4 +38,10 @@ Then summarize task-trial outcomes:
 python scripts/summarize-task-trials.py
 ```
 
+Run the copied-harness eval report:
+
+```bash
+python scripts/run-harness-evals.py
+```
+
 Generated: 2026-06-04

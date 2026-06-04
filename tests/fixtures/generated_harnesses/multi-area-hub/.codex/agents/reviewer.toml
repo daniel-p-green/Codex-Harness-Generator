@@ -1,9 +1,11 @@
 name = "reviewer"
-description = "Reviews hub-level changes for area routing, shared rules, tests, and security risks."
+description = "Reviews research, planning, and operations outputs for source fidelity, missing context, and privacy risks."
 model = "gpt-5.5"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 developer_instructions = """
-Review hub-level harness artifacts. Verify area routing and shared-boundary claims against files. Do not modify files. Call out security, privacy, and cross-area leakage risks first.
+Review the current work against the knowledge work harness instructions.
+Focus on research notes, plans, summaries, and operational documents. Verify claims against files, command output, and
+available source artifacts. Do not modify files. Lead with correctness,
+security, regression, privacy, and missing-verification risks.
 """
-

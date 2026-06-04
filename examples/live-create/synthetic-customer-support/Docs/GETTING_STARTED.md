@@ -1,19 +1,30 @@
 # Getting Started
 
-Open Codex in this project and ask for a support escalation note from synthetic
-ticket and policy materials. This harness is for public-safe customer-support
-examples only.
+Open Codex in this project and ask for a small verified task. This
+harness expects the assistant to inspect files before editing, avoid secrets, and
+verify work with the narrowest meaningful check.
 
-## First Task
+## First Checks
 
-1. Add or inspect synthetic ticket and policy files.
-2. Ask Codex to write `reports/support-escalation-note.md`.
-3. Verify the note includes source scope, grounded claims, `[VERIFY]` gaps,
-   `[PROPOSED]` commitments, privacy checks, and escalation or human-review
-   paths.
+1. Run `/health-check` to verify the harness structure.
+2. Ask Codex to map support sources and ticket categories.
+3. Ask for one grounded FAQ or escalation note.
+4. Ask the reviewer to inspect privacy, escalation, and overpromised claims.
 
 The permission profile allows workspace edits while denying secrets, tokens,
-credentials, `.env` files, and private keys.
+credentials, private keys, and `.env` files.
+
+You can also run the local smoke check without the generator repo:
+
+```bash
+python scripts/check-harness.py
+```
+
+When a repeated issue appears, record it in the local improvement log:
+
+```bash
+python scripts/record-improvement.py --category CHECK_GAP --task "short task" --friction "what went wrong" --evidence "file or command evidence"
+```
 
 After a meaningful Codex task, record a task trial:
 
@@ -27,3 +38,10 @@ Then summarize task-trial outcomes:
 python scripts/summarize-task-trials.py
 ```
 
+Run the copied-harness eval report:
+
+```bash
+python scripts/run-harness-evals.py
+```
+
+Generated: 2026-06-04

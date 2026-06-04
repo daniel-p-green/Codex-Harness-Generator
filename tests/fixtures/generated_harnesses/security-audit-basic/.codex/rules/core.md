@@ -1,13 +1,21 @@
 # Core Rules
 
-Use routing to decide whether to inspect files, run safe tests, ask for authorization, or invoke the reviewer.
+Route simple questions directly. Use file inspection before changing code. Use
+the reviewer for meaningful edits, risky behavior, missing tests, or security
+questions.
 
-Autonomy: make low-risk local reads and edits, but request approval for destructive or active security testing.
+Domain focus: follow the generated AGENTS.md domain guidance for specialized
+work and keep outputs source-backed, privacy-aware, and verification-oriented.
 
-Context: preserve affected paths, evidence, assumptions, and remediation status.
+Autonomy: make low-risk local reads and edits. Request approval for destructive
+work, broad rewrites, or changes that could expose secrets.
 
-Error handling: fail loud when evidence is missing, reproduction is unsafe, or impact is uncertain.
+Context: summarize long findings before continuing. Keep only current task facts
+active and save state before context gets crowded.
 
-Self-learning: write retro notes for repeated vulnerability classes and update the harness after validated patterns emerge.
+Error handling: fail loud when commands fail, inputs are missing, or verification
+cannot be completed.
 
-Self-learning: record repeated friction and user corrections in `Docs/Environment/IMPROVEMENT_LOG.md` before updating harness behavior.
+Self-learning: write repeated friction and user corrections to
+`Docs/Environment/IMPROVEMENT_LOG.md`; update the harness only after validated
+patterns emerge.

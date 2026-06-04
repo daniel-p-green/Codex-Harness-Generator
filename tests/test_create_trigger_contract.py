@@ -51,6 +51,10 @@ class CreateTriggerContractTests(unittest.TestCase):
             self.assertTrue((target / "Docs/Environment/CREATION_CONTEXT.md").is_file())
             self.assertIn("- Stated project type: Python CLI", context)
             self.assertIn("- Additional notes: solo tool", context)
+            self.assertNotIn("/Users/", context)
+            self.assertNotIn("/home/", context)
+            self.assertNotIn("/opt/homebrew", context)
+            self.assertNotIn("C:\\Users\\", context)
 
     def test_existing_environment_is_recorded_without_overwrite(self):
         with tempfile.TemporaryDirectory() as temp_dir:

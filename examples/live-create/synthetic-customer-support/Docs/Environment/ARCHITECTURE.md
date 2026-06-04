@@ -27,3 +27,5 @@ health-check skill, scoped permissions, and source-grounding rules.
 - Docs/Environment/CREATION_CONTEXT.md
 - Docs/Environment/LIVE_CREATE_CAPTURE.md
 - README.md
+- scripts/run-harness-evals.py
+- Docs/Environment/EVAL_REPORT.md

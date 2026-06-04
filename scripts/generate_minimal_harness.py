@@ -711,6 +711,12 @@ Summarize recorded trials with:
 python scripts/summarize-task-trials.py
 ```
 
+Run the copied-harness eval summary with:
+
+```bash
+python scripts/run-harness-evals.py
+```
+
 ## Outcome Labels
 
 - `success`: Codex completed the task and verification passed.
@@ -1037,6 +1043,150 @@ if __name__ == "__main__":
 '''
 
 
+def run_harness_evals_script() -> str:
+    return r'''#!/usr/bin/env python3
+"""Run copied-harness-local eval checks and write an eval report."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+REPORT_PATH = ROOT / "Docs/Environment/EVAL_REPORT.md"
+
+
+def run_command(command: list[str], display_command: list[str]) -> dict:
+    completed = subprocess.run(command, cwd=ROOT, text=True, capture_output=True, check=False)
+    return {
+        "command": " ".join(display_command),
+        "returncode": completed.returncode,
+        "stdout": completed.stdout.strip(),
+        "stderr": completed.stderr.strip(),
+        "status": "pass" if completed.returncode == 0 else "fail",
+    }
+
+
+def parse_json_stdout(result: dict) -> dict:
+    if not result["stdout"]:
+        return {}
+    try:
+        return json.loads(result["stdout"])
+    except json.JSONDecodeError:
+        return {}
+
+
+def build_payload(min_successes: int) -> dict:
+    checks = {
+        "local_check": run_command(
+            [sys.executable, "scripts/check-harness.py"],
+            ["python", "scripts/check-harness.py"],
+        ),
+        "task_trials": run_command(
+            [
+                sys.executable,
+                "scripts/summarize-task-trials.py",
+                "--min-successes",
+                str(min_successes),
+                "--json",
+            ],
+            [
+                "python",
+                "scripts/summarize-task-trials.py",
+                "--min-successes",
+                str(min_successes),
+                "--json",
+            ],
+        ),
+    }
+    task_trial_payload = parse_json_stdout(checks["task_trials"])
+    issues: list[str] = []
+    for name, result in checks.items():
+        if result["status"] != "pass":
+            issues.append(f"{name} failed")
+    for issue in task_trial_payload.get("issues", []):
+        if issue not in issues:
+            issues.append(issue)
+    return {
+        "status": "pass" if not issues else "fail",
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "min_successes": min_successes,
+        "checks": checks,
+        "task_trials": task_trial_payload,
+        "issues": issues,
+    }
+
+
+def write_report(payload: dict) -> Path:
+    lines = [
+        "# Eval Report",
+        "",
+        f"Generated: {payload['generated_at']}",
+        f"Status: {payload['status'].upper()}",
+        f"Minimum success trials required: {payload['min_successes']}",
+        "",
+        "## Checks",
+        "",
+    ]
+    for name, result in payload["checks"].items():
+        lines.append(f"- {name}: {result['status'].upper()} (`{result['command']}`)")
+    task_trials = payload.get("task_trials") or {}
+    if task_trials:
+        lines.extend(
+            [
+                "",
+                "## Task Trials",
+                "",
+                f"- total: {task_trials.get('total', 0)}",
+                f"- complete records: {task_trials.get('complete_records', 0)}",
+            ]
+        )
+        outcomes = task_trials.get("outcomes", {})
+        for outcome, count in outcomes.items():
+            lines.append(f"- {outcome}: {count}")
+    if payload["issues"]:
+        lines.extend(["", "## Issues", ""])
+        for issue in payload["issues"]:
+            lines.append(f"- {issue}")
+    else:
+        lines.extend(["", "## Issues", "", "- none"])
+    REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return REPORT_PATH
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--min-successes", type=int, default=0, help="Fail unless at least this many success task trials are recorded")
+    parser.add_argument("--json", action="store_true", help="Emit JSON")
+    parser.add_argument("--no-write", action="store_true", help="Do not update Docs/Environment/EVAL_REPORT.md")
+    args = parser.parse_args()
+
+    payload = build_payload(min_successes=args.min_successes)
+    if not args.no_write:
+        write_report(payload)
+    if args.json:
+        print(json.dumps(payload, indent=2))
+    else:
+        print(f"Harness evals: {payload['status'].upper()}")
+        print(f"- report: {REPORT_PATH.relative_to(ROOT).as_posix()}")
+        for name, result in payload["checks"].items():
+            print(f"- {name}: {result['status'].upper()}")
+        for issue in payload["issues"]:
+            print(f"- issue: {issue}")
+    return 0 if payload["status"] == "pass" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+'''
+
+
 def local_check_script() -> str:
     return r'''#!/usr/bin/env python3
 """Local smoke check for a generated Codex harness."""
@@ -1063,6 +1213,7 @@ REQUIRED_PATHS = [
     "scripts/record-improvement.py",
     "scripts/record-task-trial.py",
     "scripts/summarize-task-trials.py",
+    "scripts/run-harness-evals.py",
     "Docs/GETTING_STARTED.md",
     "Docs/Environment/GENESIS.md",
     "Docs/Environment/ARCHITECTURE.md",
@@ -1071,6 +1222,7 @@ REQUIRED_PATHS = [
     "Docs/Environment/EVAL_PLAN.md",
     "Docs/Environment/IMPROVEMENT_LOG.md",
     "Docs/Environment/TASK_TRIALS.md",
+    "Docs/Environment/EVAL_REPORT.md",
     "Docs/Environment/SOURCE_MAP.md",
     "Docs/Environment/VALIDATION_REPORT.md",
 ]
@@ -1175,7 +1327,13 @@ def main() -> int:
     require_terms(
         "Docs/Environment/TASK_TRIALS.md",
         "task trials",
-        ["outcome labels", "evidence", "verification", "privacy review", "limitations", "record-task-trial.py", "summarize-task-trials.py"],
+        ["outcome labels", "evidence", "verification", "privacy review", "limitations", "record-task-trial.py", "summarize-task-trials.py", "run-harness-evals.py"],
+        issues,
+    )
+    require_terms(
+        "Docs/Environment/EVAL_REPORT.md",
+        "eval report",
+        ["status", "checks", "task trials", "issues"],
         issues,
     )
     require_terms(
@@ -1429,6 +1587,12 @@ Then summarize task-trial outcomes:
 python scripts/summarize-task-trials.py
 ```
 
+Run the copied-harness eval report:
+
+```bash
+python scripts/run-harness-evals.py
+```
+
 Generated: {generated_at}
 """,
     )
@@ -1468,12 +1632,14 @@ scoped permissions, compact core rules, and environment records.
 - scripts/record-improvement.py
 - scripts/record-task-trial.py
 - scripts/summarize-task-trials.py
+- scripts/run-harness-evals.py
 - Docs/GETTING_STARTED.md
 - Docs/Environment/GENESIS.md
 - Docs/Environment/ARCHITECTURE.md
 - Docs/Environment/ASSUMPTIONS.md
 - Docs/Environment/MANIFEST.md
 - Docs/Environment/EVAL_PLAN.md
+- Docs/Environment/EVAL_REPORT.md
 - Docs/Environment/IMPROVEMENT_LOG.md
 - Docs/Environment/TASK_TRIALS.md
 - Docs/Environment/SOURCE_MAP.md
@@ -1490,7 +1656,7 @@ scoped permissions, compact core rules, and environment records.
 - Assumption: {profile.assumptions[1]}
 - Assumption: {profile.assumptions[2]}
 - Limit: It is a minimal acceptance harness, not a full model-mediated custom `/create` run.
-- Verify: Run `python scripts/check-harness.py` locally, or run `codex-harness validate <target>` from the generator repo.
+- Verify: Run `python scripts/run-harness-evals.py` locally, or run `codex-harness validate <target>` from the generator repo.
 """,
     )
 
@@ -1504,12 +1670,14 @@ scoped permissions, compact core rules, and environment records.
         "scripts/record-improvement.py",
         "scripts/record-task-trial.py",
         "scripts/summarize-task-trials.py",
+        "scripts/run-harness-evals.py",
         "Docs/GETTING_STARTED.md",
         "Docs/Environment/GENESIS.md",
         "Docs/Environment/ARCHITECTURE.md",
         "Docs/Environment/ASSUMPTIONS.md",
         "Docs/Environment/MANIFEST.md",
         "Docs/Environment/EVAL_PLAN.md",
+        "Docs/Environment/EVAL_REPORT.md",
         "Docs/Environment/IMPROVEMENT_LOG.md",
         "Docs/Environment/TASK_TRIALS.md",
         "Docs/Environment/SOURCE_MAP.md",
@@ -1534,6 +1702,33 @@ scoped permissions, compact core rules, and environment records.
     write(target / "scripts/record-task-trial.py", record_task_trial_script())
 
     write(target / "scripts/summarize-task-trials.py", summarize_task_trials_script())
+
+    write(target / "scripts/run-harness-evals.py", run_harness_evals_script())
+
+    write(
+        target / "Docs/Environment/EVAL_REPORT.md",
+        """
+# Eval Report
+
+Generated: initial harness generation.
+Status: PASS
+Minimum success trials required: 0
+
+## Checks
+
+- local_check: PASS (`python scripts/check-harness.py`)
+- task_trials: PASS (`python scripts/summarize-task-trials.py --min-successes 0 --json`)
+
+## Task Trials
+
+- total: 0
+- complete records: 0
+
+## Issues
+
+- none
+""",
+    )
 
     write(
         target / "Docs/Environment/VALIDATION_REPORT.md",

@@ -1,12 +1,23 @@
-# Nontechnical User Harness
+# Knowledge Work Hub Codex Harness
 
-You help a nontechnical user work safely with local files. Verify before changing anything important, test simple workflows when possible, and explain outcomes in plain language.
+This Codex harness supports a document-heavy research, planning, or operations workspace. Verify live file state before
+editing, run the narrowest meaningful check, and report any skipped verification.
 
 ## Defaults
 
-- Keep instructions short and concrete.
-- Do not read secrets, tokens, private keys, or credential files.
-- Treat privacy and security as default constraints.
-- Ask before risky file moves, deletes, or public sharing.
+- Prefer simple, maintainable code with clear names.
+- Do not read secrets, tokens, private keys, credential files, or `.env` files.
+- Treat security and privacy issues as high priority.
+- Ask for clarification when correctness, data loss, or privacy depends on
+  missing context.
+- Run tests when they exist; otherwise use source checks, dry runs, or the
+  narrowest runnable command.
+- Use the reviewer for non-trivial changes before calling work done.
+- Record repeated workflow friction in `Docs/Environment/IMPROVEMENT_LOG.md`
+  before changing harness behavior.
 
-- Record repeated workflow friction in `Docs/Environment/IMPROVEMENT_LOG.md` before changing harness behavior.
+## Verification
+
+- Check cited source files before summarizing or rewriting.
+- Compare final claims against the source notes or documents.
+- Mark missing source access, uncertainty, and unresolved assumptions plainly.

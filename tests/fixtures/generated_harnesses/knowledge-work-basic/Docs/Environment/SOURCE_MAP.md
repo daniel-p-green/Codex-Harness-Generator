@@ -5,4 +5,3 @@
 - https://developers.openai.com/codex/subagents
 - https://developers.openai.com/codex/skills
 - https://developers.openai.com/codex/permissions
-

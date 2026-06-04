@@ -1,17 +1,30 @@
 # Getting Started
 
-Open Codex in this project and ask for a scenario note from synthetic financial
-assumptions. This harness is for public-safe financial-modeling examples only.
+Open Codex in this project and ask for a small verified task. This
+harness expects the assistant to inspect files before editing, avoid secrets, and
+verify work with the narrowest meaningful check.
 
-## First Task
+## First Checks
 
-1. Add or inspect a synthetic assumptions file.
-2. Ask Codex to write `reports/financial-scenario-note.md`.
-3. Verify the note includes source scope, assumptions, scenarios, risk,
-   uncertainty, sensitivity, and a not-financial-advice boundary.
+1. Run `/health-check` to verify the harness structure.
+2. Ask Codex to map assumptions, tabs, reports, and metric definitions.
+3. Ask for one source-backed scenario note.
+4. Ask the reviewer to inspect calculations and advice-boundary risks.
 
 The permission profile allows workspace edits while denying secrets, tokens,
-credentials, `.env` files, and private keys.
+credentials, private keys, and `.env` files.
+
+You can also run the local smoke check without the generator repo:
+
+```bash
+python scripts/check-harness.py
+```
+
+When a repeated issue appears, record it in the local improvement log:
+
+```bash
+python scripts/record-improvement.py --category CHECK_GAP --task "short task" --friction "what went wrong" --evidence "file or command evidence"
+```
 
 After a meaningful Codex task, record a task trial:
 
@@ -25,3 +38,10 @@ Then summarize task-trial outcomes:
 python scripts/summarize-task-trials.py
 ```
 
+Run the copied-harness eval report:
+
+```bash
+python scripts/run-harness-evals.py
+```
+
+Generated: 2026-06-04

@@ -60,6 +60,9 @@ replacement. What is proven today:
   task outcome, evidence, verification, privacy review, and limitations.
 - Generated harnesses include `scripts/summarize-task-trials.py`, a local
   summary/check over recorded task-trial outcomes.
+- Generated harnesses include `scripts/run-harness-evals.py` and
+  `Docs/Environment/EVAL_REPORT.md`, a copied-harness-local eval report that
+  runs the local smoke check and task-trial summary without this generator repo.
 - Generated harnesses include `scripts/check-harness.py`, a local smoke check
   that can run without this generator repo and catches missing paths, stale
   manifest references, broken agent/skill config, and weak eval/improvement
@@ -451,17 +454,27 @@ your-project/
 |-- .agents/
 |   |-- skills/
 |-- Docs/
-    |-- GETTING_STARTED.md
-    |-- Environment/
-    |   |-- GENESIS.md
-    |   |-- ARCHITECTURE.md
-    |   |-- ASSUMPTIONS.md
-    |   |-- MANIFEST.md
-    |   |-- SOURCE_MAP.md
-    |   |-- VALIDATION_REPORT.md
-    |-- Memory/
-    |-- State/
-    |-- Retro/
+|   |-- GETTING_STARTED.md
+|   |-- Environment/
+|   |   |-- GENESIS.md
+|   |   |-- ARCHITECTURE.md
+|   |   |-- ASSUMPTIONS.md
+|   |   |-- MANIFEST.md
+|   |   |-- EVAL_PLAN.md
+|   |   |-- EVAL_REPORT.md
+|   |   |-- IMPROVEMENT_LOG.md
+|   |   |-- TASK_TRIALS.md
+|   |   |-- SOURCE_MAP.md
+|   |   |-- VALIDATION_REPORT.md
+|-- scripts/
+|   |-- check-harness.py
+|   |-- run-harness-evals.py
+|   |-- record-improvement.py
+|   |-- record-task-trial.py
+|   |-- summarize-task-trials.py
+|-- Memory/
+|-- State/
+|-- Retro/
 ```
 
 The exact file set depends on the project. The important contract is that the

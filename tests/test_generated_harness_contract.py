@@ -395,6 +395,58 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertEqual("fail", payload["status"])
         self.assertTrue(any("below required minimum" in issue for issue in payload["issues"]), payload)
 
+    def test_run_harness_evals_writes_eval_report(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+
+        completed = subprocess.run(
+            [sys.executable, "scripts/run-harness-evals.py", "--json"],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+        payload = json.loads(completed.stdout)
+        self.assertEqual("pass", payload["status"])
+        self.assertEqual("pass", payload["checks"]["local_check"]["status"])
+        self.assertEqual("pass", payload["checks"]["task_trials"]["status"])
+        report = (target / "Docs/Environment/EVAL_REPORT.md").read_text(encoding="utf-8")
+        self.assertIn("Status: PASS", report)
+        self.assertIn("## Task Trials", report)
+        self.assertIn("- none", report)
+
+    def test_run_harness_evals_fails_when_success_threshold_not_met(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+
+        completed = subprocess.run(
+            [sys.executable, "scripts/run-harness-evals.py", "--min-successes", "1", "--json"],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertNotEqual(0, completed.returncode)
+        payload = json.loads(completed.stdout)
+        self.assertEqual("fail", payload["status"])
+        self.assertEqual("fail", payload["checks"]["task_trials"]["status"])
+        report = (target / "Docs/Environment/EVAL_REPORT.md").read_text(encoding="utf-8")
+        self.assertIn("Status: FAIL", report)
+        self.assertIn("success count 0 is below required minimum 1", report)
+
+    def test_missing_run_harness_evals_script_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        (target / "scripts/run-harness-evals.py").unlink()
+
+        result = eval_generated_harness.evaluate(target)
+
+        self.assertEqual("fail", result["status"])
+        self.assert_has_check(result, "required_path")
+
     def test_codex_live_smoke_uses_non_interactive_exec(self):
         completed = subprocess.CompletedProcess(args=[], returncode=0, stdout="OK\n", stderr="")
         with patch.object(smoke_generated_harness.shutil, "which", return_value="/usr/local/bin/codex"):

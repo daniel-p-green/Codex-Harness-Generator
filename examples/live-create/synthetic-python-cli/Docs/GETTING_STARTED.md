@@ -1,31 +1,30 @@
 # Getting Started
 
-This Codex harness is for a synthetic Python CLI that scans Markdown files for stale TODO items and writes a cleanup summary.
+Open Codex in this project and ask for a small verified task. This
+harness expects the assistant to inspect files before editing, avoid secrets, and
+verify work with the narrowest meaningful check.
 
 ## First Checks
 
-1. Open the project in the target directory.
-2. Ask Codex to inspect the CLI files before editing.
-3. For TODO logic changes, run focused tests first.
-4. For report changes, run the CLI against public-safe fake Markdown fixtures and inspect the output.
+1. Run `/health-check` to verify the harness structure.
+2. Ask Codex to explain the CLI entry point.
+3. Ask for one tiny change and verify the result.
+4. Ask the reviewer to inspect the change before finalizing.
 
-## Permissions
+The permission profile allows workspace edits while denying secrets, tokens,
+credentials, private keys, and `.env` files.
 
-The default permission profile keeps work inside the workspace and denies common secret-bearing files such as `.env`, token files, credential files, `.pem`, and `.key` files. Network access is disabled by default because this CLI should not need it.
+You can also run the local smoke check without the generator repo:
 
-## Common Tasks
+```bash
+python scripts/check-harness.py
+```
 
-- Fix stale TODO detection: use the `audit-todos` skill.
-- Improve cleanup summary wording: use the `write-cleanup-summary` skill.
-- Add a CLI flag: inspect the parser, update tests, then run a synthetic command.
+When a repeated issue appears, record it in the local improvement log:
 
-## Verification
-
-Use the smallest meaningful command for the task. To verify behavior changes, run a focused test plus a CLI invocation that writes a cleanup summary from synthetic Markdown.
-
-## Cost And Context
-
-The harness uses medium reasoning by default and enables agent teams only as an available mode for larger future investigations. For this small CLI, direct sequential work should usually be enough.
+```bash
+python scripts/record-improvement.py --category CHECK_GAP --task "short task" --friction "what went wrong" --evidence "file or command evidence"
+```
 
 After a meaningful Codex task, record a task trial:
 
@@ -39,3 +38,10 @@ Then summarize task-trial outcomes:
 python scripts/summarize-task-trials.py
 ```
 
+Run the copied-harness eval report:
+
+```bash
+python scripts/run-harness-evals.py
+```
+
+Generated: 2026-06-04

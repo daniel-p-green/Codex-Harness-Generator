@@ -2,28 +2,28 @@ model = "gpt-5.5"
 model_reasoning_effort = "medium"
 model_verbosity = "medium"
 approval_policy = "on-request"
-default_permissions = "multi-area-hub"
+default_permissions = "knowledge-work"
 
 [agents]
-max_threads = 6
+max_threads = 4
 max_depth = 1
 
 [agents.reviewer]
-description = "Reviews multi-area changes for routing, boundaries, tests, and security risks."
+description = "Reviews research, planning, and operations outputs for source fidelity, missing context, and privacy risks."
 config_file = "agents/reviewer.toml"
 
 [[skills.config]]
 path = "../.agents/skills/health-check"
 enabled = true
 
-[permissions.multi-area-hub]
+[permissions.knowledge-work]
 description = "Workspace write access with sensitive files denied."
 extends = ":workspace"
 
-[permissions.multi-area-hub.filesystem]
+[permissions.knowledge-work.filesystem]
 glob_scan_max_depth = 4
 
-[permissions.multi-area-hub.filesystem.":workspace_roots"]
+[permissions.knowledge-work.filesystem.":workspace_roots"]
 "." = "write"
 "**/.env" = "deny"
 "**/.env.*" = "deny"
@@ -33,11 +33,10 @@ glob_scan_max_depth = 4
 "**/*.pem" = "deny"
 "**/*.key" = "deny"
 
-[permissions.multi-area-hub.network]
+[permissions.knowledge-work.network]
 enabled = true
 mode = "limited"
 
-[permissions.multi-area-hub.network.domains]
+[permissions.knowledge-work.network.domains]
 "developers.openai.com" = "allow"
 "docs.github.com" = "allow"
-

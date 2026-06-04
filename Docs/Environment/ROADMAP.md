@@ -21,6 +21,8 @@ Already proven:
   corrections into evidence-backed harness updates.
 - Generated harness task-trial logs and summaries that capture task outcomes,
   verification, privacy review, and limitations after copied-harness use.
+- Generated harness local eval reports that run copied-harness smoke checks and
+  task-trial summaries without depending on this generator repo.
 - Checked-in deterministic, create-acceptance, brief-acceptance, and live-create
   examples.
 - Privacy-checked usage-record validation.

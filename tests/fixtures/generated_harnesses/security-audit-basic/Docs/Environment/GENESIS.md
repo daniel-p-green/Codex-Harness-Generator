@@ -1,6 +1,10 @@
 # Genesis
 
 Domain: security audit.
-User level: advanced.
-Primary goal: source-backed security review.
-
+Profile: security-audit.
+Project: Security Audit Workspace.
+User level: somewhat familiar with Codex.
+Primary goal: reliable support for defensive security audit, vulnerability review, threat model, and remediation work with verification records.
+Team shape: solo developer.
+External services: none specified.
+Sensitive data: none specified.

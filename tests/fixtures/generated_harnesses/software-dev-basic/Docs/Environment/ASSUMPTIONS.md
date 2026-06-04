@@ -1,5 +1,7 @@
 # Assumptions
 
-- Assumption: This fixture models a compact software-development harness with one reviewer agent and one health-check skill.
-- Limit: It does not prove a full interactive create run or real build integration; it proves generated artifact contracts.
-- Verify: Run `python scripts/run_evals.py` before release.
+- Assumption: This deterministic harness targets a small Python CLI utility for a solo developer.
+- Assumption: The project has local files that can be inspected before edits.
+- Assumption: The narrowest meaningful check is usually a unit test or CLI command.
+- Limit: It is a minimal acceptance harness, not a full model-mediated custom `/create` run.
+- Verify: Run `python scripts/run-harness-evals.py` locally, or run `codex-harness validate <target>` from the generator repo.

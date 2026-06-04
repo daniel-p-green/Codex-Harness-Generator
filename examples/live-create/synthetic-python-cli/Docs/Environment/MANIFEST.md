@@ -43,3 +43,5 @@ Generated harness inventory.
 - Docs/Environment/EVAL_PLAN.md
 - Docs/Environment/IMPROVEMENT_LOG.md
 - Docs/Environment/TASK_TRIALS.md
+- scripts/run-harness-evals.py
+- Docs/Environment/EVAL_REPORT.md

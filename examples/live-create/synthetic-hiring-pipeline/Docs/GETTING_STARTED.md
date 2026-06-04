@@ -1,18 +1,30 @@
 # Getting Started
 
-Open Codex in this project and ask for a scorecard note from synthetic hiring
-materials. This harness is for public-safe hiring-pipeline examples only.
+Open Codex in this project and ask for a small verified task. This
+harness expects the assistant to inspect files before editing, avoid secrets, and
+verify work with the narrowest meaningful check.
 
-## First Task
+## First Checks
 
-1. Add or inspect a synthetic role and candidate-evidence file.
-2. Ask Codex to write `reports/hiring-scorecard-note.md`.
-3. Verify the note includes source scope, role requirements, structured
-   criteria, scorecard evidence, bias and privacy checks, and a human-review
-   boundary.
+1. Run `/health-check` to verify the harness structure.
+2. Ask Codex to map role requirements, criteria, and interview materials.
+3. Ask for one structured scorecard or interview guide.
+4. Ask the reviewer to inspect bias, privacy, and human-review boundaries.
 
 The permission profile allows workspace edits while denying secrets, tokens,
-credentials, `.env` files, and private keys.
+credentials, private keys, and `.env` files.
+
+You can also run the local smoke check without the generator repo:
+
+```bash
+python scripts/check-harness.py
+```
+
+When a repeated issue appears, record it in the local improvement log:
+
+```bash
+python scripts/record-improvement.py --category CHECK_GAP --task "short task" --friction "what went wrong" --evidence "file or command evidence"
+```
 
 After a meaningful Codex task, record a task trial:
 
@@ -26,3 +38,10 @@ Then summarize task-trial outcomes:
 python scripts/summarize-task-trials.py
 ```
 
+Run the copied-harness eval report:
+
+```bash
+python scripts/run-harness-evals.py
+```
+
+Generated: 2026-06-04

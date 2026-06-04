@@ -17,6 +17,12 @@ Summarize recorded trials with:
 python scripts/summarize-task-trials.py
 ```
 
+Run the copied-harness eval summary with:
+
+```bash
+python scripts/run-harness-evals.py
+```
+
 ## Outcome Labels
 
 - `success`: Codex completed the task and verification passed.

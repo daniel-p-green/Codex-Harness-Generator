@@ -9,7 +9,7 @@ max_threads = 4
 max_depth = 1
 
 [agents.reviewer]
-description = "Reviews research and writing outputs for evidence, clarity, and confidentiality risks."
+description = "Reviews research, planning, and operations outputs for source fidelity, missing context, and privacy risks."
 config_file = "agents/reviewer.toml"
 
 [[skills.config]]
@@ -40,4 +40,3 @@ mode = "limited"
 [permissions.knowledge-work.network.domains]
 "developers.openai.com" = "allow"
 "docs.github.com" = "allow"
-

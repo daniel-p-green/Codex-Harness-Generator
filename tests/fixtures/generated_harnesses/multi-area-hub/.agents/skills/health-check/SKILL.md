@@ -1,9 +1,8 @@
 ---
 name: health-check
-description: Runs a deterministic multi-area hub health check over config, agents, skills, rules, docs, routing, and shared-boundary guidance. Use when the user asks to validate the harness, check setup health, verify Codex configuration, audit generated files, or run /health-check.
+description: Runs a deterministic Codex harness health check over config, agents, skills, rules, and docs. Use when the user asks to validate the harness, check setup health, verify Codex configuration, audit generated files, or run /health-check.
 ---
 
 ## Critical
 
 Validate the generated harness and report failures before suggesting fixes.
-

@@ -12,7 +12,7 @@ Created: 2026-06-04T12:00:00Z
 
 ## Tool Availability
 - Python: Python 3.13.13
-- pip: pip 26.1 from /opt/homebrew/lib/python3.10/site-packages/pip (python 3.10)
+- pip: pip 26.1 (python 3.10)
 - Pandoc: pandoc 3.9.0.2
 - PowerShell: not found
 

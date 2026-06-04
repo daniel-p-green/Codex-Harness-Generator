@@ -26,3 +26,5 @@ health-check skill, scoped permissions, and security-first rules.
 - Docs/Environment/VALIDATION_REPORT.md
 - Docs/Environment/CREATION_CONTEXT.md
 - Docs/Environment/LIVE_CREATE_CAPTURE.md
+- scripts/run-harness-evals.py
+- Docs/Environment/EVAL_REPORT.md

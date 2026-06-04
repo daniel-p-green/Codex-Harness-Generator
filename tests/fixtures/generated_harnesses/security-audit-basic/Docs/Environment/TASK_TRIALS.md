@@ -1,4 +1,3 @@
-
 # Task Trials
 
 Use this file to record whether the generated harness helps Codex complete real
@@ -16,6 +15,12 @@ Summarize recorded trials with:
 
 ```bash
 python scripts/summarize-task-trials.py
+```
+
+Run the copied-harness eval summary with:
+
+```bash
+python scripts/run-harness-evals.py
 ```
 
 ## Outcome Labels

@@ -1,6 +1,10 @@
 # Genesis
 
 Domain: knowledge work.
-User level: nontechnical to intermediate.
-Primary goal: source-faithful drafting and review.
-
+Profile: knowledge-work.
+Project: Knowledge Work Hub.
+User level: somewhat familiar with Codex.
+Primary goal: reliable support for a document-heavy research, planning, or operations workspace with verification records.
+Team shape: solo developer.
+External services: none specified.
+Sensitive data: none specified.

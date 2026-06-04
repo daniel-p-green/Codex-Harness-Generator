@@ -64,6 +64,11 @@ def first_line(command: list[str], fallback: str = "not found") -> str:
     return text[0].strip() if completed.returncode == 0 and text else fallback
 
 
+def sanitize_tool_version(text: str) -> str:
+    text = re.sub(r"\s+from\s+(?:/|[A-Za-z]:\\\\)\S+", "", text)
+    return text
+
+
 def tool_availability() -> dict[str, str]:
     python_version = first_line(["python", "--version"])
     if python_version == "not found":
@@ -71,6 +76,7 @@ def tool_availability() -> dict[str, str]:
     pip_version = first_line(["pip", "--version"])
     if pip_version == "not found":
         pip_version = first_line(["pip3", "--version"])
+    pip_version = sanitize_tool_version(pip_version)
     powershell = first_line(["powershell", "-Command", "echo available"])
     return {
         "Python": python_version,
