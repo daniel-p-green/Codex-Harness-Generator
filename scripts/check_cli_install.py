@@ -304,6 +304,19 @@ def build_payload() -> dict:
                 ],
             ),
             (
+                "upstream_drift",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "upstream-drift",
+                    "--upstream",
+                    "HEAD",
+                    "--target",
+                    "HEAD",
+                    "--no-write",
+                    "--json",
+                ],
+            ),
+            (
                 "init_from_project",
                 [
                     (venv / "bin" / "codex-harness").as_posix(),
@@ -659,6 +672,12 @@ def build_payload() -> dict:
                         step["status"] = "fail"
                         step["returncode"] = 1
                         step["stderr"] += "\nIssue lint payload did not prove a conversion-ready issue body."
+                if name == "upstream_drift" and completed.returncode == 0:
+                    drift_payload = json.loads(completed.stdout)
+                    if drift_payload.get("status") != "pass" or drift_payload.get("ahead_behind", {}).get("upstream_only") != 0:
+                        step["status"] = "fail"
+                        step["returncode"] = 1
+                        step["stderr"] += "\nUpstream drift smoke did not prove a clean self-compare."
                 if name == "usage_from_issue_pilot_conversion" and completed.returncode == 0:
                     conversion_payload = json.loads(completed.stdout)
                     pilot_update = conversion_payload.get("pilot_update") or {}

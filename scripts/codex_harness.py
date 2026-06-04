@@ -412,6 +412,24 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("check_codex_equivalence.py", command)
 
+    if args.command == "upstream-drift":
+        command = []
+        if args.upstream:
+            command.extend(["--upstream", args.upstream])
+        if args.target:
+            command.extend(["--target", args.target])
+        if args.report:
+            command.extend(["--report", args.report])
+        if args.sample_limit is not None:
+            command.extend(["--sample-limit", str(args.sample_limit)])
+        if args.commit_limit is not None:
+            command.extend(["--commit-limit", str(args.commit_limit)])
+        if args.no_write:
+            command.append("--no-write")
+        if args.json:
+            command.append("--json")
+        return python_script("check_upstream_drift.py", command)
+
     if args.command == "usage-record":
         command = [
             "--slug",
@@ -789,6 +807,7 @@ def command_cwd(args: argparse.Namespace) -> Path:
     checkout_audit_commands = {
         "doctor": "doctor.py",
         "equivalence": "check_codex_equivalence.py",
+        "upstream-drift": "check_upstream_drift.py",
     }
     script_name = checkout_audit_commands.get(args.command)
     if script_name and (Path.cwd() / "scripts" / script_name).is_file():
@@ -1031,6 +1050,15 @@ def make_parser() -> argparse.ArgumentParser:
     equivalence.add_argument("--report", help="Equivalence matrix Markdown report path")
     equivalence.add_argument("--no-write", action="store_true", help="Do not write the Markdown report")
     equivalence.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    upstream_drift = subparsers.add_parser("upstream-drift", help="Report divergence from the source upstream ref")
+    upstream_drift.add_argument("--upstream", help="Source upstream ref")
+    upstream_drift.add_argument("--target", help="Codex target ref")
+    upstream_drift.add_argument("--report", help="Upstream drift Markdown report path")
+    upstream_drift.add_argument("--sample-limit", type=int, help="Changed files to include in the report")
+    upstream_drift.add_argument("--commit-limit", type=int, help="Recent commits to include per side")
+    upstream_drift.add_argument("--no-write", action="store_true", help="Do not write the Markdown report")
+    upstream_drift.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     usage = subparsers.add_parser("usage-record", help="Record sanitized generated-harness usage evidence")
     usage.add_argument("--slug", required=True, help="Stable record slug")

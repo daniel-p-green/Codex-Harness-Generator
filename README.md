@@ -121,6 +121,10 @@ replacement. What is proven today:
   `Docs/Environment/CODEX_EQUIVALENCE_MATRIX.md`, a tested capability map from
   the earlier harness-generator responsibilities to the Codex-native command,
   artifact, and proof surfaces.
+- `scripts/check_upstream_drift.py` and `codex-harness upstream-drift` write
+  `Docs/Environment/UPSTREAM_DRIFT.md`, a source-lineage audit showing whether
+  the source upstream ref has upstream-only commits that need
+  Codex-port review.
 - `scripts/record_usage_case.py` provides a privacy-checked path for recording
   sanitized real-world or private-summary usage evidence under
   `Docs/Environment/usage-records/`, and `scripts/validate_usage_records.py`
@@ -674,6 +678,7 @@ Common subcommands:
 | `source-freshness` | `check_source_freshness.py` | Confirms official OpenAI source URLs are reachable. |
 | `semantic-alignment` | `check_semantic_alignment.py` | Checks local guidance against official Codex doc concepts. |
 | `equivalence` | `check_codex_equivalence.py` | Checks and writes the Codex-native equivalence matrix. |
+| `upstream-drift` | `check_upstream_drift.py` | Reports divergence from the source upstream ref without treating drift status as product proof. |
 | `usage-record` | `record_usage_case.py` | Records sanitized generated-harness usage evidence. |
 | `usage-from-harness` | `usage_from_harness.py` | Converts copied-harness task trials and eval reports into a privacy-checked usage record; add `--no-write` to preview first or `--pilot-record-dir` to prevalidate and convert a matching prepared pilot. |
 | `evidence-packet <path>` | `export_evidence_packet.py` | Exports a public-safe Markdown evidence packet from copied-harness local eval and task trials. |

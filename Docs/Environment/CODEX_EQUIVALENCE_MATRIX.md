@@ -1,6 +1,6 @@
 # Codex Equivalence Matrix
 
-Generated: 2026-06-04T14:13:57Z
+Generated: 2026-06-04T15:44:41Z
 Status: PASS
 
 This matrix maps the earlier harness-generator responsibilities to the
@@ -22,3 +22,4 @@ performance.
 | High-risk guardrails | PASS | Domain guardrails for risky work. | Profile-specific guardrails and evaluator failures for missing boundaries. | `scripts/generate_minimal_harness.py`<br>`tests/test_generated_harness_contract.py`<br>`Docs/DomainLibrary` | `python -m unittest tests.test_generated_harness_contract -q` |
 | Usage evidence | PASS | Record whether generated harnesses actually help with real tasks. | Usage records, validation thresholds, prepared pilots, pilot packs, and pilot campaigns. | `Docs/Environment/USAGE_RECORDS.md`<br>`Docs/Environment/USAGE_GAPS.md`<br>`Docs/Environment/PILOT_CAMPAIGN.md`<br>`Docs/Environment/PILOT_BOARD.md`<br>`scripts/prepare_pilot.py`<br>`scripts/prepare_next_pilot.py`<br>`scripts/pilot_board.py`<br>`scripts/record_usage_case.py` | `codex-harness prepare-pilot <target>`<br>`codex-harness prepare-next-pilot [target]`<br>`codex-harness pilot-board`<br>`codex-harness pilot-update <slug>`<br>`codex-harness usage-validate`<br>`codex-harness usage-gaps`<br>`codex-harness pilot-campaign` |
 | Release proof | PASS | A single readiness view before public claims. | Proof status, next-action packet, proof matrix, generated-surface refresh, eval trends, source freshness, and semantic alignment. | `Docs/Environment/PROOF_STATUS.md`<br>`Docs/Environment/PROOF_NEXT.md`<br>`Docs/Environment/PROOF_MATRIX.md`<br>`Docs/Environment/BETA_EXIT_AUDIT.md`<br>`scripts/proof_status.py`<br>`scripts/proof_next.py`<br>`scripts/beta_exit_audit.py`<br>`scripts/refresh_generated_surfaces.py` | `codex-harness refresh-examples`<br>`codex-harness proof-next`<br>`codex-harness proof-status`<br>`codex-harness beta-exit-audit`<br>`codex-harness gate` |
+| Source lineage | PASS | Know whether the source upstream has changes that need Codex-port review. | Upstream drift audit against the source upstream ref with explicit claim boundaries. | `scripts/check_upstream_drift.py`<br>`Docs/Environment/UPSTREAM_DRIFT.md`<br>`tests/test_upstream_drift.py` | `codex-harness upstream-drift --no-write --json` |

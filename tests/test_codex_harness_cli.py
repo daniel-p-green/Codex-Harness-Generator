@@ -1100,6 +1100,51 @@ class CodexHarnessCliTests(unittest.TestCase):
 
         self.assertEqual(Path.cwd(), codex_harness.command_cwd(args))
 
+    def test_upstream_drift_delegates_to_checker(self):
+        command, _ = self.run_cli(
+            [
+                "upstream-drift",
+                "--upstream",
+                "source-upstream/main",
+                "--target",
+                "HEAD",
+                "--report",
+                "/tmp/UPSTREAM_DRIFT.md",
+                "--sample-limit",
+                "10",
+                "--commit-limit",
+                "5",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/check_upstream_drift.py",
+                "--upstream",
+                "source-upstream/main",
+                "--target",
+                "HEAD",
+                "--report",
+                "/tmp/UPSTREAM_DRIFT.md",
+                "--sample-limit",
+                "10",
+                "--commit-limit",
+                "5",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
+    def test_upstream_drift_uses_current_checkout_when_available(self):
+        parser = codex_harness.make_parser()
+        args = parser.parse_args(["upstream-drift"])
+
+        self.assertEqual(Path.cwd(), codex_harness.command_cwd(args))
+
     def test_usage_record_delegates_to_recorder(self):
         command, _ = self.run_cli(
             [

@@ -26,6 +26,7 @@ PILOT_CAMPAIGN_REPORT = REPO_ROOT / "Docs" / "Environment" / "PILOT_CAMPAIGN.md"
 PILOT_BOARD_REPORT = REPO_ROOT / "Docs" / "Environment" / "PILOT_BOARD.md"
 PROOF_NEXT_REPORT = REPO_ROOT / "Docs" / "Environment" / "PROOF_NEXT.md"
 BETA_EXIT_AUDIT_REPORT = REPO_ROOT / "Docs" / "Environment" / "BETA_EXIT_AUDIT.md"
+UPSTREAM_DRIFT_REPORT = REPO_ROOT / "Docs" / "Environment" / "UPSTREAM_DRIFT.md"
 SOURCE_FRESHNESS_REPORT = REPO_ROOT / "Docs" / "Environment" / "SOURCE_FRESHNESS.md"
 SOURCE_FRESHNESS_JSON = REPO_ROOT / "Docs" / "Environment" / "SOURCE_FRESHNESS.json"
 SEMANTIC_ALIGNMENT_REPORT = REPO_ROOT / "Docs" / "Environment" / "SEMANTIC_ALIGNMENT.md"
@@ -140,6 +141,7 @@ def check_installable_cli() -> tuple[dict, dict]:
     inspect_step = next((step for step in payload["steps"] if step["name"] == "inspect"), {})
     adoption_step = next((step for step in payload["steps"] if step["name"] == "adoption_plan"), {})
     equivalence_step = next((step for step in payload["steps"] if step["name"] == "equivalence"), {})
+    upstream_drift_step = next((step for step in payload["steps"] if step["name"] == "upstream_drift"), {})
     local_eval_step = next((step for step in payload["steps"] if step["name"] == "local_eval"), {})
     public_usage_report_step = next((step for step in payload["steps"] if step["name"] == "public_usage_report"), {})
     evidence_packet_step = next((step for step in payload["steps"] if step["name"] == "evidence_packet"), {})
@@ -163,7 +165,7 @@ def check_installable_cli() -> tuple[dict, dict]:
     if failed:
         detail = f"failed at {failed['name']}"
     else:
-        detail = "profiles={profiles} doctor={doctor_status} init={init_status} quickstart={quickstart_status} prepare_pilot={prepare_pilot_status} init_from_project={init_from_project_status} demo_capture={demo_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} equivalence={equivalence_status} local_eval={local_eval_status} public_usage_report={public_usage_report_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue_lint={usage_from_issue_lint_status} usage_from_issue_preview={usage_from_issue_preview_status} usage_from_issue={usage_from_issue_status} prepare_next_pilot={prepare_next_pilot_status} pilot_board={pilot_board_status} pilot_update={pilot_update_status} usage_from_issue_pilot_conversion={usage_from_issue_pilot_conversion_status} usage_gaps={usage_gaps_status} beta_exit_audit={beta_exit_audit_status} pilot_campaign={pilot_campaign_status} proof_next={proof_next_status} migration_audit={migration_status} eval={eval_status}".format(
+        detail = "profiles={profiles} doctor={doctor_status} init={init_status} quickstart={quickstart_status} prepare_pilot={prepare_pilot_status} init_from_project={init_from_project_status} demo_capture={demo_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} equivalence={equivalence_status} upstream_drift={upstream_drift_status} local_eval={local_eval_status} public_usage_report={public_usage_report_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue_lint={usage_from_issue_lint_status} usage_from_issue_preview={usage_from_issue_preview_status} usage_from_issue={usage_from_issue_status} prepare_next_pilot={prepare_next_pilot_status} pilot_board={pilot_board_status} pilot_update={pilot_update_status} usage_from_issue_pilot_conversion={usage_from_issue_pilot_conversion_status} usage_gaps={usage_gaps_status} beta_exit_audit={beta_exit_audit_status} pilot_campaign={pilot_campaign_status} proof_next={proof_next_status} migration_audit={migration_status} eval={eval_status}".format(
             profiles=profile_step.get("profile_count", "unknown"),
             doctor_status=doctor_step.get("status", "unknown"),
             init_status=init_step.get("status", "unknown"),
@@ -175,6 +177,7 @@ def check_installable_cli() -> tuple[dict, dict]:
             inspect_status=inspect_step.get("status", "unknown"),
             adoption_status=adoption_step.get("status", "unknown"),
             equivalence_status=equivalence_step.get("status", "unknown"),
+            upstream_drift_status=upstream_drift_step.get("status", "unknown"),
             local_eval_status=local_eval_step.get("status", "unknown"),
             public_usage_report_status=public_usage_report_step.get("status", "unknown"),
             evidence_packet_status=evidence_packet_step.get("status", "unknown"),
@@ -234,6 +237,7 @@ def build_payload(
         check_file_exists("pilot_board_report", PILOT_BOARD_REPORT),
         check_file_exists("proof_next_report", PROOF_NEXT_REPORT),
         check_file_exists("beta_exit_audit_report", BETA_EXIT_AUDIT_REPORT),
+        check_file_exists("upstream_drift_report", UPSTREAM_DRIFT_REPORT),
         check_status_report("source_freshness_report", SOURCE_FRESHNESS_REPORT, SOURCE_FRESHNESS_JSON),
         check_status_report("semantic_alignment_report", SEMANTIC_ALIGNMENT_REPORT, SEMANTIC_ALIGNMENT_JSON),
         check_file_exists("task_trials_report", TASK_TRIALS_REPORT),

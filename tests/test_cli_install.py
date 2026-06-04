@@ -26,6 +26,8 @@ class CheckCliInstallTests(unittest.TestCase):
                 stdout = json.dumps({"status": "pass", "profile_count": 20})
             if "usage-from-issue" in command and "--lint-only" in command:
                 stdout = json.dumps({"status": "pass", "readiness": "conversion-ready"})
+            elif "upstream-drift" in command:
+                stdout = json.dumps({"status": "pass", "ahead_behind": {"upstream_only": 0, "target_only": 0}})
             elif "usage-from-issue" in command and "--pilot-record-dir" in command:
                 stdout = json.dumps(
                     {
@@ -44,7 +46,7 @@ class CheckCliInstallTests(unittest.TestCase):
 
         self.assertEqual("pass", payload["status"])
         names = [step["name"] for step in payload["steps"]]
-        self.assertEqual(["create_venv", "install_package", "profiles", "doctor", "init", "quickstart", "demo_capture", "prepare_pilot", "validate", "inspect", "adoption_plan", "equivalence", "init_from_project", "record_task_trial", "local_eval", "public_usage_report", "evidence_packet", "pilot_pack", "usage_from_harness", "usage_from_issue_lint", "usage_from_issue_preview", "usage_from_issue", "prepare_next_pilot", "pilot_board", "pilot_update", "usage_from_issue_pilot_conversion", "usage_gaps", "beta_exit_audit", "pilot_campaign", "proof_next", "migration_audit", "eval"], names)
+        self.assertEqual(["create_venv", "install_package", "profiles", "doctor", "init", "quickstart", "demo_capture", "prepare_pilot", "validate", "inspect", "adoption_plan", "equivalence", "upstream_drift", "init_from_project", "record_task_trial", "local_eval", "public_usage_report", "evidence_packet", "pilot_pack", "usage_from_harness", "usage_from_issue_lint", "usage_from_issue_preview", "usage_from_issue", "prepare_next_pilot", "pilot_board", "pilot_update", "usage_from_issue_pilot_conversion", "usage_gaps", "beta_exit_audit", "pilot_campaign", "proof_next", "migration_audit", "eval"], names)
         self.assertTrue(any("pip" in command and "install" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "doctor" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "init" in command for command in calls))
@@ -55,6 +57,7 @@ class CheckCliInstallTests(unittest.TestCase):
         self.assertTrue(any("codex-harness" in command[0] and "inspect" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "adoption-plan" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "equivalence" in command for command in calls))
+        self.assertTrue(any("codex-harness" in command[0] and "upstream-drift" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "--blueprint-out" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "--copy-script" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "init" in command and "--from-project" in command for command in calls))

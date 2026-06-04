@@ -23,6 +23,7 @@ class CodexEquivalenceTests(unittest.TestCase):
         self.assertIn("Generation", names)
         self.assertIn("Usage evidence", names)
         self.assertIn("Release proof", names)
+        self.assertIn("Source lineage", names)
 
     def test_missing_evidence_path_fails_capability(self):
         original = check_codex_equivalence.CAPABILITIES

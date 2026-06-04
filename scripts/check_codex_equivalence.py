@@ -121,6 +121,13 @@ CAPABILITIES = [
         ],
         "commands": ["codex-harness refresh-examples", "codex-harness proof-next", "codex-harness proof-status", "codex-harness beta-exit-audit", "codex-harness gate"],
     },
+    {
+        "name": "Source lineage",
+        "original_need": "Know whether the source upstream has changes that need Codex-port review.",
+        "codex_surface": "Upstream drift audit against the source upstream ref with explicit claim boundaries.",
+        "evidence_paths": ["scripts/check_upstream_drift.py", "Docs/Environment/UPSTREAM_DRIFT.md", "tests/test_upstream_drift.py"],
+        "commands": ["codex-harness upstream-drift --no-write --json"],
+    },
 ]
 
 
