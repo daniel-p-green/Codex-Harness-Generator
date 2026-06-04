@@ -47,7 +47,10 @@ class DoctorTests(unittest.TestCase):
                 "Private reporter summary confirmed the generated harness was used.",
                 "The pilot record included a concrete task outcome and verification summary.",
             ],
-            "verification": ["Reporter-provided verification steps were completed without blocking failures."],
+            "verification": [
+                "Reporter-provided verification steps were completed without blocking failures.",
+                "The resulting usage record passed the local usage-record validator.",
+            ],
             "privacy_review": "Private details were summarized and no secrets or personal data are included.",
             "limitations": ["Evidence is a privacy-preserving summary rather than raw workspace contents."],
         }
