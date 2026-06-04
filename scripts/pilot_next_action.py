@@ -85,15 +85,22 @@ def build_next_action(sync_payload: dict, args: argparse.Namespace) -> dict:
 
     record = first_unposted_followup(records)
     if record:
+        reporter_replied_after_followup = record.get("reporter_replies", {}).get("after_latest_maintainer_followup", False)
         return {
-            "type": "post-reporter-followup",
+            "type": "post-reporter-clarification" if reporter_replied_after_followup else "post-reporter-followup",
             "priority": "high",
             "slug": record["slug"],
             "issue_url": record["issue_url"],
             "followup_file": record["display_followup_file"],
+            "maintainer_followup_comment": record.get("maintainer_followup_comment", {}),
+            "reporter_replies": record.get("reporter_replies", {}),
             "missing_fields": record["missing_fields"],
             "command": record["commands"]["comment_followup"],
-            "reason": "A live pilot issue is missing public-safe evidence fields; post the generated follow-up comment.",
+            "reason": (
+                "A reporter replied after the latest maintainer follow-up, but required evidence fields are still missing; post a targeted clarification."
+                if reporter_replied_after_followup
+                else "A live pilot issue is missing public-safe evidence fields; post the generated follow-up comment."
+            ),
         }
 
     record = first_record(records, "waiting-for-reporter")
@@ -105,6 +112,7 @@ def build_next_action(sync_payload: dict, args: argparse.Namespace) -> dict:
             "issue_url": record["issue_url"],
             "followup_file": "",
             "maintainer_followup_comment": record.get("maintainer_followup_comment", {}),
+            "reporter_replies": record.get("reporter_replies", {}),
             "missing_fields": record["missing_fields"],
             "command": sync_command(args),
             "reason": "A maintainer follow-up is already posted; wait for reporter evidence, then rerun sync.",
@@ -152,6 +160,7 @@ def build_payload(
                 "command": record["commands"].get("comment_followup", ""),
                 "maintainer_followup_posted": record.get("maintainer_followup_posted", False),
                 "maintainer_followup_comment": record.get("maintainer_followup_comment", {}),
+                "reporter_replies": record.get("reporter_replies", {}),
             }
             for record in sync_payload["records"]
             if record.get("readiness") == "waiting-for-reporter"
@@ -190,6 +199,8 @@ def write_report(path: Path, payload: dict) -> None:
         f"- Conversion-ready issues: {payload['summary']['conversion_ready']}",
         f"- Waiting for reporter: {payload['summary']['waiting_for_reporter']}",
         f"- Maintainer follow-ups already posted: {payload['summary'].get('maintainer_followups_posted', 0)}",
+        f"- Reporter replies: {payload['summary'].get('reporter_reply_count', 0)}",
+        f"- Reporter replies after latest maintainer follow-up: {payload['summary'].get('reporter_replies_after_followup', 0)}",
         f"- Needs attention: {payload['summary']['needs_attention']}",
         f"- Missing live issue URL: {payload['summary']['missing_issue_url']}",
         "",
@@ -201,6 +212,8 @@ def write_report(path: Path, payload: dict) -> None:
         f"- Issue: {action.get('issue_url') or 'none'}",
         f"- Maintainer follow-up: {action.get('maintainer_followup_comment', {}).get('url') or 'none'}",
         f"- Maintainer follow-up posted at: `{action.get('maintainer_followup_comment', {}).get('created_at') or 'none'}`",
+        f"- Latest reporter reply: {action.get('reporter_replies', {}).get('latest', {}).get('url') or 'none'}",
+        f"- Reporter replied after latest maintainer follow-up: `{str(action.get('reporter_replies', {}).get('after_latest_maintainer_followup', False)).lower()}`",
         f"- Reason: {action['reason']}",
         "",
         "```bash",
@@ -219,6 +232,9 @@ def write_report(path: Path, payload: dict) -> None:
                     f"  - Maintainer follow-up already posted: `{str(item.get('maintainer_followup_posted', False)).lower()}`",
                     f"  - Maintainer follow-up URL: {item.get('maintainer_followup_comment', {}).get('url') or 'none'}",
                     f"  - Maintainer follow-up posted at: `{item.get('maintainer_followup_comment', {}).get('created_at') or 'none'}`",
+                    f"  - Reporter replies: {item.get('reporter_replies', {}).get('count', 0)}",
+                    f"  - Latest reporter reply: {item.get('reporter_replies', {}).get('latest', {}).get('url') or 'none'}",
+                    f"  - Reporter replied after latest maintainer follow-up: `{str(item.get('reporter_replies', {}).get('after_latest_maintainer_followup', False)).lower()}`",
                     f"  - Missing fields: {', '.join(item['missing_fields']) if item['missing_fields'] else 'none'}",
                     f"  - Command: `{item['command'] or 'wait for reporter reply, then rerun sync'}`",
                 ]

@@ -199,7 +199,38 @@ class PilotNextActionTests(unittest.TestCase):
         self.assertEqual(1, len(payload["waiting_followups"]))
         self.assertTrue(payload["waiting_followups"][0]["maintainer_followup_posted"])
         self.assertEqual("https://github.com/example/repo/issues/42#issuecomment-1", payload["waiting_followups"][0]["maintainer_followup_comment"]["url"])
+        self.assertEqual(0, payload["waiting_followups"][0]["reporter_replies"]["count"])
         self.assertEqual("", payload["waiting_followups"][0]["command"])
+
+    def test_reporter_reply_after_followup_next_action_posts_clarification(self):
+        maintainer_comment = f"{pilot_next_action.sync_pilot_github_issues.MAINTAINER_FOLLOWUP_MARKER}\n\nPlease add the missing fields."
+        comments = [
+            {
+                "author": {"login": "maintainer"},
+                "body": maintainer_comment,
+                "createdAt": "2026-06-04T19:38:17Z",
+                "url": "https://github.com/example/repo/issues/42#issuecomment-1",
+            },
+            {
+                "author": {"login": "reporter"},
+                "body": "I ran it, but I have not filled out every section yet.",
+                "createdAt": "2026-06-04T20:00:00Z",
+                "url": "https://github.com/example/repo/issues/42#issuecomment-2",
+            },
+        ]
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_pilot_record(root)
+
+            payload = pilot_next_action.build_payload(
+                self.args(root),
+                fetch_issue=lambda *args, **kwargs: self.github_payload(comments=comments),
+            )
+
+        self.assertEqual("post-reporter-clarification", payload["next_action"]["type"])
+        self.assertIn("gh issue comment https://github.com/example/repo/issues/42", payload["next_action"]["command"])
+        self.assertTrue(payload["next_action"]["reporter_replies"]["after_latest_maintainer_followup"])
+        self.assertEqual("https://github.com/example/repo/issues/42#issuecomment-2", payload["next_action"]["reporter_replies"]["latest"]["url"])
 
     def test_conversion_ready_issue_next_action_previews_before_writing(self):
         with tempfile.TemporaryDirectory() as temp_dir:

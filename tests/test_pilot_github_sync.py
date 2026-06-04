@@ -207,9 +207,45 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertEqual("2026-06-04T19:38:17Z", record["maintainer_followup_comment"]["created_at"])
         self.assertEqual("maintainer", record["maintainer_followup_comment"]["author"])
         self.assertEqual(0, record["github_issue"]["comment_count"])
+        self.assertEqual(0, record["reporter_replies"]["count"])
+        self.assertFalse(record["reporter_replies"]["after_latest_maintainer_followup"])
         self.assertEqual("", record["followup_file"])
         self.assertNotIn("comment_followup", record["commands"])
         self.assertIn("already posted", record["reporter_followup"])
+
+    def test_reporter_reply_after_followup_reenables_targeted_comment(self):
+        maintainer_comment = f"{sync_pilot_github_issues.MAINTAINER_FOLLOWUP_MARKER}\n\nPlease add the missing fields."
+        comments = [
+            {
+                "author": {"login": "maintainer"},
+                "body": maintainer_comment,
+                "createdAt": "2026-06-04T19:38:17Z",
+                "url": "https://github.com/example/repo/issues/42#issuecomment-1",
+            },
+            {
+                "author": {"login": "reporter"},
+                "body": "I ran it, but I have not filled out every section yet.",
+                "createdAt": "2026-06-04T20:00:00Z",
+                "url": "https://github.com/example/repo/issues/42#issuecomment-2",
+            },
+        ]
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_pilot_record(root)
+
+            payload = sync_pilot_github_issues.build_payload(
+                self.args(root),
+                fetch_issue=lambda *args, **kwargs: self.github_payload(comments=comments),
+            )
+
+        record = payload["records"][0]
+        self.assertEqual("waiting-for-reporter", record["readiness"])
+        self.assertEqual(1, record["github_issue"]["comment_count"])
+        self.assertEqual(1, record["reporter_replies"]["count"])
+        self.assertEqual("https://github.com/example/repo/issues/42#issuecomment-2", record["reporter_replies"]["latest"]["url"])
+        self.assertTrue(record["reporter_replies"]["after_latest_maintainer_followup"])
+        self.assertTrue(record["followup_file"].endswith("llm-app-pilot-followup.md"))
+        self.assertIn("comment_followup", record["commands"])
 
     def test_repo_local_default_paths_render_as_relative_commands(self):
         args = argparse.Namespace(

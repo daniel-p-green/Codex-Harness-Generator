@@ -114,17 +114,43 @@ def followup_path(args: argparse.Namespace, record: dict) -> Path:
     return Path(args.followup_dir) / f"{record['slug']}-followup.md"
 
 
+def comment_created_at(comment: dict) -> str:
+    return str(comment.get("createdAt", ""))
+
+
+def comment_metadata(comment: dict) -> dict:
+    author = comment.get("author") or {}
+    return {
+        "url": str(comment.get("url", "")),
+        "created_at": comment_created_at(comment),
+        "author": str(author.get("login", "")),
+    }
+
+
 def maintainer_followup_comment(github_payload: dict) -> dict:
+    latest: dict = {}
     for comment in github_payload.get("comments") or []:
         if MAINTAINER_FOLLOWUP_MARKER not in str(comment.get("body", "")):
             continue
-        author = comment.get("author") or {}
-        return {
-            "url": str(comment.get("url", "")),
-            "created_at": str(comment.get("createdAt", "")),
-            "author": str(author.get("login", "")),
-        }
-    return {}
+        metadata = comment_metadata(comment)
+        if not latest or metadata["created_at"] >= latest.get("created_at", ""):
+            latest = metadata
+    return latest
+
+
+def reporter_reply_summary(github_payload: dict, maintainer_comment: dict) -> dict:
+    replies = []
+    for comment in github_payload.get("comments") or []:
+        if MAINTAINER_FOLLOWUP_MARKER in str(comment.get("body", "")):
+            continue
+        replies.append(comment_metadata(comment))
+    latest = max(replies, key=lambda item: item.get("created_at", ""), default={})
+    maintainer_created_at = maintainer_comment.get("created_at", "")
+    return {
+        "count": len(replies),
+        "latest": latest,
+        "after_latest_maintainer_followup": bool(latest and latest.get("created_at", "") > maintainer_created_at),
+    }
 
 
 FIELD_LABELS = {
@@ -206,6 +232,7 @@ def issue_sync_record(
         "display_followup_file": "",
         "maintainer_followup_posted": False,
         "maintainer_followup_comment": {},
+        "reporter_replies": {"count": 0, "latest": {}, "after_latest_maintainer_followup": False},
     }
     if not issue_url:
         base["errors"] = ["Pilot record has no live GitHub issue URL in notes or status history."]
@@ -221,6 +248,7 @@ def issue_sync_record(
         github_payload = fetch_issue(issue_url, repo=args.repo or "", gh_bin=args.gh_bin, include_comments=True)
         base["maintainer_followup_comment"] = maintainer_followup_comment(github_payload)
         base["maintainer_followup_posted"] = bool(base["maintainer_followup_comment"])
+        base["reporter_replies"] = reporter_reply_summary(github_payload, base["maintainer_followup_comment"])
         lint_payload = usage_from_github_issue.build_payload(
             lint_args(args, record, issue_url),
             github_payload=github_payload,
@@ -241,7 +269,7 @@ def issue_sync_record(
     base["github_issue"] = lint_payload.get("github_issue", {})
     base["reporter_followup"] = reporter_followup(base)
     if base["readiness"] == "waiting-for-reporter":
-        if base["maintainer_followup_posted"]:
+        if base["maintainer_followup_posted"] and not base["reporter_replies"]["after_latest_maintainer_followup"]:
             base["reporter_followup"] = (
                 "Maintainer follow-up already posted; wait for a reporter reply with the missing public-safe evidence fields."
             )
@@ -262,6 +290,10 @@ def summarize(records: list[dict]) -> dict:
         "needs_attention": sum(1 for record in records if record.get("readiness") == "needs-attention"),
         "missing_issue_url": sum(1 for record in records if record.get("readiness") == "needs-live-issue"),
         "maintainer_followups_posted": sum(1 for record in records if record.get("maintainer_followup_posted")),
+        "reporter_reply_count": sum(record.get("reporter_replies", {}).get("count", 0) for record in records),
+        "reporter_replies_after_followup": sum(
+            1 for record in records if record.get("reporter_replies", {}).get("after_latest_maintainer_followup")
+        ),
     }
 
 
@@ -342,6 +374,8 @@ def write_report(path: Path, payload: dict) -> None:
         f"- Conversion-ready issues: {summary['conversion_ready']}",
         f"- Waiting for reporter: {summary['waiting_for_reporter']}",
         f"- Maintainer follow-ups already posted: {summary['maintainer_followups_posted']}",
+        f"- Reporter replies: {summary['reporter_reply_count']}",
+        f"- Reporter replies after latest maintainer follow-up: {summary['reporter_replies_after_followup']}",
         f"- Needs attention: {summary['needs_attention']}",
         f"- Missing live issue URL: {summary['missing_issue_url']}",
         "",
@@ -363,6 +397,9 @@ def write_report(path: Path, payload: dict) -> None:
                 f"- Maintainer follow-up already posted: `{str(record.get('maintainer_followup_posted', False)).lower()}`",
                 f"- Maintainer follow-up URL: {record.get('maintainer_followup_comment', {}).get('url') or 'none'}",
                 f"- Maintainer follow-up posted at: `{record.get('maintainer_followup_comment', {}).get('created_at') or 'none'}`",
+                f"- Reporter replies: {record.get('reporter_replies', {}).get('count', 0)}",
+                f"- Latest reporter reply: {record.get('reporter_replies', {}).get('latest', {}).get('url') or 'none'}",
+                f"- Reporter replied after latest maintainer follow-up: `{str(record.get('reporter_replies', {}).get('after_latest_maintainer_followup', False)).lower()}`",
                 f"- Missing fields: {', '.join(record['missing_fields']) if record['missing_fields'] else 'none'}",
                 f"- Follow-up file: `{record['display_followup_file']}`" if record.get("display_followup_file") else "- Follow-up file: not needed",
             ]
