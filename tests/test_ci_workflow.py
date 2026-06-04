@@ -29,6 +29,8 @@ class CiWorkflowTests(unittest.TestCase):
     def test_ci_preserves_gate_failure_and_uploads_payload(self):
         text = WORKFLOW.read_text(encoding="utf-8")
 
+        self.assertIn("Install runtime dependencies", text)
+        self.assertIn("python -m pip install .", text)
         self.assertIn("set -o pipefail", text)
         self.assertIn("python scripts/run_evals.py --json | tee eval-gate-${{ matrix.python-version }}.json", text)
         self.assertIn("actions/upload-artifact@v4", text)
