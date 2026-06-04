@@ -364,6 +364,18 @@ plus a non-destructive adoption plan. It also includes a cleanup checklist for
 legacy paths to archive or remove after their useful content has been
 translated.
 
+To prepare the audit, Codex blueprint, adoption plan, and add-only copy script
+as one local packet:
+
+```bash
+python scripts/codex_harness.py prepare-migration /path/to/harness /tmp/codex-migration-packet \
+  --source-label "public-safe legacy harness label"
+```
+
+The migration packet still does not rewrite or delete legacy files. Its copy
+script copies only `add` rows, refuses overwrites, and leaves conflicts plus
+legacy cleanup for manual review after post-adoption checks pass.
+
 The deterministic generator currently supports the four base starter profiles
 and 16 bundled domain presets listed by:
 
@@ -693,6 +705,7 @@ Common subcommands:
 | `validate <paths...>` | `validate_generated_harness.py` | Runs eval, offline smoke, and the generated local self-check together. |
 | `local-eval <path>` | generated `scripts/run-harness-evals.py` | Runs the copied harness's embedded eval report without depending on this generator repo. |
 | `migration-audit <paths...>` | `migration_audit.py` | Audits legacy harness artifacts and writes an optional Codex migration plan report. |
+| `prepare-migration <source> <output>` | `prepare_migration.py` | Writes a migration packet with audit report, Codex blueprint, adoption plan, and add-only copy script. |
 | `gate` | `run_evals.py` | Runs the repo release gate. |
 | `refresh-examples` | `refresh_generated_surfaces.py` | Refreshes checked-in generated fixtures and example families from the current generator, then runs the example inventory contract check. |
 | `live-trials` | `run_live_example_task_trials.py` | Runs authenticated Codex tasks against checked-in live examples. |

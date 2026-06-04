@@ -1201,6 +1201,57 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_prepare_migration_delegates_to_packet_script(self):
+        command, _ = self.run_cli(
+            [
+                "prepare-migration",
+                "/tmp/legacy",
+                "/tmp/migration-packet",
+                "--profile",
+                "software-development",
+                "--project-name",
+                "Legacy Project",
+                "--source-label",
+                "public legacy project",
+                "--max-files",
+                "100",
+                "--limit",
+                "2",
+                "--generated-date",
+                "2026-06-04",
+                "--generated",
+                "2026-06-04T12:00:00Z",
+                "--force",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/prepare_migration.py",
+                "/tmp/legacy",
+                "/tmp/migration-packet",
+                "--profile",
+                "software-development",
+                "--project-name",
+                "Legacy Project",
+                "--source-label",
+                "public legacy project",
+                "--max-files",
+                "100",
+                "--limit",
+                "2",
+                "--generated-date",
+                "2026-06-04",
+                "--generated",
+                "2026-06-04T12:00:00Z",
+                "--force",
+                "--json",
+            ],
+            command,
+        )
+
     def test_semantic_alignment_delegates_to_checker(self):
         command, _ = self.run_cli(["semantic-alignment", "--timeout", "5", "--no-write", "--json"])
 

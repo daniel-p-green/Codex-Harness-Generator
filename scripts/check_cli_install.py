@@ -85,6 +85,7 @@ def build_payload() -> dict:
         pilot_campaign_report = temp_root / "PILOT_CAMPAIGN.md"
         proof_next_report = temp_root / "PROOF_NEXT.md"
         migration_plan_report = temp_root / "CODEX_MIGRATION_PLAN.md"
+        migration_packet = temp_root / "migration-packet"
         issue_body = temp_root / "external-usage-issue.md"
         linked_pilot_issue_body = temp_root / "linked-pilot-usage-issue.md"
         issue_body.write_text(
@@ -694,6 +695,20 @@ def build_payload() -> dict:
                     "--json",
                 ],
             ),
+            (
+                "prepare_migration",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "prepare-migration",
+                    generated.as_posix(),
+                    migration_packet.as_posix(),
+                    "--source-label",
+                    "install smoke generated harness",
+                    "--generated",
+                    "2026-06-04T12:00:00Z",
+                    "--json",
+                ],
+            ),
             ("eval", [(venv / "bin" / "codex-harness").as_posix(), "eval", generated.as_posix()]),
         ]
 
@@ -738,6 +753,16 @@ def build_payload() -> dict:
                         step["status"] = "fail"
                         step["returncode"] = 1
                         step["stderr"] += "\nUpstream drift smoke did not prove a clean self-compare."
+                if name == "prepare_migration" and completed.returncode == 0:
+                    migration_payload = json.loads(completed.stdout)
+                    if (
+                        migration_payload.get("status") != "pass"
+                        or not (migration_packet / "README.md").exists()
+                        or not (migration_packet / "copy-codex-harness-adds.sh").exists()
+                    ):
+                        step["status"] = "fail"
+                        step["returncode"] = 1
+                        step["stderr"] += "\nPrepare-migration did not write a complete migration packet."
                 if name == "prepare_pilot_batch_dry_run" and completed.returncode == 0:
                     batch_payload = json.loads(completed.stdout)
                     if (

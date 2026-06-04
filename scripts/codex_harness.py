@@ -426,6 +426,28 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("migration_audit.py", command)
 
+    if args.command == "prepare-migration":
+        command = [args.source, args.output]
+        if args.profile:
+            command.extend(["--profile", args.profile])
+        if args.project_name:
+            command.extend(["--project-name", args.project_name])
+        if args.source_label:
+            command.extend(["--source-label", args.source_label])
+        if args.max_files is not None:
+            command.extend(["--max-files", str(args.max_files)])
+        if args.limit is not None:
+            command.extend(["--limit", str(args.limit)])
+        if args.generated_date:
+            command.extend(["--generated-date", args.generated_date])
+        if args.generated:
+            command.extend(["--generated", args.generated])
+        if args.force:
+            command.append("--force")
+        if args.json:
+            command.append("--json")
+        return python_script("prepare_migration.py", command)
+
     if args.command == "gate":
         command: list[str] = []
         if args.codex_live:
@@ -1141,6 +1163,22 @@ def make_parser() -> argparse.ArgumentParser:
     migration_audit.add_argument("--report", help="Optional Markdown migration plan report path")
     migration_audit.add_argument("--no-write", action="store_true", help="Do not write --report")
     migration_audit.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    prepare_migration = subparsers.add_parser(
+        "prepare-migration",
+        help="Prepare a Codex migration packet for a legacy harness",
+    )
+    prepare_migration.add_argument("source", help="Legacy harness or project directory")
+    prepare_migration.add_argument("output", help="Output directory for the migration packet")
+    prepare_migration.add_argument("--profile", help="Starter profile override; defaults to inspection recommendation")
+    prepare_migration.add_argument("--project-name", help="Project name for generated blueprint docs")
+    prepare_migration.add_argument("--source-label", help="Public-safe label for the source project")
+    prepare_migration.add_argument("--max-files", type=int, help="Maximum source files to inspect")
+    prepare_migration.add_argument("--limit", type=int, help="Number of inspection recommendations to consider")
+    prepare_migration.add_argument("--generated-date", help="Stable generated date for blueprint docs")
+    prepare_migration.add_argument("--generated", help="UTC timestamp for packet metadata")
+    prepare_migration.add_argument("--force", action="store_true", help="Replace output directory contents")
+    prepare_migration.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     gate = subparsers.add_parser("gate", help="Run the repo eval gate")
     gate.add_argument("--codex-live", action="store_true", help="Include authenticated Codex CLI live smoke")

@@ -47,9 +47,11 @@ SKIP_FORBIDDEN_TEXT_PATHS = {
     "scripts/eval_codex_port.py",
     "scripts/eval_generated_harness.py",
     "scripts/migration_audit.py",
+    "scripts/prepare_migration.py",
     "tests/test_eval_codex_port.py",
     "tests/test_generated_harness_contract.py",
     "tests/test_migration_audit.py",
+    "tests/test_prepare_migration.py",
 }
 SKIP_FORBIDDEN_TEXT_PREFIXES = {
     "tests/fixtures/legacy_harnesses/",

@@ -55,6 +55,7 @@ class ProofStatusTests(unittest.TestCase):
                 {"name": "pilot_campaign", "status": "pass"},
                 {"name": "proof_next", "status": "pass"},
                 {"name": "migration_audit", "status": "pass"},
+                {"name": "prepare_migration", "status": "pass"},
                 {"name": "eval", "status": "pass"},
             ],
         }
@@ -122,6 +123,7 @@ Status: PASS
         self.assertIn("pilot_campaign=pass", install_check["detail"])
         self.assertIn("proof_next=pass", install_check["detail"])
         self.assertIn("migration_audit=pass", install_check["detail"])
+        self.assertIn("prepare_migration=pass", install_check["detail"])
         self.assertIn("installable_cli", [check["name"] for check in payload["checks"]])
         self.assertIn("external_usage_issue_example", [check["name"] for check in payload["checks"]])
         self.assertIn("source_freshness_report", [check["name"] for check in payload["checks"]])

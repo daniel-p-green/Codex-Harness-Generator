@@ -57,6 +57,7 @@ class DoctorTests(unittest.TestCase):
                 {"name": "pilot_campaign", "status": "pass"},
                 {"name": "proof_next", "status": "pass"},
                 {"name": "migration_audit", "status": "pass"},
+                {"name": "prepare_migration", "status": "pass"},
                 {"name": "eval", "status": "pass"},
             ],
         }
@@ -125,6 +126,7 @@ class DoctorTests(unittest.TestCase):
         self.assertIn("pilot_campaign=pass", install_check["detail"])
         self.assertIn("proof_next=pass", install_check["detail"])
         self.assertIn("migration_audit=pass", install_check["detail"])
+        self.assertIn("prepare_migration=pass", install_check["detail"])
         self.assertIn("installable_cli", [check["name"] for check in payload["checks"]])
 
     def test_main_json_returns_failure_for_unmet_usage_threshold(self):

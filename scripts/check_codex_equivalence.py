@@ -67,9 +67,19 @@ CAPABILITIES = [
     {
         "name": "Existing-project adoption",
         "original_need": "Adopt a harness into an existing project without overwriting work.",
-        "codex_surface": "Project inspection, adoption plans, add-only copy scripts, and migration audit.",
-        "evidence_paths": ["scripts/inspect_project.py", "scripts/plan_project_adoption.py", "scripts/migration_audit.py"],
-        "commands": ["codex-harness inspect <path>", "codex-harness adoption-plan <path>", "codex-harness migration-audit <path>"],
+        "codex_surface": "Project inspection, adoption plans, add-only copy scripts, migration audit, and migration packets.",
+        "evidence_paths": [
+            "scripts/inspect_project.py",
+            "scripts/plan_project_adoption.py",
+            "scripts/migration_audit.py",
+            "scripts/prepare_migration.py",
+        ],
+        "commands": [
+            "codex-harness inspect <path>",
+            "codex-harness adoption-plan <path>",
+            "codex-harness migration-audit <path>",
+            "codex-harness prepare-migration <source> <output>",
+        ],
     },
     {
         "name": "Copied-harness autonomy",
