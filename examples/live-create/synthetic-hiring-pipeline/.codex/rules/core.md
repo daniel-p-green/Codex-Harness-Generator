@@ -16,3 +16,5 @@ unsupported, candidate facts are private, or a human hiring decision is required
 
 Self-learning: write retro notes for repeated criteria, privacy, or bias-boundary
 issues and update the harness after validated patterns emerge.
+
+Self-learning: record repeated friction and user corrections in `Docs/Environment/IMPROVEMENT_LOG.md` before updating harness behavior.

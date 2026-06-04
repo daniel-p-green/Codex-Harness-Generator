@@ -64,3 +64,5 @@ Use `.codex/rules/00-orchestrator.md` for routing. Delegate focused analysis to:
 - "Check this CSV" means inspect the file, run deterministic quality checks, and report issues with columns and row counts.
 - "Summarize last week" means identify the date column/window, compute weekly metrics, and write a concise reusable note.
 - "Make chart notes" means produce title candidates, axis/series notes, caveats, and 2-4 plain-English takeaways.
+
+- Record repeated workflow friction in `Docs/Environment/IMPROVEMENT_LOG.md` before changing harness behavior.

@@ -1,4 +1,5 @@
 import importlib.util
+import json
 from unittest.mock import patch
 import shutil
 import subprocess
@@ -99,6 +100,19 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         checks = {finding["check"] for finding in result["findings"]}
         self.assertIn(check, checks, result)
 
+    def run_local_check(self, target: Path) -> dict:
+        completed = subprocess.run(
+            [sys.executable, "scripts/check-harness.py"],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        payload = json.loads(completed.stdout)
+        payload["returncode"] = completed.returncode
+        payload["stderr"] = completed.stderr
+        return payload
+
     def test_all_generated_harness_fixtures_pass_with_high_scores(self):
         fixtures = self.fixture_paths()
         self.assertGreaterEqual(len(fixtures), 5)
@@ -143,6 +157,40 @@ class GeneratedHarnessContractTests(unittest.TestCase):
                 )
                 self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
                 self.assertIn('"status": "pass"', completed.stdout)
+
+    def test_local_harness_check_fails_for_weak_eval_plan(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        (target / "Docs/Environment/EVAL_PLAN.md").write_text("# Eval Plan\n\n- Later.\n", encoding="utf-8")
+
+        payload = self.run_local_check(target)
+
+        self.assertEqual("fail", payload["status"], payload)
+        self.assertNotEqual(0, payload["returncode"])
+        self.assertTrue(any("eval plan should mention" in issue for issue in payload["issues"]), payload)
+
+    def test_local_harness_check_fails_for_weak_improvement_log(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        (target / "Docs/Environment/IMPROVEMENT_LOG.md").write_text("# Improvement Log\n\n- Later.\n", encoding="utf-8")
+
+        payload = self.run_local_check(target)
+
+        self.assertEqual("fail", payload["status"], payload)
+        self.assertNotEqual(0, payload["returncode"])
+        self.assertTrue(any("improvement log should mention" in issue for issue in payload["issues"]), payload)
+
+    def test_local_harness_check_fails_for_stale_manifest_reference(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        manifest = target / "Docs/Environment/MANIFEST.md"
+        manifest.write_text(manifest.read_text(encoding="utf-8") + "- missing/file.md\n", encoding="utf-8")
+
+        payload = self.run_local_check(target)
+
+        self.assertEqual("fail", payload["status"], payload)
+        self.assertNotEqual(0, payload["returncode"])
+        self.assertTrue(any("manifest references missing path" in issue for issue in payload["issues"]), payload)
 
     def test_codex_live_smoke_uses_non_interactive_exec(self):
         completed = subprocess.CompletedProcess(args=[], returncode=0, stdout="OK\n", stderr="")

@@ -9,3 +9,4 @@ You coordinate shared guidance across multiple work areas. Verify the active are
 - Treat cross-area security and privacy as default constraints.
 - Ask for clarification when a request could affect more than one area.
 
+- Record repeated workflow friction in `Docs/Environment/IMPROVEMENT_LOG.md` before changing harness behavior.

@@ -28,3 +28,5 @@ Default posture: conservative for overwrites and external-facing drafts, proacti
 ## Delegation Contract
 
 Each delegation must include task, source paths, output format, target path if writing, and verification expectation. Agents must never speculate about files they have not read.
+
+Self-learning: record repeated friction and user corrections in `Docs/Environment/IMPROVEMENT_LOG.md` before updating harness behavior.

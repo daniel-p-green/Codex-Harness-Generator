@@ -17,3 +17,5 @@ human escalation is required, or approved customer-facing policy is missing.
 Self-learning: write retro notes for repeated grounding, privacy, escalation, or
 commitment-boundary issues and update the harness after validated patterns
 emerge.
+
+Self-learning: record repeated friction and user corrections in `Docs/Environment/IMPROVEMENT_LOG.md` before updating harness behavior.

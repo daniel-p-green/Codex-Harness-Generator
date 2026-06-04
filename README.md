@@ -49,7 +49,9 @@ replacement. What is proven today:
   loop for converting repeated friction and user corrections into small,
   evidence-backed harness updates.
 - Generated harnesses include `scripts/check-harness.py`, a local smoke check
-  that can run without this generator repo.
+  that can run without this generator repo and catches missing paths, stale
+  manifest references, broken agent/skill config, and weak eval/improvement
+  logs.
 - `scripts/capture_live_create_example.py` provides a repeatable packaging path
   for sanitized live `/create` outputs.
 - `examples/live-create/` contains sanitized live model-mediated `/create`

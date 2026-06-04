@@ -704,9 +704,9 @@ ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_PATHS = [
     "AGENTS.md",
     ".codex/config.toml",
-    ".codex/agents/reviewer.toml",
-    ".codex/rules/core.md",
-    ".agents/skills/health-check/SKILL.md",
+    ".codex/rules",
+    ".agents/skills",
+    "scripts/check-harness.py",
     "Docs/GETTING_STARTED.md",
     "Docs/Environment/GENESIS.md",
     "Docs/Environment/ARCHITECTURE.md",
@@ -770,11 +770,63 @@ def parse_config(text: str) -> dict:
     return config
 
 
+def require_terms(path: str, label: str, terms: list[str], issues: list[str]) -> None:
+    target = ROOT / path
+    if not target.exists():
+        return
+    text = read_text(target).lower()
+    for term in terms:
+        if term not in text:
+            issues.append(f"{label} should mention: {term}")
+
+
+def check_manifest_references(issues: list[str]) -> None:
+    manifest = ROOT / "Docs/Environment/MANIFEST.md"
+    if not manifest.exists():
+        return
+    for line_number, raw_line in enumerate(read_text(manifest).splitlines(), 1):
+        line = raw_line.strip()
+        if not line.startswith("- "):
+            continue
+        entry = line[2:].strip().split(" #", 1)[0].strip("` ")
+        if not entry or " " in entry:
+            continue
+        if not (ROOT / entry).exists():
+            issues.append(f"manifest references missing path at line {line_number}: {entry}")
+
+
 def main() -> int:
     issues = []
     for required in REQUIRED_PATHS:
         if not (ROOT / required).exists():
             issues.append(f"missing required path: {required}")
+
+    check_manifest_references(issues)
+
+    require_terms(
+        "Docs/Environment/EVAL_PLAN.md",
+        "eval plan",
+        ["success criteria", "smoke checks", "acceptance checks", "reviewer check", "regression checks", "inspect", "verify", "risk"],
+        issues,
+    )
+    require_terms(
+        "Docs/Environment/IMPROVEMENT_LOG.md",
+        "improvement log",
+        ["categories", "seed patterns", "entry template", "update rule", "friction", "evidence", "user correction", "verification after update"],
+        issues,
+    )
+    require_terms(
+        "AGENTS.md",
+        "AGENTS.md",
+        ["verify", "improvement_log.md"],
+        issues,
+    )
+    rules_root = ROOT / ".codex/rules"
+    if rules_root.exists():
+        rules_text = "\n".join(read_text(path).lower() for path in sorted(rules_root.glob("*.md")))
+        for term in ["self-learning", "improvement_log.md"]:
+            if term not in rules_text:
+                issues.append(f"rules should mention: {term}")
 
     config = {}
     config_path = ROOT / ".codex/config.toml"

@@ -20,3 +20,5 @@ Prefer Git worktrees over Agent Teams if the project later becomes Git-based and
 ## Context
 
 Keep task context small. Summarize long findings into `Docs/_working/state/SESSION_CONTEXT.md` when a task spans multiple turns, then continue from that summary.
+
+Self-learning: record repeated friction and user corrections in `Docs/Environment/IMPROVEMENT_LOG.md` before updating harness behavior.

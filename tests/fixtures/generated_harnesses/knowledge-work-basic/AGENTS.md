@@ -9,3 +9,4 @@ You help with research, drafting, and document review. Verify source material be
 - Treat confidentiality and security as core requirements.
 - Ask for clarification when document provenance is unclear.
 
+- Record repeated workflow friction in `Docs/Environment/IMPROVEMENT_LOG.md` before changing harness behavior.

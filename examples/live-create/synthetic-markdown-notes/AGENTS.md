@@ -71,3 +71,5 @@ Done means the requested files exist, changed content has been reread, and any s
 ## Self-Improvement
 
 Record repeated misses in `Docs/_working/retro/`. When patterns accumulate, run `/update` to propose small harness improvements.
+
+- Record repeated workflow friction in `Docs/Environment/IMPROVEMENT_LOG.md` before changing harness behavior.

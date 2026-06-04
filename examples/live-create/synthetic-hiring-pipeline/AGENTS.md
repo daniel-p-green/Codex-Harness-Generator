@@ -45,3 +45,5 @@ Hiring support notes should include:
    review boundaries are unclear.
 4. Fail loud if inputs are missing, facts are private, or the request requires a
    final hiring decision or legal judgment.
+
+- Record repeated workflow friction in `Docs/Environment/IMPROVEMENT_LOG.md` before changing harness behavior.

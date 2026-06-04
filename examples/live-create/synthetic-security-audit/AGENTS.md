@@ -35,3 +35,5 @@ Security review reports should include:
 3. Use the reviewer agent for non-trivial findings or when severity is unclear.
 4. Fail loud if source files are missing, contain real secrets, or require
    active testing to verify.
+
+- Record repeated workflow friction in `Docs/Environment/IMPROVEMENT_LOG.md` before changing harness behavior.

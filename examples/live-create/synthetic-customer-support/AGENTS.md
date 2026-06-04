@@ -44,3 +44,5 @@ Customer support notes should include:
    commitment boundaries are unclear.
 4. Fail loud if sources are missing, facts are private, or the request requires
    approved customer-facing commitments.
+
+- Record repeated workflow friction in `Docs/Environment/IMPROVEMENT_LOG.md` before changing harness behavior.

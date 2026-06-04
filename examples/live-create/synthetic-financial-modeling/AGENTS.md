@@ -43,3 +43,5 @@ Financial analysis notes should include:
    boundaries are unclear.
 4. Fail loud if inputs are missing, facts are private, or the request requires
    professional financial judgment.
+
+- Record repeated workflow friction in `Docs/Environment/IMPROVEMENT_LOG.md` before changing harness behavior.

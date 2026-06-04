@@ -10,3 +10,4 @@ Error handling: fail loud when sources are missing, ambiguous, or contradictory.
 
 Self-learning: write retro notes for repeated source-quality issues and update the harness after validated patterns emerge.
 
+Self-learning: record repeated friction and user corrections in `Docs/Environment/IMPROVEMENT_LOG.md` before updating harness behavior.

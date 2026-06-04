@@ -27,3 +27,4 @@ The orchestrator may directly read `AGENTS.md`, `.codex/rules/*.md`, `Docs/index
 
 When delegating, provide the target path, relevant CSV/report paths, known metric definitions, and the exact output expected. Require the assistant to state files read, commands run, and verification result.
 
+Self-learning: record repeated friction and user corrections in `Docs/Environment/IMPROVEMENT_LOG.md` before updating harness behavior.

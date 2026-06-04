@@ -10,3 +10,4 @@ Error handling: fail loud when area ownership is unclear, tests fail, or verific
 
 Self-learning: write retro notes for repeated routing issues and update the hub after validated patterns emerge.
 
+Self-learning: record repeated friction and user corrections in `Docs/Environment/IMPROVEMENT_LOG.md` before updating harness behavior.

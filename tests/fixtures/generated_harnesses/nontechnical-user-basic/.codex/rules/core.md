@@ -10,3 +10,4 @@ Error handling: fail loud when file state is unclear, a command fails, or privac
 
 Self-learning: write retro notes for repeated confusion and update the harness after validated patterns emerge.
 
+Self-learning: record repeated friction and user corrections in `Docs/Environment/IMPROVEMENT_LOG.md` before updating harness behavior.

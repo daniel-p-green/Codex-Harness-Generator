@@ -10,3 +10,4 @@ Error handling: fail loud when evidence is missing, reproduction is unsafe, or i
 
 Self-learning: write retro notes for repeated vulnerability classes and update the harness after validated patterns emerge.
 
+Self-learning: record repeated friction and user corrections in `Docs/Environment/IMPROVEMENT_LOG.md` before updating harness behavior.

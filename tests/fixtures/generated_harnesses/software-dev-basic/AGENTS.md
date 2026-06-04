@@ -9,3 +9,4 @@ You help maintain a small web application. Verify file state before changing cod
 - Treat security issues as high priority.
 - Ask for clarification when correctness or privacy depends on missing context.
 
+- Record repeated workflow friction in `Docs/Environment/IMPROVEMENT_LOG.md` before changing harness behavior.

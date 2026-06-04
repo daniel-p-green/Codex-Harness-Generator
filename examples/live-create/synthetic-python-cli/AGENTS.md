@@ -48,3 +48,5 @@ This is a public-safe example CLI that scans local Markdown files, reports stale
 ## Done Means
 
 The change is implemented, verified with tests or a concrete CLI run, and any remaining risk is called out plainly.
+
+- Record repeated workflow friction in `Docs/Environment/IMPROVEMENT_LOG.md` before changing harness behavior.

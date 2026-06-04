@@ -10,3 +10,4 @@ Error handling: fail loud when commands fail, inputs are missing, or verificatio
 
 Self-learning: write retro notes for repeated issues and update the harness after validated patterns emerge.
 
+Self-learning: record repeated friction and user corrections in `Docs/Environment/IMPROVEMENT_LOG.md` before updating harness behavior.

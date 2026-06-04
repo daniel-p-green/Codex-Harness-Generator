@@ -15,3 +15,5 @@ missing, facts are private, or professional financial judgment is required.
 
 Self-learning: write retro notes for repeated formula or boundary issues and
 update the harness after validated patterns emerge.
+
+Self-learning: record repeated friction and user corrections in `Docs/Environment/IMPROVEMENT_LOG.md` before updating harness behavior.
