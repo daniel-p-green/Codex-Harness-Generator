@@ -26,7 +26,9 @@ class CodexEquivalenceTests(unittest.TestCase):
         self.assertIn("Source lineage", names)
         usage = next(capability for capability in payload["capabilities"] if capability["name"] == "Usage evidence")
         self.assertIn("Docs/Environment/EXTERNAL_USAGE_ISSUE_EXAMPLE.md", usage["evidence_paths"])
+        self.assertIn("Docs/Environment/PILOT_HANDOFF_AUDIT.md", usage["evidence_paths"])
         self.assertIn("codex-harness usage-from-issue <issue-body>", usage["commands"])
+        self.assertIn("codex-harness pilot-handoff-audit", usage["commands"])
 
     def test_missing_evidence_path_fails_capability(self):
         original = check_codex_equivalence.CAPABILITIES

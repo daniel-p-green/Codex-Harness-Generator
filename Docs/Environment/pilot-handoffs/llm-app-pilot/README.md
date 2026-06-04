@@ -1,0 +1,23 @@
+# LLM app pilot Handoff
+
+Generated: 2026-06-04T17:49:42Z
+Pilot slug: `llm-app-pilot`
+Status: `prepared`
+Domain: LLM app
+Source type: `external`
+Generation path: `installed-quickstart`
+
+## Reporter Files
+
+- `REPORTER_MESSAGE.txt`: message to send with the pilot.
+- `PILOT_PACK.md`: one-task pilot guide, copied when available.
+- `USAGE_ISSUE_DRAFT.md`: issue-body evidence template, copied when available.
+- `USAGE_REPORT_DRAFT.md`: prefilled issue-body draft to complete after the pilot task.
+
+## Maintainer Files
+
+- `MAINTAINER_COMMANDS.md`: tracking, preview, and conversion commands.
+
+## Claim Boundary
+
+Pilot handoff folders help send and track pilots; they are not usage proof until a real task is completed and converted into a validated usage record.

@@ -65,6 +65,23 @@ python scripts/codex_harness.py prepare-pilot /tmp/codex-llm-app-pilot \
   --json
 ```
 
+When the pilot is tracked in `Docs/Environment/pilot-records`, export and audit
+the shareable handoff before sending it:
+
+```bash
+python scripts/codex_harness.py pilot-handoff \
+  --out Docs/Environment/pilot-handoffs \
+  --force
+
+python scripts/codex_harness.py pilot-handoff-audit \
+  --handoff-dir Docs/Environment/pilot-handoffs
+```
+
+The audit checks required reporter files, claim boundaries, and the prefilled
+`USAGE_REPORT_DRAFT.md` importer shape. It is still not usage proof until the
+reporter completes a real task and the evidence is converted into a validated
+usage record.
+
 When a copied generated harness already exists, create a pilot pack from that
 harness. The pack gives the reporter a one-task loop, safe evidence boundaries,
 maintainer commands, and an optional issue-body draft:

@@ -735,6 +735,57 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_pilot_handoff_audit_delegates_to_handoff_auditor(self):
+        command, _ = self.run_cli(
+            [
+                "pilot-handoff-audit",
+                "--handoff-dir",
+                "/tmp/handoffs",
+                "--record-dir",
+                "/tmp/pilot-records",
+                "--usage-record-dir",
+                "/tmp/usage-records",
+                "--usage-report",
+                "/tmp/USAGE_RECORDS.md",
+                "--pilot-board-report",
+                "/tmp/PILOT_BOARD.md",
+                "--report",
+                "/tmp/PILOT_HANDOFF_AUDIT.md",
+                "--status",
+                "prepared",
+                "--slug",
+                "llm-app-pilot",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/audit_pilot_handoffs.py",
+                "--handoff-dir",
+                "/tmp/handoffs",
+                "--record-dir",
+                "/tmp/pilot-records",
+                "--usage-record-dir",
+                "/tmp/usage-records",
+                "--usage-report",
+                "/tmp/USAGE_RECORDS.md",
+                "--pilot-board-report",
+                "/tmp/PILOT_BOARD.md",
+                "--report",
+                "/tmp/PILOT_HANDOFF_AUDIT.md",
+                "--status",
+                "prepared",
+                "--slug",
+                "llm-app-pilot",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
     def test_beta_exit_audit_delegates_to_auditor(self):
         command, _ = self.run_cli(
             [

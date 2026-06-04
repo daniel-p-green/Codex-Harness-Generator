@@ -186,6 +186,7 @@ class ProofNextTests(unittest.TestCase):
         self.assertIn("codex-harness usage-from-harness", text)
         self.assertIn("codex-harness usage-from-issue", text)
         self.assertIn("codex-harness pilot-handoff", text)
+        self.assertIn("codex-harness pilot-handoff-audit", text)
         self.assertIn("--no-write --json", text)
         self.assertIn("This does not prove", text)
 
@@ -208,6 +209,7 @@ class ProofNextTests(unittest.TestCase):
         self.assertIn("Continue this pilot instead of preparing a duplicate.", text)
         self.assertIn("codex-harness pilot-outreach", text)
         self.assertIn("codex-harness pilot-handoff", text)
+        self.assertIn("codex-harness pilot-handoff-audit", text)
 
     def test_ready_payload_has_no_next_pilot(self):
         records = []

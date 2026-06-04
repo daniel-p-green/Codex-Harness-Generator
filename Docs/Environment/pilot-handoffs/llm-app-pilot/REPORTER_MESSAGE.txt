@@ -1,0 +1,11 @@
+Would you be willing to try one small real Codex task using LLM app pilot?
+
+- Domain: LLM app
+- Pilot pack: Docs/Environment/LLM_APP_PILOT_PACK.md
+- Issue draft: Docs/Environment/LLM_APP_USAGE_ISSUE_DRAFT.md
+
+Please pick one privacy-safe task, run the generated harness checks, record the task trial,
+and share either the completed issue draft or a private copied harness directory with public-safe evidence.
+
+Do not include secrets, personal data, proprietary source, private repository names, local machine paths, raw logs, or raw private transcripts.
+A private-summary report is fine if the raw evidence cannot be public.

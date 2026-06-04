@@ -97,6 +97,7 @@ class PilotHandoffTests(unittest.TestCase):
             usage_report_draft = (handoff / "USAGE_REPORT_DRAFT.md").read_text(encoding="utf-8")
             self.assertIn("### Pilot or usage-record slug\n\nllm-app-pilot", usage_report_draft)
             self.assertIn("### Domain or project type\n\nLLM app", usage_report_draft)
+            self.assertIn("### Generated harness profile or label\n\nLLM App Workspace Pilot", usage_report_draft)
             self.assertIn("### Source type\n\nexternal", usage_report_draft)
             self.assertIn("### Generation path\n\ninstalled-quickstart", usage_report_draft)
             self.assertIn("_no response_", usage_report_draft)

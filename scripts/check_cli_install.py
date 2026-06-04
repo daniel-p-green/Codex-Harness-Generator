@@ -79,6 +79,7 @@ def build_payload() -> dict:
         pilot_board_report = temp_root / "PILOT_BOARD.md"
         pilot_outreach_report = temp_root / "PILOT_OUTREACH.md"
         pilot_handoff_root = temp_root / "pilot-handoffs"
+        pilot_handoff_audit_report = temp_root / "PILOT_HANDOFF_AUDIT.md"
         beta_exit_audit_report = temp_root / "BETA_EXIT_AUDIT.md"
         usage_records = temp_root / "usage-records"
         usage_report = temp_root / "USAGE_RECORDS.md"
@@ -624,6 +625,26 @@ def build_payload() -> dict:
                 ],
             ),
             (
+                "pilot_handoff_audit",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "pilot-handoff-audit",
+                    "--handoff-dir",
+                    pilot_handoff_root.as_posix(),
+                    "--record-dir",
+                    pilot_records.as_posix(),
+                    "--usage-record-dir",
+                    usage_records.as_posix(),
+                    "--usage-report",
+                    usage_report.as_posix(),
+                    "--pilot-board-report",
+                    pilot_board_report.as_posix(),
+                    "--report",
+                    pilot_handoff_audit_report.as_posix(),
+                    "--json",
+                ],
+            ),
+            (
                 "usage_from_issue_pilot_conversion",
                 [
                     (venv / "bin" / "codex-harness").as_posix(),
@@ -815,6 +836,17 @@ def build_payload() -> dict:
                         step["status"] = "fail"
                         step["returncode"] = 1
                         step["stderr"] += "\nPilot handoff did not write a passing shareable handoff folder."
+                if name == "pilot_handoff_audit" and completed.returncode == 0:
+                    handoff_audit_payload = json.loads(completed.stdout)
+                    if (
+                        handoff_audit_payload.get("status") != "pass"
+                        or handoff_audit_payload.get("readiness") != "handoff-audit-ready"
+                        or handoff_audit_payload.get("handoff_count", 0) < 1
+                        or not pilot_handoff_audit_report.exists()
+                    ):
+                        step["status"] = "fail"
+                        step["returncode"] = 1
+                        step["stderr"] += "\nPilot handoff audit did not prove reporter-ready handoff folders."
                 if name == "usage_from_issue_pilot_conversion" and completed.returncode == 0:
                     conversion_payload = json.loads(completed.stdout)
                     pilot_update = conversion_payload.get("pilot_update") or {}

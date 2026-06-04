@@ -147,6 +147,17 @@ def build_pilot_handoff_command(args: argparse.Namespace) -> str:
     )
 
 
+def build_pilot_handoff_audit_command(args: argparse.Namespace) -> str:
+    return (
+        "codex-harness pilot-handoff-audit "
+        f"--handoff-dir {args.pilot_handoff_out} "
+        f"--record-dir {args.pilot_record_dir} "
+        f"--usage-record-dir {args.record_dir} "
+        f"--usage-report {args.usage_report} "
+        f"--pilot-board-report {args.pilot_board_report}"
+    )
+
+
 def active_pilot_for_next(gaps_payload: dict, board_payload: dict) -> dict | None:
     next_pilot = (gaps_payload.get("suggested_pilots") or [None])[0]
     if not next_pilot:
@@ -215,6 +226,13 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
                 "purpose": "write shareable per-pilot folders with reporter materials and maintainer commands",
             }
         )
+        commands.append(
+            {
+                "name": "audit pilot handoff",
+                "command": build_pilot_handoff_audit_command(args),
+                "purpose": "verify each handoff folder has reporter materials and an importer-shaped usage draft",
+            }
+        )
         if active_pilot["status"] == "prepared":
             commands.append(
                 {
@@ -269,6 +287,11 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
                     "name": "export pilot handoff",
                     "command": build_pilot_handoff_command(args),
                     "purpose": "write shareable per-pilot folders with reporter materials and maintainer commands",
+                },
+                {
+                    "name": "audit pilot handoff",
+                    "command": build_pilot_handoff_audit_command(args),
+                    "purpose": "verify each handoff folder has reporter materials and an importer-shaped usage draft",
                 },
             ]
         )

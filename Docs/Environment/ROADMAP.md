@@ -116,8 +116,10 @@ The project can stop calling itself a beta only when all of these are true:
    Use `codex-harness usage-gaps` for the raw gap report,
    `codex-harness prepare-next-pilot` to prepare the next suggested pilot
    directly, `codex-harness pilot-board` to inspect in-flight pilots,
-   `codex-harness pilot-update` after outreach or conversion steps, or
-   `codex-harness pilot-campaign` when a shareable outreach packet is useful.
+   `codex-harness pilot-handoff` plus `codex-harness pilot-handoff-audit`
+   before sending reporter materials, `codex-harness pilot-update` after
+   outreach or conversion steps, or `codex-harness pilot-campaign` when a
+   shareable outreach packet is useful.
 
 2. Add more public-safe live examples.
    Prioritize domains where the generated harness has high-risk boundaries:
