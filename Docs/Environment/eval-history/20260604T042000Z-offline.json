@@ -1,0 +1,76 @@
+{
+  "generated": "2026-06-04T04:20:00Z",
+  "label": "offline",
+  "status": "pass",
+  "returncode": 0,
+  "step_count": 13,
+  "passed": 13,
+  "failed": 0,
+  "steps": [
+    {
+      "name": "static_codex_port_eval",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "generated_harness_fixture_eval",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "generated_harness_smoke",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "deterministic_profile_generation",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "deterministic_example_eval",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "deterministic_example_smoke",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "deterministic_create_acceptance",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "create_acceptance_example_eval",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "create_acceptance_example_smoke",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "live_create_example_eval",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "live_create_example_smoke",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "unit_and_mutation_tests",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "python_compile",
+      "status": "pass",
+      "returncode": 0
+    }
+  ]
+}

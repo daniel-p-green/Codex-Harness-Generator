@@ -29,6 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Added a checked-in sanitized live `/create` capture and offline eval/smoke coverage for live-create examples.
 - Added three checked-in sanitized live `/create` captures covering knowledge work, Python CLI, and data analysis.
 - Added authenticated live example task trials to verify generated harnesses can steer Codex through representative work.
+- Added eval trend snapshots to preserve release-gate history over time.
 
 ### Changed
 

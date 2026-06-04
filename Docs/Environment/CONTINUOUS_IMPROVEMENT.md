@@ -68,6 +68,15 @@ This copies each live example to a temporary workspace, seeds synthetic inputs,
 runs `codex exec`, verifies concrete output files, and writes
 `examples/live-create/TASK_TRIALS.md`.
 
+For eval trend tracking:
+
+```bash
+python scripts/record_eval_snapshot.py
+```
+
+This writes a compact JSON snapshot under `Docs/Environment/eval-history/` and
+updates `Docs/Environment/EVAL_TRENDS.md`.
+
 ## Fixture Coverage
 
 The current golden fixtures cover:

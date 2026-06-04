@@ -47,6 +47,8 @@ replacement. What is proven today:
 - `scripts/run_live_example_task_trials.py` runs authenticated Codex task trials
   against temporary copies of those generated harnesses and verifies concrete
   output files.
+- `scripts/record_eval_snapshot.py` records eval-gate snapshots under
+  `Docs/Environment/eval-history/` and updates `Docs/Environment/EVAL_TRENDS.md`.
 
 What still needs product proof:
 
@@ -196,6 +198,12 @@ This uses authenticated local Codex CLI access, copies each live example to a
 temporary workspace, seeds synthetic inputs, runs `codex exec`, and writes
 `examples/live-create/TASK_TRIALS.md`.
 
+To record an eval trend snapshot:
+
+```bash
+python scripts/record_eval_snapshot.py
+```
+
 ## Commands
 
 | Command | What it does |
@@ -287,6 +295,7 @@ This runs:
 - Live-create capture helper tests.
 - Live-create task-trial helper tests. Authenticated maintainers can run the
   full task trials separately with `python scripts/run_live_example_task_trials.py`.
+- Eval trend snapshot helper tests.
 - Contract and mutation tests.
 - Python compile checks.
 
