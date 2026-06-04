@@ -154,6 +154,14 @@ class PilotNextActionTests(unittest.TestCase):
             "comments": comments or [],
         }
 
+    def current_followup_template(self) -> str:
+        return pilot_next_action.sync_pilot_github_issues.reporter_followup(
+            {
+                "readiness": "waiting-for-reporter",
+                "missing_fields": ["outcome", "task_summary", "evidence", "verification", "privacy_review", "limitations"],
+            }
+        )
+
     def test_waiting_issue_next_action_posts_reporter_followup(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
@@ -174,10 +182,9 @@ class PilotNextActionTests(unittest.TestCase):
         self.assertIn("outcome", payload["waiting_followups"][0]["missing_fields"])
 
     def test_posted_followup_next_action_waits_for_reporter_response(self):
-        maintainer_comment = f"{pilot_next_action.sync_pilot_github_issues.MAINTAINER_FOLLOWUP_MARKER}\n\nPlease add the missing fields."
         comment_payload = {
             "author": {"login": "maintainer"},
-            "body": maintainer_comment,
+            "body": self.current_followup_template(),
             "createdAt": "2026-06-04T19:38:17Z",
             "url": "https://github.com/example/repo/issues/42#issuecomment-1",
         }
@@ -201,17 +208,48 @@ class PilotNextActionTests(unittest.TestCase):
         self.assertEqual("2026-06-07T19:38:17Z", payload["next_action"]["next_reminder_at"])
         self.assertEqual(1, len(payload["waiting_followups"]))
         self.assertTrue(payload["waiting_followups"][0]["maintainer_followup_posted"])
+        self.assertFalse(payload["waiting_followups"][0]["maintainer_followup_stale"])
         self.assertEqual("https://github.com/example/repo/issues/42#issuecomment-1", payload["waiting_followups"][0]["maintainer_followup_comment"]["url"])
         self.assertEqual(0, payload["waiting_followups"][0]["reporter_replies"]["count"])
         self.assertEqual("", payload["waiting_followups"][0]["command"])
+        self.assertEqual("", payload["waiting_followups"][0]["edit_command"])
+
+    def test_stale_posted_followup_next_action_edits_existing_comment(self):
+        maintainer_comment = f"{pilot_next_action.sync_pilot_github_issues.MAINTAINER_FOLLOWUP_MARKER}\n\nPlease add the missing fields."
+        comment_payload = {
+            "author": {"login": "maintainer"},
+            "body": maintainer_comment,
+            "createdAt": "2026-06-04T19:38:17Z",
+            "url": "https://github.com/example/repo/issues/42#issuecomment-1",
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_pilot_record(root)
+
+            payload = pilot_next_action.build_payload(
+                self.args(root),
+                fetch_issue=lambda *args, **kwargs: self.github_payload(comments=[comment_payload]),
+            )
+
+        self.assertEqual("pass", payload["status"], payload)
+        self.assertEqual("refresh-maintainer-followup", payload["next_action"]["type"])
+        self.assertEqual("high", payload["next_action"]["priority"])
+        self.assertEqual("llm-app-pilot", payload["next_action"]["slug"])
+        self.assertTrue(payload["next_action"]["maintainer_followup_stale"])
+        self.assertEqual(0, payload["next_action"]["maintainer_followup_age_hours"])
+        self.assertFalse(payload["next_action"]["reminder_due"])
+        self.assertEqual("2026-06-07T19:38:17Z", payload["next_action"]["next_reminder_at"])
+        self.assertIn("gh api --method PATCH /repos/example/repo/issues/comments/1", payload["next_action"]["command"])
+        self.assertNotIn("gh issue comment", payload["next_action"]["command"])
+        self.assertEqual("", payload["waiting_followups"][0]["command"])
+        self.assertIn("gh api --method PATCH", payload["waiting_followups"][0]["edit_command"])
 
     def test_usage_lint_comment_after_followup_still_waits_for_reporter_response(self):
-        maintainer_comment = f"{pilot_next_action.sync_pilot_github_issues.MAINTAINER_FOLLOWUP_MARKER}\n\nPlease add the missing fields."
         lint_comment = f"{pilot_next_action.sync_pilot_github_issues.USAGE_LINT_MARKER}\n\nReporter comment count: `0`"
         comments = [
             {
                 "author": {"login": "maintainer"},
-                "body": maintainer_comment,
+                "body": self.current_followup_template(),
                 "createdAt": "2026-06-04T19:38:17Z",
                 "url": "https://github.com/example/repo/issues/42#issuecomment-1",
             },
@@ -238,12 +276,12 @@ class PilotNextActionTests(unittest.TestCase):
         self.assertEqual(0, payload["next_action"]["reporter_replies"]["count"])
         self.assertEqual(0, payload["waiting_followups"][0]["reporter_replies"]["count"])
         self.assertEqual("", payload["waiting_followups"][0]["command"])
+        self.assertEqual("", payload["waiting_followups"][0]["edit_command"])
 
-    def test_stale_followup_next_action_requires_review_not_auto_comment(self):
-        maintainer_comment = f"{pilot_next_action.sync_pilot_github_issues.MAINTAINER_FOLLOWUP_MARKER}\n\nPlease add the missing fields."
+    def test_old_current_followup_next_action_requires_review_not_auto_comment(self):
         comment_payload = {
             "author": {"login": "maintainer"},
-            "body": maintainer_comment,
+            "body": self.current_followup_template(),
             "createdAt": "2026-06-04T19:38:17Z",
             "url": "https://github.com/example/repo/issues/42#issuecomment-1",
         }
@@ -335,6 +373,29 @@ class PilotNextActionTests(unittest.TestCase):
         self.assertIn("gh issue comment https://github.com/example/repo/issues/42", text)
 
     def test_write_report_distinguishes_wait_action_from_followup_template(self):
+        comment_payload = {
+            "author": {"login": "maintainer"},
+            "body": self.current_followup_template(),
+            "createdAt": "2026-06-04T19:38:17Z",
+            "url": "https://github.com/example/repo/issues/42#issuecomment-1",
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_pilot_record(root)
+            args = self.args(root)
+            payload = pilot_next_action.build_payload(
+                args,
+                fetch_issue=lambda *fetch_args, **kwargs: self.github_payload(comments=[comment_payload]),
+            )
+
+            pilot_next_action.write_report(Path(args.report), payload)
+            text = Path(args.report).read_text(encoding="utf-8")
+
+        self.assertIn("wait-for-reporter-response", text)
+        self.assertIn("Follow-up action: wait for reporter reply; do not repost follow-up", text)
+        self.assertNotIn("gh issue comment", text)
+
+    def test_write_report_distinguishes_refresh_action_from_duplicate_comment(self):
         maintainer_comment = f"{pilot_next_action.sync_pilot_github_issues.MAINTAINER_FOLLOWUP_MARKER}\n\nPlease add the missing fields."
         comment_payload = {
             "author": {"login": "maintainer"},
@@ -354,8 +415,10 @@ class PilotNextActionTests(unittest.TestCase):
             pilot_next_action.write_report(Path(args.report), payload)
             text = Path(args.report).read_text(encoding="utf-8")
 
-        self.assertIn("wait-for-reporter-response", text)
-        self.assertIn("Follow-up action: wait for reporter reply; do not repost follow-up", text)
+        self.assertIn("refresh-maintainer-followup", text)
+        self.assertIn("Maintainer follow-up stale: `true`", text)
+        self.assertIn("Follow-up action: edit existing follow-up comment with refreshed template", text)
+        self.assertIn("gh api --method PATCH", text)
         self.assertNotIn("gh issue comment", text)
 
     def test_sync_fallback_command_renders_repo_local_paths_as_relative(self):

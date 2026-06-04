@@ -1,6 +1,6 @@
 # Proof Next Actions
 
-Generated: 2026-06-04T22:59:30Z
+Generated: 2026-06-04T23:15:18Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 
@@ -203,7 +203,15 @@ Purpose: refresh the non-gating readiness audit after each converted usage recor
 codex-harness beta-exit-audit --record-dir Docs/Environment/usage-records --pilot-record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records
 ```
 
-20. run final proof status
+20. run beta-exit doctor
+
+Purpose: apply the roadmap's strict usage-evidence thresholds before treating the checkout as beta-exit ready
+
+```bash
+codex-harness doctor --beta-exit --record-dir Docs/Environment/usage-records
+```
+
+21. run final proof status
 
 Purpose: only use this as a beta-exit gate after usage thresholds are satisfied
 

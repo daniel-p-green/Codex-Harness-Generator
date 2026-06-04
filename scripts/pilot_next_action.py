@@ -40,6 +40,13 @@ def first_reminder_due(records: list[dict]) -> dict | None:
     return None
 
 
+def first_stale_followup(records: list[dict]) -> dict | None:
+    for record in records:
+        if record.get("readiness") == "waiting-for-reporter" and record.get("commands", {}).get("edit_followup"):
+            return record
+    return None
+
+
 def sync_command(args: argparse.Namespace) -> str:
     parts = [
         "codex-harness",
@@ -111,6 +118,26 @@ def build_next_action(sync_payload: dict, args: argparse.Namespace) -> dict:
                 if reporter_replied_after_followup
                 else "A live pilot issue is missing public-safe evidence fields; post the generated follow-up comment."
             ),
+        }
+
+    record = first_stale_followup(records)
+    if record:
+        return {
+            "type": "refresh-maintainer-followup",
+            "priority": "high",
+            "slug": record["slug"],
+            "issue_url": record["issue_url"],
+            "followup_file": record["display_followup_file"],
+            "maintainer_followup_comment": record.get("maintainer_followup_comment", {}),
+            "reporter_replies": record.get("reporter_replies", {}),
+            "missing_fields": record["missing_fields"],
+            "maintainer_followup_stale": record.get("maintainer_followup_stale", False),
+            "maintainer_followup_age_hours": record.get("maintainer_followup_age_hours"),
+            "reminder_after_hours": record.get("reminder_after_hours"),
+            "reminder_due": record.get("reminder_due", False),
+            "next_reminder_at": record.get("next_reminder_at", ""),
+            "command": record["commands"]["edit_followup"],
+            "reason": "A maintainer follow-up is already posted, but its body differs from the current non-convertible reporter template; edit the existing comment instead of posting a duplicate.",
         }
 
     record = first_reminder_due(records)
@@ -191,7 +218,9 @@ def build_payload(
                 "followup_file": record["display_followup_file"],
                 "missing_fields": record["missing_fields"],
                 "command": record["commands"].get("comment_followup", ""),
+                "edit_command": record["commands"].get("edit_followup", ""),
                 "maintainer_followup_posted": record.get("maintainer_followup_posted", False),
+                "maintainer_followup_stale": record.get("maintainer_followup_stale", False),
                 "maintainer_followup_comment": record.get("maintainer_followup_comment", {}),
                 "maintainer_followup_age_hours": record.get("maintainer_followup_age_hours"),
                 "reminder_after_hours": record.get("reminder_after_hours"),
@@ -222,6 +251,8 @@ def build_payload(
 def waiting_followup_action(item: dict) -> str:
     if item.get("command"):
         return "post generated follow-up comment"
+    if item.get("edit_command"):
+        return "edit existing follow-up comment with refreshed template"
     if item.get("maintainer_followup_posted"):
         return "wait for reporter reply; do not repost follow-up"
     return "rerun sync before posting"
@@ -244,6 +275,7 @@ def write_report(path: Path, payload: dict) -> None:
         f"- Conversion-ready issues: {payload['summary']['conversion_ready']}",
         f"- Waiting for reporter: {payload['summary']['waiting_for_reporter']}",
         f"- Maintainer follow-ups already posted: {payload['summary'].get('maintainer_followups_posted', 0)}",
+        f"- Stale maintainer follow-ups: {payload['summary'].get('stale_maintainer_followups', 0)}",
         f"- GitHub comments fetched: {payload['summary'].get('github_comment_count', 0)}",
         f"- Maintainer/automation comments excluded: {payload['summary'].get('excluded_comment_count', 0)}",
         f"- Reporter replies: {payload['summary'].get('reporter_reply_count', 0)}",
@@ -259,6 +291,7 @@ def write_report(path: Path, payload: dict) -> None:
         f"- Pilot: `{action.get('slug') or 'none'}`",
         f"- Issue: {action.get('issue_url') or 'none'}",
         f"- Maintainer follow-up: {action.get('maintainer_followup_comment', {}).get('url') or 'none'}",
+        f"- Maintainer follow-up stale: `{str(action.get('maintainer_followup_stale', False)).lower()}`",
         f"- Maintainer follow-up posted at: `{action.get('maintainer_followup_comment', {}).get('created_at') or 'none'}`",
         f"- Maintainer follow-up age: `{action.get('maintainer_followup_age_hours') if action.get('maintainer_followup_age_hours') is not None else 'unknown'}` hours",
         f"- Reminder threshold: `{action.get('reminder_after_hours') or payload.get('summary', {}).get('reminder_after_hours', sync_pilot_github_issues.DEFAULT_REMINDER_AFTER_HOURS)}` hours",
@@ -282,6 +315,7 @@ def write_report(path: Path, payload: dict) -> None:
                     f"- `{item['slug']}`: {item['issue_url']}",
                     f"  - Follow-up file: `{item['followup_file'] or 'already posted'}`",
                     f"  - Maintainer follow-up already posted: `{str(item.get('maintainer_followup_posted', False)).lower()}`",
+                    f"  - Maintainer follow-up stale: `{str(item.get('maintainer_followup_stale', False)).lower()}`",
                     f"  - Maintainer follow-up URL: {item.get('maintainer_followup_comment', {}).get('url') or 'none'}",
                     f"  - Maintainer follow-up posted at: `{item.get('maintainer_followup_comment', {}).get('created_at') or 'none'}`",
                     f"  - Maintainer follow-up age: `{item.get('maintainer_followup_age_hours') if item.get('maintainer_followup_age_hours') is not None else 'unknown'}` hours",
@@ -292,7 +326,7 @@ def write_report(path: Path, payload: dict) -> None:
                     f"  - Reporter replied after latest maintainer follow-up: `{str(item.get('reporter_replies', {}).get('after_latest_maintainer_followup', False)).lower()}`",
                     f"  - Missing fields: {', '.join(item['missing_fields']) if item['missing_fields'] else 'none'}",
                     f"  - Follow-up action: {waiting_followup_action(item)}",
-                    f"  - Command: `{item['command'] or 'wait for reporter reply, then rerun sync'}`",
+                    f"  - Command: `{item.get('edit_command') or item['command'] or 'wait for reporter reply, then rerun sync'}`",
                 ]
             )
     else:

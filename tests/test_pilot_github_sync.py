@@ -162,6 +162,14 @@ class PilotGithubSyncTests(unittest.TestCase):
             "comments": comments or [],
         }
 
+    def current_followup_template(self) -> str:
+        return sync_pilot_github_issues.reporter_followup(
+            {
+                "readiness": "waiting-for-reporter",
+                "missing_fields": ["outcome", "task_summary", "evidence", "verification", "privacy_review", "limitations"],
+            }
+        )
+
     def test_pending_issue_reports_waiting_for_reporter(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
@@ -226,6 +234,8 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertEqual("https://github.com/example/repo/issues/42#issuecomment-1", record["maintainer_followup_comment"]["url"])
         self.assertEqual("2026-06-04T19:38:17Z", record["maintainer_followup_comment"]["created_at"])
         self.assertEqual("maintainer", record["maintainer_followup_comment"]["author"])
+        self.assertTrue(record["maintainer_followup_stale"])
+        self.assertEqual(1, payload["summary"]["stale_maintainer_followups"])
         self.assertEqual(0, record["github_issue"]["comment_count"])
         self.assertEqual(0, record["github_issue"]["reporter_comment_count"])
         self.assertEqual(1, record["github_issue"]["total_comment_count"])
@@ -237,7 +247,35 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertEqual("2026-06-07T19:38:17Z", record["next_reminder_at"])
         self.assertTrue(record["followup_file"].endswith("llm-app-pilot-followup.md"))
         self.assertIn("Reporter reply template", record["followup_template"])
+        self.assertTrue(record["maintainer_followup_stale"])
+        self.assertIn("edit_followup", record["commands"])
+        self.assertIn("gh api --method PATCH /repos/example/repo/issues/comments/1", record["commands"]["edit_followup"])
+        self.assertIn('body="$(cat ', record["commands"]["edit_followup"])
         self.assertNotIn("comment_followup", record["commands"])
+        self.assertIn("edit the existing follow-up comment", record["reporter_followup"])
+
+    def test_current_maintainer_followup_waits_without_edit_or_duplicate(self):
+        comment_payload = {
+            "author": {"login": "maintainer"},
+            "body": self.current_followup_template(),
+            "createdAt": "2026-06-04T19:38:17Z",
+            "url": "https://github.com/example/repo/issues/42#issuecomment-1",
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_pilot_record(root)
+
+            payload = sync_pilot_github_issues.build_payload(
+                self.args(root),
+                fetch_issue=lambda *args, **kwargs: self.github_payload(comments=[comment_payload]),
+            )
+
+        record = payload["records"][0]
+        self.assertTrue(record["maintainer_followup_posted"])
+        self.assertFalse(record["maintainer_followup_stale"])
+        self.assertEqual(0, payload["summary"]["stale_maintainer_followups"])
+        self.assertNotIn("comment_followup", record["commands"])
+        self.assertNotIn("edit_followup", record["commands"])
         self.assertIn("already posted", record["reporter_followup"])
 
     def test_usage_lint_comment_does_not_count_as_reporter_reply(self):
@@ -278,6 +316,8 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertFalse(record["reporter_replies"]["after_latest_maintainer_followup"])
         self.assertTrue(record["followup_file"].endswith("llm-app-pilot-followup.md"))
         self.assertIn("Reporter reply template", record["followup_template"])
+        self.assertTrue(record["maintainer_followup_stale"])
+        self.assertIn("edit_followup", record["commands"])
         self.assertNotIn("comment_followup", record["commands"])
 
     def test_unmarked_owner_comment_does_not_count_as_reporter_reply(self):
@@ -522,7 +562,9 @@ class PilotGithubSyncTests(unittest.TestCase):
             report = Path(args.report).read_text(encoding="utf-8")
 
         self.assertIn("- Follow-up file: `", report)
-        self.assertIn("- Follow-up action: template refreshed; no duplicate public comment", report)
+        self.assertIn("- Maintainer follow-up stale: `true`", report)
+        self.assertIn("- Follow-up action: edit existing follow-up comment with refreshed template", report)
+        self.assertIn("gh api --method PATCH /repos/example/repo/issues/comments/1", report)
         self.assertNotIn("gh issue comment", report)
 
     def test_write_followups_writes_waiting_issue_files_only(self):
@@ -570,7 +612,7 @@ class PilotGithubSyncTests(unittest.TestCase):
 
         self.assertTrue(record["maintainer_followup_posted"])
         self.assertNotIn("comment_followup", record["commands"])
-        self.assertIn("already posted", record["reporter_followup"])
+        self.assertIn("edit the existing follow-up comment", record["reporter_followup"])
         self.assertIn("Reporter reply template", text)
         self.assertIn("converted, validated usage record counts", text)
 

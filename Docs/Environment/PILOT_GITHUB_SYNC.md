@@ -1,6 +1,6 @@
 # Pilot GitHub Issue Sync
 
-Generated: 2026-06-04T22:51:09Z
+Generated: 2026-06-04T23:14:41Z
 Status: PASS
 Readiness: waiting-for-reporters
 
@@ -13,6 +13,7 @@ Pilot GitHub issue sync checks public intake readiness only; it is not usage pro
 - Conversion-ready issues: 0
 - Waiting for reporter: 3
 - Maintainer follow-ups already posted: 3
+- Stale maintainer follow-ups: 3
 - GitHub comments fetched: 6
 - Maintainer/automation comments excluded: 6
 - Reporter replies: 0
@@ -34,9 +35,10 @@ Pilot GitHub issue sync checks public intake readiness only; it is not usage pro
 - Reporter comments included: 0
 - Maintainer/automation comments excluded: 2
 - Maintainer follow-up already posted: `true`
+- Maintainer follow-up stale: `true`
 - Maintainer follow-up URL: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3#issuecomment-4625495059
 - Maintainer follow-up posted at: `2026-06-04T19:38:17Z`
-- Maintainer follow-up age: `3.21` hours
+- Maintainer follow-up age: `3.61` hours
 - Reminder due: `false`
 - Next reminder review at: `2026-06-07T19:38:17Z`
 - Reporter replies: 0
@@ -44,7 +46,7 @@ Pilot GitHub issue sync checks public intake readiness only; it is not usage pro
 - Reporter replied after latest maintainer follow-up: `false`
 - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
 - Follow-up file: `Docs/Environment/pilot-github-followups/llm-app-pilot-followup.md`
-- Follow-up action: template refreshed; no duplicate public comment
+- Follow-up action: edit existing follow-up comment with refreshed template
 
 Errors:
 - Missing required issue field(s): outcome, task_summary, evidence, verification, privacy_review, limitations
@@ -58,12 +60,13 @@ Commands:
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --lint-only --json
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --no-write --json
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --json
+gh api --method PATCH /repos/daniel-p-green/Codex-Harness-Generator/issues/comments/4625495059 --raw-field body="$(cat Docs/Environment/pilot-github-followups/llm-app-pilot-followup.md)"
 ```
 
 Reporter follow-up:
 
 ```markdown
-Maintainer follow-up already posted; wait for a reporter reply with the missing public-safe evidence fields.
+Maintainer follow-up already posted, but the generated template has changed; edit the existing follow-up comment with the refreshed file instead of posting a duplicate.
 ```
 
 ### security-audit-pilot
@@ -76,9 +79,10 @@ Maintainer follow-up already posted; wait for a reporter reply with the missing 
 - Reporter comments included: 0
 - Maintainer/automation comments excluded: 2
 - Maintainer follow-up already posted: `true`
+- Maintainer follow-up stale: `true`
 - Maintainer follow-up URL: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1#issuecomment-4625495203
 - Maintainer follow-up posted at: `2026-06-04T19:38:18Z`
-- Maintainer follow-up age: `3.21` hours
+- Maintainer follow-up age: `3.61` hours
 - Reminder due: `false`
 - Next reminder review at: `2026-06-07T19:38:18Z`
 - Reporter replies: 0
@@ -86,7 +90,7 @@ Maintainer follow-up already posted; wait for a reporter reply with the missing 
 - Reporter replied after latest maintainer follow-up: `false`
 - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
 - Follow-up file: `Docs/Environment/pilot-github-followups/security-audit-pilot-followup.md`
-- Follow-up action: template refreshed; no duplicate public comment
+- Follow-up action: edit existing follow-up comment with refreshed template
 
 Errors:
 - Missing required issue field(s): outcome, task_summary, evidence, verification, privacy_review, limitations
@@ -100,12 +104,13 @@ Commands:
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --lint-only --json
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --no-write --json
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --json
+gh api --method PATCH /repos/daniel-p-green/Codex-Harness-Generator/issues/comments/4625495203 --raw-field body="$(cat Docs/Environment/pilot-github-followups/security-audit-pilot-followup.md)"
 ```
 
 Reporter follow-up:
 
 ```markdown
-Maintainer follow-up already posted; wait for a reporter reply with the missing public-safe evidence fields.
+Maintainer follow-up already posted, but the generated template has changed; edit the existing follow-up comment with the refreshed file instead of posting a duplicate.
 ```
 
 ### customer-support-pilot
@@ -118,9 +123,10 @@ Maintainer follow-up already posted; wait for a reporter reply with the missing 
 - Reporter comments included: 0
 - Maintainer/automation comments excluded: 2
 - Maintainer follow-up already posted: `true`
+- Maintainer follow-up stale: `true`
 - Maintainer follow-up URL: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2#issuecomment-4625495326
 - Maintainer follow-up posted at: `2026-06-04T19:38:19Z`
-- Maintainer follow-up age: `3.21` hours
+- Maintainer follow-up age: `3.61` hours
 - Reminder due: `false`
 - Next reminder review at: `2026-06-07T19:38:19Z`
 - Reporter replies: 0
@@ -128,7 +134,7 @@ Maintainer follow-up already posted; wait for a reporter reply with the missing 
 - Reporter replied after latest maintainer follow-up: `false`
 - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
 - Follow-up file: `Docs/Environment/pilot-github-followups/customer-support-pilot-followup.md`
-- Follow-up action: template refreshed; no duplicate public comment
+- Follow-up action: edit existing follow-up comment with refreshed template
 
 Errors:
 - Missing required issue field(s): outcome, task_summary, evidence, verification, privacy_review, limitations
@@ -142,12 +148,13 @@ Commands:
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --lint-only --json
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --no-write --json
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --json
+gh api --method PATCH /repos/daniel-p-green/Codex-Harness-Generator/issues/comments/4625495326 --raw-field body="$(cat Docs/Environment/pilot-github-followups/customer-support-pilot-followup.md)"
 ```
 
 Reporter follow-up:
 
 ```markdown
-Maintainer follow-up already posted; wait for a reporter reply with the missing public-safe evidence fields.
+Maintainer follow-up already posted, but the generated template has changed; edit the existing follow-up comment with the refreshed file instead of posting a duplicate.
 ```
 
 ## Claim Boundary

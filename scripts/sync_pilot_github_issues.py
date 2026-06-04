@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shlex
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -26,6 +27,7 @@ DEFAULT_PILOT_BOARD_REPORT = pilot_board.DEFAULT_REPORT
 DEFAULT_REMINDER_AFTER_HOURS = 72
 MAINTAINER_FOLLOWUP_MARKER = "<!-- codex-harness-maintainer-followup -->"
 USAGE_LINT_MARKER = usage_from_github_issue.USAGE_LINT_MARKER
+ISSUE_COMMENT_RE = re.compile(r"github\.com/([^/]+)/([^/]+)/issues/\d+#issuecomment-(\d+)")
 
 
 def utc_now() -> str:
@@ -129,6 +131,17 @@ def gh_issue_comment_command(issue_url: str, followup_file: str) -> str:
     return " ".join(shlex.quote(part) for part in parts)
 
 
+def gh_issue_comment_edit_command(comment_url: str, followup_file: str, gh_bin: str = "gh") -> str:
+    match = ISSUE_COMMENT_RE.search(comment_url)
+    if not match:
+        return ""
+    owner, repo, comment_id = match.groups()
+    api_path = f"/repos/{owner}/{repo}/issues/comments/{comment_id}"
+    body_arg = f'body="$(cat {shlex.quote(followup_file)})"'
+    parts = [gh_bin, "api", "--method", "PATCH", api_path, "--raw-field"]
+    return " ".join(shlex.quote(part) for part in parts) + f" {body_arg}"
+
+
 def followup_path(args: argparse.Namespace, record: dict) -> Path:
     return Path(args.followup_dir) / f"{record['slug']}-followup.md"
 
@@ -137,14 +150,17 @@ def comment_created_at(comment: dict) -> str:
     return str(comment.get("createdAt", ""))
 
 
-def comment_metadata(comment: dict) -> dict:
+def comment_metadata(comment: dict, *, include_body: bool = False) -> dict:
     author = comment.get("author") or {}
-    return {
+    metadata = {
         "url": str(comment.get("url", "")),
         "created_at": comment_created_at(comment),
         "author": str(author.get("login", "")),
         "author_association": str(comment.get("authorAssociation", "")),
     }
+    if include_body:
+        metadata["body"] = str(comment.get("body", ""))
+    return metadata
 
 
 def maintainer_followup_comment(github_payload: dict) -> dict:
@@ -152,7 +168,7 @@ def maintainer_followup_comment(github_payload: dict) -> dict:
     for comment in github_payload.get("comments") or []:
         if MAINTAINER_FOLLOWUP_MARKER not in str(comment.get("body", "")):
             continue
-        metadata = comment_metadata(comment)
+        metadata = comment_metadata(comment, include_body=True)
         if not latest or metadata["created_at"] >= latest.get("created_at", ""):
             latest = metadata
     return latest
@@ -171,6 +187,16 @@ def reporter_reply_summary(github_payload: dict, maintainer_comment: dict) -> di
         "latest": latest,
         "after_latest_maintainer_followup": bool(latest and latest.get("created_at", "") > maintainer_created_at),
     }
+
+
+def normalized_comment_body(value: str) -> str:
+    return "\n".join(line.rstrip() for line in value.strip().splitlines())
+
+
+def followup_template_stale(posted_body: str, current_template: str) -> bool:
+    if not posted_body or not current_template:
+        return False
+    return normalized_comment_body(posted_body) != normalized_comment_body(current_template)
 
 
 def followup_wait_state(generated: str, maintainer_comment: dict, reporter_replies: dict, reminder_after_hours: float) -> dict:
@@ -288,6 +314,7 @@ def issue_sync_record(
         "display_followup_file": "",
         "maintainer_followup_posted": False,
         "maintainer_followup_comment": {},
+        "maintainer_followup_stale": False,
         "reporter_replies": {"count": 0, "latest": {}, "after_latest_maintainer_followup": False},
         "maintainer_followup_age_hours": None,
         "reminder_after_hours": reminder_after_hours(args),
@@ -341,9 +368,28 @@ def issue_sync_record(
         base["followup_file"] = path.as_posix()
         base["display_followup_file"] = display_path(path)
         base["followup_template"] = base["reporter_followup"]
+        base["maintainer_followup_stale"] = bool(
+            base["maintainer_followup_posted"]
+            and not base["reporter_replies"]["after_latest_maintainer_followup"]
+            and followup_template_stale(
+                base["maintainer_followup_comment"].get("body", ""),
+                base["followup_template"],
+            )
+        )
+        if base["maintainer_followup_stale"]:
+            edit_command = gh_issue_comment_edit_command(
+                base["maintainer_followup_comment"].get("url", ""),
+                base["display_followup_file"],
+                gh_bin=args.gh_bin,
+            )
+            if edit_command:
+                base["commands"]["edit_followup"] = edit_command
+        base["maintainer_followup_comment"].pop("body", None)
         if base["maintainer_followup_posted"] and not base["reporter_replies"]["after_latest_maintainer_followup"]:
             base["reporter_followup"] = (
-                "Maintainer follow-up already posted; wait for a reporter reply with the missing public-safe evidence fields."
+                "Maintainer follow-up already posted, but the generated template has changed; edit the existing follow-up comment with the refreshed file instead of posting a duplicate."
+                if base["maintainer_followup_stale"]
+                else "Maintainer follow-up already posted; wait for a reporter reply with the missing public-safe evidence fields."
             )
         else:
             base["commands"]["comment_followup"] = gh_issue_comment_command(issue_url, base["display_followup_file"])
@@ -359,6 +405,7 @@ def summarize(records: list[dict]) -> dict:
         "needs_attention": sum(1 for record in records if record.get("readiness") == "needs-attention"),
         "missing_issue_url": sum(1 for record in records if record.get("readiness") == "needs-live-issue"),
         "maintainer_followups_posted": sum(1 for record in records if record.get("maintainer_followup_posted")),
+        "stale_maintainer_followups": sum(1 for record in records if record.get("maintainer_followup_stale")),
         "github_comment_count": sum(record.get("github_issue", {}).get("total_comment_count", 0) for record in records),
         "excluded_comment_count": sum(record.get("github_issue", {}).get("excluded_comment_count", 0) for record in records),
         "reporter_reply_count": sum(record.get("reporter_replies", {}).get("count", 0) for record in records),
@@ -435,6 +482,8 @@ def followup_action(record: dict) -> str:
         return "not needed"
     if record.get("commands", {}).get("comment_followup"):
         return "post generated follow-up comment"
+    if record.get("commands", {}).get("edit_followup"):
+        return "edit existing follow-up comment with refreshed template"
     if record.get("maintainer_followup_posted"):
         return "template refreshed; no duplicate public comment"
     return "template refreshed; rerun sync before posting"
@@ -458,6 +507,7 @@ def write_report(path: Path, payload: dict) -> None:
         f"- Conversion-ready issues: {summary['conversion_ready']}",
         f"- Waiting for reporter: {summary['waiting_for_reporter']}",
         f"- Maintainer follow-ups already posted: {summary['maintainer_followups_posted']}",
+        f"- Stale maintainer follow-ups: {summary.get('stale_maintainer_followups', 0)}",
         f"- GitHub comments fetched: {summary.get('github_comment_count', 0)}",
         f"- Maintainer/automation comments excluded: {summary.get('excluded_comment_count', 0)}",
         f"- Reporter replies: {summary['reporter_reply_count']}",
@@ -485,6 +535,7 @@ def write_report(path: Path, payload: dict) -> None:
                 f"- Reporter comments included: {record.get('github_issue', {}).get('reporter_comment_count', record.get('github_issue', {}).get('comment_count', 0))}",
                 f"- Maintainer/automation comments excluded: {record.get('github_issue', {}).get('excluded_comment_count', 0)}",
                 f"- Maintainer follow-up already posted: `{str(record.get('maintainer_followup_posted', False)).lower()}`",
+                f"- Maintainer follow-up stale: `{str(record.get('maintainer_followup_stale', False)).lower()}`",
                 f"- Maintainer follow-up URL: {record.get('maintainer_followup_comment', {}).get('url') or 'none'}",
                 f"- Maintainer follow-up posted at: `{record.get('maintainer_followup_comment', {}).get('created_at') or 'none'}`",
                 f"- Maintainer follow-up age: `{record.get('maintainer_followup_age_hours') if record.get('maintainer_followup_age_hours') is not None else 'unknown'}` hours",
@@ -514,6 +565,7 @@ def write_report(path: Path, payload: dict) -> None:
                     record["commands"]["lint"],
                     record["commands"]["preview"],
                     record["commands"]["convert"],
+                    *([record["commands"]["edit_followup"]] if record["commands"].get("edit_followup") else []),
                     *([record["commands"]["comment_followup"]] if record["commands"].get("comment_followup") else []),
                     "```",
                 ]

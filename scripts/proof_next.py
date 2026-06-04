@@ -437,6 +437,13 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
                 "purpose": "refresh the non-gating readiness audit after each converted usage record",
             },
             {
+                "name": "run beta-exit doctor",
+                "command": f"codex-harness doctor --beta-exit --record-dir {args.record_dir}",
+                "purpose": (
+                    "apply the roadmap's strict usage-evidence thresholds before treating the checkout as beta-exit ready"
+                ),
+            },
+            {
                 "name": "run final proof status",
                 "command": f"codex-harness proof-status --beta-exit --record-dir {args.record_dir}",
                 "purpose": "only use this as a beta-exit gate after usage thresholds are satisfied",
