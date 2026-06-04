@@ -235,6 +235,8 @@ Only public-safe summary evidence was shared; no private names, local paths, cre
             payload["record"]["task_summary"],
         )
         self.assertEqual(1, payload["github_issue"]["comment_count"])
+        self.assertEqual(1, payload["github_issue"]["reporter_comment_count"])
+        self.assertEqual(1, payload["github_issue"]["total_comment_count"])
         self.assertTrue(payload["github_issue"]["comments_included"])
 
     def test_include_comments_can_ingest_reporter_reply_template_headings(self):
@@ -305,6 +307,8 @@ Only public-safe summary evidence was shared; no private names, local paths, cre
         self.assertEqual(2, len(payload["record"]["evidence"]))
         self.assertEqual(2, len(payload["record"]["verification"]))
         self.assertEqual(1, payload["github_issue"]["comment_count"])
+        self.assertEqual(1, payload["github_issue"]["reporter_comment_count"])
+        self.assertEqual(1, payload["github_issue"]["total_comment_count"])
 
     def test_include_comments_ignores_maintainer_followup_comments(self):
         incomplete_body = ISSUE_BODY.replace("success", "_no response_")
@@ -350,6 +354,8 @@ Add at least two public-safe bullets about what the generated harness helped you
         self.assertEqual("fail", payload["status"])
         self.assertEqual("needs-input", payload["readiness"])
         self.assertEqual(0, payload["github_issue"]["comment_count"])
+        self.assertEqual(0, payload["github_issue"]["reporter_comment_count"])
+        self.assertEqual(1, payload["github_issue"]["total_comment_count"])
         self.assertIn("outcome", payload["missing_fields"])
         self.assertTrue(payload["github_issue"]["comments_included"])
 
@@ -380,6 +386,8 @@ Reporter comment count: `1`
         self.assertEqual("pass", payload["status"], payload)
         self.assertEqual("conversion-ready", payload["readiness"])
         self.assertEqual(0, payload["github_issue"]["comment_count"])
+        self.assertEqual(0, payload["github_issue"]["reporter_comment_count"])
+        self.assertEqual(1, payload["github_issue"]["total_comment_count"])
         self.assertTrue(payload["github_issue"]["comments_included"])
 
     def test_sensitive_comment_fails_lint(self):

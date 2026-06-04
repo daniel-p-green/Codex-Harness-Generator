@@ -201,6 +201,7 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertEqual("waiting-for-reporters", payload["readiness"])
         self.assertEqual(1, payload["summary"]["waiting_for_reporter"])
         self.assertEqual(1, payload["summary"]["maintainer_followups_posted"])
+        self.assertEqual(1, payload["summary"]["github_comment_count"])
         record = payload["records"][0]
         self.assertEqual("waiting-for-reporter", record["readiness"])
         self.assertTrue(record["maintainer_followup_posted"])
@@ -208,6 +209,8 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertEqual("2026-06-04T19:38:17Z", record["maintainer_followup_comment"]["created_at"])
         self.assertEqual("maintainer", record["maintainer_followup_comment"]["author"])
         self.assertEqual(0, record["github_issue"]["comment_count"])
+        self.assertEqual(0, record["github_issue"]["reporter_comment_count"])
+        self.assertEqual(1, record["github_issue"]["total_comment_count"])
         self.assertEqual(0, record["reporter_replies"]["count"])
         self.assertFalse(record["reporter_replies"]["after_latest_maintainer_followup"])
         self.assertEqual(72, record["reminder_after_hours"])
@@ -245,7 +248,10 @@ class PilotGithubSyncTests(unittest.TestCase):
 
         record = payload["records"][0]
         self.assertEqual("waiting-for-reporter", record["readiness"])
+        self.assertEqual(2, payload["summary"]["github_comment_count"])
         self.assertEqual(0, record["github_issue"]["comment_count"])
+        self.assertEqual(0, record["github_issue"]["reporter_comment_count"])
+        self.assertEqual(2, record["github_issue"]["total_comment_count"])
         self.assertEqual(0, record["reporter_replies"]["count"])
         self.assertFalse(record["reporter_replies"]["after_latest_maintainer_followup"])
         self.assertEqual("", record["followup_file"])
@@ -304,6 +310,8 @@ class PilotGithubSyncTests(unittest.TestCase):
         record = payload["records"][0]
         self.assertEqual("waiting-for-reporter", record["readiness"])
         self.assertEqual(1, record["github_issue"]["comment_count"])
+        self.assertEqual(1, record["github_issue"]["reporter_comment_count"])
+        self.assertEqual(2, record["github_issue"]["total_comment_count"])
         self.assertEqual(1, record["reporter_replies"]["count"])
         self.assertEqual("https://github.com/example/repo/issues/42#issuecomment-2", record["reporter_replies"]["latest"]["url"])
         self.assertTrue(record["reporter_replies"]["after_latest_maintainer_followup"])
@@ -350,6 +358,8 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertEqual("conversion-ready", record["readiness"])
         self.assertEqual([], record["missing_fields"])
         self.assertEqual(1, record["github_issue"]["comment_count"])
+        self.assertEqual(1, record["github_issue"]["reporter_comment_count"])
+        self.assertEqual(1, record["github_issue"]["total_comment_count"])
         self.assertIn("No reporter follow-up needed", record["reporter_followup"])
         self.assertEqual("", record["followup_file"])
         self.assertNotIn("comment_followup", record["commands"])
@@ -417,6 +427,8 @@ class PilotGithubSyncTests(unittest.TestCase):
 
         self.assertIn("# Pilot GitHub Issue Sync", report)
         self.assertIn("Conversion-ready issues: 1", report)
+        self.assertIn("GitHub comments fetched: 1", report)
+        self.assertIn("Reporter comments included: 1", report)
         self.assertIn("Do not count live issues", report)
         self.assertIn("usage-from-github-issue https://github.com/example/repo/issues/42", report)
         self.assertIn("Reporter follow-up:", report)

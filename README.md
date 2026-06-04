@@ -683,8 +683,10 @@ issues. `pilot-next-action` writes `Docs/Environment/PILOT_NEXT_ACTION.md` and
 prints the single next maintainer command from that same live readiness check.
 The `Usage Evidence Lint` GitHub Action runs the same lint-only importer path on
 public usage issues and reporter comments, updating one marker-managed issue
-comment with readiness, missing fields, and evidence counts. It never writes a
-usage record and does not make the issue adoption proof.
+comment plus a `usage-evidence:needs-input` or
+`usage-evidence:conversion-ready` label with readiness, missing fields, and
+evidence counts. It never writes a usage record and does not make the issue
+adoption proof.
 To refresh every open public pilot issue in one pass, manually dispatch the
 workflow with `issue=all-open-pilots`; it still upserts one marker-managed
 comment per issue rather than creating duplicate comments.

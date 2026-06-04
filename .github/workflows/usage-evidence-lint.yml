@@ -26,6 +26,7 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       (
         github.event.issue.pull_request == null &&
+        !(github.event_name == 'issues' && github.event.action == 'labeled' && startsWith(github.event.label.name, 'usage-evidence:')) &&
         (
           github.event_name == 'issues' ||
           (github.event_name == 'issue_comment' && !contains(github.event.comment.body, '<!-- codex-harness-usage-lint -->'))
@@ -120,6 +121,41 @@ jobs:
                 --repo "$GITHUB_REPOSITORY" \
                 --body-file "usage-lint-results/$ISSUE_NUMBER-comment.md"
             fi
+          done < usage-lint-results/issues.tsv
+
+      - name: Update readiness labels
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NEEDS_INPUT_LABEL="usage-evidence:needs-input"
+          READY_LABEL="usage-evidence:conversion-ready"
+          gh label create "$NEEDS_INPUT_LABEL" \
+            --repo "$GITHUB_REPOSITORY" \
+            --color D4C5F9 \
+            --description "Usage evidence still needs reporter input before conversion." \
+            --force >/dev/null
+          gh label create "$READY_LABEL" \
+            --repo "$GITHUB_REPOSITORY" \
+            --color 0E8A16 \
+            --description "Usage evidence is ready for maintainer preview and conversion." \
+            --force >/dev/null
+
+          while IFS=$'\t' read -r ISSUE_NUMBER ISSUE_SELECTOR; do
+            [ -n "$ISSUE_NUMBER" ] || continue
+            READINESS="$(python -c 'import json, sys; print(json.load(open(sys.argv[1], encoding="utf-8")).get("readiness", "needs-input"))' "usage-lint-results/$ISSUE_NUMBER.json")"
+            if [ "$READINESS" = "conversion-ready" ]; then
+              ADD_LABEL="$READY_LABEL"
+              REMOVE_LABEL="$NEEDS_INPUT_LABEL"
+            else
+              ADD_LABEL="$NEEDS_INPUT_LABEL"
+              REMOVE_LABEL="$READY_LABEL"
+            fi
+            gh issue edit "$ISSUE_NUMBER" \
+              --repo "$GITHUB_REPOSITORY" \
+              --remove-label "$REMOVE_LABEL" >/dev/null 2>&1 || true
+            gh issue edit "$ISSUE_NUMBER" \
+              --repo "$GITHUB_REPOSITORY" \
+              --add-label "$ADD_LABEL" >/dev/null
           done < usage-lint-results/issues.tsv
 
       - name: Upload lint payload

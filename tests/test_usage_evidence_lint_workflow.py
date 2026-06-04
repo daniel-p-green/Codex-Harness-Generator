@@ -24,6 +24,8 @@ class UsageEvidenceLintWorkflowTests(unittest.TestCase):
         self.assertIn("startsWith(github.event.issue.title, '[usage]')", text)
         self.assertIn("contains(github.event.issue.labels.*.name, 'usage-evidence')", text)
         self.assertIn("github.event.issue.pull_request == null", text)
+        self.assertIn("!(", text)
+        self.assertIn("startsWith(github.event.label.name, 'usage-evidence:')", text)
         self.assertIn("github.event_name == 'issues'", text)
         self.assertIn("github.event_name == 'issue_comment'", text)
         self.assertIn("!contains(github.event.comment.body, '<!-- codex-harness-usage-lint -->')", text)
@@ -56,6 +58,21 @@ class UsageEvidenceLintWorkflowTests(unittest.TestCase):
         self.assertIn("usage-lint-results/$ISSUE_NUMBER-comment.md", text)
         self.assertIn("usage-lint-results/", text)
         self.assertRegex(text, re.compile(r"issues:\s+write"))
+
+    def test_workflow_updates_readiness_labels_without_counting_as_proof(self):
+        text = self.workflow_text()
+
+        self.assertIn("Update readiness labels", text)
+        self.assertIn('NEEDS_INPUT_LABEL="usage-evidence:needs-input"', text)
+        self.assertIn('READY_LABEL="usage-evidence:conversion-ready"', text)
+        self.assertIn("gh label create \"$NEEDS_INPUT_LABEL\"", text)
+        self.assertIn("gh label create \"$READY_LABEL\"", text)
+        self.assertIn('--description "Usage evidence still needs reporter input before conversion."', text)
+        self.assertIn('--description "Usage evidence is ready for maintainer preview and conversion."', text)
+        self.assertIn("json.load(open(sys.argv[1], encoding=\"utf-8\")).get(\"readiness\", \"needs-input\")", text)
+        self.assertIn('if [ "$READINESS" = "conversion-ready" ]; then', text)
+        self.assertIn("--remove-label \"$REMOVE_LABEL\"", text)
+        self.assertIn("--add-label \"$ADD_LABEL\"", text)
 
 
 if __name__ == "__main__":

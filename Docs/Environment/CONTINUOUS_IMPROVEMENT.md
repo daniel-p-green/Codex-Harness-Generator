@@ -31,10 +31,11 @@ The GitHub Actions workflow `.github/workflows/evals.yml` runs the same gate on 
 The GitHub Actions workflow `.github/workflows/usage-evidence-lint.yml` runs a
 lint-only public usage-evidence check on `[usage]`, `External usage pilot:`, and
 `usage-evidence` issues/comments. It upserts one marker-managed readiness
-comment with missing fields and evidence counts; it does not write usage records
-or count as adoption proof. Maintainers can also manually dispatch it with
-`issue=all-open-pilots` to refresh readiness comments across every open
-`External usage pilot:` issue in one run.
+comment and applies either `usage-evidence:needs-input` or
+`usage-evidence:conversion-ready` with missing fields and evidence counts; it
+does not write usage records or count as adoption proof. Maintainers can also
+manually dispatch it with `issue=all-open-pilots` to refresh readiness comments
+and labels across every open `External usage pilot:` issue in one run.
 
 For a local live smoke check against the Codex CLI, run:
 

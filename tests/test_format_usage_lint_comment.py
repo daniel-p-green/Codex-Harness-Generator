@@ -38,6 +38,8 @@ class FormatUsageLintCommentTests(unittest.TestCase):
                 "url": "https://github.com/example/repo/issues/12",
                 "comments_included": True,
                 "comment_count": 1,
+                "reporter_comment_count": 1,
+                "total_comment_count": 3,
             },
         }
 
@@ -48,6 +50,8 @@ class FormatUsageLintCommentTests(unittest.TestCase):
         self.assertIn("ready for maintainer preview", comment)
         self.assertIn("does not write usage records", comment)
         self.assertIn("does not write usage records, convert pilots, or count as adoption proof", comment)
+        self.assertIn("Fetched GitHub comment count: `3`", comment)
+        self.assertIn("Reporter comment count: `1`", comment)
         self.assertIn("Evidence bullets: `2`", comment)
         self.assertNotIn("Reporter reply template", comment)
 
@@ -63,12 +67,16 @@ class FormatUsageLintCommentTests(unittest.TestCase):
                 "number": 13,
                 "comments_included": True,
                 "comment_count": 0,
+                "reporter_comment_count": 0,
+                "total_comment_count": 2,
             },
         }
 
         comment = format_usage_lint_comment.format_comment(payload)
 
         self.assertIn("Readiness: `needs-input`", comment)
+        self.assertIn("Fetched GitHub comment count: `2`", comment)
+        self.assertIn("Reporter comment count: `0`", comment)
         self.assertIn("- outcome", comment)
         self.assertIn("- evidence", comment)
         self.assertIn("Missing required issue field", comment)

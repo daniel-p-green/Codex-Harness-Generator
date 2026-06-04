@@ -93,13 +93,17 @@ def importer_args(args: argparse.Namespace, body: str) -> argparse.Namespace:
 
 
 def issue_metadata(payload: dict, *, include_comments: bool) -> dict:
+    reporter_comment_count = len(comment_bodies(payload)) if include_comments else 0
+    total_comment_count = len(payload.get("comments") or []) if include_comments else 0
     return {
         "number": payload.get("number"),
         "title": payload.get("title", ""),
         "url": payload.get("url", ""),
         "state": payload.get("state", ""),
         "comments_included": include_comments,
-        "comment_count": len(comment_bodies(payload)) if include_comments else 0,
+        "comment_count": reporter_comment_count,
+        "reporter_comment_count": reporter_comment_count,
+        "total_comment_count": total_comment_count,
     }
 
 
