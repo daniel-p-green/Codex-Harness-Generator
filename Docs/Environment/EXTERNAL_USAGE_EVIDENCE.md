@@ -25,6 +25,10 @@ Good reports include:
 - A privacy review.
 - At least one limitation.
 
+For a parseable, public-safe example issue body, see
+`Docs/Environment/EXTERNAL_USAGE_ISSUE_EXAMPLE.md`. That file is synthetic and
+exists to test the intake shape; it is not usage proof.
+
 ## What Not To Submit
 
 Do not include:
@@ -121,6 +125,11 @@ normalized record before writing files. For standalone issue conversion, provide
 field, `usage-from-issue` can infer the slug without a separate flag:
 
 ```bash
+python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
+  --title "External example" \
+  --lint-only \
+  --json
+
 python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
   --title "External example" \
   --no-write \

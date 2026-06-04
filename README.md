@@ -188,11 +188,13 @@ replacement. What is proven today:
   know which commands to run, what evidence to record, and what not to share.
 - `scripts/usage_from_issue.py` and `codex-harness usage-from-issue` convert a
   sanitized GitHub external-usage issue body into a privacy-checked usage
-  record; add `--no-write --json` to preview before writing files, or
-  `--pilot-record-dir Docs/Environment/pilot-records` to convert the matching
-  prepared pilot after the record is written. New issue drafts include the
-  pilot or usage-record slug so maintainers can omit `--slug` when the issue
-  body is complete.
+  record; use `--lint-only` before preview or write, add `--no-write --json` to
+  preview before writing files, or `--pilot-record-dir
+  Docs/Environment/pilot-records` to convert the matching prepared pilot after
+  the record is written. New issue drafts include the pilot or usage-record
+  slug so maintainers can omit `--slug` when the issue body is complete.
+  `Docs/Environment/EXTERNAL_USAGE_ISSUE_EXAMPLE.md` is a synthetic,
+  importer-tested example of the expected issue shape; it is not usage proof.
 - `Docs/Environment/usage-records/` includes sanitized self-dogfood usage
   records from this public repo's Codex work. They are useful evidence, but not
   yet external or longitudinal adoption proof.

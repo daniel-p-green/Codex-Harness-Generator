@@ -21,6 +21,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 PROOF_MATRIX = REPO_ROOT / "Docs" / "Environment" / "PROOF_MATRIX.md"
 EQUIVALENCE_MATRIX = REPO_ROOT / "Docs" / "Environment" / "CODEX_EQUIVALENCE_MATRIX.md"
 USAGE_REPORT = REPO_ROOT / "Docs" / "Environment" / "USAGE_RECORDS.md"
+EXTERNAL_USAGE_ISSUE_EXAMPLE = REPO_ROOT / "Docs" / "Environment" / "EXTERNAL_USAGE_ISSUE_EXAMPLE.md"
 USAGE_GAPS_REPORT = REPO_ROOT / "Docs" / "Environment" / "USAGE_GAPS.md"
 PILOT_CAMPAIGN_REPORT = REPO_ROOT / "Docs" / "Environment" / "PILOT_CAMPAIGN.md"
 PILOT_BOARD_REPORT = REPO_ROOT / "Docs" / "Environment" / "PILOT_BOARD.md"
@@ -239,6 +240,7 @@ def build_payload(
         check_file_exists("proof_matrix", PROOF_MATRIX),
         check_file_exists("equivalence_matrix", EQUIVALENCE_MATRIX),
         check_file_exists("usage_report", USAGE_REPORT),
+        check_file_exists("external_usage_issue_example", EXTERNAL_USAGE_ISSUE_EXAMPLE),
         check_file_exists("usage_gaps_report", USAGE_GAPS_REPORT),
         check_file_exists("pilot_campaign_report", PILOT_CAMPAIGN_REPORT),
         check_file_exists("pilot_board_report", PILOT_BOARD_REPORT),

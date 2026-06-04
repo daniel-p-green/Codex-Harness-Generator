@@ -1,6 +1,6 @@
 # Proof Status
 
-Generated: 2026-06-04T16:40:50Z
+Generated: 2026-06-04T16:47:30Z
 Status: PASS
 Mode: self-dogfood-proof
 Readiness: Codex-equivalent beta with checked-in self-dogfood proof
@@ -15,6 +15,7 @@ conservative and should be read with `PROOF_MATRIX.md`.
 | `proof_matrix` | PASS | Docs/Environment/PROOF_MATRIX.md |
 | `equivalence_matrix` | PASS | Docs/Environment/CODEX_EQUIVALENCE_MATRIX.md |
 | `usage_report` | PASS | Docs/Environment/USAGE_RECORDS.md |
+| `external_usage_issue_example` | PASS | Docs/Environment/EXTERNAL_USAGE_ISSUE_EXAMPLE.md |
 | `usage_gaps_report` | PASS | Docs/Environment/USAGE_GAPS.md |
 | `pilot_campaign_report` | PASS | Docs/Environment/PILOT_CAMPAIGN.md |
 | `pilot_board_report` | PASS | Docs/Environment/PILOT_BOARD.md |
