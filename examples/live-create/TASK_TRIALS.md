@@ -1,6 +1,6 @@
 # Live Example Task Trials
 
-Generated: 2026-06-04T05:41:52Z
+Generated: 2026-06-04T06:05:37Z
 Status: PASS
 
 These trials copy checked-in live-create examples to a temporary
@@ -15,6 +15,8 @@ verify that each generated harness produces the expected output file.
 | `security-review-synthetic-code` | `synthetic-security-audit` | PASS | `reports/security-review.md` |
 | `legal-research-synthetic-policy` | `synthetic-legal-research` | PASS | `reports/legal-research-note.md` |
 | `financial-modeling-synthetic-scenarios` | `synthetic-financial-modeling` | PASS | `reports/financial-scenario-note.md` |
+| `hiring-pipeline-synthetic-scorecard` | `synthetic-hiring-pipeline` | PASS | `reports/hiring-scorecard-note.md` |
+| `customer-support-synthetic-escalation` | `synthetic-customer-support` | PASS | `reports/support-escalation-note.md` |
 
 ## Scope
 

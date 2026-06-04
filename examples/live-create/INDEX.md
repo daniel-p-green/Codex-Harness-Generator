@@ -2,10 +2,11 @@
 
 These examples are checked-in product-proof artifacts for generated Codex
 harnesses. Most were generated through the live model-mediated `/create`
-capture path, sanitized, and checked in. The security-audit, legal-research, and
-financial-modeling examples are curated public-safe high-risk task-trial
-fixtures so the same eval, smoke, and live task runner can exercise high-risk
-boundaries without publishing real security, legal, or financial work.
+capture path, sanitized, and checked in. The security-audit, legal-research,
+financial-modeling, hiring-pipeline, and customer-support examples are curated
+public-safe high-risk task-trial fixtures so the same eval, smoke, and live task
+runner can exercise high-risk boundaries without publishing real security,
+legal, financial, hiring, or support work.
 
 Each example includes `Docs/Environment/CREATION_CONTEXT.md`,
 `LIVE_CREATE_CAPTURE.md` or equivalent capture notes, eval score, offline smoke
@@ -19,6 +20,8 @@ result, and public-safe synthetic scope notes.
 | `synthetic-security-audit/` | Security audit | Defensive review of synthetic vulnerable code with explicit high-risk boundaries | `reviewer` | `health-check` |
 | `synthetic-legal-research/` | Legal research | Source-backed synthetic policy note with jurisdiction, uncertainty, and not-legal-advice boundaries | `reviewer` | `health-check` |
 | `synthetic-financial-modeling/` | Financial modeling | Synthetic scenario note with assumptions, sensitivity, risk, and not-financial-advice boundaries | `reviewer` | `health-check` |
+| `synthetic-hiring-pipeline/` | Hiring pipeline | Synthetic scorecard note with job-related criteria, bias, privacy, and human-review boundaries | `reviewer` | `health-check` |
+| `synthetic-customer-support/` | Customer support | Synthetic support escalation note with source grounding, `[VERIFY]` gaps, `[PROPOSED]` commitments, privacy, and escalation boundaries | `reviewer` | `health-check` |
 
 Verify all checked-in live examples with:
 

@@ -1,0 +1,42 @@
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+model_verbosity = "medium"
+approval_policy = "on-request"
+default_permissions = "customer-support"
+
+[agents]
+max_threads = 4
+max_depth = 1
+
+[agents.reviewer]
+description = "Reviews customer-support notes for source grounding, privacy, escalation, and commitment boundaries."
+config_file = "agents/reviewer.toml"
+
+[[skills.config]]
+path = "../.agents/skills/health-check"
+enabled = true
+
+[permissions.customer-support]
+description = "Workspace write access with sensitive files denied."
+extends = ":workspace"
+
+[permissions.customer-support.filesystem]
+glob_scan_max_depth = 4
+
+[permissions.customer-support.filesystem.":workspace_roots"]
+"." = "write"
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"**/*secret*" = "deny"
+"**/*token*" = "deny"
+"**/*credential*" = "deny"
+"**/*.pem" = "deny"
+"**/*.key" = "deny"
+
+[permissions.customer-support.network]
+enabled = true
+mode = "limited"
+
+[permissions.customer-support.network.domains]
+"developers.openai.com" = "allow"
+"docs.github.com" = "allow"

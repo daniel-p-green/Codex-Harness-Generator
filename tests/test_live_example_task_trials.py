@@ -27,6 +27,8 @@ class LiveExampleTaskTrialTests(unittest.TestCase):
         self.assertIn("synthetic-security-audit", examples)
         self.assertIn("synthetic-legal-research", examples)
         self.assertIn("synthetic-financial-modeling", examples)
+        self.assertIn("synthetic-hiring-pipeline", examples)
+        self.assertIn("synthetic-customer-support", examples)
 
     def test_seed_and_verify_trial_output(self):
         trial = run_live_example_task_trials.selected_trials(["python-cli-todo-audit"])[0]

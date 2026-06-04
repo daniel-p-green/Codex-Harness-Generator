@@ -208,6 +208,86 @@ assumptions, sensitivity notes, risk and uncertainty notes, and a clear `not
 financial advice` boundary. Do not invent market data, valuations, securities,
 or recommendations. Verify the report file exists before replying.""",
     ),
+    TaskTrial(
+        name="hiring-pipeline-synthetic-scorecard",
+        example="synthetic-hiring-pipeline",
+        seed_files=(
+            (
+                "inputs/role-and-evidence.md",
+                """# Synthetic Role and Candidate Evidence
+
+Role: Support Operations Analyst
+
+## Role Requirements
+
+- Build weekly ticket-quality summaries from structured support data.
+- Identify escalation-pattern risks and communicate them clearly.
+- Maintain customer privacy and avoid exposing personal data.
+
+## Rubric Anchors
+
+- Data reasoning: maps evidence to the support metric and explains limits.
+- Escalation judgment: identifies when a human owner should review.
+- Privacy discipline: avoids PII and sensitive customer detail exposure.
+
+## Candidate Evidence
+
+Candidate C01:
+- Built a weekly synthetic ticket dashboard.
+- Flagged escalation gaps in a sample workflow.
+- Wrote public-safe summaries without customer identifiers.
+
+Candidate C02:
+- Drafted support macros for common questions.
+- Missed one escalation trigger in a tabletop exercise.
+- Included a fake customer email in an early draft, then removed it after review.
+""",
+            ),
+        ),
+        expected_file="reports/hiring-scorecard-note.md",
+        expected_terms=("human review", "job-related", "privacy"),
+        prompt="""Inspect `inputs/role-and-evidence.md` and use this generated
+hiring pipeline harness to write `reports/hiring-scorecard-note.md`. Include
+source scope, role requirements, structured criteria, rubric or scorecard
+evidence, bias/fairness/protected-class checks, candidate privacy checks, and a
+clear human-review boundary. Do not rank candidates, make a hire/no-hire
+decision, draft a rejection, invent evidence, or use protected class traits.
+Verify the report file exists before replying.""",
+    ),
+    TaskTrial(
+        name="customer-support-synthetic-escalation",
+        example="synthetic-customer-support",
+        seed_files=(
+            (
+                "sources/support-ticket-and-policy.md",
+                """# Synthetic Support Ticket and Policy
+
+## Ticket T-1007
+
+The customer reports that a billing export is missing the latest project row.
+They ask for a refund and a guaranteed fix date. No personal data is included in
+this synthetic ticket.
+
+## Policy Source: Billing Export Help
+
+- Support can acknowledge export delays and collect reproduction details.
+- Refund eligibility is not defined in this excerpt.
+- Fix dates require product-owner approval.
+- Account-specific disclosures require identity verification.
+- Billing-impact issues should be escalated to a human support owner.
+""",
+            ),
+        ),
+        expected_file="reports/support-escalation-note.md",
+        expected_terms=("[VERIFY]", "[PROPOSED", "escalate"),
+        prompt="""Inspect `sources/support-ticket-and-policy.md` and use this
+generated customer support harness to write `reports/support-escalation-note.md`.
+Include source scope, grounded ticket summary, draft response or escalation note,
+`[VERIFY]` gaps, `[PROPOSED -- requires owner approval]` commitments, privacy
+and PII checks, identity-verification note, escalation path, and human-review
+boundary. Do not promise a refund, fix date, SLA, roadmap item, or account
+outcome without a source. Verify the report file exists before replying.""",
+    ),
 )
 
 
