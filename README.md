@@ -74,6 +74,8 @@ replacement. What is proven today:
 - Generated harnesses include `Docs/Environment/TASK_TRIALS.md` and
   `scripts/record-task-trial.py`, a copied-harness-local lane for recording
   task outcome, evidence, verification, privacy review, and limitations.
+- Generated harnesses include `NEXT_TASK.md`, a reporter-facing first-task
+  recipe that turns one real task into public-safe task-trial evidence.
 - Generated harnesses include `scripts/summarize-task-trials.py`, a local
   summary/check over recorded task-trial outcomes.
 - Generated harnesses include `scripts/run-harness-evals.py` and
@@ -841,6 +843,7 @@ target environment.
 ```text
 your-project/
 |-- AGENTS.md
+|-- NEXT_TASK.md
 |-- .codex/
 |   |-- config.toml
 |   |-- rules/

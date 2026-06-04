@@ -106,3 +106,4 @@ Use workspace write with sensitive recursive deny rules for `.env`, secrets, tok
 - Docs/Environment/EVAL_REPORT.md
 
 - scripts/export-public-usage-report.py
+- NEXT_TASK.md

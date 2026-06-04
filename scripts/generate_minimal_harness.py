@@ -727,6 +727,58 @@ Generated: {generated_at}
 """
 
 
+def next_task_doc(profile: Profile) -> str:
+    return f"""
+# Next Task Trial
+
+Use this file when a reporter or teammate asks, "What do I actually do first?"
+It is the shortest path from a generated Codex harness to public-safe evidence
+that a maintainer can inspect.
+
+## Pick The Task
+
+Choose one small real {profile.domain} task with a visible artifact or answer.
+Good candidates:
+
+{bullet_list(profile.first_tasks)}
+
+Avoid tasks that require secrets, personal data, customer data, candidate data,
+private repository names, raw logs, or irreversible production actions.
+
+## Run The Loop
+
+1. Ask Codex to inspect the relevant files before changing or summarizing them.
+2. Ask Codex to state the planned verification before it edits or summarizes.
+3. Complete the task and run the narrowest meaningful check.
+4. Ask the reviewer to inspect correctness, privacy, safety, regressions, and
+   missing verification.
+5. Record the trial with `python scripts/record-task-trial.py`.
+6. Run `python scripts/run-harness-evals.py --min-successes 1`.
+7. Export `Docs/Environment/PUBLIC_USAGE_REPORT.md` with
+   `python scripts/export-public-usage-report.py --out Docs/Environment/PUBLIC_USAGE_REPORT.md`.
+
+## Copyable Record Command
+
+```bash
+python scripts/record-task-trial.py \\
+  --task "short public-safe task summary" \\
+  --outcome success \\
+  --evidence "public-safe artifact, file, command, or source comparison" \\
+  --verification "command, reviewer pass, source check, or manual inspection" \\
+  --privacy-review "no secrets, personal data, private repo names, local paths, or raw private logs included" \\
+  --harness-helped "what the generated harness made easier" \\
+  --limitations "one task trial, not longitudinal proof"
+```
+
+## Evidence Boundary
+
+Share the exported public usage report, local eval status, and task-trial
+summary. Do not share raw private files, secrets, personal data, customer data,
+candidate data, private repository names, email addresses, local machine paths,
+or raw private logs.
+"""
+
+
 def improvement_log(profile: Profile) -> str:
     return f"""
 # Improvement Log
@@ -1747,6 +1799,7 @@ except ModuleNotFoundError:
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_PATHS = [
     "AGENTS.md",
+    "NEXT_TASK.md",
     ".codex/config.toml",
     ".codex/rules",
     ".agents/skills",
@@ -1855,6 +1908,12 @@ def main() -> int:
 
     check_manifest_references(issues)
 
+    require_terms(
+        "NEXT_TASK.md",
+        "next task trial",
+        ["pick the task", "run the loop", "record-task-trial.py", "run-harness-evals.py --min-successes 1", "export-public-usage-report.py", "evidence boundary", "privacy-review", "limitations"],
+        issues,
+    )
     require_terms(
         "Docs/GETTING_STARTED.md",
         "getting started",
@@ -2131,6 +2190,7 @@ scoped permissions, compact core rules, and environment records.
 - .codex/agents/reviewer.toml
 - .codex/rules/core.md
 - .agents/skills/health-check/SKILL.md
+- NEXT_TASK.md
 - scripts/check-harness.py
 - scripts/record-improvement.py
 - scripts/record-task-trial.py
@@ -2167,6 +2227,7 @@ scoped permissions, compact core rules, and environment records.
 
     manifest_entries = [
         "AGENTS.md",
+        "NEXT_TASK.md",
         ".codex/config.toml",
         ".codex/agents/reviewer.toml",
         ".codex/rules/core.md",
@@ -2193,6 +2254,8 @@ scoped permissions, compact core rules, and environment records.
     if (target / CREATION_CONTEXT_PATH).exists():
         manifest_entries.append("Docs/Environment/CREATION_CONTEXT.md")
     write(target / "Docs/Environment/MANIFEST.md", "# Manifest\n\n" + "\n".join(f"- {entry}" for entry in manifest_entries))
+
+    write(target / "NEXT_TASK.md", next_task_doc(profile))
 
     write(target / "Docs/Environment/EVAL_PLAN.md", eval_plan(profile))
 

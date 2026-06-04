@@ -6,6 +6,7 @@ one health-check skill, scoped permissions, and scenario-analysis rules.
 ## Component Manifest
 
 - AGENTS.md
+- NEXT_TASK.md
 - .codex/config.toml
 - .codex/agents/reviewer.toml
 - .codex/rules/core.md

@@ -16,6 +16,7 @@ except ModuleNotFoundError:
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_PATHS = [
     "AGENTS.md",
+    "NEXT_TASK.md",
     ".codex/config.toml",
     ".codex/rules",
     ".agents/skills",
@@ -124,6 +125,12 @@ def main() -> int:
 
     check_manifest_references(issues)
 
+    require_terms(
+        "NEXT_TASK.md",
+        "next task trial",
+        ["pick the task", "run the loop", "record-task-trial.py", "run-harness-evals.py --min-successes 1", "export-public-usage-report.py", "evidence boundary", "privacy-review", "limitations"],
+        issues,
+    )
     require_terms(
         "Docs/GETTING_STARTED.md",
         "getting started",

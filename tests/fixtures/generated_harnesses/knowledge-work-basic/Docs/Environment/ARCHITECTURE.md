@@ -10,6 +10,7 @@ scoped permissions, compact core rules, and environment records.
 - .codex/agents/reviewer.toml
 - .codex/rules/core.md
 - .agents/skills/health-check/SKILL.md
+- NEXT_TASK.md
 - scripts/check-harness.py
 - scripts/record-improvement.py
 - scripts/record-task-trial.py

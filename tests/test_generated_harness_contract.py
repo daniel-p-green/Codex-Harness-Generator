@@ -213,6 +213,17 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertNotEqual(0, payload["returncode"])
         self.assertTrue(any("task trials should mention" in issue for issue in payload["issues"]), payload)
 
+    def test_local_harness_check_fails_for_weak_next_task_guide(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        (target / "NEXT_TASK.md").write_text("# Next Task\n\n- Try something.\n", encoding="utf-8")
+
+        payload = self.run_local_check(target)
+
+        self.assertEqual("fail", payload["status"], payload)
+        self.assertNotEqual(0, payload["returncode"])
+        self.assertTrue(any("next task trial should mention" in issue for issue in payload["issues"]), payload)
+
     def test_local_harness_check_fails_for_stale_manifest_reference(self):
         temp_dir, target = self.copy_fixture()
         self.addCleanup(temp_dir.cleanup)
@@ -835,6 +846,14 @@ class GeneratedHarnessContractTests(unittest.TestCase):
             self.assertIn("python scripts/run-harness-evals.py", getting_started)
             self.assertIn("privacy review", getting_started.lower())
             self.assertIn("limitations", getting_started.lower())
+            next_task = (target / "NEXT_TASK.md").read_text(encoding="utf-8")
+            self.assertIn("## Pick The Task", next_task)
+            self.assertIn("## Run The Loop", next_task)
+            self.assertIn("python scripts/record-task-trial.py", next_task)
+            self.assertIn("python scripts/run-harness-evals.py --min-successes 1", next_task)
+            self.assertIn("python scripts/export-public-usage-report.py", next_task)
+            self.assertIn("--privacy-review", next_task)
+            self.assertIn("## Evidence Boundary", next_task)
             task_trials = (target / "Docs/Environment/TASK_TRIALS.md").read_text(encoding="utf-8")
             self.assertIn("--limitations", task_trials)
 

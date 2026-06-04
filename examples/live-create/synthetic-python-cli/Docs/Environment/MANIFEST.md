@@ -5,6 +5,7 @@ Generated harness inventory.
 ## Core
 
 - AGENTS.md
+- NEXT_TASK.md
 - .codex/config.toml
 - .gitignore
 

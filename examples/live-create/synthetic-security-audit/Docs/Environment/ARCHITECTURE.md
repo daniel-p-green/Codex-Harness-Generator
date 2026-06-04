@@ -6,6 +6,7 @@ health-check skill, scoped permissions, and security-first rules.
 ## Component Manifest
 
 - AGENTS.md
+- NEXT_TASK.md
 - .codex/config.toml
 - .codex/agents/reviewer.toml
 - .codex/rules/core.md

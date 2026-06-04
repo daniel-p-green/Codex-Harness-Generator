@@ -48,3 +48,4 @@ Every generated handoff file below was created for `temporary synthetic target`.
 - Docs/Environment/EVAL_REPORT.md
 
 - scripts/export-public-usage-report.py
+- NEXT_TASK.md

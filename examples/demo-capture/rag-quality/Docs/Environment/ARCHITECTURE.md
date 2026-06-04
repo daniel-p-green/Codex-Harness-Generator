@@ -6,6 +6,7 @@ scoped permissions, compact core rules, and environment records.
 ## Component Manifest
 
 - AGENTS.md
+- NEXT_TASK.md
 - .codex/config.toml
 - .codex/agents/reviewer.toml
 - .codex/rules/core.md

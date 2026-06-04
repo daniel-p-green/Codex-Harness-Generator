@@ -229,6 +229,7 @@ def has_broad_web_access(config: dict) -> bool:
 def check_required_paths(root: Path, findings: list[Finding]) -> None:
     required_paths = [
         "AGENTS.md",
+        "NEXT_TASK.md",
         ".codex/config.toml",
         ".codex/rules",
         ".agents/skills",
@@ -477,6 +478,22 @@ def check_rules(root: Path, findings: list[Finding]) -> None:
 
 
 def check_docs(root: Path, findings: list[Finding]) -> None:
+    next_task = root / "NEXT_TASK.md"
+    if next_task.exists():
+        text = read_text(next_task).lower()
+        for phrase in [
+            "pick the task",
+            "run the loop",
+            "record-task-trial.py",
+            "run-harness-evals.py --min-successes 1",
+            "export-public-usage-report.py",
+            "evidence boundary",
+            "privacy-review",
+            "limitations",
+        ]:
+            if phrase not in text:
+                add(findings, "next_task", "user_clarity", "warn", "NEXT_TASK.md", f"Next task guide should mention {phrase}.")
+
     getting_started = root / "Docs/GETTING_STARTED.md"
     if getting_started.exists():
         text = read_text(getting_started).lower()

@@ -1,6 +1,7 @@
 # Manifest
 
 - AGENTS.md
+- NEXT_TASK.md
 - .codex/config.toml
 - .gitignore
 - .codex/hooks/self_learning_check.py
