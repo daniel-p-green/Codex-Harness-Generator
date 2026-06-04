@@ -58,6 +58,9 @@ Already proven:
 - Beta-exit usage-gap reporting, suggested pilot targets, and a shareable
   campaign packet through `codex-harness usage-gaps` and
   `codex-harness pilot-campaign`.
+- A non-gating beta-exit audit through `codex-harness beta-exit-audit`, so the
+  repo can publish missing criteria without confusing "audit ran" with
+  "external adoption is proven."
 - Short deterministic demo capture through `codex-harness demo-capture`.
 
 Still unproven:
@@ -78,6 +81,8 @@ The project can stop calling itself a beta only when all of these are true:
   `codex-harness prepare-pilot`, `codex-harness prepare-next-pilot`,
   `codex-harness quickstart`, or `codex-harness init --brief`.
 - `python scripts/codex_harness.py proof-status --beta-exit` passes.
+- `python scripts/codex_harness.py beta-exit-audit` reports
+  `beta-exit-ready-for-final-gate`.
 - `python scripts/codex_harness.py gate` passes on CI and locally.
 - `python scripts/codex_harness.py source-freshness` and
   `python scripts/codex_harness.py semantic-alignment` have current PASS reports

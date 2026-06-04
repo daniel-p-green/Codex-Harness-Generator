@@ -517,6 +517,41 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_beta_exit_audit_delegates_to_auditor(self):
+        command, _ = self.run_cli(
+            [
+                "beta-exit-audit",
+                "--record-dir",
+                "/tmp/usage-records",
+                "--pilot-record-dir",
+                "/tmp/pilot-records",
+                "--usage-record-dir",
+                "/tmp/usage-records",
+                "--report",
+                "/tmp/BETA_EXIT_AUDIT.md",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/beta_exit_audit.py",
+                "--record-dir",
+                "/tmp/usage-records",
+                "--pilot-record-dir",
+                "/tmp/pilot-records",
+                "--usage-record-dir",
+                "/tmp/usage-records",
+                "--report",
+                "/tmp/BETA_EXIT_AUDIT.md",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
     def test_adoption_plan_delegates_to_planner(self):
         command, _ = self.run_cli(
             [

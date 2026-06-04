@@ -112,10 +112,12 @@ CAPABILITIES = [
         "evidence_paths": [
             "Docs/Environment/PROOF_STATUS.md",
             "Docs/Environment/PROOF_MATRIX.md",
+            "Docs/Environment/BETA_EXIT_AUDIT.md",
             "scripts/proof_status.py",
+            "scripts/beta_exit_audit.py",
             "scripts/refresh_generated_surfaces.py",
         ],
-        "commands": ["codex-harness refresh-examples", "codex-harness proof-status", "codex-harness gate"],
+        "commands": ["codex-harness refresh-examples", "codex-harness proof-status", "codex-harness beta-exit-audit", "codex-harness gate"],
     },
 ]
 

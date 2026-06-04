@@ -35,6 +35,7 @@ REQUIRED_FILES = (
     "Docs/Environment/USAGE_RECORDS.md",
     "Docs/Environment/PILOT_CAMPAIGN.md",
     "Docs/Environment/PILOT_BOARD.md",
+    "Docs/Environment/BETA_EXIT_AUDIT.md",
     "scripts/codex_harness.py",
     "scripts/generate_minimal_harness.py",
     "scripts/inspect_project.py",
@@ -158,12 +159,13 @@ def check_installable_cli() -> tuple[dict, dict]:
     pilot_board_step = next((step for step in payload["steps"] if step["name"] == "pilot_board"), {})
     pilot_update_step = next((step for step in payload["steps"] if step["name"] == "pilot_update"), {})
     usage_gaps_step = next((step for step in payload["steps"] if step["name"] == "usage_gaps"), {})
+    beta_exit_audit_step = next((step for step in payload["steps"] if step["name"] == "beta_exit_audit"), {})
     pilot_campaign_step = next((step for step in payload["steps"] if step["name"] == "pilot_campaign"), {})
     migration_step = next((step for step in payload["steps"] if step["name"] == "migration_audit"), {})
     if failed:
         detail = f"failed at {failed['name']}"
     else:
-        detail = "profiles={profiles} doctor={doctor_status} init=pass quickstart={quickstart_status} prepare_pilot={prepare_pilot_status} init_from_project={init_from_project_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} equivalence={equivalence_status} local_eval={local_eval_status} public_usage_report={public_usage_report_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue_preview={usage_from_issue_preview_status} usage_from_issue={usage_from_issue_status} prepare_next_pilot={prepare_next_pilot_status} pilot_board={pilot_board_status} pilot_update={pilot_update_status} usage_gaps={usage_gaps_status} pilot_campaign={pilot_campaign_status} migration_audit={migration_status} eval=pass".format(
+        detail = "profiles={profiles} doctor={doctor_status} init=pass quickstart={quickstart_status} prepare_pilot={prepare_pilot_status} init_from_project={init_from_project_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} equivalence={equivalence_status} local_eval={local_eval_status} public_usage_report={public_usage_report_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue_preview={usage_from_issue_preview_status} usage_from_issue={usage_from_issue_status} prepare_next_pilot={prepare_next_pilot_status} pilot_board={pilot_board_status} pilot_update={pilot_update_status} usage_gaps={usage_gaps_status} beta_exit_audit={beta_exit_audit_status} pilot_campaign={pilot_campaign_status} migration_audit={migration_status} eval=pass".format(
             profiles=profile_step.get("profile_count", "unknown"),
             doctor_status=doctor_step.get("status", "unknown"),
             quickstart_status=quickstart_step.get("status", "unknown"),
@@ -184,6 +186,7 @@ def check_installable_cli() -> tuple[dict, dict]:
             pilot_board_status=pilot_board_step.get("status", "unknown"),
             pilot_update_status=pilot_update_step.get("status", "unknown"),
             usage_gaps_status=usage_gaps_step.get("status", "unknown"),
+            beta_exit_audit_status=beta_exit_audit_step.get("status", "unknown"),
             pilot_campaign_status=pilot_campaign_step.get("status", "unknown"),
             migration_status=migration_step.get("status", "unknown"),
         )

@@ -128,6 +128,10 @@ replacement. What is proven today:
   `Docs/Environment/USAGE_GAPS.md`, a concrete list of the remaining beta-exit
   evidence gaps plus suggested external pilot targets from the supported Codex
   profile catalog.
+- `scripts/beta_exit_audit.py` and `codex-harness beta-exit-audit` write
+  `Docs/Environment/BETA_EXIT_AUDIT.md`, a non-gating beta-exit readiness audit
+  that names missing evidence, source-check state, pilot-board state, and the
+  final commands to run before dropping the beta label.
 - `scripts/export_pilot_campaign.py` and `codex-harness pilot-campaign` write
   `Docs/Environment/PILOT_CAMPAIGN.md`, a shareable external-pilot campaign
   plan derived from the current usage gaps.
@@ -623,6 +627,7 @@ Common subcommands:
 | `pilot-campaign` | `export_pilot_campaign.py` | Writes a shareable external-pilot campaign plan from current usage evidence gaps. |
 | `pilot-board` | `pilot_board.py` | Summarizes prepared pilot records and cross-checks converted pilots against usage records without counting outreach as proof. |
 | `pilot-update <slug>` | `pilot_board.py` | Updates one prepared pilot's status, validates converted usage-record references, and refreshes the pilot board. |
+| `beta-exit-audit` | `beta_exit_audit.py` | Writes a non-gating audit of beta-exit readiness and remaining evidence gaps. |
 | `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record; add `--no-write` to preview first. |
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
 | `usage-gaps` | `usage_gaps.py` | Reports remaining beta-exit usage evidence gaps and writes `Docs/Environment/USAGE_GAPS.md`. |

@@ -24,6 +24,7 @@ USAGE_REPORT = REPO_ROOT / "Docs" / "Environment" / "USAGE_RECORDS.md"
 USAGE_GAPS_REPORT = REPO_ROOT / "Docs" / "Environment" / "USAGE_GAPS.md"
 PILOT_CAMPAIGN_REPORT = REPO_ROOT / "Docs" / "Environment" / "PILOT_CAMPAIGN.md"
 PILOT_BOARD_REPORT = REPO_ROOT / "Docs" / "Environment" / "PILOT_BOARD.md"
+BETA_EXIT_AUDIT_REPORT = REPO_ROOT / "Docs" / "Environment" / "BETA_EXIT_AUDIT.md"
 SOURCE_FRESHNESS_REPORT = REPO_ROOT / "Docs" / "Environment" / "SOURCE_FRESHNESS.md"
 SOURCE_FRESHNESS_JSON = REPO_ROOT / "Docs" / "Environment" / "SOURCE_FRESHNESS.json"
 SEMANTIC_ALIGNMENT_REPORT = REPO_ROOT / "Docs" / "Environment" / "SEMANTIC_ALIGNMENT.md"
@@ -149,13 +150,14 @@ def check_installable_cli() -> tuple[dict, dict]:
     pilot_board_step = next((step for step in payload["steps"] if step["name"] == "pilot_board"), {})
     pilot_update_step = next((step for step in payload["steps"] if step["name"] == "pilot_update"), {})
     usage_gaps_step = next((step for step in payload["steps"] if step["name"] == "usage_gaps"), {})
+    beta_exit_audit_step = next((step for step in payload["steps"] if step["name"] == "beta_exit_audit"), {})
     pilot_campaign_step = next((step for step in payload["steps"] if step["name"] == "pilot_campaign"), {})
     migration_step = next((step for step in payload["steps"] if step["name"] == "migration_audit"), {})
     eval_step = next((step for step in payload["steps"] if step["name"] == "eval"), {})
     if failed:
         detail = f"failed at {failed['name']}"
     else:
-        detail = "profiles={profiles} doctor={doctor_status} init={init_status} quickstart={quickstart_status} prepare_pilot={prepare_pilot_status} init_from_project={init_from_project_status} demo_capture={demo_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} equivalence={equivalence_status} local_eval={local_eval_status} public_usage_report={public_usage_report_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue_preview={usage_from_issue_preview_status} usage_from_issue={usage_from_issue_status} prepare_next_pilot={prepare_next_pilot_status} pilot_board={pilot_board_status} pilot_update={pilot_update_status} usage_gaps={usage_gaps_status} pilot_campaign={pilot_campaign_status} migration_audit={migration_status} eval={eval_status}".format(
+        detail = "profiles={profiles} doctor={doctor_status} init={init_status} quickstart={quickstart_status} prepare_pilot={prepare_pilot_status} init_from_project={init_from_project_status} demo_capture={demo_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} equivalence={equivalence_status} local_eval={local_eval_status} public_usage_report={public_usage_report_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue_preview={usage_from_issue_preview_status} usage_from_issue={usage_from_issue_status} prepare_next_pilot={prepare_next_pilot_status} pilot_board={pilot_board_status} pilot_update={pilot_update_status} usage_gaps={usage_gaps_status} beta_exit_audit={beta_exit_audit_status} pilot_campaign={pilot_campaign_status} migration_audit={migration_status} eval={eval_status}".format(
             profiles=profile_step.get("profile_count", "unknown"),
             doctor_status=doctor_step.get("status", "unknown"),
             init_status=init_step.get("status", "unknown"),
@@ -178,6 +180,7 @@ def check_installable_cli() -> tuple[dict, dict]:
             pilot_board_status=pilot_board_step.get("status", "unknown"),
             pilot_update_status=pilot_update_step.get("status", "unknown"),
             usage_gaps_status=usage_gaps_step.get("status", "unknown"),
+            beta_exit_audit_status=beta_exit_audit_step.get("status", "unknown"),
             pilot_campaign_status=pilot_campaign_step.get("status", "unknown"),
             migration_status=migration_step.get("status", "unknown"),
             eval_status=eval_step.get("status", "unknown"),
@@ -220,6 +223,7 @@ def build_payload(
         check_file_exists("usage_gaps_report", USAGE_GAPS_REPORT),
         check_file_exists("pilot_campaign_report", PILOT_CAMPAIGN_REPORT),
         check_file_exists("pilot_board_report", PILOT_BOARD_REPORT),
+        check_file_exists("beta_exit_audit_report", BETA_EXIT_AUDIT_REPORT),
         check_status_report("source_freshness_report", SOURCE_FRESHNESS_REPORT, SOURCE_FRESHNESS_JSON),
         check_status_report("semantic_alignment_report", SEMANTIC_ALIGNMENT_REPORT, SEMANTIC_ALIGNMENT_JSON),
         check_file_exists("task_trials_report", TASK_TRIALS_REPORT),

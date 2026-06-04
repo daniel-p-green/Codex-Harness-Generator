@@ -587,6 +587,22 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("pilot_board.py", command)
 
+    if args.command == "beta-exit-audit":
+        command = []
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.pilot_record_dir:
+            command.extend(["--pilot-record-dir", args.pilot_record_dir])
+        if args.usage_record_dir:
+            command.extend(["--usage-record-dir", args.usage_record_dir])
+        if args.report:
+            command.extend(["--report", args.report])
+        if args.no_write:
+            command.append("--no-write")
+        if args.json:
+            command.append("--json")
+        return python_script("beta_exit_audit.py", command)
+
     if args.command == "usage-from-issue":
         command = [
             args.issue_body,
@@ -1092,6 +1108,14 @@ def make_parser() -> argparse.ArgumentParser:
     pilot_update.add_argument("--updated", help="UTC timestamp override")
     pilot_update.add_argument("--no-write", action="store_true", help="Do not write the Markdown board")
     pilot_update.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    beta_exit_audit = subparsers.add_parser("beta-exit-audit", help="Write a non-gating beta-exit readiness audit")
+    beta_exit_audit.add_argument("--record-dir", help="Directory where usage record JSON files are read")
+    beta_exit_audit.add_argument("--pilot-record-dir", help="Directory where prepared pilot JSON records are read")
+    beta_exit_audit.add_argument("--usage-record-dir", help="Directory where converted usage record JSON files are read")
+    beta_exit_audit.add_argument("--report", help="Beta-exit audit Markdown path")
+    beta_exit_audit.add_argument("--no-write", action="store_true", help="Do not write the Markdown audit")
+    beta_exit_audit.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     usage_from_issue = subparsers.add_parser("usage-from-issue", help="Create usage evidence from a GitHub issue-form body")
     usage_from_issue.add_argument("issue_body", help="Markdown issue body path, or '-' for stdin")
