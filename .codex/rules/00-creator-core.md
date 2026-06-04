@@ -1,22 +1,22 @@
 # Creator core (orchestrator rule)
 
 The Harness Generator uses an orchestrator pattern: the main conversation stays lean,
-delegates complex work to specialized agents via the Task tool, and returns
+delegates complex work to specialized agents via the Codex subagent tools, and returns
 concise summaries pointing to artifacts on disk.
 
 ## Routing table
 
 | User request | Route | Fallback | Notes |
 |---|---|---|---|
-| /create (bare) | Skill trigger -> orchestrator pipeline | Prompt user for project context | See CLAUDE.md pipeline steps |
+| /create (bare) | Skill trigger -> orchestrator pipeline | Prompt user for project context | See AGENTS.md pipeline steps |
 | /create + project context | Handle directly (skip skill) | Skill trigger if context is complex | User already gave info; ask for path, then intake |
 | /update | Skill (fork context) | Manual topic file edit | Ingests ProvideKnowledge/ then web-researches; local-only mode skips web |
 | /validate-environment | Skill (fork context) | Manual checklist review | Runs validator, presents report |
-| /upgrade-environment | Skill trigger -> orchestrator pipeline | Prompt user for environment path | See CLAUDE.md upgrade pipeline steps |
+| /upgrade-environment | Skill trigger -> orchestrator pipeline | Prompt user for environment path | See AGENTS.md upgrade pipeline steps |
 | Upgrade interview questions | Handle directly (2-3 rounds) | Re-read UPGRADE_CONTEXT.md | Append answers to UPGRADE_CONTEXT.md |
 | Upgrade analysis | Delegate to upgrade-analyzer | Re-run with narrower scope | Input: UPGRADE_CONTEXT.md path |
 | Upgrade implementation | Delegate to component-generator | Re-run failed edits (max 2) | Pass approved recommendation IDs + UPGRADE_RECOMMENDATIONS.md |
-| "How does the Harness Generator work?" | Answer directly | Refer to OVERVIEW.md | Use CLAUDE.md + plan knowledge |
+| "How does the Harness Generator work?" | Answer directly | Refer to OVERVIEW.md | Use AGENTS.md + plan knowledge |
 | "What will my environment include?" | Answer directly | Load relevant starter profile | Use plan + starter profiles |
 | Profile-first intake questions | Handle directly | Delegate to intake-interviewer | Do not delegate simple Q&A rounds |
 | Deep interview (no profile fit) | Delegate to intake-interviewer | Ask user for clarification | Use question relay protocol |
@@ -24,7 +24,7 @@ concise summaries pointing to artifacts on disk.
 | File generation (passes 1-5) | Delegate to component-generator | Re-run failed pass (max 2 retries) | One invocation per pass. Hub: shell pass once, then 5 passes per work area |
 | Post-generation validation | Delegate to environment-validator | Manual review checklist | Input: target directory path |
 | /create inside existing hub | Detect parent HUB_GENESIS.md, add-area flow | Prompt user to confirm hub match | Skips shared-basics intake, writes new `<area-slug>/` under hub |
-| Convert single environment to hub | Route via /upgrade-environment | Ask user to run /upgrade-environment | Moves existing `.claude/`, CLAUDE.md, Docs/ into `<current-area-name>/`, generates parent shell |
+| Convert single environment to hub | Route via /upgrade-environment | Ask user to run /upgrade-environment | Moves existing `.codex/`, AGENTS.md, Docs/ into `<current-area-name>/`, generates parent shell |
 | Collapse hub to single environment | Route via /upgrade-environment | Ask user to run /upgrade-environment | Only offered when hub has exactly one remaining area |
 
 ## Artifact-first handoff
@@ -47,13 +47,13 @@ Do NOT paste full file contents into chat.
 
 ## Autonomy
 
-See CLAUDE.md for full autonomy rules. Summary: all file operations within
-Claude-Harness-Generator/ are pre-approved. Act and report.
+See AGENTS.md for full autonomy rules. Summary: all file operations within
+Codex-Harness-Generator/ are pre-approved. Act and report.
 
 ## Vocabulary
 
 Plain language for all user-facing output. Technical vocabulary only in
-generated environment files. See CLAUDE.md vocabulary section.
+generated environment files. See AGENTS.md vocabulary section.
 
 ## Progress reporting
 

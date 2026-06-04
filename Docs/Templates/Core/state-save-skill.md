@@ -16,7 +16,7 @@
   - Domain-specific state examples
 
   WHY THIS EXISTS:
-  Sessions end. Context compacts. Claude Code restarts. Without state-save,
+  Sessions end. Context compacts. Codex restarts. Without state-save,
   every new session starts from zero. The 6-category taxonomy ensures all
   types of state are captured: tool state (what the environment looks like),
   task state (what we are doing), artifact state (what we produced), decision
@@ -29,7 +29,7 @@
   Domain: FastAPI + React web application
 
   File structure:
-  .claude/skills/state-save/
+  .agents/skills/state-save/
     SKILL.md              (this file -- core instructions)
     scripts/
       capture-vcs-state.sh  (captures git status, branch, recent commits)
@@ -44,16 +44,16 @@
 name: state-save
 description: Capture current session state for later restoration. Use when the user says "save state", "save progress", "save my work", "I'm done for now", "before I clear", or "/state-save". Do NOT use for saving files or committing code.
 context: fork
-allowed-tools: [Read, Write, Bash, Glob]
+tool access policy: [Read, Write, Bash, Glob]
 metadata:
-  author: Claude Harness Generator
+  author: Codex Harness Generator
   version: 1.0.0
 ---
 ```
 
 <!-- CRITICAL INSTRUCTIONS AT TOP
   WHY: "Critical instructions at TOP of SKILL.md" (Amendment 10f).
-  The most important behavior must be the first thing Claude reads.
+  The most important behavior must be the first thing Codex reads.
 -->
 
 ## Critical

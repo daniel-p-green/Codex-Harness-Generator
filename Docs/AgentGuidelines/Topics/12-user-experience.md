@@ -3,7 +3,7 @@
 ## 12.1 First-Run Onboarding
 
 - **Established**: Baseline
-- **Source**: Derived from claude-code-best-practices.md, opus-4-6-guide.md | Tier 1
+- **Source**: Derived from https://developers.openai.com/codex/concepts/customization, https://developers.openai.com/api/docs/guides/reasoning | Tier 1
 - **Recommendation**: Generate a first-run detection mechanism: check `Docs/index.md`
   for a `Status: NEW_ENVIRONMENT` marker. On first run:
   - Plain-language greeting explaining what the environment does
@@ -19,7 +19,7 @@
 ## 12.2 Plain Language
 
 - **Established**: Baseline
-- **Source**: Derived from opus-4-6-guide.md | Tier 1
+- **Source**: Derived from https://developers.openai.com/api/docs/guides/reasoning | Tier 1
 - **Recommendation**: Use plain language in all user-facing output. Technical vocabulary only
   in generated configuration files. Vocabulary adaptation:
   - "assistant" not "agent" (for non-technical users)
@@ -59,7 +59,7 @@
   - Common first-time issues and solutions
   - Where to find more detailed documentation
 
-  This file is for humans, not for Claude. Keep it concise and actionable.
+  This file is for humans, not for Codex. Keep it concise and actionable.
 - **Anti-pattern**: No GETTING_STARTED.md or an overly technical one. Users should be
   productive within 5 minutes of reading this file.
 

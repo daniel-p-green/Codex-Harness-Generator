@@ -23,11 +23,11 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| manuscript-editor | opus | Developmental + line editing: structure, flow, pacing, ToC design, author-voice preservation; never introduces a new factual claim, named source, statistic, quote, or case study during rewrite (flag for author verification); builds a continuity ledger for fiction | drafter.md |
-| proofreader | sonnet | Spelling/grammar/punctuation correction and notation standardization (original -> corrected); notation baseline re-grounded to the target language/house style (see Customization) | reviewer.md |
-| cover-designer | sonnet | Cover concept, typography/color strategy, image-gen prompts, A/B variants | custom (concept + image-gen direction) |
-| metadata-manager | sonnet | BISAC classification, sales description, keyword SEO, pricing, distribution settings; never fabricates an endorsement, review quote, credential, award, or sales statistic (mark [AUTHOR/PUBLISHER TO VERIFY]); introduces no new factual claim during copywriting | custom (metadata + SEO + distribution) |
-| publishing-reviewer | opus | Cross-validate manuscript/proof/cover/metadata; spec compliance; release-readiness QA; runs a rights-clearance pass (scan for epigraphs, song lyrics, quotations beyond fair use, images needing permission) (read-only) | reviewer.md |
+| manuscript-editor | high-effort | Developmental + line editing: structure, flow, pacing, ToC design, author-voice preservation; never introduces a new factual claim, named source, statistic, quote, or case study during rewrite (flag for author verification); builds a continuity ledger for fiction | drafter.md |
+| proofreader | medium-effort | Spelling/grammar/punctuation correction and notation standardization (original -> corrected); notation baseline re-grounded to the target language/house style (see Customization) | reviewer.md |
+| cover-designer | medium-effort | Cover concept, typography/color strategy, image-gen prompts, A/B variants | custom (concept + image-gen direction) |
+| metadata-manager | medium-effort | BISAC classification, sales description, keyword SEO, pricing, distribution settings; never fabricates an endorsement, review quote, credential, award, or sales statistic (mark [AUTHOR/PUBLISHER TO VERIFY]); introduces no new factual claim during copywriting | custom (metadata + SEO + distribution) |
+| publishing-reviewer | high-effort | Cross-validate manuscript/proof/cover/metadata; spec compliance; release-readiness QA; runs a rights-clearance pass (scan for epigraphs, song lyrics, quotations beyond fair use, images needing permission) (read-only) | reviewer.md |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy, context-management, self-learning, error-handling, memory-management;
@@ -80,9 +80,9 @@ Base + Universal Deny -- see `Docs/Templates/References/ecosystem-permissions.md
 Add Git only if the author version-controls manuscripts. No language ecosystem
 needed (this is a document domain). Domain-specific additions:
 
-- `Write(./_workspace/**)`, `Edit(./_workspace/**)` -- the pipeline writes every
+- writable `_workspace/**` -- the pipeline writes every
   deliverable (`00_input.md` .. `05_review_report.md`, `covers/`) here
-- `WebSearch`, `WebFetch(*)` -- classification codes, genre conventions,
+- `web search`, `browser/web retrieval` -- classification codes, genre conventions,
   competitor scans, keyword research (already in Base)
 - The cover image-generation tool is selected during intake as an AI Ecosystem
   Extension (see Customization Points), not a fixed permission
@@ -148,14 +148,14 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 
 ## Cost / Model Notes
 
-Opus for the reasoning roles -- manuscript-editor (developmental judgment,
+GPT-5.5 for the reasoning roles -- manuscript-editor (developmental judgment,
 pacing, structure) and publishing-reviewer (cross-deliverable consistency
-reasoning, release-readiness calls). Sonnet for the established-pattern execution
+reasoning, release-readiness calls). medium-effort GPT-5.5 for the established-pattern execution
 roles -- proofreader (rule-driven correction), cover-designer (convention-driven
 concepting), metadata-manager (classification + templated description/keyword
-work). Defaults: balanced (Opus on reasoning, Sonnet on execution; compaction
-95%; CLAUDE.md ~200 lines). Cost-conscious override: all-Sonnet, compaction 85%,
-full RTK in GETTING_STARTED. Quality-first: Opus on metadata too (description is
+work). Defaults: balanced (GPT-5.5 on reasoning, medium-effort GPT-5.5 on execution; compaction
+95%; AGENTS.md ~200 lines). Cost-conscious override: all medium-effort GPT-5.5, compaction 85%,
+full RTK in GETTING_STARTED. Quality-first: GPT-5.5 on metadata too (description is
 the conversion lever). Image generation bills separately per the chosen tool.
 
 ## Customization Points

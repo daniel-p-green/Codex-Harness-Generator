@@ -153,7 +153,7 @@ Each test takes about 1 minute.
 
 ### Test 1: First Run Greeting
 1. Open a new terminal in your project directory
-2. Run `claude` (or your Claude Code invocation)
+2. Run `codex` (or your Codex invocation)
 3. Send any greeting message ("hello", "hi", "what can you do?")
 
 Expected: The assistant greets you, describes what it can do, and
@@ -196,7 +196,7 @@ hallucinate capabilities, or modify files it should not touch.
 If any test fails:
 - Run /health-check to identify structural issues
 - Check Docs/Environment/VALIDATION_REPORT.md for known issues
-- Check settings.json for missing permissions
+- Check .codex/config.toml for missing permissions
 - Report the issue to help improve the Harness Generator
 ```
 
@@ -222,9 +222,9 @@ Additional checks for situations that commonly cause problems:
 - [ ] Wiki index.md (Docs/index.md) has NEW_ENVIRONMENT status marker
 
 ### Permission Boundaries
-- [ ] settings.json allow rules cover all operations agents need to perform
-- [ ] settings.json deny rules do not block normal operation
-- [ ] Agents with disallowedTools do not reference those tools in their instructions
+- [ ] .codex/config.toml allow rules cover all operations agents need to perform
+- [ ] .codex/config.toml deny rules do not block normal operation
+- [ ] Agents with sandbox_mode do not reference those tools in their instructions
 
 ### Scale Appropriateness
 - [ ] Memory tier matches project scale from GENESIS.md

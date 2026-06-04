@@ -20,7 +20,7 @@ review/
     review-criteria.md        # Detailed review criteria by domain (optional)
 ```
 
-## Example: Review Skill (`.claude/skills/review/SKILL.md`)
+## Example: Review Skill (`.agents/skills/review/SKILL.md`)
 
 ````markdown
 ---
@@ -32,7 +32,7 @@ description: >
   for reviewing external PRs or commits -- that requires the full reviewer
   agent.
 context: fork
-allowed-tools:
+tool access policy:
   - Read
   - Glob
   - Grep
@@ -44,7 +44,7 @@ metadata:
 <!-- ANNOTATION: Frontmatter design decisions:
      - context: fork (isolated context to avoid polluting main conversation)
      - Bash allowed for running VCS diff commands
-     - Write/Edit NOT allowed (review is read-only)
+     - workspace writes are not allowed (review is read-only)
      - description: 5 trigger phrases, 1 negative trigger -->
 
 ## Critical: Review is Read-Only
@@ -169,7 +169,7 @@ fi
      - [ ] Description includes 3+ trigger phrases
      - [ ] Description includes negative trigger
      - [ ] context: fork specified
-     - [ ] Review is explicitly read-only (no Write/Edit in allowed-tools)
+     - [ ] Review is explicitly read-only (no workspace writes)
      - [ ] CRITICAL/WARNING/SUGGESTION rubric present
      - [ ] Domain-appropriate examples in each rubric tier
      - [ ] Output format includes assessment (APPROVE/NEEDS_CHANGES/BLOCK)

@@ -15,12 +15,12 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| researcher | opus | Research APIs/libraries/patterns before implementation | researcher.md |
-| planner | opus | Break features/refactors into buildable checkpoints | planner.md |
-| implementer | sonnet | Implement one checkpoint at a time, run verification | implementer.md |
-| reviewer | opus | Review changes for correctness/security/perf (read-only) | reviewer.md |
-| explorer | sonnet | Locate code, map call chains and dependencies | explorer.md |
-| debugger | opus | Reproduce, hypothesize, fix, verify | debugger.md |
+| researcher | high-effort | Research APIs/libraries/patterns before implementation | researcher.md |
+| planner | high-effort | Break features/refactors into buildable checkpoints | planner.md |
+| implementer | medium-effort | Implement one checkpoint at a time, run verification | implementer.md |
+| reviewer | high-effort | Review changes for correctness/security/perf (read-only) | reviewer.md |
+| explorer | medium-effort | Locate code, map call chains and dependencies | explorer.md |
+| debugger | high-effort | Reproduce, hypothesize, fix, verify | debugger.md |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy, context-management, self-learning, error-handling (with diagnostic
@@ -60,7 +60,7 @@ multi-file features, refactors, migrations).
 Base + Universal Deny + Git, plus the language ecosystem(s) the intake names --
 all in `Docs/Templates/References/ecosystem-permissions.md`. Add `Docs(...)`
 output paths the implementer commonly writes (test fixtures, migrations) to avoid
-permission prompts. Generate `settings.local.json` for machine-specific paths.
+permission prompts. Generate `local config profile` for machine-specific paths.
 
 ## Self-Learning Seed Entries
 
@@ -72,7 +72,7 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 - [PATTERN] (pre-seeded) "Fix" vs "rewrite" routing ambiguity -- when a fix needs a
   new approach (not just correcting a mistake), route to planner first.
 - [PATTERN] (pre-seeded) Permission prompts for new file paths -- implementer creates
-  files outside pre-approved dirs. Add common output paths to settings.json.
+  files outside pre-approved dirs. Add common output paths to .codex/config.toml.
 - [PATTERN] (pre-seeded) Code mismatches project conventions -- explorer should check
   existing import/error-handling style before implementation.
 - [PATTERN] (pre-seeded) state-load misses newly added files -- artifact state should
@@ -88,10 +88,10 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 
 ## Cost / Model Notes
 
-Opus for planner/debugger/reviewer/researcher; Sonnet for implementer/explorer.
-Defaults: balanced (Opus on reasoning roles, Sonnet on execution; compaction 95%;
-CLAUDE.md ~200 lines). Cost-conscious override: all-Sonnet, compaction 85%,
-CLAUDE.md ~150, full RTK in GETTING_STARTED. Subagents ~4x, teams ~15x vs direct.
+high-effort GPT-5.5 for planner/debugger/reviewer/researcher; medium-effort GPT-5.5 for implementer/explorer.
+Defaults: balanced (high-effort GPT-5.5 on reasoning roles, medium-effort GPT-5.5 on execution; compaction 95%;
+AGENTS.md ~200 lines). Cost-conscious override: all medium-effort GPT-5.5, compaction 85%,
+AGENTS.md ~150, full RTK in GETTING_STARTED. Subagents ~4x, teams ~15x vs direct.
 
 ## Customization Points
 
@@ -104,4 +104,4 @@ Language/framework (drives ecosystem permissions + verify commands); solo vs tea
 Producer-Reviewer (implement -> review) within a Pipeline (plan -> implement ->
 review). Subagents are the default; consider Agent Teams only for a feature that
 cleanly splits across non-overlapping areas (backend / frontend / tests) -- prefer
-`claude --worktree` (~4x) over teams (~15x) for parallel file work.
+`codex with worktrees` (~4x) over teams (~15x) for parallel file work.

@@ -27,10 +27,10 @@ inter-agent communication.
 - 4.9 Human Review Gate Pattern [ALL]
 - 4.10 Git Worktree Isolation [ALL]
 - 4.11 Parallelism Helps/Hurts Matrix [ALL]
-- 4.12 Parallel Tool Use Prompting [ALL / 4.7+ note]
+- 4.12 Parallel Tool Use Prompting [ALL]
 - 4.13 Git Worktrees for Parallel Sessions [ALL]
 - 4.14 Container-Based Parallel Execution [ALL]
-- 4.15 Dynamic Workflows (Opus 4.8, research preview) [4.8]
+- 4.15 Dynamic Workflows (GPT-5.5, research preview) [Plan-gated]
 - 4.16 Team-Architecture Patterns (design vocabulary) [ALL]
 
 ---
@@ -63,13 +63,13 @@ inter-agent communication.
 - **Recommendation**: Understand the cost multipliers before choosing architecture:
   - Single chat: 1x baseline
   - Subagent invocation: ~4x baseline (separate context window)
-  - Agent Teams: ~15x baseline (each teammate is a separate Claude instance)
+  - Agent Teams: ~15x baseline (each teammate is a separate Codex instance)
 
   Token usage alone explains 80% of performance variance in research tasks. More tokens
   (more exploration, more tool calls) improves results, but with diminishing returns. Budget
   accordingly: use teams only when parallelism provides clear value exceeding the 15x cost.
 
-  Rough cost guide: parallel Claude sessions averaged ~$10/session in the C compiler project
+  Rough cost guide: parallel Codex sessions averaged ~$10/session in the C compiler project
   ($20K over ~2,000 sessions, 2B input + 140M output tokens).
 - **Anti-pattern**: Ignoring token costs when designing multi-agent architectures. A 5-teammate
   team costs ~75x a single chat. Without clear parallel value, this is wasteful.
@@ -104,7 +104,7 @@ inter-agent communication.
 ### 4.5 Quality Gate Hooks [ALL]
 
 - **Established**: Baseline
-- **Source**: agent-teams.md, claude-code-docs.md | Tier 1
+- **Source**: agent-teams.md, https://developers.openai.com/codex | Tier 1
 - **Recommendation**: Use team-specific hooks for quality control:
   - `TeammateIdle`: Runs when a teammate is about to go idle. Exit code 2 sends feedback
     and keeps the teammate working. Use for: "Run tests before going idle."
@@ -119,7 +119,7 @@ inter-agent communication.
 ### 4.6 Task Locking via Filesystem [ALL]
 
 - **Established**: Baseline
-- **Source**: parallel-claudes-c-compiler.md | Tier 1
+- **Source**: parallel-codex-agents-c-compiler.md | Tier 1
 - **Recommendation**: For parallel agents working on a shared codebase, use simple file-based
   locking. Agents write text files to a `current_tasks/` directory (e.g.,
   `parse_if_statement.txt`) to signal what they are working on. Other agents check this
@@ -133,10 +133,10 @@ inter-agent communication.
 ### 4.7 Fan-Out Pattern (headless) [ALL]
 
 - **Established**: Baseline
-- **Source**: claude-code-best-practices.md | Tier 1
+- **Source**: https://developers.openai.com/codex/concepts/customization | Tier 1
 - **Recommendation**: For repetitive tasks across many files:
-  1. Have Claude list all files needing the operation
-  2. Script the operation: `for file in $(cat files.txt); do claude -p "Migrate $file..." done`
+  1. Have Codex list all files needing the operation
+  2. Script the operation: `for file in $(cat files.txt); do codex exec "Migrate $file..." done`
   3. Test on 2-3 files first, refine the prompt, then run at scale
 
   This is simpler than Agent Teams and appropriate when each file's transformation is
@@ -188,23 +188,23 @@ inter-agent communication.
 
   Combine with: deny rules preventing Write to original/client documents (only write
   to working copies), and audit trail hooks logging all review decisions.
-- **Anti-pattern**: Relying on CLAUDE.md instructions alone to stop for review.
+- **Anti-pattern**: Relying on AGENTS.md instructions alone to stop for review.
   Instructions are advisory. Use deny rules + structured markers + routing table
   enforcement for guaranteed human review gates.
 
 ### 4.10 Git Worktree Isolation [ALL]
 
 - **Established**: 2026-02
-- **Source**: claude-code-docs.md | Tier 1
-- **Recommendation**: For parallel agent work on Git-based projects, use Claude Code's
+- **Source**: https://developers.openai.com/codex | Tier 1
+- **Recommendation**: For parallel agent work on Git-based projects, use Codex's
   built-in worktree support (`--worktree` flag) instead of Agent Teams. Each agent gets
   its own git worktree -- a separate working directory with its own branch -- preventing
   file conflicts entirely.
 
   ```bash
-  # Launch Claude in an isolated worktree
-  claude --worktree feature-auth
-  claude -w bugfix-login
+  # Launch Codex in an isolated worktree
+  codex with worktrees feature-auth
+  codex -w bugfix-login
   ```
 
   Worktrees are lighter than Agent Teams (~4x cost vs ~15x) and provide true filesystem
@@ -222,7 +222,7 @@ inter-agent communication.
 ### 4.11 Parallelism Helps/Hurts Matrix [ALL]
 
 - **Established**: 2025-09
-- **Source**: multi-agent-research-system.md, parallel-claudes-c-compiler.md | Tier 1
+- **Source**: multi-agent-research-system.md, parallel-codex-agents-c-compiler.md | Tier 1
 - **Recommendation**:
 
   | Scenario | Parallelism Helps | Parallelism Hurts |
@@ -242,11 +242,11 @@ inter-agent communication.
 - **Anti-pattern**: Forcing parallelism on inherently sequential or interdependent tasks.
   When all agents hit the same bottleneck, they all stall simultaneously.
 
-### 4.12 Parallel Tool Use Prompting [ALL / 4.7+ note]
+### 4.12 Parallel Tool Use Prompting [ALL]
 
 - **Established**: 2025-09
-- **Source**: platform-agent-patterns.md | Tier 1
-- **Recommendation**: Parallel tool use is default behavior in Claude. For explicit
+- **Source**: https://developers.openai.com/codex/subagents | Tier 1
+- **Recommendation**: Parallel tool use is default behavior in Codex. For explicit
   encouragement when needed:
   ```xml
   <use_parallel_tool_calls>
@@ -259,7 +259,7 @@ inter-agent communication.
   All tool results must be in a SINGLE user message (not separate messages) for parallel
   tool use. Tool_result blocks must come FIRST in the content array, text AFTER.
 - **Anti-pattern**: Violating the single-message constraint for tool results.
-  Over-prompting for parallelism on Opus 4.6 (handles this well natively). For Opus 4.7+,
+  Over-prompting for parallelism on GPT-5.5 (handles this well natively). For GPT-5.5+,
   which is more conservative by default, some explicit guidance IS useful if you want
   aggressive parallelism -- see topic 13.12 and 13.16.
 
@@ -267,12 +267,12 @@ inter-agent communication.
 
 - **Established**: Baseline
 - **Source**: common-workflows.md | Tier 1
-- **Recommendation**: Use git worktrees for parallel Claude sessions without Agent Teams:
+- **Recommendation**: Use git worktrees for parallel Codex sessions without Agent Teams:
   ```bash
   git worktree add ../project-feature-a -b feature-a
   git worktree add ../project-bugfix bugfix-123
-  cd ../project-feature-a && claude
-  cd ../project-bugfix && claude
+  cd ../project-feature-a && codex
+  cd ../project-bugfix && codex
   ```
 
   Each worktree has independent file state but shares git history and remotes. Must
@@ -288,7 +288,7 @@ inter-agent communication.
 ### 4.14 Container-Based Parallel Execution [ALL]
 
 - **Established**: Baseline
-- **Source**: parallel-claudes-c-compiler.md | Tier 1
+- **Source**: parallel-codex-agents-c-compiler.md | Tier 1
 - **Recommendation**: For fully autonomous parallel execution, use Docker containers:
   - Mount repo to `/upstream` in the container
   - Clone locally to `/workspace` for isolated work
@@ -298,7 +298,7 @@ inter-agent communication.
     ```bash
     while true; do
       COMMIT=$(git rev-parse --short=6 HEAD)
-      claude --dangerously-skip-permissions -p "$(cat AGENT_PROMPT.md)" \
+      codex --dangerously-skip-permissions -p "$(cat AGENT_PROMPT.md)" \
              &> "agent_logs/agent_${COMMIT}.log"
     done
     ```
@@ -307,12 +307,12 @@ inter-agent communication.
 - **Anti-pattern**: Running parallel autonomous agents without container isolation. Without
   filesystem isolation, agents can interfere with each other's work.
 
-### 4.15 Dynamic Workflows (Opus 4.8, research preview) [4.8]
+### 4.15 Dynamic Workflows (GPT-5.5, research preview) [Plan-gated]
 
 - **Established**: 2026-05-31
-- **Source**: anthropic.com/news/claude-opus-4-8, code.claude.com/docs/en/changelog
+- **Source**: developers.openai.com/api/docs/guides/reasoning, developers.openai.com/codex
   (v2.1.154) | Tier 1
-- **Recommendation**: Opus 4.8 + Claude Code can plan a task and then run tens-to-hundreds
+- **Recommendation**: GPT-5.5 + Codex can plan a task and then run tens-to-hundreds
   of parallel subagents in the background within a single session, verifying their output
   before reporting. View runs with `/workflows`; a live agent count shows in the status row.
   Available on Enterprise, Team, and Max plans only.
@@ -381,7 +381,7 @@ then merged:
   perspectives or domains at once.
 - **Example**: Comprehensive research -- official sources / media / community /
   background investigated simultaneously, then merged into one report. (The
-  Stakeholder Review Team in 4.8 is a production instance of this.)
+  stakeholder review pattern above is a production instance of this.)
 - **Agent-team vs subagent suitability**: This is the most natural agent-team
   pattern -- it is where the team premium most clearly earns its cost. Teammates
   share findings and challenge each other, and one agent's discovery can redirect

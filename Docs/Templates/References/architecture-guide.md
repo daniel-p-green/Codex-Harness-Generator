@@ -15,15 +15,15 @@ Format:
 ```
 | Pass | File Path | Reference Template | Notes |
 |------|-----------|-------------------|-------|
-| 1 | CLAUDE.md | Core/claude-md.md | ... |
-| 1 | .claude/rules/00-orchestrator.md | Core/orchestrator-rule.md | ... |
+| 1 | AGENTS.md | Core/agents-md.md | ... |
+| 1 | .codex/rules/00-orchestrator.md | Core/orchestrator-rule.md | ... |
 | ... | ... | ... | ... |
 ```
 
 Every file that will be generated must appear in this table, and nothing is generated that is not in it (validator check 16b). This includes every shipped file -- `.gitignore`, and `.mcp.json` whenever an MCP server is recommended -- not only the obvious components.
 
 Pass assignments:
-- Pass 1 (Foundation): CLAUDE.md, all rules, settings.json, .claudeignore, `.gitignore` (must exclude `Docs/_working/`), hooks (including the REQUIRED self-learning trigger hook -- see Hook configuration), and `.mcp.json` when any MCP server is recommended
+- Pass 1 (Foundation): AGENTS.md, all rules, .codex/config.toml, VCS ignore rules, `.gitignore` (must exclude `Docs/_working/`), hooks (including the REQUIRED self-learning trigger hook -- see Hook configuration), and `.mcp.json` when any MCP server is recommended
 - Pass 2 (Agents): All agent definition files
 - Pass 3 (Skills): All skill definitions (SKILL.md + scripts/ + references/)
 - Pass 4 (Infrastructure): Wiki scaffold (Docs/index.md, overview.md, area stubs), working memory scaffold (Docs/_working/state/, sessions/, retro/), self-learning seeds
@@ -99,12 +99,12 @@ before generation begins.
 Lite (solo, simple):
 ```
 project-root/
-├── CLAUDE.md                          # (always loaded)
-├── .claude/
+├── AGENTS.md                          # (always loaded)
+├── .codex/
 │   ├── rules/                         # 3-5 rule files (always loaded)
 │   └── skills/                        # Commands you can use
-├── .claudeignore
-├── settings.json
+├── VCS ignore rules
+├── .codex/config.toml
 └── Docs/
     ├── index.md                       # (always loaded)
     ├── GETTING_STARTED.md
@@ -116,13 +116,13 @@ project-root/
 Standard (small team, medium complexity):
 ```
 project-root/
-├── CLAUDE.md                          # (always loaded)
-├── .claude/
+├── AGENTS.md                          # (always loaded)
+├── .codex/
 │   ├── rules/                         # 5-8 rule files (always loaded)
 │   ├── agents/                        # Specialist assistants
 │   └── skills/                        # Commands you can use
-├── .claudeignore
-├── settings.json
+├── VCS ignore rules
+├── .codex/config.toml
 ├── Docs/
 │   ├── index.md                       # (always loaded)
 │   ├── GETTING_STARTED.md
@@ -138,13 +138,13 @@ project-root/
 Enterprise (large team, complex domain):
 ```
 project-root/
-├── CLAUDE.md                          # (always loaded)
-├── .claude/
+├── AGENTS.md                          # (always loaded)
+├── .codex/
 │   ├── rules/                         # 8-10 rule files (always loaded)
 │   ├── agents/
 │   └── skills/
-├── .claudeignore
-├── settings.json
+├── VCS ignore rules
+├── .codex/config.toml
 ├── Docs/
 │   ├── index.md                       # (always loaded)
 │   ├── GETTING_STARTED.md
@@ -153,7 +153,7 @@ project-root/
 │   │   │   ├── index.md
 │   │   │   └── [topic pages]
 │   ├── Decisions/
-│   ├── Roles/                         # Per-role CLAUDE.local.md templates
+│   ├── Roles/                         # Per-role AGENTS.override.md templates
 │   ├── Environment/
 │   └── _working/                      # (gitignored)
 ```
@@ -201,7 +201,7 @@ After user decisions, the architect records the final choices.
 **Common trade-offs to evaluate** (generate only those relevant to the project):
 - MCP servers vs. built-in tools + CLI
 - Third-party memory plugins vs. markdown wiki + /state-save
-- Vector DB / semantic search vs. Glob/Grep
+- Vector DB / semantic search vs. shell-first code search
 - Pandoc (formatted output) vs. markdown-only output
 - Automated file pipelines (Inbox/Outbox) vs. manual file handling
 - Browser automation MCP vs. manual browser + `gh` CLI
@@ -223,47 +223,46 @@ Read the Token Efficiency Priority section from GENESIS.md (default: balanced if
 not specified). Write a `## Token Optimization` section to ARCHITECTURE.md with:
 
 - **Efficiency tier**: cost-conscious / balanced / quality-first
-- **Model override policy**: Whether all agents default to Sonnet (cost-conscious),
-  standard mixed selection (balanced), or Opus-available (quality-first)
+- **Model override policy**: Whether all agents default to medium-effort GPT-5.5 (cost-conscious),
+  standard mixed selection (balanced), or GPT-5.5-available (quality-first)
 - **Compaction threshold**: 85% (cost-conscious) or 95% default (balanced/quality-first)
-- **.claudeignore aggressiveness**: aggressive (cost-conscious), standard (balanced),
+- **VCS ignore rules aggressiveness**: aggressive (cost-conscious), standard (balanced),
   minimal (quality-first) -- with domain-specific pattern lists
 - **RTK recommendation level**: full setup (cost-conscious), mention (balanced),
   omit (quality-first)
 - **Agent consolidation notes**: For cost-conscious, identify agents whose roles
   overlap and could be merged (e.g., explorer into debugger, reviewer functions
   into planner). For balanced/quality-first, use the standard roster.
-- **CLAUDE.md line target**: 150 (cost-conscious), 200 (balanced), 250 (quality-first)
+- **AGENTS.md line target**: 150 (cost-conscious), 200 (balanced), 250 (quality-first)
 
-This section informs Pass 1 (settings.json, .claudeignore, CLAUDE.md) and Pass 5
+This section informs Pass 1 (.codex/config.toml, VCS ignore rules, AGENTS.md) and Pass 5
 (GETTING_STARTED.md cost monitoring section).
 
-### 5. settings.json Specification
+### 5. .codex/config.toml Specification
 
 Define the complete permissions configuration:
 
-**Allow rules**: Start with the base permissions (Read all, Write/Edit Docs and .claude, WebSearch, WebFetch). Add ecosystem-specific permissions based on GENESIS.md:
-- Language-specific Bash commands (npm, pip, cargo, dotnet, etc.)
-- Build commands
-- Test commands
-- VCS commands (git, p4, etc.)
-- Any CLI tools mentioned in External Services
+**Permission profile**: Start with the base Codex permission profile from
+`ecosystem-permissions.md`. Add ecosystem-specific filesystem and network
+permissions based on GENESIS.md:
+- docs, generated environment files, and approved output folders are writable;
+- secrets, credentials, private keys, and raw immutable data are denied or read-only;
+- network domains are limited to official docs, registries, or selected services.
 
-**Deny rules**: Start with base deny rules (.env, secrets, sudo, rm -rf /). Add domain-specific deny rules:
-- Destructive VCS operations (force push, branch delete)
-- Production database access (if applicable)
-- Any operations the user marked as "never do without asking"
+**Command guidance**: Put build/test/VCS commands in AGENTS.md and GETTING_STARTED.md.
+Require explicit user approval for destructive operations such as force pushes,
+branch deletion, production database mutations, deploys, and package publishing.
 
 **Sandbox configuration**: Recommend auto-allow scope with appropriate boundaries.
 
-**Autocompact**: Only include CLAUDE_CODE_AUTOCOMPACT_PCT_OVERRIDE if the
+**Autocompact**: Only include CODEX_AUTOCOMPACT_PCT_OVERRIDE if the
 project genuinely has very large context needs (many large files read per
 session, complex multi-system codebases). When included, use 85 -- never
 lower. Lower values (like 70) cut sessions too short. For most projects,
 omit the setting entirely and let the default (95) apply.
 
 **Agent Teams** (required in every environment): Always include
-`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "1"` in the env block. The orchestrator
+`CODEX_EXPERIMENTAL_AGENT_TEAMS: "1"` in the env block. The orchestrator
 rule must include a decision matrix for choosing between sequential subagents,
 parallel subagents, and agent teams based on task characteristics.
 
@@ -279,9 +278,10 @@ parallel subagents, and agent teams based on task characteristics.
   (tests/lint after edits), PreToolUse protection (binary/PII gates), Stop self-review
   (software/game dev). Do not over-hook.
 
-**Fast mode configuration** (when cost-conscious or balanced tier):
-- `"fastModePerSessionOptIn": true` -- requires per-session opt-in, prevents persistent
-  cost increases. Required for cost-conscious tier; recommended for balanced tier.
+**Service tier configuration** (when cost-conscious or balanced tier):
+- Document Codex `service_tier` trade-offs in GETTING_STARTED.md when relevant.
+- Do not force premium or latency-focused tiers in shared `.codex/config.toml`
+  without an explicit user preference.
 
 **MCP Tool Search** (when 3+ MCP servers):
 - `ENABLE_TOOL_SEARCH` in env block with recommended threshold (e.g., `"auto:5"`)
@@ -321,21 +321,21 @@ Define domain-specific compaction preservation hints: what must survive compacti
 
 List every agent to generate, with:
 - name (kebab-case)
-- model (opus / sonnet / haiku) with reasoning
+- model (`gpt-5.5`) and reasoning effort with reasoning
 - tools list
-- disallowedTools list (if any)
-- maxTurns
+- sandbox_mode list (if any)
+- reasoning effort
 - 1-2 sentence description of when the orchestrator should delegate to it
 - Key responsibilities (3-5 bullets)
 
-Model selection policy -- default to Opus for maximum quality:
-- Opus (default): All agents unless there is a specific reason to deviate.
+Model selection policy -- default to GPT-5.5 for maximum quality:
+- GPT-5.5 (default): All agents unless there is a specific reason to deviate.
   This includes: planning, implementation, review, debugging, analysis,
   research, and any task involving code or reasoning.
-- Haiku (rare exception): Only when ALL of these are true: (1) the task is
+- low-effort GPT-5.5 (rare exception): Only when ALL of these are true: (1) the task is
   a simple lookup or file search with no reasoning required, (2) quality
-  difference vs Opus is negligible, (3) speed is the primary concern.
-- Sonnet: Avoid. Use Opus instead for better quality.
+  difference vs GPT-5.5 is negligible, (3) speed is the primary concern.
+- medium-effort GPT-5.5: Avoid. Use GPT-5.5 instead for better quality.
 
 Do not over-generate agents. Each agent must serve a distinct, identifiable need from GENESIS.md. If the user's workflow can be served by 2-3 agents, do not generate 6.
 
@@ -345,7 +345,7 @@ List every skill to generate, with:
 - name (kebab-case)
 - description (following the pattern: [What it does]. [When/triggers with 3+ phrases]. [Negative triggers if ambiguity risk].)
 - context: fork
-- allowed-tools list
+- tool access policy list
 - Whether it needs scripts/ or references/ subdirectories
 - Key capabilities (3-5 bullets)
 
@@ -374,15 +374,15 @@ For each verified MCP server recommended:
 If no external services were mentioned or none match verified servers, write
 "No MCP servers recommended."
 
-### 10b. Recommended Plugins (Anthropic Official Skills)
+### 10b. Recommended Plugins (OpenAI Official Skills)
 
 **Complexity decision required**: Each recommended plugin must have a
 corresponding entry in the Environment Complexity decision table. Plugins are
 optional installs, so frame as "available if you want it" not "required."
 
 Canonical source: `Docs/Templates/References/tool-registry.md` (categories AP, BA, SD).
-Match GENESIS.md signals to official Anthropic plugin collections from
-`github.com/anthropics/skills`. These are installed via the marketplace
+Match GENESIS.md signals to official OpenAI plugin collections from
+`developers.openai.com/codex/concepts/customization`. These are installed via the marketplace
 system, not statically copied. Recommend only plugins with clear signal match.
 
 Matching rules:
@@ -391,11 +391,11 @@ Matching rules:
 - Building MCP servers -> `example-skills`
 - Brand/design guidelines -> `example-skills`
 - Internal communications -> `example-skills`
-- Claude API/SDK development -> `claude-api`
+- OpenAI API/SDK development -> `openai-api`
 - User wants to create custom skills -> `example-skills` (skill-creator)
 - Complex codebase, 50k+ lines -> mention `/batch` bundled skill (no install needed)
 - Frontend/web dev, testing, web scraping -> Playwright CLI (`npm i -g @playwright/cli`)
-- Authenticated browser workflows (logged-in sites) -> Claude in Chrome
+- Authenticated browser workflows (logged-in sites) -> Codex browser/app workflows
 - Performance profiling, Core Web Vitals -> Chrome DevTools MCP
 - Browser automation without shell access -> Playwright MCP (fallback only)
 
@@ -408,7 +408,7 @@ For each recommended plugin, write:
 If no signals match, write "No official plugins recommended." Do NOT
 recommend plugins speculatively. The user can always install them later.
 
-Bundled skills (/code-review, /batch, /debug, /claude-api) do not need
+Bundled skills (/code-review, /batch, /debug, /openai-api) do not need
 installation. Mention relevant ones in the architecture for inclusion
 in GETTING_STARTED.md.
 
@@ -424,11 +424,11 @@ recommend a third-party memory plugin as an optional enhancement. Signals:
 - Multi-session projects where the user reports context loss between sessions
 - Large codebases (1000+ files) with complex architectural decisions
 - Teams sharing context across developers
-- User explicitly mentions "Claude keeps forgetting" or similar frustration
+- User explicitly mentions "Codex keeps forgetting" or similar frustration
 
 Matching rules (recommend ONE, not multiple):
 - Node.js or non-coding project, wants visual UI -> Synabun
-- Heavy coding, long sessions, context limit issues -> claude-mem
+- Heavy coding, long sessions, context limit issues -> codex memories
 - Python project or multi-agent pipeline -> mcp-memory-service
 
 Write in the Recommended Plugins section:
@@ -440,7 +440,7 @@ Write in the Recommended Plugins section:
 If no memory plugin signals are present, omit entirely. The generated
 environment's /state-save and markdown wiki are sufficient for most projects.
 
-### 11. .claudeignore Patterns
+### 11. VCS ignore rules Patterns
 
 List file patterns to ignore, based on the project's ecosystem:
 - Build artifacts
@@ -469,13 +469,13 @@ Generate:
   - Handling rules per category (what can be stored in memory, what must be anonymized, what must never appear in logs)
   - Memory isolation requirements (per-client, per-case, per-student folders if applicable)
   - Compaction hints: warn that sensitive data may be in context; preserve anonymization decisions
-- Add deny patterns to settings.json for writing sensitive data to shared/public locations
-- Add a constraint to CLAUDE.md: "Never include [data type] in memory files. Use identifiers only."
+- Add deny patterns to .codex/config.toml for writing sensitive data to shared/public locations
+- Add a constraint to AGENTS.md: "Never include [data type] in memory files. Use identifiers only."
 - Add a routing entry: "Handle sensitive data question" -> answer directly with data classification guidance
 - **If GENESIS.md Sensitive Data Handling section specifies "deterministic hooks" enforcement**:
-  - Add PreToolUse PII content gate hook to settings.json hooks section
-  - Add `.claude/hooks/pii-scan.sh` (or `.ps1` on Windows) to component manifest (Pass 1)
-  - Add `.claude/hooks/pii-patterns.conf` with domain-specific regex patterns to component manifest (Pass 1)
+  - Add PreToolUse PII content gate hook to .codex/config.toml hooks section
+  - Add `.codex/hooks/pii-scan.sh` (or `.ps1` on Windows) to component manifest (Pass 1)
+  - Add `.codex/hooks/pii-patterns.conf` with domain-specific regex patterns to component manifest (Pass 1)
   - Optionally add UserPromptSubmit input screening hook
   - Add PostToolUse audit trail hook if regulatory compliance requires action logging
   - Document hook setup and pattern customization in GETTING_STARTED.md requirements
@@ -513,8 +513,8 @@ Generate:
 Trigger: GENESIS.md mentions working with images, videos, audio, design files (PSD, AI, Figma), or any non-text files that the assistant should not edit. This is SEPARATE from the Game Dev profile's binary protection -- it applies to any domain with binary files.
 
 Generate:
-- .claudeignore patterns for the specific binary file types mentioned
-- A PreToolUse hook blocking Write/Edit on the relevant binary extensions (same pattern as the game development profile but with domain-appropriate extensions)
+- VCS ignore rules patterns for the specific binary file types mentioned
+- A pre-edit hook blocking direct writes to the relevant binary extensions (same pattern as the game development profile but with domain-appropriate extensions)
 - A routing entry: "Change/edit [binary file type]" -> answer directly with step-by-step instructions for the appropriate tool (Figma, Photoshop, video editor, etc.)
 - A rule in the autonomy file: "Do not edit [file types]. If a change requires editing these files, describe the exact steps in the appropriate application and stop for the user."
 
@@ -534,9 +534,9 @@ Trigger: GENESIS.md indicates the user works with non-text files (office documen
 
 **INBOUND (always the same -- no decision needed):**
 - MarkItDown (`pip install 'markitdown[all]'`) is ALWAYS the inbound converter
-- Converts office docs, PDFs, spreadsheets, presentations -> Markdown for Claude to process
+- Converts office docs, PDFs, spreadsheets, presentations -> Markdown for Codex to process
 - Also available as MCP server (markitdown-mcp) for seamless integration
-- If MCP server variant is used, add to settings.json MCP config
+- If MCP server variant is used, add to .codex/config.toml MCP config
 
 **OUTBOUND (decision tree -- architect follows top to bottom, first match wins):**
 
@@ -573,8 +573,8 @@ When the user does BOTH quick analysis AND formatted deliverables, include:
 
 **SCAFFOLDED DIRECTORIES:**
 When file processing is active, add to the environment's directory structure:
-- `Inbox/` -- User drops files here for Claude to process
-- `Outbox/` -- Claude places converted/generated files here for user
+- `Inbox/` -- User drops files here for Codex to process
+- `Outbox/` -- Codex places converted/generated files here for user
 - `Data/` -- Working data files (intermediate processing, reference data)
 
 Include a routing rule or skill that watches `Inbox/` and auto-processes new files.
@@ -583,9 +583,9 @@ Generate:
 - An `Inbox/README.md` explaining: drop files here for processing, supported formats, what happens automatically
 - An `Outbox/README.md` explaining: find generated output here, naming conventions, cleanup policy
 - A routing entry for file processing requests that selects the correct mode (analysis vs. deliverable)
-- Tool permissions in settings.json matching ONLY the selected tools (do not grant Python permissions if only PowerShell tools are used)
+- Tool permissions in .codex/config.toml matching ONLY the selected tools (do not grant Python permissions if only PowerShell tools are used)
 - If Pandoc is recommended: setup instructions in GETTING_STARTED.md (download link, PATH config, verification command)
-- If markitdown-mcp is used: MCP server config block in settings.json
+- If markitdown-mcp is used: MCP server config block in .codex/config.toml
 - Reference `Docs/Templates/References/tool-catalog.md` for detailed tool specifications
 
 **BRAND GUIDANCE SUB-PATTERN (within Pattern E):**
@@ -659,7 +659,7 @@ Trigger: Game-development profile (always include). For software-development pro
 - Software-development profile with medium or large codebase indication
 
 Generate:
-- A `/map-codebase` skill that scans the source tree, extracts declarations, classifies them into areas, and updates area pages. Uses Glob/Grep/Read only (no Bash) because classification requires LLM reasoning about inheritance, naming, and domain semantics.
+- A `/map-codebase` skill that scans the source tree, extracts declarations, classifies them into areas, and updates area pages. Use `rg --files`, `rg`, and targeted file reads; avoid build or mutation commands because classification requires reasoning about inheritance, naming, and domain semantics.
 - A routing entry: "Map codebase / scan source files / update area maps" -> /map-codebase skill, fallback: explorer agent
 - A mapping preflight note in the orchestrator rule: before debug, feature, refactor, or performance tasks, check if relevant area maps exist and are fresh; suggest running /map-codebase if area pages contain placeholder content or are stale (>30 days old)
 - Reference template: `Docs/Templates/Skills/map-codebase.md`
@@ -681,7 +681,7 @@ Generate:
 - Error handling: if step N fails, report what completed and what's needed
 - A routing entry for the workflow trigger phrases
 
-Also generate: Bash permissions for each CLI tool in settings.json.
+Also generate: Bash permissions for each CLI tool in .codex/config.toml.
 
 Do NOT generate separate skills for each tool step (violates 3.6 composability
 intent). The pipeline is one skill with internal sequential steps.
@@ -695,7 +695,7 @@ Trigger: GENESIS.md mentions Obsidian, Logseq, Notion local, or "personal
 knowledge base" with a vault/workspace path.
 
 Generate:
-- Vault path in settings.json allowed paths (Read + Write permissions)
+- Vault path in .codex/config.toml allowed paths (Read + Write permissions)
 - A `pkm-conventions.md` rule file documenting the user's folder structure,
   tag conventions, and frontmatter format
 - A `/capture-knowledge` skill that formats findings as PKM-compatible markdown
@@ -715,23 +715,23 @@ is about confirming the setup cost is acceptable, not whether the tool is wanted
 Trigger: GENESIS.md "AI Ecosystem Extensions" section lists capability gaps
 and chosen tools (image generation, video generation, local inference, audio,
 etc.). This section is populated during intake when the Harness Generator identifies
-capabilities Claude can't do natively.
+capabilities Codex can't do natively.
 
 For each chosen tool, generate based on its integration type:
 
-**MCP integration** (ComfyUI, ModelsLab, OllamaClaude, obsidian-mcp):
-- Add MCP server config to .mcp.json (or settings.json mcpServers)
-- Add fully qualified tool permissions to settings.json
+**MCP integration** (ComfyUI, ModelsLab, OllamaCodex, obsidian-mcp):
+- Add MCP server config to .mcp.json (or .codex/config.toml mcpServers)
+- Add verified MCP/server configuration or documented command guidance
 - Add routing entries for the capability ("generate an image" -> use ComfyUI tools)
 
 **CLI wrapping** (Ollama CLI, Bark, Coqui, ffmpeg):
 - Generate a wrapper skill (using Pattern G pipeline structure if multi-step)
-- Add `Bash(<tool> *)` permission to settings.json
+- Document the safe CLI commands and keep destructive operations behind approval
 - Add routing entry and install verification step in the skill
 
 **API integration** (DALL-E, ElevenLabs, Nano Banana, Kling, Runway):
 - Generate an API skill that makes HTTP calls via Bash (curl)
-- API keys in settings.local.json (NEVER settings.json)
+- API keys in local config profile (NEVER .codex/config.toml)
 - Add routing entry for the capability
 - Include rate limiting and error handling in the skill
 
@@ -762,7 +762,7 @@ Generate:
   subject identifiers/scores/decision-reasons from retro/state/PreCompact (opaque
   per-case label), BUT retain the structured decision rationale in the per-case dir
   as the defensible record (retention per jurisdiction).
-- A Safeguards section in the profile/CLAUDE.md naming the governing law, plus a
+- A Safeguards section in the profile/AGENTS.md naming the governing law, plus a
   disclaimer ("draft for human review -- not legal advice; verify compliance + any
   required bias audit / subject notice with counsel") on every decision deliverable.
 - Optional deterministic PreToolUse gate: block writes to a decision/adverse-action
@@ -783,7 +783,7 @@ Generate:
 - `sensitive-data-rule.md` REQUIRED (discovered secrets/PII/evidence are Restricted;
   redact when summarizing scanner output; keep secrets/PoC out of retro/state/PreCompact).
 - Optional deterministic PreToolUse gates: (a) authorization gate -- network-touching
-  scanners gated to an authorized-host allow-list (settings.local.json); (b)
+  scanners gated to an authorized-host allow-list (local config profile); (b)
   finding-integrity gate -- a reported CVE token must trace to a scanner run or
   retrieval. Deterministic by default for live/network targets; advisory for local
   source-only audits.
@@ -798,15 +798,15 @@ one full architecture per work area.
 
 The parent layer contains only what every area shares:
 
-- Parent CLAUDE.md (thin orchestrator, 80 lines max; lists work areas with
-  one-line descriptions; Claude Code discovers child CLAUDE.md files by
+- Parent AGENTS.md (thin orchestrator, 80 lines max; lists work areas with
+  one-line descriptions; Codex discovers child AGENTS.md files by
   walking the tree)
 - Shared rules: vocabulary, autonomy, cross-area routing
 - Shared skills and agents: only components used unchanged by every area
   (e.g., a /state-save skill identical across areas; a reviewer agent that
   works for any area's code)
-- Shared MCP servers declared once in parent settings.json
-- Shared permissions and PreCompact hook in parent settings.json
+- Shared MCP servers declared once in parent .codex/config.toml
+- Shared permissions and PreCompact hook in parent .codex/config.toml
 - Work-area registry: list of `<area-slug>` values with one-line descriptions
 
 ### What lives per area (each per-area ARCHITECTURE.md)
@@ -829,7 +829,7 @@ section listing any parent components the area supersedes. Format:
 
 When a per-area component overrides a parent component, the generated file
 includes `overrides: <parent-component-name>` in its frontmatter. At runtime,
-Claude Code's hierarchical loading means the child naturally wins for its own
+Codex's hierarchical loading means the child naturally wins for its own
 scope; the override declaration makes the supersession explicit for the
 validator.
 
@@ -842,15 +842,15 @@ Hub mode tightens budgets because files stack:
 
 | Budget | Limit | Note |
 |---|---|---|
-| Parent CLAUDE.md | 80 lines | Thin orchestrator, registry, shared routing |
-| Per-area CLAUDE.md | 170 lines | Full area instructions |
-| Cumulative CLAUDE.md (parent + any one child) | 250 lines | Hard limit |
+| Parent AGENTS.md | 80 lines | Thin orchestrator, registry, shared routing |
+| Per-area AGENTS.md | 170 lines | Full area instructions |
+| Cumulative AGENTS.md (parent + any one child) | 250 lines | Hard limit |
 | Parent rule files | 120 lines each | Same as single mode |
 | Per-area rule files | 120 lines each | Same as single mode |
 
 The architect must verify cumulative budgets before writing. If the user's
 shared basics would push the parent beyond 80 lines, the architect promotes
-the parent into a "fat hub" mode: parent CLAUDE.md stays under 80 but shared
+the parent into a "fat hub" mode: parent AGENTS.md stays under 80 but shared
 rules absorb the overflow (they are loaded only when referenced).
 
 ### Hub generation manifest
@@ -866,8 +866,8 @@ The generator runs in this order:
 
 For the shell pass, the component-generator reads:
 
-- `Docs/Templates/Core/parent-claude-md.md` for the thin parent orchestrator
-- `Docs/Templates/Core/settings-json.md` for parent settings (shared subset only)
+- `Docs/Templates/Core/parent-agents-md.md` for the thin parent orchestrator
+- `Docs/Templates/Core/codex-config-toml.md` for parent settings (shared subset only)
 - Shared rule templates from `Docs/Templates/Core/` (autonomy-rule, etc.)
   only for rules designated shared in HUB_ARCHITECTURE.md
 
@@ -884,11 +884,11 @@ Run these in addition to the single-mode gates:
   `<target>/<area-slug>/Docs/Environment/ARCHITECTURE.md` file written
 - No component name collides across parent + areas unless declared in
   `## Parent Overrides`
-- Cumulative CLAUDE.md budget: parent + longest child < 250 lines
+- Cumulative AGENTS.md budget: parent + longest child < 250 lines
 - Cross-area references in any per-area routing table resolve through the
   parent routing table, not direct sibling file paths (areas must not know
   about each other's internal file structure)
-- Parent settings.json permissions are a subset of the union of permissions
+- Parent .codex/config.toml permissions are a subset of the union of permissions
   each area would need (no parent-only permissions that no area uses)
 
 ### HUB_ARCHITECTURE.md output format
@@ -919,10 +919,10 @@ Work areas: <count>
 [Only components identical for every area]
 
 ## Shared Settings
-[Parent settings.json: shared permissions, MCP servers, PreCompact hook]
+[Parent .codex/config.toml: shared permissions, MCP servers, PreCompact hook]
 
 ## Cumulative Budget Check
-[Parent CLAUDE.md projected lines; each area's CLAUDE.md projected lines;
+[Parent AGENTS.md projected lines; each area's AGENTS.md projected lines;
  cumulative for each area; any budget flags]
 ```
 
@@ -971,10 +971,10 @@ Target: <target_path>
 [Recommendations or "none"]
 
 ## Recommended Plugins
-[Matching official plugins from anthropics/skills or "none"]
+[Matching official plugins from openai/skills or "none"]
 
 ## Ignore Patterns
-[.claudeignore content]
+[VCS ignore rules content]
 
 ## Output Styles
 [Style specs or "default"]
@@ -989,8 +989,8 @@ User inclination: [lean simple / no preference / lean full-featured]
 Status: PENDING USER CONFIRMATION
 
 ## Token Optimization
-[Efficiency tier, model override policy, compaction threshold, .claudeignore
-aggressiveness, RTK recommendation level, agent consolidation notes, CLAUDE.md
+[Efficiency tier, model override policy, compaction threshold, VCS ignore rules
+aggressiveness, RTK recommendation level, agent consolidation notes, AGENTS.md
 line target]
 
 ## Special Patterns
@@ -1014,9 +1014,9 @@ Before writing the final ARCHITECTURE.md, verify:
 3. Each routing entry has a fallback chain.
 4. All 6 state taxonomy categories are addressed (even if "N/A").
 5. The agent roster does not exceed what GENESIS.md justifies.
-6. Every agent has model, tools, disallowedTools, and maxTurns specified.
+6. Every agent has model, tools, sandbox_mode, and reasoning effort specified.
 7. Every skill description has 3+ trigger phrases.
-8. settings.json deny rules cover all operations the user marked as requiring approval.
+8. .codex/config.toml deny rules cover all operations the user marked as requiring approval.
 9. The memory tier matches the stated team size and complexity.
 10. Seed entries are domain-specific (not generic "context exhaustion").
 11. If GENESIS.md mentions sensitive data, Pattern A components are in the manifest.

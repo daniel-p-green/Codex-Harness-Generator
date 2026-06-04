@@ -25,12 +25,12 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| revenue-modeler | opus | Revenue streams, pricing, TAM/SAM/SOM, growth curves, unit economics; distinguish bookings/billings from RECOGNIZED revenue | analyst.md |
-| cost-analyst | sonnet | Fixed/variable classification, COGS/OpEx/CapEx, break-even (= fixed / unit contribution margin), margins | analyst.md |
-| scenario-planner | opus | Bear/Base/Bull (internally consistent -- Bull revenue implies Bull-level cost/CAC), sensitivity (tornado/2-way), probability-weighting (default 20/60/20) | performance-analyst.md |
-| valuation-expert | opus | DCF/WACC (CAPM w/ size premium; unlever/relever beta; EV->equity bridge), multiples, IRR/MOIC; present a RANGE | analyst.md (valuation-judgment variant: opus, no data-cleaning framing) |
-| model-reviewer | opus | Cross-validate formulas, three-statement articulation, units/currency, recognition, false precision (read-only QA) | reviewer.md (model-integrity variant -- see Disclaimer & integrity) |
-| summary-drafter | sonnet | Edit the model into an investor/executive summary; attach the forward-looking notice | drafter.md |
+| revenue-modeler | high-effort | Revenue streams, pricing, TAM/SAM/SOM, growth curves, unit economics; distinguish bookings/billings from RECOGNIZED revenue | analyst.md |
+| cost-analyst | medium-effort | Fixed/variable classification, COGS/OpEx/CapEx, break-even (= fixed / unit contribution margin), margins | analyst.md |
+| scenario-planner | high-effort | Bear/Base/Bull (internally consistent -- Bull revenue implies Bull-level cost/CAC), sensitivity (tornado/2-way), probability-weighting (default 20/60/20) | performance-analyst.md |
+| valuation-expert | high-effort | DCF/WACC (CAPM w/ size premium; unlever/relever beta; EV->equity bridge), multiples, IRR/MOIC; present a RANGE | analyst.md (valuation-judgment variant: high reasoning effort, no data-cleaning framing) |
+| model-reviewer | high-effort | Cross-validate formulas, three-statement articulation, units/currency, recognition, false precision (read-only QA) | reviewer.md (model-integrity variant -- see Disclaimer & integrity) |
+| summary-drafter | medium-effort | Edit the model into an investor/executive summary; attach the forward-looking notice | drafter.md |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy, context-management, self-learning, error-handling (with diagnostic
@@ -140,7 +140,7 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 
 - **PreCompact auto-save** (recommended) -- preserve in-flight assumptions and
   `_workspace/` state across compaction.
-- **PreToolUse disclaimer gate** (domain-unique) -- on Write/Edit to a summary/deck
+- **PreToolUse disclaimer gate** (domain-unique) -- on scoped writes to a summary/deck
   or client-facing path, confirm the forward-looking/not-advice notice; advisory by
   default, deterministic for fundraising/M&A output.
 - **Stop hook self-review** (optional) -- "do the totals tie out, does the BS
@@ -148,13 +148,13 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 
 ## Cost / Model Notes
 
-Opus for reasoning-heavy roles (revenue-modeler, scenario-planner,
-valuation-expert, model-reviewer); Sonnet for established-pattern roles
-(cost-analyst, summary-drafter). Balanced default (compaction 95%, CLAUDE.md ~200).
-Cost-conscious: cost-analyst + revenue-modeler drop to Sonnet, keep
-valuation-expert + model-reviewer on Opus (valuation judgment and QA are where
+GPT-5.5 for reasoning-heavy roles (revenue-modeler, scenario-planner,
+valuation-expert, model-reviewer); medium-effort GPT-5.5 for established-pattern roles
+(cost-analyst, summary-drafter). Balanced default (compaction 95%, AGENTS.md ~200).
+Cost-conscious: cost-analyst + revenue-modeler drop to medium-effort GPT-5.5, keep
+valuation-expert + model-reviewer on GPT-5.5 (valuation judgment and QA are where
 errors are most expensive), compaction 85%, full RTK. Quality-first: all reasoning
-roles on Opus, widen sensitivity/comparable scope.
+roles on GPT-5.5, widen sensitivity/comparable scope.
 
 ## Customization Points
 

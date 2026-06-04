@@ -25,21 +25,21 @@ health-check/
 <!-- ANNOTATION: The scripts/ directory is critical for this skill.
      Deterministic validation via scripts is more reliable than LLM-based
      file existence checking. "Code is deterministic; language
-     interpretation isn't" (Anthropic skills guide). -->
+     interpretation isn't" (OpenAI skills guide). -->
 
-## Example: Health Check Skill (`.claude/skills/health-check/SKILL.md`)
+## Example: Health Check Skill (`.agents/skills/health-check/SKILL.md`)
 
 ````markdown
 ---
 name: health-check
 description: >
-  Check the health and integrity of this Claude Code environment. Use when
+  Check the health and integrity of this Codex environment. Use when
   the user says "health check", "check environment", "validate setup",
   "is everything working", or "/health-check". Also useful after updates
   or when something seems broken. Do NOT use for checking application
   code health -- this checks the AI environment only.
 context: fork
-allowed-tools:
+tool access policy:
   - Read
   - Glob
   - Grep
@@ -63,26 +63,26 @@ This health check runs in two phases:
 
 Run the validation script:
 ```bash
-bash .claude/skills/health-check/scripts/validate.sh
+bash .agents/skills/health-check/scripts/validate.sh
 ```
 
 <!-- VARIATION: For Windows-primary projects, use validate.py instead
      of validate.sh. Python scripts are more portable. -->
 
 The script checks:
-- All files referenced in CLAUDE.md exist
-- settings.json is valid JSON
+- All files referenced in AGENTS.md exist
+- .codex/config.toml is valid TOML
 - Skill folders use kebab-case naming
 - Each skill directory contains SKILL.md
-- Agent files have required frontmatter fields (name, description, maxTurns)
+- Agent TOML files have required fields (name, description, developer_instructions, model, model_reasoning_effort, sandbox_mode)
 - Wiki index.md (Docs/index.md) exists
 
 Script outputs JSON:
 ```json
 {
   "checks": [
-    {"name": "claude-md-refs", "status": "PASS", "details": ""},
-    {"name": "settings-json", "status": "FAIL", "details": "Invalid JSON at line 15"}
+    {"name": "agents-md-refs", "status": "PASS", "details": ""},
+    {"name": "codex-config-toml", "status": "FAIL", "details": "Invalid TOML at line 15"}
   ],
   "summary": {"pass": 5, "warn": 1, "fail": 1}
 }
@@ -123,8 +123,8 @@ Date: YYYY-MM-DD
 ### Structural Checks (Script)
 | Check | Status | Details |
 |-------|--------|---------|
-| CLAUDE.md references | PASS/WARN/FAIL | ... |
-| settings.json valid | PASS/WARN/FAIL | ... |
+| AGENTS.md references | PASS/WARN/FAIL | ... |
+| .codex/config.toml valid | PASS/WARN/FAIL | ... |
 | Skill folder naming | PASS/WARN/FAIL | ... |
 | Agent frontmatter | PASS/WARN/FAIL | ... |
 | Wiki index exists | PASS/WARN/FAIL | ... |
@@ -160,7 +160,7 @@ For each WARN or FAIL, include a one-line recommendation for how to fix it.
 
 ```bash
 #!/bin/bash
-# Structural validation for Claude Code environment
+# Structural validation for Codex environment
 # Outputs JSON with check results
 
 PASS=0
@@ -179,26 +179,26 @@ add_check() {
     esac
 }
 
-# Check 1: CLAUDE.md exists
-if [ -f "CLAUDE.md" ]; then
-    add_check "claude-md-exists" "PASS" ""
+# Check 1: AGENTS.md exists
+if [ -f "AGENTS.md" ]; then
+    add_check "agents-md-exists" "PASS" ""
 else
-    add_check "claude-md-exists" "FAIL" "CLAUDE.md not found in project root"
+    add_check "agents-md-exists" "FAIL" "AGENTS.md not found in project root"
 fi
 
-# Check 2: settings.json is valid JSON
-if [ -f ".claude/settings.json" ]; then
-    if python3 -c "import json; json.load(open('.claude/settings.json'))" 2>/dev/null; then
-        add_check "settings-json-valid" "PASS" ""
+# Check 2: .codex/config.toml is valid TOML
+if [ -f ".codex/config.toml" ]; then
+    if python3 -c "import tomllib; tomllib.load(open('.codex/config.toml','rb'))" 2>/dev/null; then
+        add_check "codex-config-toml-valid" "PASS" ""
     else
-        add_check "settings-json-valid" "FAIL" "settings.json contains invalid JSON"
+        add_check "codex-config-toml-valid" "FAIL" ".codex/config.toml contains invalid TOML"
     fi
 else
-    add_check "settings-json-valid" "WARN" "No .claude/settings.json found"
+    add_check "codex-config-toml-valid" "WARN" "No .codex/config.toml found"
 fi
 
 # Check 3: Skill folders use kebab-case
-for dir in .claude/skills/*/; do
+for dir in .agents/skills/*/; do
     if [ -d "$dir" ]; then
         dirname=$(basename "$dir")
         if echo "$dirname" | grep -qE '^[a-z][a-z0-9-]*$'; then
@@ -210,7 +210,7 @@ for dir in .claude/skills/*/; do
 done
 
 # Check 4: Each skill has SKILL.md
-for dir in .claude/skills/*/; do
+for dir in .agents/skills/*/; do
     if [ -d "$dir" ]; then
         dirname=$(basename "$dir")
         if [ -f "${dir}SKILL.md" ]; then
@@ -255,4 +255,4 @@ echo "{\"checks\":$CHECKS,\"summary\":{\"pass\":$PASS,\"warn\":$WARN,\"fail\":$F
 <!-- ANTI-PATTERN: Do not make the health check modify files. It is
      a diagnostic tool that reports issues. Fixing issues is a separate
      operation (either manual or via /update). Write is NOT in
-     allowed-tools for this reason. -->
+     tool access policy for this reason. -->

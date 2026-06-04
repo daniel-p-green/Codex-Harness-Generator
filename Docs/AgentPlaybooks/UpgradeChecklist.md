@@ -29,11 +29,11 @@ If a check passes (no gap found), record it in the Deferred section of the repor
 
 ## Part 1 -- Foundation Audit (7 checks)
 
-### F1: CLAUDE.md Line Count
+### F1: AGENTS.md Line Count
 
-Single environments: Read CLAUDE.md and count lines.
+Single environments: Read AGENTS.md and count lines.
 
-Hub environments: count parent CLAUDE.md AND the longest per-area CLAUDE.md. The cumulative (parent + longest-child) is the number that matters, because both are loaded when working inside that area.
+Hub environments: count parent AGENTS.md AND the longest per-area AGENTS.md. The cumulative (parent + longest-child) is the number that matters, because both are loaded when working inside that area.
 
 | Condition | Recommendation |
 |---|---|
@@ -47,7 +47,7 @@ Reference: Topics/01-rules.md, Generation Standards item 1, architecture-guide.m
 
 ### F2: Intent-Behind-Rules Coverage
 
-Read CLAUDE.md and all rule files. For each constraint or instruction:
+Read AGENTS.md and all rule files. For each constraint or instruction:
 - Does it explain WHY, not just WHAT?
 - Bad: "Never modify files outside the project directory."
 - Good: "Never modify files outside the project directory -- changes outside the project are irreversible and may affect other work."
@@ -61,7 +61,7 @@ Sample at least 10 constraints across all files. Calculate the percentage that i
 | >= 80% with WHY | PASS |
 
 Effort: Quick Win (add parenthetical reasons to existing rules)
-Reference: Topics/13-opus-specifics.md, Generation Standards Prompt Engineering
+Reference: Topics/13-gpt-5-5-specifics.md, Generation Standards Prompt Engineering
 
 ### F3: Role-Setting Prompt Scan
 
@@ -84,29 +84,28 @@ Acceptable patterns (not role-setting):
 | None found | PASS |
 
 Effort: Quick Win (reword affected lines)
-Reference: Topics/13-opus-specifics.md, Generation Standards Prompt Engineering
+Reference: Topics/13-gpt-5-5-specifics.md, Generation Standards Prompt Engineering
 
 ### F4: Overemphasis Scan
 
-Count occurrences of high-emphasis words across all rule files and CLAUDE.md:
+Count occurrences of high-emphasis words across all rule files and AGENTS.md:
 CRITICAL, MUST, ALWAYS, NEVER, IMPORTANT, REQUIRED, MANDATORY, ESSENTIAL
 
 Exclude occurrences inside code blocks and file headers.
 
 | Condition | Recommendation |
 |---|---|
-| > 15 total | Reduce emphasis; Opus 4.6/4.7 follow moderate instructions reliably |
+| > 15 total | Reduce emphasis; GPT-5.5 follows moderate, intent-rich instructions reliably |
 | 10-15 total | Review each usage -- keep only where truly critical |
 | < 10 total | PASS |
 
 Effort: Quick Win (tone down individual words)
-Reference: Topics/13-opus-specifics.md (Opus does not need aggressive emphasis;
-4.7 in particular interprets instructions literally and may overcomply with
-CAPS emphasis)
+Reference: Topics/13-gpt-5-5-specifics.md (GPT-5.5 does not need aggressive emphasis;
+CAPS emphasis often causes narrower or more brittle compliance)
 
-### F5: settings.json Deny Rule Coverage
+### F5: .codex/config.toml Deny Rule Coverage
 
-Read settings.json. Check that deny rules cover:
+Read .codex/config.toml. Check that deny rules cover:
 - Destructive bash commands: rm -rf, sudo, format, del /f
 - Sensitive file reads: .env, credentials, secrets, private keys
 - Force push: git push --force, git push -f
@@ -123,7 +122,7 @@ Reference: Topics/11-permissions.md, Generation Standards item 6
 
 ### F6: Agent Teams Enablement
 
-Check settings.json for `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "1"` in the env block. Check the orchestrator rule for an execution mode decision matrix (sequential / parallel / teams).
+Check .codex/config.toml for `CODEX_EXPERIMENTAL_AGENT_TEAMS: "1"` in the env block. Check the orchestrator rule for an execution mode decision matrix (sequential / parallel / teams).
 
 | Condition | Recommendation |
 |---|---|
@@ -138,7 +137,7 @@ Reference: Topics/04-teams.md, Generation Standards Execution Mode
 
 ### F7: Autocompact Configuration
 
-Check settings.json or CLAUDE.md for autocompact threshold configuration.
+Check .codex/config.toml or AGENTS.md for autocompact threshold configuration.
 
 | Condition | Recommendation |
 |---|---|
@@ -146,71 +145,73 @@ Check settings.json or CLAUDE.md for autocompact threshold configuration.
 | Threshold < 80% | Warn: low threshold wastes context |
 | Threshold >= 80% | PASS |
 
-Effort: Quick Win (add to settings.json or CLAUDE.md)
+Effort: Quick Win (add to .codex/config.toml or AGENTS.md)
 Reference: Topics/05-memory.md
 
 ---
 
 ## Part 2 -- Agent and Skill Audit (6 checks)
 
-### A1: Model Selection Review
+### A1: Model and Effort Selection Review
 
-Read all agent files. Check the `model` field in frontmatter.
+Read all Codex subagent TOML files. Check `model` and `model_reasoning_effort`.
 
 | Pattern | Recommendation |
 |---|---|
-| All agents use opus | Recommend Sonnet for implementer/explorer agents (5x cost savings) |
-| No model specified on any agent | Add explicit model selection with rationale |
-| Mix of opus/sonnet appropriate to role | PASS |
+| All agents use high reasoning effort | Use `medium` for bounded implementation/validation agents and `high` for architecture/review agents |
+| No model specified on any agent | Add explicit `model = "gpt-5.5"` with rationale |
+| Mix of high/medium reasoning effort appropriate to role | PASS |
 
-Opus is for: orchestrator, planner, complex debugger, reviewer. (Opus 4.7 current)
-Sonnet is for: implementer, validator, explorer, formatter.
-Pairing Sonnet implementation with Opus review creates cross-model cognitive diversity.
+High-effort GPT-5.5 is for: orchestrator, planner, complex debugger, reviewer.
+Medium-effort GPT-5.5 is for: implementer, validator, explorer, formatter.
+Pairing medium-effort implementation with high-effort review creates useful
+cost/quality separation without changing model families.
 
-Effort: Quick Win (change model field in frontmatter)
+Effort: Quick Win (change model or model_reasoning_effort fields)
 Reference: Topics/02-agents.md, Generation Standards Model Selection Policy
 
-### A1b: Opus 4.7 Migration Readiness
+### A1b: GPT-5.5 Codex Runtime Readiness
 
-Environments pinned to Opus 4.6 (via model aliases, frontmatter `model:`, or
-ANTHROPIC_DEFAULT_OPUS_MODEL env var) can migrate to 4.7. Scan for 4.7-incompatible
-patterns in settings, agent bodies, skill bodies, and any embedded API snippets:
+Environments targeting GPT-5.5 should use Codex-native runtime surfaces. Scan
+settings, agent bodies, skill bodies, and embedded API snippets for incompatible
+patterns:
 
 | Signal | Recommendation |
 |---|---|
-| `temperature`, `top_p`, `top_k` set to non-default values | REMOVE (API 400 on 4.7); tune via `effort` |
-| `thinking: {type: "enabled", budget_tokens: N}` | Replace with `thinking: {type: "adaptive"}` + `effort` |
-| `MAX_THINKING_TOKENS` env var used to tune Opus | Remove; switch to `effort` level or `/effort` command |
-| 4.6-era scaffolding like "double-check before returning", "think carefully first" | Try removing and compare; often unnecessary on 4.7 |
-| Emphatic language (CRITICAL, MUST, ALWAYS) stacked | 4.7 reads literally; tone down |
-| `max_tokens` hardcoded at 4k/8k in agentic API examples | Raise to 64k+ for 4.7 agentic runs |
-| CLAUDE.md/settings recommendations for `effort: medium` as default | Update to `effort: xhigh` for coding/agentic; `effort: high` for general |
+| Legacy agent Markdown schemas | Replace with `.codex/agents/*.toml` |
+| Config examples that treat `.codex/config.toml` as JSON | Replace with valid TOML and parse with `tomllib` or equivalent |
+| `temperature`, `top_p`, `top_k` in GPT-5.5 snippets | Remove; tune with `reasoning.effort` |
+| `thinking.budget_tokens` or max-thinking env vars | Remove; use model-supported effort values |
+| Emphatic language stacked across rules | Tone down and state intent once |
+| Missing `model_reasoning_effort` | Add role-specific effort values |
+| Top-level `sandbox_mode` combined with `default_permissions` | Choose one Codex config pattern; do not combine them |
 
 Effort: Medium (multiple files typically affected)
-Reference: Topics/13-opus-specifics.md (full 4.7 guidance),
-platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-7
+Reference: Topics/13-gpt-5-5-specifics.md,
+https://developers.openai.com/api/docs/guides/reasoning
 
-### A2: maxTurns Presence
+### A2: Reasoning Effort Presence
 
-Read all agent files. Check for `maxTurns` in frontmatter.
+Read all Codex subagent TOML files. Check for `model_reasoning_effort`.
 
 | Condition | Recommendation |
 |---|---|
-| Any agent missing maxTurns | Add maxTurns (prevents runaway execution) |
-| All agents have maxTurns | PASS |
+| Any agent missing reasoning effort | Add reasoning effort (prevents runaway execution) |
+| All agents have reasoning effort | PASS |
 
-Suggested values: explorers 15-25, implementers 40-60, reviewers 20-30.
+Suggested values: `medium` for bounded generation/validation; `high` for
+architecture, review, security, and upgrade analysis.
 
 Effort: Quick Win (add one frontmatter field per agent)
 Reference: Topics/02-agents.md, Generation Standards Agent Rules
 
-### A3: disallowedTools for Reviewers
+### A3: sandbox_mode for Reviewers
 
-Read all agent files. Identify agents whose name or description indicates review, validation, or analysis. Check for `disallowedTools` in frontmatter.
+Read all Codex subagent TOML files. Identify agents whose name or description indicates review, validation, or analysis. Check for `sandbox_mode`.
 
 | Condition | Recommendation |
 |---|---|
-| Reviewer/validator without disallowedTools | Add disallowedTools: [Edit, Write] for read-only agents |
+| Reviewer/validator without sandbox_mode | Add sandbox_mode: [Edit, Write] for read-only agents |
 | All reviewers have appropriate restrictions | PASS |
 
 Effort: Quick Win (add one frontmatter field)
@@ -218,7 +219,7 @@ Reference: Topics/02-agents.md, Generation Standards Agent Rules
 
 ### A4: Anti-Oversubagenting
 
-Read the orchestrator rule or CLAUDE.md. Check for instructions that prevent excessive agent delegation (e.g., "handle simple questions directly", "delegate only for complex multi-step tasks").
+Read the orchestrator rule or AGENTS.md. Check for instructions that prevent excessive agent delegation (e.g., "handle simple questions directly", "delegate only for complex multi-step tasks").
 
 | Condition | Recommendation |
 |---|---|
@@ -367,7 +368,7 @@ Reference: Topics/05-memory.md, Generation Standards items 7-8
 
 Check if a Stop hook is configured that performs self-review of modified files before accepting work. This is especially valuable for code-producing projects.
 
-Check settings.json hooks or `.claude/hooks.json` for a Stop hook.
+Check .codex/config.toml hooks or `.codex/hooks.json` for a Stop hook.
 
 | Condition | Recommendation |
 |---|---|
@@ -382,7 +383,7 @@ Reference: Topics/16-hook-system.md, Generation Standards item 12c
 
 Check for a PreCompact hook that saves session state before context compaction.
 
-Check settings.json hooks for a PreCompact event, or check GETTING_STARTED.md for documentation of manual PreCompact handling.
+Check .codex/config.toml hooks for a PreCompact event, or check GETTING_STARTED.md for documentation of manual PreCompact handling.
 
 | Condition | Recommendation |
 |---|---|
@@ -390,22 +391,22 @@ Check settings.json hooks for a PreCompact event, or check GETTING_STARTED.md fo
 | Documented but not automated | PASS (with note) |
 | Hook configured | PASS |
 
-Effort: Quick Win (add hook to settings.json) or Medium (create auto-save script)
+Effort: Quick Win (add hook to .codex/config.toml) or Medium (create auto-save script)
 Reference: Topics/16-hook-system.md, Generation Standards item 12b
 
 ### H3: Binary File Protection
 
 Check if the environment handles binary or large files that should not be read:
-- .claudeignore patterns for binary extensions (.exe, .dll, .pdb, .uasset, etc.)
+- VCS ignore rules patterns for binary extensions (.exe, .dll, .pdb, .uasset, etc.)
 - Settings deny rules for binary file operations
 
 | Condition | Recommendation |
 |---|---|
-| Project has binaries + no protection | Add binary extensions to .claudeignore |
+| Project has binaries + no protection | Add binary extensions to VCS ignore rules |
 | No binaries in project | PASS |
 | Protection present | PASS |
 
-Effort: Quick Win (add patterns to .claudeignore)
+Effort: Quick Win (add patterns to VCS ignore rules)
 Reference: Topics/11-permissions.md
 
 ### H4: Self-Learning Execution Trigger
@@ -428,11 +429,11 @@ Reference: Topics/07-self-learning.md, Generation Standards item 16
 ### H5: Compliance Enforcement Hooks
 
 If the environment handles sensitive/regulated data (check GENESIS.md, sensitive-data
-rule, or CLAUDE.md for mentions of PII, HIPAA, SOX, GDPR, financial data, patient data,
+rule, or AGENTS.md for mentions of PII, HIPAA, SOX, GDPR, financial data, patient data,
 legal privilege):
 
 Check for deterministic enforcement hooks:
-- PreToolUse hook scanning Write/Edit content for PII patterns
+- PreToolUse hook scanning scoped writes content for PII patterns
 - pii-patterns.conf with domain-appropriate regex patterns
 - UserPromptSubmit hook for input screening (optional but recommended)
 - PostToolUse audit trail hook for compliance logging
@@ -445,7 +446,7 @@ Check for deterministic enforcement hooks:
 | No sensitive data in project | Not applicable (PASS) |
 | Full enforcement stack present | PASS |
 
-Effort: Medium (create hook scripts + pattern config + settings.json entries)
+Effort: Medium (create hook scripts + pattern config + .codex/config.toml entries)
 Reference: Topics/16-hook-system.md (Section 16.9), Generation Standards item 25
 
 ---
@@ -463,7 +464,7 @@ Check completeness:
 
 Check domain-specificity:
 - At least 3 entries use domain-specific vocabulary (not generic "code question")
-- Compare against GENESIS.md or CLAUDE.md for domain terms
+- Compare against GENESIS.md or AGENTS.md for domain terms
 
 | Condition | Recommendation |
 |---|---|
@@ -479,7 +480,7 @@ Reference: Topics/08-routing.md, Generation Standards Routing Table Rules
 
 Check the orchestrator rule for a decision matrix covering:
 1. Sequential subagents (serial pipeline)
-2. Parallel subagents (independent Task tool calls)
+2. Parallel subagents (independent Codex subagent tools calls)
 3. Agent Teams (experimental, multi-stream)
 
 | Condition | Recommendation |
@@ -510,7 +511,7 @@ If GENESIS.md indicates a team with different roles (dev, design, QA, etc.) or i
 
 | Condition | Recommendation |
 |---|---|
-| Team with diverse roles + no Docs/Roles/ | Add role templates (CLAUDE.local.md per role) |
+| Team with diverse roles + no Docs/Roles/ | Add role templates (AGENTS.override.md per role) |
 | Solo or uniform team | Not applicable |
 | Docs/Roles/ present | PASS |
 
@@ -536,15 +537,15 @@ Read the `Shape` field from UPGRADE_CONTEXT.md. Cross-reference with interview a
 
 | Condition | Recommendation |
 |---|---|
-| Shape: SINGLE + user mentions multiple distinct projects or "I wish Claude would forget about X while I'm on Y" | Convert to multi-area hub. Move existing `.claude/`, CLAUDE.md, Docs/ under `<area-slug>/`; generate parent shell. Reversible. |
-| Shape: HUB + exactly one remaining area | Collapse hub to single area. Move `<only-area>/*` up; delete HUB_GENESIS.md, HUB_ARCHITECTURE.md, parent `.claude/`. Reversible. |
+| Shape: SINGLE + user mentions multiple distinct projects or "I wish Codex would forget about X while I'm on Y" | Convert to multi-area hub. Move existing `.codex/`, AGENTS.md, Docs/ under `<area-slug>/`; generate parent shell. Reversible. |
+| Shape: HUB + exactly one remaining area | Collapse hub to single area. Move `<only-area>/*` up; delete HUB_GENESIS.md, HUB_ARCHITECTURE.md, parent `.codex/`. Reversible. |
 | Shape: HUB_LIKE_UNDECLARED (sibling environments, no HUB_GENESIS.md) | Declare hub structure. Generate HUB_GENESIS.md and parent shell based on deduplication analysis. |
-| Shape: HUB + cumulative CLAUDE.md budget exceeded | Tighten parent CLAUDE.md or move shared content into a loaded-on-demand rule |
+| Shape: HUB + cumulative AGENTS.md budget exceeded | Tighten parent AGENTS.md or move shared content into a loaded-on-demand rule |
 | Shape: HUB + areas rarely touched together | Consider splitting into independent single environments in different directories |
 | Shape matches user's workflow cleanly | PASS |
 
 Effort: Large for conversion (Convert to hub / Declare hub); Medium for collapse; Quick Win for budget tightening.
-Reference: architecture-guide.md Hub Architecture section; CLAUDE.md /upgrade-environment pipeline shape-conversion branch.
+Reference: architecture-guide.md Hub Architecture section; AGENTS.md /upgrade-environment pipeline shape-conversion branch.
 
 ---
 
@@ -555,14 +556,14 @@ pain point to the relevant checks for prioritization.
 
 | User Pain Point | Primary Checks | Secondary Checks |
 |---|---|---|
-| "Context runs out too fast" | F7 (autocompact), M4 (growth bounds) | F1 (CLAUDE.md size), M2 (wiki size), A6 (skill size) |
+| "Context runs out too fast" | F7 (autocompact), M4 (growth bounds) | F1 (AGENTS.md size), M2 (wiki size), A6 (skill size) |
 | "Wrong assistant handles my request" | P1 (routing), A5 (skill descriptions) | A4 (anti-oversubagenting) |
-| "Keeps asking for permission" | F5 (deny rules, may need more allow rules) | Check settings.json allow patterns |
+| "Keeps asking for permission" | F5 (deny rules, may need more allow rules) | Check .codex/config.toml allow patterns |
 | "Doesn't remember across sessions" | M6 (state-save/load), M1 (wiki staleness) | H2 (PreCompact), M4 (state pruning) |
-| "Environment feels bloated" | F1 (CLAUDE.md size), M2 (wiki size), M5 (tier) | A6 (skill size), F4 (overemphasis) |
+| "Environment feels bloated" | F1 (AGENTS.md size), M2 (wiki size), M5 (tier) | A6 (skill size), F4 (overemphasis) |
 | "Doesn't catch its own mistakes" | H1 (Stop hook self-review) | Self-learning checks (H4) |
 | "Wiki is always outdated" | M1 (staleness tracking) | P3 (codebase mapping) |
-| "Takes too long on simple tasks" | A4 (anti-oversubagenting), P1 (routing) | A1 (model selection -- Opus for simple tasks is slow) |
+| "Takes too long on simple tasks" | A4 (anti-oversubagenting), P1 (routing) | A1 (model selection -- GPT-5.5 for simple tasks is slow) |
 | "Makes the same mistake repeatedly" | H4 (self-learning trigger) | M6 (state persistence) |
 | "Files get corrupted or overwritten" | H3 (binary protection), F5 (deny rules) | H1 (Stop hook review) |
 | "Worried about sensitive data leaking" | H5 (compliance hooks), sensitive-data rule | F5 (deny rules), PostToolUse audit |
@@ -603,6 +604,6 @@ Some recommendations may conflict. Flag these explicitly:
 - Adding more rules (completeness) vs keeping files small (F1, M2)
 - Adding more agents (capability) vs anti-oversubagenting (A4)
 - Enterprise memory tier (completeness) vs Lite tier (simplicity, M5)
-- Automated hooks (H1-H4) vs keeping settings.json simple
+- Automated hooks (H1-H4) vs keeping .codex/config.toml simple
 
 Present conflicts as choices for the user, not as both-recommended.

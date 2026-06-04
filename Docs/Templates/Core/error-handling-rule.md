@@ -15,7 +15,7 @@
   WHY THIS EXISTS:
   Generated environments operate in unpredictable conditions. VCS may not be
   configured. Tools may be missing. State files may be corrupted. Without
-  explicit error handling, Claude either crashes, retries infinitely, or
+  explicit error handling, Codex either crashes, retries infinitely, or
   silently produces wrong results. This rule ensures failures are handled
   gracefully with clear recovery paths.
 -->
@@ -70,9 +70,9 @@ When a required file is not found:
 | `Docs/_working/state/SESSION_CONTEXT.md` | Create with header and "No previous session state." |
 | `Docs/_working/retro/YYYY-MM.md` | Create with header for the current month |
 | `Docs/_working/retro/INDEX.md` | Create with empty theme list |
-| `.claude/rules/*.md` | Note the missing rule file, continue without it |
-| `.claude/agents/*.md` | Note the missing agent, use direct approach instead of delegation |
-| `.claude/skills/*/SKILL.md` | Note the missing skill, inform user it is unavailable |
+| `.codex/rules/*.md` | Note the missing rule file, continue without it |
+| `.codex/agents/*.toml` | Note the missing agent, use direct approach instead of delegation |
+| `.agents/skills/*/SKILL.md` | Note the missing skill, inform user it is unavailable |
 | Any source file referenced | Ask the user if the file was moved or renamed |
 
 ## Tool unavailable
@@ -83,10 +83,10 @@ When a required file is not found:
 -->
 When a tool is not available (permission denied, not installed, disabled):
 
-- **Bash tool blocked**: Note which command was blocked. Suggest the user run it manually or update permissions in settings.json.
-- **WebSearch/WebFetch blocked**: Skip web research. Note that results are based only on local context and codebase. Suggest the user fetch the information manually.
+- **Shell command blocked**: Note which command was blocked. Suggest the user run it manually or update the Codex permission profile in `.codex/config.toml`.
+- **Web retrieval blocked**: Skip web research. Note that results are based only on local context and codebase. Suggest the user fetch the information manually.
 - **MCP tool unavailable**: Skip the MCP operation. Note which server/tool was unavailable and suggest checking `.mcp.json` configuration.
-- **Write/Edit blocked on a path**: Report the specific path that was blocked. Suggest updating the `permissions.allow` list in `.claude/settings.json`.
+- **Workspace write blocked on a path**: Report the specific path that was blocked. Suggest updating the Codex permission profile in `.codex/config.toml`.
 
 Pattern: "[tool] is unavailable for [operation]. Skipping [step]. To enable: [specific fix]."
 
@@ -103,9 +103,9 @@ When a state file is corrupted (malformed JSON, inconsistent structure):
 - **Docs/index.md**: Regenerate the index by scanning the Docs/ wiki directory. List all found files with basic metadata.
 - **Docs/_working/retro/INDEX.md**: Regenerate by scanning Docs/_working/retro/ monthly files.
 - **Docs/_working/retro/YYYY-MM.md**: If the monthly log is corrupted, rename it to `.corrupted` and start a fresh file. Do not discard the corrupted file (user may want to recover entries).
-- **settings.json or settings.local.json**: Do NOT modify. Report the corruption and ask the user to fix it manually (settings control permissions and safety).
+- **.codex/config.toml or local config profile**: Do NOT modify. Report the corruption and ask the user to fix it manually (settings control permissions and safety).
 
-General rule: For files Claude manages, regenerate from directory contents.
+General rule: For files Codex manages, regenerate from directory contents.
 For files the user manages, report and ask.
 
 ## VCS not configured
@@ -131,8 +131,8 @@ When git (or other VCS) is not configured or not available:
 When a permission is denied for a tool or operation:
 
 1. Report which specific permission is missing
-2. Suggest the exact settings.json addition to fix it
-3. Example: "Permission denied for `Bash(npm test)`. Add `\"Bash(npm test)\"` to `permissions.allow` in `.claude/settings.json`."
+2. Suggest the exact Codex config profile or AGENTS.md command guidance change to fix it
+3. Example: "Permission denied for `npm test`. Document it as the validation command and adjust the project permission profile if the current Codex config supports that scope."
 4. Log as FRICTION in the retro log (this feeds into /update for permission improvements)
 
 Do not:
@@ -232,7 +232,7 @@ When diagnosing errors or unexpected behavior:
      Fix: Create with sensible defaults. Most missing files can be regenerated.
 
   4. MODIFYING SETTINGS ON PERMISSION ERROR
-     Problem: Claude edits settings.json to grant itself more permissions.
+     Problem: Codex edits .codex/config.toml to grant itself more permissions.
      Fix: Report the needed permission, let the USER decide whether to grant it.
 
   5. WORKAROUNDS FOR BLOCKED TOOLS
@@ -240,7 +240,7 @@ When diagnosing errors or unexpected behavior:
      Fix: Respect permission boundaries. Report and suggest, do not circumvent.
 
   6. SUPPRESSING BUILD ERRORS
-     Problem: Tests fail, Claude skips them or marks them as expected failures.
+     Problem: Tests fail, Codex skips them or marks them as expected failures.
      Fix: "Never suppress errors or skip failing tests to make the build pass."
 
   7. DIAGNOSTIC ANCHORING
@@ -257,9 +257,9 @@ When diagnosing errors or unexpected behavior:
   [ ] Each failure type has a specific recovery action (not just "handle gracefully")
   [ ] "Never retry more than once" rule present
   [ ] Missing file table with recovery actions per file type
-  [ ] Permission denied includes example settings.json fix
+  [ ] Permission denied includes example .codex/config.toml fix
   [ ] VCS not configured degrades cleanly (skip, note, continue)
-  [ ] State corruption handles both Claude-managed and user-managed files differently
+  [ ] State corruption handles both Codex-managed and user-managed files differently
   [ ] Domain-specific failure type included (build/test for software, etc.)
   [ ] Diagnostic discipline section included (for environments with debugging/troubleshooting)
   [ ] No silent failures -- all errors logged or reported

@@ -26,7 +26,7 @@ process-inbox/
      error handling and format detection. This avoids regenerating the
      conversion logic each time. Falls back to inline commands if missing. -->
 
-## Example: Process-Inbox Skill (`.claude/skills/process-inbox/SKILL.md`)
+## Example: Process-Inbox Skill (`.agents/skills/process-inbox/SKILL.md`)
 
 ````markdown
 ---
@@ -40,7 +40,7 @@ description: >
   data-specific analysis (route to /process-data or analyst agent) or for
   single-file quick reads (use Read tool directly).
 context: fork
-allowed-tools:
+tool access policy:
   - Read
   - Write
   - Edit
@@ -53,7 +53,7 @@ metadata:
 
 <!-- ANNOTATION: Frontmatter design decisions:
      - context: fork (isolated context -- inbox files can be numerous/large)
-     - Write/Edit allowed for producing output files
+     - scoped workspace writes allowed for producing output files
      - Bash allowed for MarkItDown conversion and file operations
      - description: 6 trigger phrases and 2 negative triggers
      VARIATION: For data-analysis profile, this skill may chain to

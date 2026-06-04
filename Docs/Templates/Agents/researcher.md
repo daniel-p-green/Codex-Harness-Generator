@@ -1,54 +1,41 @@
 # Researcher Agent (Template)
 
 <!-- ANNOTATION: The researcher agent gathers information without modifying
-     the codebase. It is read-only by design (disallowedTools: Write, Edit).
-     Uses opus because research requires deep investigation, synthesis
+     the codebase. It is read-only by design (`sandbox_mode = "read-only"`).
+     Uses GPT-5.5 with high reasoning effort because research requires deep investigation, synthesis
      across multiple sources, and complex reasoning about findings. -->
 
-<!-- QUALITY: Must include full frontmatter. Must include research budget
-     limits. Must disallow Write and Edit. Must require source citations.
+<!-- QUALITY: Must include Codex subagent TOML. Must include research budget
+     limits. Must use read-only sandbox_mode. Must require source citations.
      Agent body under 80 lines. -->
 
-## Example: Researcher Agent (`.claude/agents/researcher.md`)
+## Example: Researcher Agent (`.codex/agents/researcher.toml`)
 
-````markdown
----
-name: researcher
-description: >
-  Research topics using codebase analysis and web search. Delegate to this
-  agent when the user asks "how does X work", "what is Y", "find documentation
-  for Z", "research best practices for W", or "what are the options for Q".
-  Do NOT delegate for implementation tasks or code changes.
-model: opus
-tools:
-  - Read
-  - Glob
-  - Grep
-  - WebSearch
-  - WebFetch
-disallowedTools:
-  - Write
-  - Edit
-  - Bash
-maxTurns: 30
----
-
-<!-- ANNOTATION: The frontmatter above shows all supported fields.
+````toml
+name = "researcher"
+description = """
+Research topics using codebase analysis and web search. Delegate to this agent when the user asks "how does X work", "what is Y", "find documentation for Z", "research best practices for W", or "what are the options for Q". Do NOT delegate for implementation tasks or code changes.
+"""
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+developer_instructions = """
+<!-- ANNOTATION: The TOML fields above show the Codex subagent surface used by this template.
      Key design decisions:
-     - model: opus (research requires deep investigation and synthesis
-       across multiple sources, which benefits from opus-level reasoning)
-     - disallowedTools: Write/Edit enforces read-only behavior
-     - maxTurns: 30 is enough for thorough research without runaway
+     - model: gpt-5.5 (research requires deep investigation and synthesis
+       across multiple sources, which benefits from GPT-5.5-level reasoning)
+     - sandbox_mode: read-only enforces read-only behavior
+     - model_reasoning_effort: low or high depending on role is enough for thorough research without runaway
      VARIATION: For simple lookups that do not require synthesis,
-     sonnet may suffice. Use opus when research involves comparing
+     lower reasoning effort may suffice. Use high reasoning effort when research involves comparing
      multiple architectures or synthesizing complex findings.
      VARIATION (pipeline producer): when this agent is a producer in a
      pipeline (it must write a `_workspace/0N_*.md` handoff artifact), REMOVE
-     Write/Edit from disallowedTools and grant Write/Edit scoped to the handoff
+     write access and use a workspace-write sandbox only for the handoff
      dir (e.g. `./_workspace/**`) while staying read-only toward all other paths.
      The read-only default below is for return-to-orchestrator use only.
      VARIATION (legal / high-stakes citations): tag every source as
-     RETRIEVED (fetched via WebFetch from a primary/official source, URL recorded)
+     RETRIEVED (fetched through browser or web retrieval from a primary/official source, URL recorded)
      vs RECALLED (from model memory -- unverified); treat recalled facts/cites as
      claims to verify, never as authority. -->
 
@@ -66,7 +53,7 @@ write it to the assigned `_workspace/` handoff path.
 1. Check existing research first: read `Docs/Research/INDEX.md` (or
    equivalent) to avoid duplicating prior work
 2. Search the codebase for relevant code, configuration, and documentation
-3. If codebase evidence is insufficient, use WebSearch and WebFetch
+3. If codebase evidence is insufficient, use web search and browser/web retrieval
 4. Synthesize findings into a structured note
 
 Never speculate about files you have not read. If you cannot find
@@ -131,13 +118,14 @@ Out of scope:
 - Modifying any files (you cannot write or edit)
 - Running commands or scripts
 - Making implementation recommendations (report facts, let the planner decide)
+"""
 ````
 
 <!-- QUALITY: Validation checklist for the generator:
-     - [ ] Frontmatter includes: name, description, model, tools, disallowedTools, maxTurns
+     - [ ] TOML includes: name, description, model, model_reasoning_effort, sandbox_mode, developer_instructions
      - [ ] Description includes 3+ trigger phrases
      - [ ] Description includes negative trigger ("Do NOT delegate for...")
-     - [ ] disallowedTools includes Write and Edit
+     - [ ] sandbox_mode is read-only
      - [ ] Research budget limits defined
      - [ ] "Never speculate" instruction present
      - [ ] Output format specified with structure

@@ -17,10 +17,10 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| researcher | opus | Look up standards/regulations/methodology (GAAP, IRS, FASB, stats) before analysis; cite sources | researcher.md |
-| analyst | sonnet | Read/transform/compute over data files via Python; produce dated output files | analyst.md |
-| drafter | sonnet | Write reports, memos, executive summaries from analysis results | drafter.md |
-| reviewer | opus | Verify calculations, validate methodology, audit reports (read-only) | reviewer.md |
+| researcher | high-effort | Look up standards/regulations/methodology (GAAP, IRS, FASB, stats) before analysis; cite sources | researcher.md |
+| analyst | medium-effort | Read/transform/compute over data files via Python; produce dated output files | analyst.md |
+| drafter | medium-effort | Write reports, memos, executive summaries from analysis results | drafter.md |
+| reviewer | high-effort | Verify calculations, validate methodology, audit reports (read-only) | reviewer.md |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy (conservative), context-management, self-learning, error-handling (with
@@ -68,16 +68,17 @@ forecast models, full report with verification).
 
 Base + Universal Deny + the "Data / Python-analysis" ecosystem (Python ALLOWED
 here -- the key difference from Knowledge Work) -- all in
-`Docs/Templates/References/ecosystem-permissions.md`. Add output paths the analyst
-writes (`Write/Edit(./output/**)`, `./Outbox/**`, `./Data/**`) to avoid prompts.
+`Docs/Templates/References/ecosystem-permissions.md`. Add writable output paths
+such as `output/**`, `Outbox/**`, and `Data/**` when the analyst needs to land
+derived files.
 Treat raw-data dirs as read-mostly. Domain-specific allows not in the reference:
 
-- Data CLIs: `Bash(csvtool *)`, `Bash(jq *)`, `Bash(markitdown *)`, `Bash(pandoc *)`
+- Data CLIs to document when installed: `csvtool`, `jq`, `markitdown`, `pandoc`
 - Extended (only if intake names the tool): R (`Rscript *`, `R *`), SQL
   (`sqlite3 *`, `psql *`), read-only cloud storage (`aws s3 cp/ls/sync *`;
   deny `aws s3 rm/mv *`)
 
-Generate `settings.local.json` for machine-specific Python install or DB
+Generate `local config profile` for machine-specific Python install or DB
 connection paths.
 
 ## Self-Learning Seed Entries
@@ -115,13 +116,13 @@ categories CALC_ERROR, DATA_FORMAT, METHODOLOGY_GAP, OUTPUT_MISMATCH):
 
 ## Cost / Model Notes
 
-Opus for researcher/reviewer (standards lookup, calculation verification); Sonnet
-for analyst/drafter (established-pattern execution). Defaults: balanced (Opus on
-reasoning roles, Sonnet on execution; compaction 95%; CLAUDE.md ~200 lines).
-Cost-conscious override: all-Sonnet (Opus only for reviewer verifying against
+high-effort GPT-5.5 for researcher/reviewer (standards lookup, calculation verification); medium-effort GPT-5.5
+for analyst/drafter (established-pattern execution). Defaults: balanced (GPT-5.5 on
+reasoning roles, medium-effort GPT-5.5 on execution; compaction 95%; AGENTS.md ~200 lines).
+Cost-conscious override: all medium-effort GPT-5.5 (GPT-5.5 only for reviewer verifying against
 regulatory standards), consider merging drafter into analyst, compaction 85%,
-CLAUDE.md ~150, full RTK in GETTING_STARTED (filters verbose pandas/numpy output
-and tracebacks), `.claudeignore` large data files (`*.csv`, `*.parquet`, `*.h5`,
+AGENTS.md ~150, full RTK in GETTING_STARTED (filters verbose pandas/numpy output
+and tracebacks), `VCS ignore rules` large data files (`*.csv`, `*.parquet`, `*.h5`,
 `data/raw/`) and Python artifacts (`__pycache__/`, `*.pyc`, `.ipynb_checkpoints/`).
 Analyst Python iteration is the main token sink (~5-15 Bash calls/analysis);
 /process-data first run is expensive with many files. Subagents ~4x vs direct;

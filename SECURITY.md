@@ -2,8 +2,8 @@
 
 ## Scope
 
-The Claude Harness Generator generates configuration files (Markdown, JSON) for
-Claude Code environments. It does not handle secrets, credentials, or authentication
+The Codex Harness Generator generates configuration files (Markdown, JSON) for
+Codex environments. It does not handle secrets, credentials, or authentication
 tokens directly. The generated files define assistant behavior, permissions, and
 routing rules -- they do not store or transmit sensitive data.
 
@@ -16,7 +16,7 @@ impact.
 
 ## Generated Permissions
 
-The Harness Generator generates a `.claude/settings.json` file with allow and deny rules
+The Harness Generator generates a `.codex/config.toml` file with allow and deny rules
 tailored to the user's project. **Users should review these permissions before use**
 to ensure they match their security requirements. In particular:
 

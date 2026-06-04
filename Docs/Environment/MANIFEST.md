@@ -1,6 +1,6 @@
 # Component Manifest
 
-Single source of truth for the Claude Harness Generator's own component
+Single source of truth for the Codex Harness Generator's own component
 inventory. **Do not hardcode these counts elsewhere.** `README.md`,
 `OVERVIEW.md`, `USER_GUIDE.md`, and the `INDEX.md` files reference this file
 instead of repeating numbers.
@@ -15,9 +15,9 @@ Harness Generator version: see `Docs/Environment/VERSION.md`.
 
 | Component class | Count | Location |
 |---|---|---|
-| Agents | 5 | `.claude/agents/` |
-| Skills | 4 | `.claude/skills/` |
-| Rules | 4 | `.claude/rules/` |
+| Agents | 5 | `.codex/agents/` |
+| Skills | 4 | `.agents/skills/` |
+| Rules | 4 | `.codex/rules/` |
 | Knowledge topics | 18 | `Docs/AgentGuidelines/Topics/` (non-contiguous numbering; gaps are reserved) |
 | Agent playbooks | 6 (+INDEX) | `Docs/AgentPlaybooks/` |
 | Base starter profiles | 4 (+INDEX, PROFILE_FORMAT, DOMAIN_REFERENCE) | `Docs/StarterProfiles/` |
@@ -28,11 +28,11 @@ Harness Generator version: see `Docs/Environment/VERSION.md`.
 
 | Name | Model | Role |
 |---|---|---|
-| intake-interviewer | sonnet | Deep 5-stage interview when no profile fits (relay protocol) |
-| environment-architect | opus | Designs ARCHITECTURE.md from GENESIS.md + knowledge base |
-| component-generator | opus | Writes environment files, one of 5 passes per invocation |
-| environment-validator | sonnet | Runs the validation checklist; read-only w.r.t. the environment |
-| upgrade-analyzer | opus | Audits an existing environment against best practices (review-grade reasoning) |
+| intake-interviewer | medium-effort | Deep 5-stage interview when no profile fits (relay protocol) |
+| environment-architect | high-effort | Designs ARCHITECTURE.md from GENESIS.md + knowledge base |
+| component-generator | high-effort | Writes environment files, one of 5 passes per invocation |
+| environment-validator | medium-effort | Runs the validation checklist; read-only w.r.t. the environment |
+| upgrade-analyzer | high-effort | Audits an existing environment against best practices (review-grade reasoning) |
 
 ## Skills (4)
 

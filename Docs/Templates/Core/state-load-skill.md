@@ -17,7 +17,7 @@
 
   WHY THIS EXISTS:
   Every new session starts with an empty context window. Without state-load,
-  Claude must re-discover the project state by reading files and asking questions.
+  Codex must re-discover the project state by reading files and asking questions.
   State-load provides instant context restoration from the last /state-save,
   enabling seamless continuation of work across sessions.
 -->
@@ -27,7 +27,7 @@
   Domain: FastAPI + React web application
 
   File structure:
-  .claude/skills/state-load/
+  .agents/skills/state-load/
     SKILL.md              (this file -- core instructions)
     references/
       troubleshooting.md    (drift resolution guidance)
@@ -40,9 +40,9 @@
 name: state-load
 description: Restore session context from a previous save. Use when starting a new session, after /clear, when the user says "load state", "restore progress", "where was I", "continue from last time", or "/state-load". Do NOT use for loading files or reading documents.
 context: fork
-allowed-tools: [Read, Glob, Bash]
+tool access policy: [Read, Glob, Bash]
 metadata:
-  author: Claude Harness Generator
+  author: Codex Harness Generator
   version: 1.0.0
 ---
 ```

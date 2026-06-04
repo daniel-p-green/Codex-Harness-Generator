@@ -20,13 +20,13 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| researcher | opus | Research engine APIs, gameplay/networking/rendering patterns; check wiki before web | researcher.md |
-| planner | opus | Break features/refactors into independently compilable checkpoints (PT-XX) | planner.md |
-| implementer | sonnet | Implement ONE checkpoint; preserve reflection macros; never touch binary assets | implementer.md |
-| reviewer | opus | Review changes (read-only); rubric crashes > GC > replication > perf > style | reviewer.md |
-| explorer | sonnet | Locate code, map class hierarchy/call flow/replication boundaries | explorer.md |
-| debugger | opus | Reproduce, hypothesize, fix crashes/gameplay/replication bugs, verify | debugger.md |
-| performance-analyst | sonnet | Analyze profiling data, find hotspots (tick, traces, draw calls, GC) | performance-analyst.md |
+| researcher | high-effort | Research engine APIs, gameplay/networking/rendering patterns; check wiki before web | researcher.md |
+| planner | high-effort | Break features/refactors into independently compilable checkpoints (PT-XX) | planner.md |
+| implementer | medium-effort | Implement ONE checkpoint; preserve reflection macros; never touch binary assets | implementer.md |
+| reviewer | high-effort | Review changes (read-only); rubric crashes > GC > replication > perf > style | reviewer.md |
+| explorer | medium-effort | Locate code, map class hierarchy/call flow/replication boundaries | explorer.md |
+| debugger | high-effort | Reproduce, hypothesize, fix crashes/gameplay/replication bugs, verify | debugger.md |
+| performance-analyst | medium-effort | Analyze profiling data, find hotspots (tick, traces, draw calls, GC) | performance-analyst.md |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy (binary-asset protection), context-management (preserve replication
@@ -75,20 +75,20 @@ Base + Universal Deny + Git or Perforce -- see
 `Docs/Templates/References/ecosystem-permissions.md`. Engine-specific source
 paths and asset denies are domain-unique, so add them here:
 
-- **Allow (engine source)**: Unreal -> `Edit/Write(./Source/**)`,
-  `Edit/Write(./Plugins/**/Source/**)`, `Edit/Write(./Config/**)`. Unity ->
-  `Edit/Write(./Assets/**/*.cs)`, `Edit/Write(./Packages/**/*.cs)`,
-  `Edit/Write(./ProjectSettings/**)`. Godot -> `Edit/Write(./**/*.{gd,tscn,tres})`,
-  `Edit/Write(./project.godot)`.
+- **Allow (engine source)**: Unreal -> `write access(./Source/**)`,
+  `write access(./Plugins/**/Source/**)`, `write access(./Config/**)`. Unity ->
+  `write access(./Assets/**/*.cs)`, `write access(./Packages/**/*.cs)`,
+  `write access(./ProjectSettings/**)`. Godot -> `write access(./**/*.{gd,tscn,tres})`,
+  `write access(./project.godot)`.
 - **Deny (binary assets, both Edit and Write)**: `**/*.{uasset,umap,prefab,asset,scene}`.
   Hard rule -- these are never text-editable.
 - **Perforce** (variant): allow `p4 edit/add/reopen/revert/change/reconcile/opened/
   fstat/describe/changes/diff/sync/info/where *`; deny `p4 submit/obliterate/archive *`
   (never submit autonomously). Perforce projects cannot use worktrees.
 
-`.claudeignore`: binary assets, media (png/jpg/tga/exr/psd/wav/mp3/ogg/mp4), build
+`VCS ignore rules`: binary assets, media (png/jpg/tga/exr/psd/wav/mp3/ogg/mp4), build
 output (Binaries/, Intermediate/, DerivedDataCache/, Library/, Temp/, obj/), and
-Engine/ (too large to index). Generate `settings.local.json` for machine-specific
+Engine/ (too large to index). Generate `local config profile` for machine-specific
 engine and build-tool paths; gitignore it.
 
 ## Self-Learning Seed Entries
@@ -126,19 +126,19 @@ Templates in `Docs/Templates/Optional/hooks-template.md`:
 - **Stop hook self-review** (recommended) -- agent reviews modified source for
   missing UPROPERTY macros, replication bugs, GAS anti-patterns; exit 2 to
   self-correct. Keep a re-entry guard.
-- **Status line** (recommended) -- `CLAUDE_CODE_STATUSLINE` for context health;
+- **Status line** (recommended) -- `CODEX_STATUSLINE` for context health;
   document WSL requirement for Windows in GETTING_STARTED.
 - **PostToolUse build reminder** (optional) -- nudge `/build` after edits.
 
 ## Cost / Model Notes
 
-Opus for planner/debugger/reviewer/researcher; Sonnet for implementer/explorer/
+high-effort GPT-5.5 for planner/debugger/reviewer/researcher; medium-effort GPT-5.5 for implementer/explorer/
 performance-analyst. Workflows are naturally serial (plan -> implement -> build ->
-playtest) so subagents (~4x) are the default. Defaults: balanced (Opus on
-reasoning roles, compaction 95%, CLAUDE.md ~200 lines). Cost-conscious override:
-all-Sonnet (Opus only for orchestrator routing), consider folding
-performance-analyst into debugger, compaction 85%, CLAUDE.md ~150, aggressive
-`.claudeignore`, full RTK in GETTING_STARTED (filters 1000+-line UBT output).
+playtest) so subagents (~4x) are the default. Defaults: balanced (GPT-5.5 on
+reasoning roles, compaction 95%, AGENTS.md ~200 lines). Cost-conscious override:
+all medium-effort GPT-5.5 (GPT-5.5 only for orchestrator routing), consider folding
+performance-analyst into debugger, compaction 85%, AGENTS.md ~150, aggressive
+`VCS ignore rules`, full RTK in GETTING_STARTED (filters 1000+-line UBT output).
 Engine builds are slow -- `/build` should track build times and suggest partial
 builds. Area maps save tokens vs repeated full scans. Monitor with `/cost`.
 
@@ -168,6 +168,6 @@ Producer-Reviewer (implement -> review) inside a Pipeline (plan -> implement ->
 build -> playtest). Subagents are the default. Consider Agent Teams only for
 parallel exploration (independent debug hypotheses) or large multi-system features
 with non-overlapping file ownership (gameplay / networking / ui). Prefer
-`claude --worktree` (~4x) over teams (~15x) for Git projects; Perforce cannot use
+`codex with worktrees` (~4x) over teams (~15x) for Git projects; Perforce cannot use
 worktrees, and split-pane mode does not work on Windows (use in-process mode).
-For large codebases set `CLAUDE_CODE_AUTOCOMPACT_PCT_OVERRIDE: "85"`.
+For large codebases set `CODEX_AUTOCOMPACT_PCT_OVERRIDE: "85"`.

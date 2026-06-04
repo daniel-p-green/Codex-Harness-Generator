@@ -21,7 +21,7 @@
   patterns, propose targeted fixes, and apply them after user approval. This is the
   primary mechanism for environment improvement over time.
 
-  The analysis/implementation split prevents accidental self-modification. Claude
+  The analysis/implementation split prevents accidental self-modification. Codex
   analyzes first, presents proposals, and only implements after explicit approval.
 -->
 
@@ -30,7 +30,7 @@
   Domain: FastAPI + React web application
 
   File structure:
-  .claude/skills/update/
+  .agents/skills/update/
     SKILL.md              (this file -- core instructions)
     references/
       proposal-format.md    (detailed proposal template)
@@ -43,9 +43,9 @@
 name: update
 description: Review friction logs and propose environment improvements. Use when the user says "update environment", "improve the setup", "review friction", "check for improvements", "what can be better", or "/update". Do NOT use for updating code, dependencies, or project files.
 context: fork
-allowed-tools: [Read, Write, Edit, Glob, Grep]
+tool access policy: [Read, Write, Edit, Glob, Grep]
 metadata:
-  author: Claude Harness Generator
+  author: Codex Harness Generator
   version: 1.0.0
 ---
 ```
@@ -83,7 +83,7 @@ Use the evaluation-driven methodology:
 
 Priority ordering:
 1. ROUTING_CORRECTION (routing table is wrong -- high impact, easy fix)
-2. CORRECTION (user taught Claude a rule -- should be codified)
+2. CORRECTION (user taught Codex a rule -- should be codified)
 3. PATTERN (confirmed recurring friction)
 4. SKILL_UNDERTRIGGER / SKILL_OVERTRIGGER (skill descriptions need tuning)
 5. FRICTION (individual friction events, lower priority)
@@ -163,7 +163,7 @@ For each approved proposal:
 
 1. Back up all affected files
 2. Create the new file(s) or modify existing ones
-3. Update cross-references (routing table, CLAUDE.md if needed)
+3. Update cross-references (routing table, AGENTS.md if needed)
 4. Verify consistency across all modified files
 5. Log in EVOLUTION.md
 
@@ -184,7 +184,7 @@ For each approved proposal:
 -->
 
 ### Self-modifiable (after user approval)
-- Rule files (`.claude/rules/*.md`)
+- Rule files (`.codex/rules/*.md`)
 - Routing table entries
 - Context management thresholds
 - Self-learning thresholds and seed patterns
@@ -193,12 +193,12 @@ For each approved proposal:
 - Retro logs and proposals
 
 ### Requires human editing (present change, do not apply)
-- `settings.json` permissions (allow/deny lists)
-- CLAUDE.md hard constraints (non-negotiable rules)
-- Agent model assignments (sonnet/opus/haiku)
-- Agent maxTurns values
+- `.codex/config.toml` permissions (allow/deny lists)
+- AGENTS.md hard constraints (non-negotiable rules)
+- Agent model assignments and reasoning effort values
+- Agent reasoning effort values
 - Hook configurations
-- `.claudeignore` patterns
+- `VCS ignore rules` patterns
 
 ### Never modified
 - `Docs/Environment/GENESIS.md` (original intake record -- immutable)
@@ -245,7 +245,7 @@ For each approved proposal:
 <!-- ANTI-PATTERNS
 
   1. ANALYSIS AND IMPLEMENTATION IN ONE STEP
-     Problem: Claude reads friction, immediately modifies rules without asking.
+     Problem: Codex reads friction, immediately modifies rules without asking.
      Fix: Split into two phases. Analysis always runs. Implementation requires approval.
 
   2. NO BACKUP BEFORE EDIT

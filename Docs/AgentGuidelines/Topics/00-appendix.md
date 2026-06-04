@@ -4,7 +4,7 @@
 
 | Component | Target | Hard Max |
 |-----------|--------|----------|
-| CLAUDE.md | 150-200 lines | 250 lines |
+| AGENTS.md | 150-200 lines | 250 lines |
 | Individual rule file | <120 lines | 120 lines |
 | Total rule files | 5-8 files | - |
 | Agent definition | <80 lines | 80 lines |
@@ -15,18 +15,18 @@
 
 1. Managed settings (system-level)
 2. CLI arguments
-3. `.claude/settings.local.json` (local project, not shared)
-4. `.claude/settings.json` (shared project)
-5. `~/.claude/settings.json` (user global)
+3. `.codex/local config profile` (local project, not shared)
+4. `.codex/config.toml` (shared project)
+5. `~/.codex/config.toml` (user global)
 
 ## Memory Hierarchy (precedence, highest first)
 
-1. Managed policy CLAUDE.md
-2. Project CLAUDE.md / .claude/CLAUDE.md
-3. Project rules (.claude/rules/*.md)
-4. User memory (~/.claude/CLAUDE.md)
-5. Project local memory (CLAUDE.local.md)
-6. Auto memory (~/.claude/projects/<project>/memory/)
+1. Managed policy AGENTS.md
+2. Project AGENTS.md / .codex/AGENTS.md
+3. Project rules (.codex/rules/*.md)
+4. User memory (~/.codex/AGENTS.md)
+5. Project local memory (AGENTS.override.md)
+6. Auto memory (~/.codex/projects/<project>/memory/)
 
 ## Hook Timeouts
 
@@ -39,4 +39,4 @@
 ---
 
 *Last Updated: 2026-03-05*
-*Sources: 16 Tier 1 (Anthropic official) research documents, 2 Tier 2 production environments (production game project, production compliance project), Mar 2026 web research (plugins, model config, checkpoints, RAG strategies, multi-modal workflows, document parsing, self-validation patterns)*
+*Sources: 16 Tier 1 (OpenAI official) research documents, 2 Tier 2 production environments (production game project, production compliance project), Mar 2026 web research (plugins, model config, checkpoints, RAG strategies, multi-modal workflows, document parsing, self-validation patterns)*

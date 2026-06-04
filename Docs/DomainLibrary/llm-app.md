@@ -7,7 +7,7 @@ not inline them.
 ## Profile Metadata
 
 - **Target audience**: engineers building LLM-powered apps -- RAG systems, chatbots, agents, prompt pipelines, AI assistants
-- **Languages/tools**: Python (primary), Node/TypeScript; Anthropic/OpenAI SDKs, LangChain/LlamaIndex, vector DBs (Chroma/pgvector/Pinecone), FastAPI, Docker
+- **Languages/tools**: Python (primary), Node/TypeScript; OpenAI/OpenAI SDKs, LangChain/LlamaIndex, vector DBs (Chroma/pgvector/Pinecone), FastAPI, Docker
 - **Complexity**: Standard | **Memory tier**: Standard | **Action default**: proactive | **VCS**: Git
 - **Scope note**: app construction (prompt design, RAG, eval, optimization, serving). Out of scope: model fine-tuning, GPU infra, self-hosted model serving (vLLM/TGI).
 
@@ -17,12 +17,12 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| prompt-engineer | opus | Design system prompts, few-shot sets, output schemas, guardrails; version prompts for A/B. Grounding contract: every retrieval/tool-backed prompt must cite its sources and abstain ("I don't know" / refuse to answer) when the supplied context is insufficient -- never fill gaps from model memory | researcher.md (custom: prompt design focus) |
-| rag-architect | opus | Design retrieval pipeline -- preprocessing, chunking, embedding, vector store, rerank | planner.md (custom: RAG pipeline focus) |
-| eval-specialist | opus | Build golden sets, automated metrics, LLM-as-Judge, RAG retrieval + regression tests. Faithfulness/groundedness is a NAMED gating metric (not just accuracy): an answer that is accurate but unsupported by retrieved context fails the gate | analyst.md (custom: eval framework focus) |
-| optimization-engineer | sonnet | Tune cost/latency/quality -- caching, model routing, prompt compression, batching | performance-analyst.md (read-only analysis) |
-| deploy-engineer | sonnet | Stand up API serving, scaling, monitoring, runtime guardrails, cost ceilings | implementer.md |
-| reviewer | opus | Review prompt/RAG/eval code for correctness, safety, parseability (read-only) | reviewer.md |
+| prompt-engineer | high-effort | Design system prompts, few-shot sets, output schemas, guardrails; version prompts for A/B. Grounding contract: every retrieval/tool-backed prompt must cite its sources and abstain ("I don't know" / refuse to answer) when the supplied context is insufficient -- never fill gaps from model memory | researcher.md (custom: prompt design focus) |
+| rag-architect | high-effort | Design retrieval pipeline -- preprocessing, chunking, embedding, vector store, rerank | planner.md (custom: RAG pipeline focus) |
+| eval-specialist | high-effort | Build golden sets, automated metrics, LLM-as-Judge, RAG retrieval + regression tests. Faithfulness/groundedness is a NAMED gating metric (not just accuracy): an answer that is accurate but unsupported by retrieved context fails the gate | analyst.md (custom: eval framework focus) |
+| optimization-engineer | medium-effort | Tune cost/latency/quality -- caching, model routing, prompt compression, batching | performance-analyst.md (read-only analysis) |
+| deploy-engineer | medium-effort | Stand up API serving, scaling, monitoring, runtime guardrails, cost ceilings | implementer.md |
+| reviewer | high-effort | Review prompt/RAG/eval code for correctness, safety, parseability (read-only) | reviewer.md |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy, context-management, self-learning, error-handling (with diagnostic
@@ -94,7 +94,7 @@ attack surfaces. These are domain defaults, not optional extras:
   retrieval-config) tuple.** A model bump, prompt edit, or RAG-config change is
   itself a regression trigger -- re-run the suite and re-baseline deliberately;
   do not silently inherit the old baseline across a model/RAG swap.
-- **Determinism via effort, not sampling params.** For Opus 4.7/4.8 targets,
+- **Determinism via effort, not sampling params.** For GPT-5.5 targets,
   strip `temperature` / `top_p` / `top_k` from any generated config snippet
   (they 400 on these models); express determinism through `effort`. The harness
   prompt-design template still lists those params -- drop them on regeneration.
@@ -113,7 +113,7 @@ golden set and the RAG corpus as read-mostly. Add domain-specific entries:
 - deny: any command that prints env to logs (LLM API keys live in `.env` -- already
   denied by Base). Gate `docker push *` / deploy commands behind human approval.
 
-Generate `settings.local.json` for machine-specific paths (local vector DB
+Generate `local config profile` for machine-specific paths (local vector DB
 dir, model cache, connection strings).
 
 ## Self-Learning Seed Entries
@@ -169,12 +169,12 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 
 ## Cost / Model Notes
 
-Opus for prompt-engineer / rag-architect / eval-specialist / reviewer (design
-and judgement under ambiguity); Sonnet for optimization-engineer (read-only,
+GPT-5.5 for prompt-engineer / rag-architect / eval-specialist / reviewer (design
+and judgement under ambiguity); medium-effort GPT-5.5 for optimization-engineer (read-only,
 metric-driven) and deploy-engineer (established serving patterns). This domain
 spends real money at runtime, so default to **balanced** with a cost lean:
 model routing and semantic caching are first-class design goals, not
-afterthoughts. Cost-conscious override: all-Sonnet authoring, compaction 85%,
+afterthoughts. Cost-conscious override: all medium-effort GPT-5.5 authoring, compaction 85%,
 full RTK in GETTING_STARTED, and a hard monthly API budget in the deploy
 config. Subagents ~4x, teams ~15x vs direct.
 
@@ -188,8 +188,8 @@ generating any `.mcp.json` entry -- no invented servers):
   RAG pipeline (which is product code, not the assistant's memory).
 - **Database** MCP for a managed vector store (e.g., a Postgres/pgvector
   instance) when eval and retrieval debugging need direct queries.
-- The `claude-api` skill (already in the harness) for building, caching, and
-  migrating Anthropic SDK code -- recommend when the app imports `anthropic`.
+- The `openai-api` skill (already in the harness) for building, caching, and
+  migrating OpenAI SDK code -- recommend when the app imports `openai`.
 
 Keep the assistant's own retrieval separate from the product's RAG pipeline;
 conflating them is a common confusion in this domain.
@@ -197,7 +197,7 @@ conflating them is a common confusion in this domain.
 ## Customization Points
 
 - RAG or not? (no external data source -> drop rag-architect, pure LLM app)
-- Provider/SDK (Anthropic vs OpenAI vs both -> drives permissions + claude-api skill)
+- Provider/SDK (OpenAI vs OpenAI vs both -> drives permissions + openai-api skill)
 - Vector DB choice (local Chroma/pgvector vs managed Pinecone -> infra + ops)
 - Eval rigor (lightweight smoke set vs full golden+adversarial+regression CI)
 - Deployment target (internal tool / API / chatbot -> deploy-engineer scope)

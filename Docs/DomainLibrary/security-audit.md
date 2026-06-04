@@ -19,7 +19,7 @@ third-party or live targets without recorded permission (see Safeguards).
   they own or are authorized to test
 - **Primary tools**: SAST + dependency scanners (npm audit, pip-audit, Trivy,
   Snyk, Bandit, gitleaks/trufflehog), OWASP Top 10 / CWE / CVSS frameworks,
-  NVD/OSV/GHSA advisory lookups via WebFetch, the target codebase's own language
+  NVD/OSV/GHSA advisory lookups via browser/web retrieval, the target codebase's own language
   toolchain (read-mostly)
 - **Complexity**: Standard | **Memory tier**: Standard | **Action default**:
   conservative (audits are read-and-report; never auto-remediate, never run
@@ -31,11 +31,11 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| vulnerability-scanner | sonnet | Scan dependencies/containers/IaC for CVEs, misconfig, leaked secrets; generate the SBOM (dependency inventory); tag each finding provenance + record scanner DB/advisory date; CVSS-rank from published scores (read-only) | custom (closest: researcher.md) -- investigation/inventory, no code changes |
-| code-analyst | opus | SAST: trace user-input source->sink, confirm reachability before any severity, map findings to OWASP Top 10 / CWE (current taxonomy), propose fix snippets (read-only) | reviewer.md |
-| pentest-reporter | opus | Chain findings into attack scenarios (MITRE ATT&CK), write reachability/verification-only PoC steps (never destructive payloads), score business impact | custom (closest: drafter.md) -- attack-scenario report writing |
-| security-consultant | opus | Build remediation roadmap (now/3mo/12mo), map to NIST CSF / ISO 27001 / CIS, cost-vs-risk priority, drive coordinated disclosure for not-owned components | custom (closest: drafter.md) -- remediation plan deliverable |
-| audit-reviewer | opus | QA cross-validation: finding-provenance audit, severity/CVSS consistency, OWASP coverage, every Critical/High has a fix; final report | reviewer.md |
+| vulnerability-scanner | medium-effort | Scan dependencies/containers/IaC for CVEs, misconfig, leaked secrets; generate the SBOM (dependency inventory); tag each finding provenance + record scanner DB/advisory date; CVSS-rank from published scores (read-only) | custom (closest: researcher.md) -- investigation/inventory, no code changes |
+| code-analyst | high-effort | SAST: trace user-input source->sink, confirm reachability before any severity, map findings to OWASP Top 10 / CWE (current taxonomy), propose fix snippets (read-only) | reviewer.md |
+| pentest-reporter | high-effort | Chain findings into attack scenarios (MITRE ATT&CK), write reachability/verification-only PoC steps (never destructive payloads), score business impact | custom (closest: drafter.md) -- attack-scenario report writing |
+| security-consultant | high-effort | Build remediation roadmap (now/3mo/12mo), map to NIST CSF / ISO 27001 / CIS, cost-vs-risk priority, drive coordinated disclosure for not-owned components | custom (closest: drafter.md) -- remediation plan deliverable |
+| audit-reviewer | high-effort | QA cross-validation: finding-provenance audit, severity/CVSS consistency, OWASP coverage, every Critical/High has a fix; final report | reviewer.md |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy (conservative -- read-and-report default), context-management,
@@ -106,11 +106,11 @@ reference):
 - gated (network/live-touching) -- NOT a blanket allow: `snyk test *`,
   `trivy image *`, and any scanner that reaches a remote host or registry are
   gated by the PreToolUse authorization hook to the host allow-list in
-  `settings.local.json`. Deterministic by default for network/live targets.
+  `local config profile`. Deterministic by default for network/live targets.
 - deny (no auto-remediation): `npm audit fix *`, `snyk monitor`, any
   `* --fix *` on the target, and writes to the audited source tree
 - Confine all generated reports to `Docs/_working/audit/`; deny report writes
-  elsewhere. Generate `settings.local.json` for machine-specific scanner paths
+  elsewhere. Generate `local config profile` for machine-specific scanner paths
   (Snyk auth, private CVE DB endpoints) AND the `AUTHORIZED_HOSTS` allow-list the
   authorization hook reads.
 
@@ -136,7 +136,7 @@ the most dangerous data this library handles. These are NOT optional for the dom
   treats any drift toward a working destructive payload as a regression.
 - **Finding provenance (mirrors legal citation integrity -- Rule 3.3 analog):**
   every CVE/finding is tagged TOOL-CONFIRMED (emitted by a named scanner run, OR
-  retrieved from NVD/OSV/GHSA via WebFetch with the source URL + retrieval date
+  retrieved from NVD/OSV/GHSA via browser/web retrieval with the source URL + retrieval date
   recorded) vs UNVERIFIED-RECALL (remembered, not retrieved). An UNVERIFIED-RECALL
   CVE may NEVER appear as a reported finding -- only on a clearly separated "Leads
   to verify (NOT findings)" list. On retrieval failure, do NOT proceed from general
@@ -213,7 +213,7 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
   default for network/live targets, advisory for local source-only) -- intercepts
   network-touching scanners (`snyk test`, `trivy image`, anything reaching a remote
   host/registry) and blocks the run unless the target host is on the
-  `AUTHORIZED_HOSTS` allow-list in `settings.local.json` (populated from
+  `AUTHORIZED_HOSTS` allow-list in `local config profile` (populated from
   00_scope.md). Without it, scope enforcement is advisory only.
 - **PreToolUse secret-redaction gate** (domain-unique, recommended) -- scans
   outbound writes to ANY artifact for live-secret patterns (AWS `AKIA...`, GitHub
@@ -228,14 +228,14 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 
 ## Cost / Model Notes
 
-Opus for the reasoning roles -- code-analyst (data-flow + false-positive judgment),
+GPT-5.5 for the reasoning roles -- code-analyst (data-flow + false-positive judgment),
 pentest-reporter (attack-chain construction), security-consultant (risk
 prioritization + framework + disclosure), audit-reviewer (cross-validation).
-Sonnet for vulnerability-scanner (running scanners, retrieving advisories, and
+medium-effort GPT-5.5 for vulnerability-scanner (running scanners, retrieving advisories, and
 tabulating published-CVSS output is established-pattern execution). Defaults:
-balanced (Opus on judgment roles, Sonnet on scanning; compaction 95%; CLAUDE.md
+balanced (high-effort GPT-5.5 on judgment roles, medium-effort GPT-5.5 on scanning; compaction 95%; AGENTS.md
 ~200 lines). Quality-first override appropriate when the audit is compliance-bearing
-(all-Opus, reviewer gets 2 correction rounds). The 5-agent serial pipeline is ~4x a
+(all-GPT-5.5, reviewer gets 2 correction rounds). The 5-agent serial pipeline is ~4x a
 direct conversation per full audit -- reserve it for full audits, not single lookups.
 
 ## Customization Points

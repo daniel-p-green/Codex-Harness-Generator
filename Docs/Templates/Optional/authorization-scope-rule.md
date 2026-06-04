@@ -13,7 +13,7 @@
      (always-loaded, not just a self-learning seed), and cover responsible
      disclosure. Under 120 lines. -->
 
-## Example: Authorization & Scope Rule (`.claude/rules/0X-authorization-scope.md`)
+## Example: Authorization & Scope Rule (`.codex/rules/0X-authorization-scope.md`)
 
 ````markdown
 # Authorization and scope
@@ -61,7 +61,7 @@ recorded -- never a CVE recalled from memory. Report the published Base CVSS sco
 <!-- VARIATION: For a deterministic posture (live/network targets), pair this rule
      with a PreToolUse authorization gate that blocks network-touching scanner
      commands unless the target matches an authorized-host allow-list in
-     settings.local.json. For local source-only audits the rule may stay advisory.
+     local config profile. For local source-only audits the rule may stay advisory.
      See hooks-template.md for the PreToolUse gate structure. -->
 
 <!-- QUALITY: Validation checklist:

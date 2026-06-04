@@ -259,7 +259,7 @@ Detect file processing requests and route to the appropriate mode:
 Intent: "summarize", "analyze", "what does this say", "key findings", "extract",
         "compare these files", "list the items in"
 Complexity: simple
-Process: MarkItDown inbound -> Claude processes -> text/Markdown output
+Process: MarkItDown inbound -> Codex processes -> text/Markdown output
 Output: Direct text response or Markdown file in Outbox/
 ```
 
@@ -277,7 +277,7 @@ Process:
    b. If new or modified files detected: re-analyze brand assets, update brand-rules.md
    c. Load brand-rules.md for content and formatting guidance
 2. MarkItDown inbound (if processing input files)
-3. Claude drafts content in Markdown, applying brand rules:
+3. Codex drafts content in Markdown, applying brand rules:
    - Tone/voice from brand-rules.md
    - Required terminology
    - Required sections/headers/disclaimers
@@ -298,7 +298,7 @@ Output: Formatted file in Outbox/
 Intent: "update the spreadsheet", "fix the formulas", "add a column",
         "merge these Excel files", "clean this data"
 Complexity: standard
-Process: openpyxl/ImportExcel reads with full fidelity -> Claude modifies -> writes in original format -> Outbox/
+Process: openpyxl/ImportExcel reads with full fidelity -> Codex modifies -> writes in original format -> Outbox/
 Preconditions: Python + openpyxl or PowerShell + ImportExcel available
 Fallback: If tools not available, describe changes and ask user to apply manually
 Output: Modified data file in Outbox/
@@ -361,7 +361,7 @@ No separate brand mode is needed -- it enriches quality mode transparently.
      Fix: Complexity scaling. Simple tasks get 1 agent, direct response.
 
   5. CONSERVATIVE DEFAULT ON EVERYTHING
-     Problem: Claude asks permission for every file read. User gets frustrated.
+     Problem: Codex asks permission for every file read. User gets frustrated.
      Fix: Set proactive defaults for reversible local operations.
 -->
 

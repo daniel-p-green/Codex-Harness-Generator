@@ -6,40 +6,29 @@
      Key difference: the drafter focuses on tone, citations, formatting, and
      section structure rather than compilation and tests. -->
 
-<!-- QUALITY: Must include full frontmatter. Must enforce read-before-write.
+<!-- QUALITY: Must include Codex subagent TOML. Must enforce read-before-write.
      Must include anti-overengineering (no unrequested restructuring). Must
      include brand/style awareness. Must include citation quality requirement.
      Agent body under 80 lines. -->
 
-## Example: Drafter Agent (`.claude/agents/drafter.md`)
+## Example: Drafter Agent (`.codex/agents/drafter.toml`)
 
-````markdown
----
-name: drafter
-description: >
-  Draft and edit documents, memos, reports, briefs, and proposals. Delegate
-  to this agent when written output is needed. Triggers: "draft", "write",
-  "compose", "prepare a report", "revise this document", "edit this section",
-  "create a memo". Do NOT delegate for research or review -- use the
-  researcher or reviewer agent instead.
-model: sonnet
-tools:
-  - Read
-  - Write
-  - Edit
-  - Glob
-  - Grep
-  - Bash
-maxTurns: 50
----
-
+````toml
+name = "drafter"
+description = """
+Draft and edit documents, memos, reports, briefs, and proposals. Delegate to this agent when written output is needed. Triggers: "draft", "write", "compose", "prepare a report", "revise this document", "edit this section", "create a memo". Do NOT delegate for research or review -- use the researcher or reviewer agent instead.
+"""
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
+developer_instructions = """
 <!-- ANNOTATION: Key design decisions:
-     - model: sonnet (document writing benefits from good prose quality;
-       haiku is too terse for professional documents)
-     - maxTurns: 50 (long documents may need many read/write cycles)
-     - Bash access is included for Pandoc conversion (.md -> .docx/.pdf)
-       but NOT for running arbitrary scripts
-     VARIATION: For environments without Pandoc, remove Bash from tools.
+     - model: gpt-5.5 (document writing benefits from good prose quality;
+       small models is too terse for professional documents)
+     - model_reasoning_effort: medium (long documents may need many read/write cycles)
+     - Shell access may be enabled for Pandoc conversion (.md -> .docx/.pdf)
+       but not for running arbitrary scripts
+     VARIATION: For environments without Pandoc, avoid shell commands.
      The drafter will produce Markdown only. -->
 
 ## Objective
@@ -107,10 +96,11 @@ Out of scope:
 - Review / fact-checking (a separate agent handles review)
 - Running data analysis or code
 - Modifying source materials or research notes
+"""
 ````
 
 <!-- QUALITY: Validation checklist for the generator:
-     - [ ] Frontmatter includes: name, description, model, tools, maxTurns
+     - [ ] TOML includes: name, description, model, model_reasoning_effort, sandbox_mode, developer_instructions
      - [ ] Description includes 3+ trigger phrases
      - [ ] Description includes negative trigger ("Do NOT delegate for...")
      - [ ] Anti-overengineering instructions present and prominent
@@ -131,7 +121,7 @@ Out of scope:
 
 <!-- ANTI-PATTERN: Do not merge the drafter and researcher into one agent.
      Research and writing are different cognitive tasks with different tool
-     needs. The researcher needs WebSearch/WebFetch but not Write. The
-     drafter needs Write but not WebSearch. Merging them creates an
+     needs. The researcher needs web retrieval but does not need write access.
+     The drafter needs write access but not open-ended web search. Merging them creates an
      overpowered agent that tends to research indefinitely instead of
      writing, or writes without sufficient research. -->

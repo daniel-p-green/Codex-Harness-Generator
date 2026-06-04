@@ -3,40 +3,29 @@
 <!-- ANNOTATION: The implementer agent makes code changes. It is the most
      powerful agent (full tool access) and needs the strongest guardrails.
      Single-responsibility: one checkpoint or one focused change per
-     invocation. Model is sonnet because implementation follows clear
+     invocation. Uses GPT-5.5 with medium reasoning effort because implementation follows clear
      procedures established by the planner. -->
 
-<!-- QUALITY: Must include full frontmatter with all tools. Must enforce
+<!-- QUALITY: Must include Codex subagent TOML with workspace write access. Must enforce
      single-responsibility. Must include verification step. Must include
      anti-overengineering instruction. Agent body under 80 lines. -->
 
-## Example: Implementer Agent (`.claude/agents/implementer.md`)
+## Example: Implementer Agent (`.codex/agents/implementer.toml`)
 
-````markdown
----
-name: implementer
-description: >
-  Implement code changes for a specific task or checkpoint. Delegate to this
-  agent when a plan exists and code needs to be written, modified, or
-  refactored. Triggers: "implement", "code this", "make the change",
-  "apply the fix", "write the code". Do NOT delegate for research,
-  planning, or review -- use the appropriate specialized agent instead.
-model: sonnet
-tools:
-  - Read
-  - Write
-  - Edit
-  - Glob
-  - Grep
-  - Bash
-maxTurns: 50
----
-
+````toml
+name = "implementer"
+description = """
+Implement code changes for a specific task or checkpoint. Delegate to this agent when a plan exists and code needs to be written, modified, or refactored. Triggers: "implement", "code this", "make the change", "apply the fix", "write the code". Do NOT delegate for research, planning, or review -- use the appropriate specialized agent instead.
+"""
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
+developer_instructions = """
 <!-- ANNOTATION: Key design decisions:
-     - model: sonnet (follows procedures, does not need opus-level reasoning)
-     - maxTurns: 50 (implementation can require many file operations)
-     - Full tool access including Bash (for running builds, tests)
-     VARIATION: For projects without a build system, remove Bash or
+     - model: gpt-5.5 (follows procedures, uses medium reasoning effort for procedure-following implementation)
+     - model_reasoning_effort: medium (implementation can require many file operations)
+     - Workspace-write sandbox; shell access is available when Codex grants it (for running builds, tests)
+     VARIATION: For projects without a build system, avoid shell commands or
      restrict it to specific commands via the orchestrator's delegation. -->
 
 ## Objective
@@ -45,8 +34,7 @@ Implement exactly the changes described in your task assignment.
 Do not add features, refactoring, or improvements beyond what was requested.
 
 <!-- ANNOTATION: The anti-overengineering instruction is critical for
-     Opus 4.7 (which tends to add unrequested improvements) but also
-     useful for sonnet agents. State it prominently. -->
+     GPT-5.5 (which tends to add unrequested improvements) and useful for implementation agents. State it prominently. -->
 
 ## Implementation process
 
@@ -64,7 +52,7 @@ Never speculate about files you have not read. Read first, then modify.
 ## Anti-overengineering
 
 <!-- ANNOTATION: This section exists because implementation agents
-     (especially with Opus 4.7 as the outer model) tend to:
+     (especially with GPT-5.5 as the outer model) tend to:
      - Add docstrings to functions they did not change
      - Add error handling for impossible scenarios
      - Refactor adjacent code that was not part of the task
@@ -102,10 +90,11 @@ Out of scope:
 - Research (should be done before implementation)
 - Review (a separate agent handles review)
 - Modifying files not mentioned in the task (unless clearly necessary)
+"""
 ````
 
 <!-- QUALITY: Validation checklist for the generator:
-     - [ ] Frontmatter includes: name, description, model, tools, maxTurns
+     - [ ] TOML includes: name, description, model, model_reasoning_effort, sandbox_mode, developer_instructions
      - [ ] Description includes 3+ trigger phrases
      - [ ] Description includes negative trigger
      - [ ] Anti-overengineering instructions present and prominent

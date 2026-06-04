@@ -1,11 +1,6 @@
 ---
 name: create
-description: Starts creating a new Claude Code environment for any project -- interviews the user, generates CLAUDE.md + rules + agents + skills + settings, and validates the result. Supports both single-project environments and multi-area hubs (several related work areas sharing a parent configuration layer). Auto-detects when run inside an existing hub and offers to add a new area. Use when user says "create environment", "set up my project", "generate environment", "I need a Claude setup", "make me an environment", "add a work area", "/create", or "build me an environment". Do NOT use for updating existing environments, validating existing environments, or best-practice upgrade recommendations.
-context: fork
-allowed-tools: [Read, Write, Glob, Bash]
-metadata:
-  author: Claude Harness Generator
-  version: 1.0.0
+description: Starts creating a new Codex environment for any project -- interviews the user, generates AGENTS.md + rules + agents + skills + .codex/config.toml, and validates the result. Supports both single-project environments and multi-area hubs (several related work areas sharing a parent configuration layer). Auto-detects when run inside an existing hub and offers to add a new area. Use when user says "create environment", "set up my project", "generate environment", "I need a Codex setup", "make me an environment", "add a work area", "/create", or "build me an environment". Do NOT use for updating existing environments, validating existing environments, or best-practice upgrade recommendations.
 ---
 
 ## Critical
@@ -17,7 +12,7 @@ This skill is a TRIGGER. It prepares the creation context and returns control to
 1. Get the target directory path from the user
 2. Verify the directory exists or can be created
 3. Test writability
-4. Check for existing Claude Code files
+4. Check for existing Codex files
 5. Write CREATION_CONTEXT.md
 6. Return to orchestrator
 
@@ -54,7 +49,7 @@ After verifying the directory, check if `<target>/Docs/Environment/GENERATION_PR
 
 Create a temporary file in the target directory to confirm write access:
 ```
-<target>/.claude_env_write_test
+<target>/.codex_env_write_test
 ```
 If creation succeeds, delete the temp file immediately. If it fails, report the permission error and stop.
 
@@ -70,12 +65,12 @@ Checks to run:
 
 Record the results for inclusion in CREATION_CONTEXT.md (Step 6).
 
-### Step 4: Check for existing Claude Code files
+### Step 4: Check for existing Codex files
 
 Look for these in the target directory:
-- `.claude/` directory
-- `CLAUDE.md` file
-- `CLAUDE.local.md` file
+- `.codex/` directory
+- `AGENTS.md` file
+- `AGENTS.override.md` file
 
 If any are found, note them in the output. Do not overwrite or modify them at this stage. The orchestrator will handle conflict resolution.
 
@@ -85,7 +80,7 @@ Check whether the target directory itself, OR any ancestor directory up to the f
 - A HUB_GENESIS.md is found -> record the hub root path and read the work-area registry (list of area slugs). Set Hub Context status to `HUB_ADD_AREA`.
 - The filesystem root is reached -> no hub detected. Set Hub Context status to `NONE`.
 
-Do not walk past a directory that itself contains CLAUDE.md + .claude/ without HUB_GENESIS.md -- that is a single-area environment, not a hub.
+Do not walk past a directory that itself contains AGENTS.md + .codex/ without HUB_GENESIS.md -- that is a single-area environment, not a hub.
 
 Record in CREATION_CONTEXT.md:
 ```

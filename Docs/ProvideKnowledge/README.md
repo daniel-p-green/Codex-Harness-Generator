@@ -1,6 +1,6 @@
 # ProvideKnowledge
 
-Drop files here to contribute knowledge to the Claude Harness Generator.
+Drop files here to contribute knowledge to the Codex Harness Generator.
 
 The Harness Generator's `/update` command scans this folder, validates the content,
 incorporates useful findings into the knowledge base, and moves processed
@@ -14,7 +14,7 @@ ingest these files without running web research.
 
 Anything that helps the Harness Generator generate better environments:
 
-- **Best practices** you have discovered through using Claude Code
+- **Best practices** you have discovered through using Codex
 - **Configuration patterns** that worked well (or failed) for your project
 - **Prompt engineering findings** (what phrasing works, what does not)
 - **Skill descriptions** that trigger reliably (or ones that do not)
@@ -41,7 +41,7 @@ Recommended structure:
 
 ## Context
 [What project/domain this applies to]
-[What version of Claude Code you were using]
+[What version of Codex you were using]
 
 ## Finding
 [What you discovered, as specifically as possible]
@@ -55,7 +55,7 @@ Recommended structure:
 
 ### Option 2: Drop a Configuration File
 
-If you have a working settings.json, CLAUDE.md, rule file, or skill
+If you have a working .codex/config.toml, AGENTS.md, rule file, or skill
 definition that you think is well-crafted, drop a copy here. Include
 a short note explaining what project it was made for and why it works well.
 
@@ -66,8 +66,8 @@ or discussion thread with relevant information. Include a one-line
 description of what the link contains.
 
 ```
-https://example.com/article-about-claude-code-tips
-Claude Code tips for Python projects -- covers virtual env handling and pytest integration
+https://example.com/article-about-codex-tips
+Codex tips for Python projects -- covers virtual env handling and pytest integration
 ```
 
 ---
@@ -93,9 +93,9 @@ You can check `Processed/` to see what was done with your contribution.
 
 Contributions are most useful when they include:
 
-- **Specificity**: "Adding `Bash(pytest *)` to settings.json allow list
-  prevents permission prompts during test runs" is better than "make sure
-  permissions are set up right."
+- **Specificity**: "Documenting `python -m pytest` as the validation command and
+  keeping destructive package commands behind approval" is better than "make
+  sure permissions are set up right."
 
 - **Evidence**: "I tested this with 3 projects and it worked each time"
   is better than "I think this might work."

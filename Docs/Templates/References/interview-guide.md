@@ -39,7 +39,7 @@ Questions:
 - "Do you have a build system, test suite, or CI/CD pipeline?"
 - "What external services does your project connect to (databases, APIs, cloud
   platforms, project management tools)?"
-- "Do you use any additional Claude Code plugins or tool integrations that
+- "Do you use any additional Codex plugins or tool integrations that
   extend what the assistant can do? (These are sometimes called MCP servers --
   if you are not sure, the answer is probably no.)"
 - "Do you work with data files like spreadsheets, CSV files, or databases? If
@@ -49,7 +49,7 @@ Questions:
   processing routing entries.
 - "Does your project include files like images, videos, audio, design files,
   or other files that cannot be edited as text?"
-  This determines: .claudeignore patterns, binary protection hooks, "describe
+  This determines: VCS ignore rules patterns, binary protection hooks, "describe
   editor steps" routing entries.
 
 SKIP CONDITION: If Stage 1 reveals a purely non-technical project (pure writing,
@@ -192,7 +192,7 @@ INTAKE_STATUS: IN_PROGRESS | COMPLETE
 [Single-session vs multi-session, dependencies, parallel work, VCS type]
 
 ## AI Tool Budget and Multi-Model Usage
-[Budget tier, other AI tools, routing recommendations, or "Claude only"]
+[Budget tier, other AI tools, routing recommendations, or "Codex only"]
 
 ## Token Efficiency Priority
 [cost-conscious / balanced / quality-first]

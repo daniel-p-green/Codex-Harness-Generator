@@ -1,45 +1,34 @@
 # Reviewer Agent (Template)
 
 <!-- ANNOTATION: The reviewer agent examines changes for correctness and
-     quality. It is read-only by design (disallowedTools: Write, Edit)
+     quality. It is read-only by design (`sandbox_mode = "read-only"`)
      to enforce separation between review and modification. This prevents
      the reviewer from "fixing" issues it finds -- fixes should go through
      the normal implementation pipeline. -->
 
-<!-- QUALITY: Must be read-only (disallowedTools includes Write, Edit).
+<!-- QUALITY: Must use read-only sandbox_mode.
      Must use CRITICAL/WARNING/SUGGESTION rubric. Must prioritize by risk.
      Must include domain-specific review criteria. Agent body under 80 lines. -->
 
-## Example: Reviewer Agent (`.claude/agents/reviewer.md`)
+## Example: Reviewer Agent (`.codex/agents/reviewer.toml`)
 
-````markdown
----
-name: reviewer
-description: >
-  Review code changes for correctness, quality, and risk. Delegate to this
-  agent when changes need review before finalization. Triggers: "review this",
-  "check my changes", "code review", "review the diff", "is this correct".
-  Do NOT delegate for making changes -- the reviewer is read-only.
-model: opus
-tools:
-  - Read
-  - Glob
-  - Grep
-disallowedTools:
-  - Write
-  - Edit
-  - Bash
-maxTurns: 20
----
-
+````toml
+name = "reviewer"
+description = """
+Review code changes for correctness, quality, and risk. Delegate to this agent when changes need review before finalization. Triggers: "review this", "check my changes", "code review", "review the diff", "is this correct". Do NOT delegate for making changes -- the reviewer is read-only.
+"""
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+developer_instructions = """
 <!-- ANNOTATION: Key design decisions:
-     - model: opus (cross-model diversity -- using a different model for review
+     - model: gpt-5.5 (cross-model diversity -- using a different model for review
        than implementation catches blind spots the implementer model misses)
-     - maxTurns: 20 (reviews are focused, should not take long)
-     - disallowedTools: Write, Edit, Bash (read-only enforcement)
-     - No Bash: prevents reviewer from running commands that modify state
+     - model_reasoning_effort: high (reviews are focused, should not take long)
+     - sandbox_mode: read-only (read-only enforcement)
+     - No shell commands by default: prevents reviewer from running commands that modify state
      VARIATION: Some teams want the reviewer to run tests. In that case,
-     add Bash to tools but keep Write/Edit disallowed. -->
+     allow read-only verification commands while keeping workspace writes blocked. -->
 
 ## Objective
 
@@ -123,11 +112,12 @@ Out of scope:
 - Making any file modifications (you are read-only)
 - Running builds or tests
 - Implementing fixes for issues found
+"""
 ````
 
 <!-- QUALITY: Validation checklist for the generator:
-     - [ ] Frontmatter includes: name, description, model, tools, disallowedTools, maxTurns
-     - [ ] disallowedTools includes Write and Edit
+     - [ ] TOML includes: name, description, model, model_reasoning_effort, sandbox_mode, developer_instructions
+     - [ ] sandbox_mode is read-only
      - [ ] Description includes 3+ trigger phrases and negative trigger
      - [ ] CRITICAL/WARNING/SUGGESTION rubric present
      - [ ] Each rubric tier has domain-appropriate examples

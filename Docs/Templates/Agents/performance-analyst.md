@@ -6,44 +6,31 @@
      into the planner/implementer pipeline for actual fixes. This is a
      game-development-specific agent but the pattern applies to any performance work. -->
 
-<!-- QUALITY: Must be read-only (disallowedTools includes Write, Edit).
+<!-- QUALITY: Must use read-only sandbox_mode.
      Must prioritize by measured impact, not guesses. Must include
      engine-specific profiling awareness. Must require measurable
      recommendations. Agent body under 80 lines. -->
 
-## Example: Performance Analyst Agent (`.claude/agents/performance-analyst.md`)
+## Example: Performance Analyst Agent (`.codex/agents/performance-analyst.toml`)
 
-````markdown
----
-name: performance-analyst
-description: >
-  Analyze performance issues and recommend optimizations. Delegate to this
-  agent when the user reports FPS drops, hitching, high tick cost, excessive
-  draw calls, memory spikes, or provides profiling data. Triggers: "FPS drop",
-  "performance", "optimize", "slow", "hitching", "lag", "profiling data",
-  "tick cost too high". Do NOT delegate for implementing fixes -- the
-  performance analyst is read-only and recommends changes only.
-model: sonnet
-tools:
-  - Read
-  - Glob
-  - Grep
-disallowedTools:
-  - Write
-  - Edit
-  - Bash
-maxTurns: 30
----
-
+````toml
+name = "performance-analyst"
+description = """
+Analyze performance issues and recommend optimizations. Delegate to this agent when the user reports FPS drops, hitching, high tick cost, excessive draw calls, memory spikes, or provides profiling data. Triggers: "FPS drop", "performance", "optimize", "slow", "hitching", "lag", "profiling data", "tick cost too high". Do NOT delegate for implementing fixes -- the performance analyst is read-only and recommends changes only.
+"""
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+sandbox_mode = "read-only"
+developer_instructions = """
 <!-- ANNOTATION: Key design decisions:
-     - model: sonnet (performance analysis requires reasoning about
+     - model: gpt-5.5 (performance analysis requires reasoning about
        runtime behavior, not just pattern matching)
-     - disallowedTools: Write, Edit, Bash (strictly read-only)
-     - maxTurns: 30 (focused analysis, not exhaustive codebase scan)
-     - No Bash: prevents accidentally running profiling tools or builds;
+     - sandbox_mode: read-only (strictly read-only)
+     - model_reasoning_effort: medium (focused analysis, not exhaustive codebase scan)
+     - No shell commands by default: prevents accidentally running profiling tools or builds;
        analysis is based on reading code and provided profiling data
      VARIATION: If the project has automated profiling scripts, consider
-     adding Bash (read-only scripts only) while keeping Write/Edit blocked. -->
+     allowing read-only profiling scripts while keeping workspace writes blocked. -->
 
 ## Objective
 
@@ -138,11 +125,12 @@ Out of scope:
 - Running builds, profiling tools, or benchmarks
 - Implementing optimizations (recommend changes for the implementer)
 - Guessing at performance without measurement data
+"""
 ````
 
 <!-- QUALITY: Validation checklist for the generator:
-     - [ ] Frontmatter includes: name, description, model, tools, disallowedTools, maxTurns
-     - [ ] disallowedTools includes Write, Edit, Bash
+     - [ ] TOML includes: name, description, model, model_reasoning_effort, sandbox_mode, developer_instructions
+     - [ ] sandbox_mode is read-only
      - [ ] Description includes 3+ trigger phrases and negative trigger
      - [ ] Hotspot checklist present with domain-appropriate categories
      - [ ] "Never guess" / "measure first" instruction present

@@ -3,11 +3,11 @@
 <!-- TEMPLATE ANNOTATION
   This template defines the dual-purpose memory system for generated environments.
   Memory serves two audiences simultaneously:
-  1. Claude's on-demand knowledge base (loaded just-in-time per task)
+  1. Codex's on-demand knowledge base (loaded just-in-time per task)
   2. Human-readable project wiki (browsable locally or via GitHub Pages)
 
   The key insight: a developer wanting to understand "how does the combat system
-  work" needs the same information Claude needs. One artifact serves both.
+  work" needs the same information Codex needs. One artifact serves both.
 
   QUALITY CRITERIA:
   - Three tiers defined (Lite/Standard/Enterprise) with selection criteria
@@ -23,7 +23,7 @@
   WHY THIS EXISTS:
   Memory bridges sessions AND bridges team members. Without it, every session
   starts from scratch and every new developer reads code blind. The dual-purpose
-  approach means the documentation stays current because Claude updates it as
+  approach means the documentation stays current because Codex updates it as
   part of normal work -- not as a separate documentation task that gets neglected.
 -->
 
@@ -36,19 +36,19 @@
 
 <!-- CORE PRINCIPLES
   WHY: These principles prevent memory from becoming stale, bloated, or
-  useful to Claude but useless to humans (or vice versa).
+  useful to Codex but useless to humans (or vice versa).
 -->
 
 ## Principles
 
-1. **index.md is always loaded**. It is the wiki home page and Claude's
+1. **index.md is always loaded**. It is the wiki home page and Codex's
    table of contents. Keep it under 50 lines.
 2. **Everything else loads on demand**. Agents read specific pages when
    needed, not the entire wiki.
 3. **Depth-aware retrieval**: Area pages have a summary at the top (quick
-   context) and detailed sections below (deep work). Claude reads the
+   context) and detailed sections below (deep work). Codex reads the
    depth appropriate to the task.
-4. **Dual-purpose content**: Every page must be useful to both Claude and
+4. **Dual-purpose content**: Every page must be useful to both Codex and
    a human developer. Write documentation-quality prose, not machine stubs.
 5. **Working memory is separate**: Session state, friction logs, and
    transient data live in `Docs/_working/` (excluded from wiki publishing).
@@ -89,14 +89,14 @@ Docs/_working/                  # Working memory (NOT published)
 ```
 
 The `_working/` prefix ensures Jekyll (GitHub Pages) ignores this directory
-by default. Working memory is useful to Claude but not to wiki readers.
+by default. Working memory is useful to Codex but not to wiki readers.
 
 **VCS exclusion (REQUIRED):** `Docs/_working/` MUST be excluded from version
 control so each developer has independent working state. The component-generator
 adds this to `.gitignore` (or `.p4ignore` for Perforce projects) automatically.
 Without this, working state from one developer bleeds into another's sessions.
 
-**Session segmentation (optional):** For users running parallel Claude Code
+**Session segmentation (optional):** For users running parallel Codex
 sessions, state files can be segmented by session:
 - Default: `_working/state/SESSION_SNAPSHOT.json` (single file, latest wins)
 - Segmented: `_working/state/<session-slug>/SESSION_SNAPSHOT.json` (per-session)
@@ -232,8 +232,8 @@ Last Updated: 2026-02-14
 ### Area document format (depth-aware)
 
 Area pages use progressive disclosure. The top sections give quick context
-(for both a skimming developer and Claude doing a quick lookup). The lower
-sections provide depth (for a developer learning the system or Claude
+(for both a skimming developer and Codex doing a quick lookup). The lower
+sections provide depth (for a developer learning the system or Codex
 working in this area).
 
 ```markdown
@@ -290,7 +290,7 @@ and format responses. Repositories handle database queries.
 - Customer soft-delete: `is_active=False`, not actual row deletion
 ```
 
-**Depth-aware retrieval for Claude**: When the task only needs to know what
+**Depth-aware retrieval for Codex**: When the task only needs to know what
 the API area covers, read the Summary and Overview sections (first ~10 lines).
 When working in this area, read the full page. When debugging a specific issue,
 also read related area pages via Integration Points.
@@ -327,7 +327,7 @@ Use FastAPI StreamingResponse with chunked CSV generation.
 ### Symbol page format (optional)
 
 Symbol pages provide reference documentation for key classes, functions, or
-components. They are populated on demand when Claude explores the codebase.
+components. They are populated on demand when Codex explores the codebase.
 
 ```markdown
 # UserService
@@ -424,7 +424,7 @@ developer can browse the Markdown files locally or in their IDE.
 
 ## Content quality standards
 
-When Claude populates area pages (through exploration, implementation, or
+When Codex populates area pages (through exploration, implementation, or
 debugging), it must write documentation-quality content:
 
 - **Complete sentences**, not just tables of file paths
@@ -481,16 +481,16 @@ When staleness is detected:
 
 ## Auto-memory integration
 
-Claude Code maintains automatic memory at `~/.claude/projects/<project>/memory/`.
+Codex maintains automatic memory at `~/.codex/projects/<project>/memory/`.
 This is separate from the wiki:
 
 | Feature | Docs/ wiki | Auto-memory |
 |---|---|---|
 | Shared with team | Yes (via VCS) | No (local to user) |
-| Structure | Defined by this environment | Claude's automatic notes |
+| Structure | Defined by this environment | Codex's automatic notes |
 | Loaded by default | index.md only | First 200 lines of MEMORY.md |
 | Purpose | Team knowledge base + wiki | Personal preferences and learnings |
-| Managed by | /state-save, /update, agents | Claude automatically |
+| Managed by | /state-save, /update, agents | Codex automatically |
 
 Both systems complement each other. The wiki is the team knowledge base.
 Auto-memory is personal preferences. Do not duplicate information between them.

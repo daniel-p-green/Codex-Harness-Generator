@@ -3,7 +3,7 @@
 ### 8.1 XML-Based Classification
 
 - **Established**: Baseline
-- **Source**: claude-cookbooks-agents.md, prompt-engineering.md | Tier 1
+- **Source**: https://developers.openai.com/codex/subagents, prompt-engineering.md | Tier 1
 - **Recommendation**: Use XML tags for structured routing decisions:
   ```
   <reasoning>Brief explanation of why this route was chosen</reasoning>
@@ -19,7 +19,7 @@
 ### 8.2 Complexity Scaling
 
 - **Established**: 2025-09
-- **Source**: multi-agent-research-system.md, claude-cookbooks-agents.md | Tier 1
+- **Source**: multi-agent-research-system.md, https://developers.openai.com/codex/subagents | Tier 1
 - **Recommendation**: Scale agent count to task complexity:
 
   | Complexity | Agent Count | Tool Calls | Example |
@@ -36,7 +36,7 @@
 ### 8.3 Proactive vs. Conservative Defaults
 
 - **Established**: Baseline
-- **Source**: platform-agent-patterns.md, guardrails.md | Tier 1
+- **Source**: https://developers.openai.com/codex/subagents, guardrails.md | Tier 1
 - **Recommendation**: Set the action default per domain:
 
   **Proactive** (default to implementation):
@@ -59,7 +59,7 @@
 ### 8.4 Ambiguity Resolution
 
 - **Established**: Baseline
-- **Source**: platform-agent-patterns.md, context-engineering.md | Tier 1
+- **Source**: https://developers.openai.com/codex/subagents, context-engineering.md | Tier 1
 - **Recommendation**: When user intent is ambiguous, prefer investigation/exploration over
   asking clarifying questions (for engineering domains). Use the explore agent to gather
   facts, then route based on findings. Only ask the user when intent is genuinely ambiguous
@@ -70,7 +70,7 @@
 
   Include fallback chains for every routing entry: if the primary route fails or is
   unavailable, what is the fallback?
-- **Anti-pattern**: Always asking the user for clarification. Users expect Claude to figure
+- **Anti-pattern**: Always asking the user for clarification. Users expect Codex to figure
   things out. Over-asking breaks flow and signals lack of capability. Investigate first,
   ask only when truly stuck.
 

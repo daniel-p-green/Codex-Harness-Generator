@@ -27,7 +27,7 @@ build/
      This saves significant tokens compared to generating build commands
      and parsing logic from scratch each time. -->
 
-## Example: Build Skill (`.claude/skills/build/SKILL.md`)
+## Example: Build Skill (`.agents/skills/build/SKILL.md`)
 
 ````markdown
 ---
@@ -38,7 +38,7 @@ description: >
   use after implementing code changes to verify they compile. Do NOT use
   for running tests (use the test command directly) or for deploying.
 context: fork
-allowed-tools:
+tool access policy:
   - Read
   - Bash
   - Glob
@@ -49,18 +49,18 @@ metadata:
 
 <!-- ANNOTATION: Frontmatter design decisions:
      - context: fork (runs in isolated subagent context)
-     - allowed-tools: Bash needed to run build, Read/Glob/Grep for
-       investigating errors. Write/Edit NOT included because the build
+     - uses shell commands to run build/test and `rg` plus targeted reads for
+       investigating errors. Workspace writes are not included because the build
        skill should not fix errors -- it reports them.
      - description: includes 5 trigger phrases and 2 negative triggers
      VARIATION: For projects where the build skill should auto-fix
      simple errors (like missing imports), add Write and Edit to
-     allowed-tools and include fix instructions. -->
+     tool access policy and include fix instructions. -->
 
 ## Critical: Build Command
 
 <!-- ANNOTATION: Critical instructions go at the TOP of SKILL.md,
-     per Anthropic's skill authoring best practices. The build
+     per OpenAI's skill authoring best practices. The build
      command is the most important piece of information. -->
 
 Run this command to build:
@@ -84,9 +84,9 @@ npm run build
 ## Build-Fix-Rebuild Loop
 
 <!-- ANNOTATION: This is the canonical feedback loop pattern from
-     Anthropic's skill authoring guide. The key insight is to make
+     OpenAI's skill authoring guide. The key insight is to make
      validation scripts verbose with specific error messages so
-     Claude can fix issues without human intervention. -->
+     Codex can fix issues without human intervention. -->
 
 1. Run the build command
 2. If the build succeeds: report SUCCESS and stop
@@ -182,7 +182,7 @@ exit $EXIT_CODE
 
 <!-- ANTI-PATTERN: Do not put the actual build command only in the script
      and not in SKILL.md. If the script is missing or fails to execute,
-     Claude needs to know the build command from SKILL.md directly. -->
+     Codex needs to know the build command from SKILL.md directly. -->
 
 <!-- ANTI-PATTERN: Do not include the full error reference in SKILL.md.
      Put it in references/error-reference.md and load on demand. This

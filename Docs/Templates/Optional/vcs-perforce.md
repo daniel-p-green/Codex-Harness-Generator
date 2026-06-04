@@ -8,14 +8,14 @@
 <!-- QUALITY: Must include the "never submit" rule. Must handle binary assets.
      Must categorize commands. Must not exceed 120 lines. -->
 
-## Example: Perforce VCS Rule (`.claude/rules/vcs-perforce.md`)
+## Example: Perforce VCS Rule (`.codex/rules/vcs-perforce.md`)
 
 ```markdown
 # Perforce integration
 
 This project uses Perforce (Helix Core), not Git.
 
-<!-- ANNOTATION: State the VCS upfront because Claude defaults to Git
+<!-- ANNOTATION: State the VCS upfront because Codex defaults to Git
      assumptions. This single line prevents many misrouted operations. -->
 
 ## Safe commands (run without asking)
@@ -66,7 +66,7 @@ Ask before running:
 
 <!-- ANNOTATION: This is critical for game dev and media projects.
      Binary files (.uasset, .umap, .psd, .fbx, etc.) cannot be
-     meaningfully diffed or merged. Claude must never edit them. -->
+     meaningfully diffed or merged. Codex must never edit them. -->
 
 Do NOT edit binary assets (`.uasset`, `.umap`, `.psd`, `.fbx`, `.blend`).
 If a binary/editor-only change is required:
@@ -95,6 +95,6 @@ If a binary/editor-only change is required:
 -->
 
 <!-- ANTI-PATTERN: Do not include Perforce workspace/client configuration
-     details. Those belong in CLAUDE.local.md (machine-specific, not
+     details. Those belong in AGENTS.override.md (machine-specific, not
      shared). Do not include depot paths -- those are project-specific
      and should come from GENESIS.md. -->

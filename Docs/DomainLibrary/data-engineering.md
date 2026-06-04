@@ -16,12 +16,12 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| etl-architect | opus | Design source analysis, layered schema (Raw->Staging->Curated->Analytics, Raw append-only), transformation models, partition/format strategy; classify sensitive columns and place the masking/tokenization layer so raw PII never reaches Curated/Analytics | planner.md (custom: ELT layer + schema design) |
-| data-quality-manager | sonnet | Profile data, author P0/P1/P2 validation rules, anomaly/drift detection, row-count reconciliation (input vs output per stage, to catch silent row drops), PII-presence checks, lineage and SLA targets | analyst.md |
-| scheduler-engineer | opus | DAG topology, dependencies, retry/backoff policy, idempotency, backfill strategy, resource limits | planner.md (custom: orchestration design) |
-| monitoring-specialist | sonnet | Pipeline/data/infra metrics, alert thresholds, dashboards, SLA tracking, incident runbooks | performance-analyst.md (custom: observability, read-only) |
-| pipeline-reviewer | opus | Cross-validate architecture<->quality<->scheduling<->monitoring; operational-readiness gate (read-only) | reviewer.md |
-| explorer | sonnet | Locate existing schemas, DAG code, dbt models, source connection configs | explorer.md |
+| etl-architect | high-effort | Design source analysis, layered schema (Raw->Staging->Curated->Analytics, Raw append-only), transformation models, partition/format strategy; classify sensitive columns and place the masking/tokenization layer so raw PII never reaches Curated/Analytics | planner.md (custom: ELT layer + schema design) |
+| data-quality-manager | medium-effort | Profile data, author P0/P1/P2 validation rules, anomaly/drift detection, row-count reconciliation (input vs output per stage, to catch silent row drops), PII-presence checks, lineage and SLA targets | analyst.md |
+| scheduler-engineer | high-effort | DAG topology, dependencies, retry/backoff policy, idempotency, backfill strategy, resource limits | planner.md (custom: orchestration design) |
+| monitoring-specialist | medium-effort | Pipeline/data/infra metrics, alert thresholds, dashboards, SLA tracking, incident runbooks | performance-analyst.md (custom: observability, read-only) |
+| pipeline-reviewer | high-effort | Cross-validate architecture<->quality<->scheduling<->monitoring; operational-readiness gate (read-only) | reviewer.md |
+| explorer | medium-effort | Locate existing schemas, DAG code, dbt models, source connection configs | explorer.md |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy, context-management, self-learning, error-handling (with diagnostic
@@ -86,9 +86,9 @@ Add **Docker** when pipelines run containerized, and the read-oriented
 gate `* apply *`, `* delete *`, `terraform apply/destroy`, and any warehouse
 DDL/DML that writes production tables behind human approval. Treat raw/source
 and landed-data directories as read-only (deny writes per intake). Domain tools
-to add to allow lists when named in intake: `dbt run/test/build/compile *`,
+to document when named in intake: `dbt run/test/build/compile *`,
 `airflow dags list/test *` (deny `airflow dags trigger/backfill *` -> ask),
-`great_expectations *` / `gx *`. Generate `settings.local.json` for
+`great_expectations *` / `gx *`. Generate `local config profile` for
 machine-specific warehouse connection strings -- never commit secrets.
 
 ## Self-Learning Seed Entries
@@ -140,12 +140,12 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 
 ## Cost / Model Notes
 
-Opus for etl-architect / scheduler-engineer / pipeline-reviewer (architecture,
-dependency, and readiness reasoning); Sonnet for data-quality-manager /
+GPT-5.5 for etl-architect / scheduler-engineer / pipeline-reviewer (architecture,
+dependency, and readiness reasoning); medium-effort GPT-5.5 for data-quality-manager /
 monitoring-specialist / explorer (rule authoring, metric setup, established
-patterns). Defaults: balanced (Opus on design/review roles, Sonnet on
-execution; compaction 95%; CLAUDE.md ~200 lines). Cost-conscious override:
-all-Sonnet except pipeline-reviewer, compaction 85%, full RTK in
+patterns). Defaults: balanced (GPT-5.5 on design/review roles, medium-effort GPT-5.5 on
+execution; compaction 95%; AGENTS.md ~200 lines). Cost-conscious override:
+all medium-effort GPT-5.5 except pipeline-reviewer, compaction 85%, full RTK in
 GETTING_STARTED. Subagents ~4x, teams ~15x vs direct -- reserve the full
 five-specialist run for genuine end-to-end pipeline design.
 

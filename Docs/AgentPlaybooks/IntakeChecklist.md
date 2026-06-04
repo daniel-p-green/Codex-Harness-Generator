@@ -33,7 +33,7 @@ Before presenting profiles, gauge the user's comfort level:
 
 This determines:
 - **Agent count**: Fewer agents for novices (avoid overwhelming them).
-- **Language complexity**: Simpler wording in generated CLAUDE.md and rules for beginners.
+- **Language complexity**: Simpler wording in generated AGENTS.md and rules for beginners.
 - **GETTING_STARTED.md depth**: Detailed walkthrough for beginners, concise for experts.
 - **Terminal basics**: Whether to include basic terminal/CLI guidance in generated docs.
 
@@ -43,11 +43,11 @@ informational, not a gate.
 
 ### Step 0b: Work-area shape
 
-Ask how Claude should treat this work (say "work area", never "hub"):
+Ask how Codex should treat this work (say "work area", never "hub"):
 
 - *One focused area* -- everything is closely related, shared context (a single
   codebase; a research effort with multiple outputs; a novel + its reference bible).
-- *Separate work areas that share some basics* -- Claude keeps each mentally
+- *Separate work areas that share some basics* -- Codex keeps each mentally
   separate but remembers shared rules and style (three client codebases; a studio
   with a shooter + a racing game + shared tools; a consultant with a policy
   project + a training curriculum + an audit tool).
@@ -57,7 +57,7 @@ Always reassure: "You can change this later -- converting between one focused
 area and multiple work areas takes about a minute. Nothing here is locked in."
 
 **"Not sure" branch**: (1) "List the main things you'll work on here -- short
-names are fine." (2) "Imagine you're deep in [thing A] and Claude suddenly pulls
+names are fine." (2) "Imagine you're deep in [thing A] and Codex suddenly pulls
 up notes from [thing B]. For each pair: helpful, annoying, or depends?" Decision
 rule: all "helpful" -> one focused area; any "annoying" -> separate work areas
 (group the "helpful" pairs); mostly "depends" -> default to separate, explain
@@ -156,9 +156,9 @@ user-volunteered information:
   - Solo -> skip multi-role entirely
   - Team, same role (e.g., all developers) -> standard team setup, no role config
   - Team, different roles -> generate multi-role support:
-    - `Docs/Roles/` directory with CLAUDE.local.md templates per role
+    - `Docs/Roles/` directory with AGENTS.override.md templates per role
     - Role-prefixed routing entries in the orchestrator rule
-    - Per-role settings.local.json templates
+    - Per-role local config profile templates
     - Per-role wiki retrieval hints
     - "Setting up your role" section in GETTING_STARTED.md
   Follow up: "What roles use or would use this project? For each role, what
@@ -226,10 +226,10 @@ user-volunteered information:
   find it hard to keep track of where things are?"
   This determines: RAG strategy for codebase retrieval.
   Signals:
-  - Fresh/small (<100 files) -> standard agentic search (Glob/Grep/Read)
+  - Fresh/small (<100 files) -> standard shell-first search (`rg --files`, `rg`, targeted reads)
   - Medium (100-1000 files) -> /map-codebase skill + wiki hierarchy
   - Large (1000+ files) -> /map-codebase + hierarchical summaries + recommend
-    semantic search MCP (Claude Context MCP or Code-Graph-RAG)
+    semantic search MCP (Codex Context MCP or Code-Graph-RAG)
   - Dense inheritance (UE5, Unity, large OOP) -> tree-sitter dependency graphs
 
 - **Reference documents**: "Do you work with reference documents like design
@@ -273,14 +273,14 @@ user-volunteered information:
   trigger wiki promotion (extracting decisions, patterns, and area updates
   from _working/ into shared Docs/).
 
-- **AI tool budget and multi-model interest**: "Are you using only Claude Code,
+- **AI tool budget and multi-model interest**: "Are you using only Codex,
   or do you also use other AI tools like ChatGPT, Gemini, Copilot, or local
   models? What is your rough monthly budget for AI tools?"
   This determines: multi-model workflow configuration.
   Signals:
-  - Claude only ($20-200/mo) -> optimize environment for Claude strengths
-  - Claude + free tools ($20-50/mo) -> document which free tools for which tasks
-  - Claude + paid tools ($100-300/mo) -> configure MCP bridges, document routing
+  - Codex only ($20-200/mo) -> optimize environment for Codex strengths
+  - Codex + free tools ($20-50/mo) -> document which free tools for which tasks
+  - Codex + paid tools ($100-300/mo) -> configure MCP bridges, document routing
   - Unlimited budget ($500+/mo) -> API-first routing, multi-model orchestration
   Present budget tiers as suggestions, not requirements. Many users are unaware
   of free/local options that could augment their workflow.
@@ -295,11 +295,11 @@ user-volunteered information:
   - **Quality-first**: "Use the most capable model wherever it helps. Generous
     context. No optimization pressure. Best when quality matters more than cost."
   This determines:
-  - Model defaults in settings.json (all-Sonnet vs mixed vs Opus-available)
+  - Model defaults in .codex/config.toml (all medium-effort GPT-5.5 vs mixed reasoning efforts vs GPT-5.5 high-effort available)
   - Compaction threshold (85% vs 95% default vs 95% default)
-  - .claudeignore aggressiveness (aggressive + generic vs domain-specific vs minimal)
+  - VCS ignore rules aggressiveness (aggressive + generic vs domain-specific vs minimal)
   - RTK install instructions in GETTING_STARTED.md (full setup vs mention vs omit)
-  - CLAUDE.md line target (150 vs 200 vs 250)
+  - AGENTS.md line target (150 vs 200 vs 250)
   - Agent roster size (consolidated vs standard vs full)
   Default: balanced if no preference stated.
 
@@ -311,13 +311,13 @@ reviews, or something else?").
 ### Step 4: External services and MCP integrations
 
 Ask about external tools and services. This is a dedicated step because it
-directly affects settings.json permissions, MCP configuration, and potentially
+directly affects .codex/config.toml permissions, MCP configuration, and potentially
 which agents are generated.
 
 Questions to ask:
 1. "Do you use any external services that your assistant should connect to?
    For example: GitHub, Jira, Notion, Slack, databases, cloud providers."
-2. "Do you use any additional Claude Code plugins or tool integrations that extend what the assistant can do? (These are sometimes called MCP servers -- if you are not sure, the answer is probably no.)"
+2. "Do you use any additional Codex plugins or tool integrations that extend what the assistant can do? (These are sometimes called MCP servers -- if you are not sure, the answer is probably no.)"
 3. "Are there any websites or documentation sources your assistant should be
    able to search or reference?"
 
@@ -385,7 +385,7 @@ Questions:
 - "Do you have a build system, test suite, or CI/CD pipeline?"
 - "What external services does your project connect to (databases, APIs,
   cloud platforms, project management tools)?"
-- "Do you use any additional Claude Code plugins or tool integrations that extend what the assistant can do? (These are sometimes called MCP servers -- if you are not sure, the answer is probably no.)"
+- "Do you use any additional Codex plugins or tool integrations that extend what the assistant can do? (These are sometimes called MCP servers -- if you are not sure, the answer is probably no.)"
 - "Do you work with data files like spreadsheets, CSV files, or databases?
   If so, what do you typically need to do with them -- read them, analyze
   them, transform them, or produce reports from them?"
@@ -393,7 +393,7 @@ Questions:
   data processing routing entries.
 - "Does your project include files like images, videos, audio, design files,
   or other files that cannot be edited as text?"
-  This determines: .claudeignore patterns, binary protection hooks,
+  This determines: VCS ignore rules patterns, binary protection hooks,
   "describe editor steps" routing entries.
 
 Skip condition: If Stage 1 reveals a purely non-technical project (e.g.,
@@ -530,7 +530,7 @@ protocol:
 
 These questions are asked in both paths (Step 4 of profile-first, Stage 2 of
 deep interview). They determine:
-- settings.json permission additions (WebFetch domain restrictions, Bash commands)
+- .codex/config.toml permission additions (network domains and filesystem scope)
 - MCP server configuration suggestions in ARCHITECTURE.md
 - Whether specialized agents need tool access
 
@@ -607,11 +607,11 @@ what they use the assistant for, and permission differences. Or "N/A -- solo"]
 Beads recommendation, or "Simple -- standard state management"]
 
 ## AI Tool Budget and Multi-Model Usage
-[Budget tier, other AI tools in use, routing recommendations, or "Claude only"]
+[Budget tier, other AI tools in use, routing recommendations, or "Codex only"]
 
 ## Token Efficiency Priority
 [cost-conscious / balanced / quality-first. Determines: model defaults, compaction
-threshold, .claudeignore aggressiveness, RTK recommendation level, CLAUDE.md line
+threshold, VCS ignore rules aggressiveness, RTK recommendation level, AGENTS.md line
 target, agent consolidation. Default: balanced if not explicitly stated.]
 
 ## Sensitive Data Handling
@@ -624,7 +624,7 @@ target, agent consolidation. Default: balanced if not explicitly stated.]
 - Tool(s) chosen (from tool-registry.md options presented to user)
 - Integration type (MCP / CLI / API)
 - Budget consideration
-Or "None -- Claude's native capabilities are sufficient"]
+Or "None -- Codex's native capabilities are sufficient"]
 
 ## Preferences
 [Communication style, documentation preferences, other]
@@ -696,7 +696,7 @@ If the project does not fit any known category:
 
 ### Existing Environment
 
-If the target directory already has .claude/ or CLAUDE.md:
+If the target directory already has .codex/ or AGENTS.md:
 
 1. The /create skill detects this before intake begins.
 2. User is offered three options:
@@ -704,7 +704,7 @@ If the target directory already has .claude/ or CLAUDE.md:
    - Cancel and use /validate-environment instead
    - Cancel entirely
 3. If backup is chosen, existing files are moved to
-   `<target>/.claude-backup-YYYYMMDD/` before proceeding.
+   `<target>/.codex-backup-YYYYMMDD/` before proceeding.
 
 ### User Wants to Stop and Resume Later
 

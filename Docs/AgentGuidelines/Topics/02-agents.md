@@ -1,205 +1,145 @@
 # 2. Agents
 
-## 2.1 Delegation Framework (5 Elements)
+**Last Updated**: 2026-06-03
 
-- **Established**: 2025-09
-- **Source**: multi-agent-research-system.md | Tier 1
-- **Recommendation**: Every subagent delegation MUST include five elements:
-  1. **Objective**: Clear, specific goal ("Find all authentication-related files and summarize
-     the token refresh flow")
-  2. **Output format**: Expected structure of results ("Return a markdown document with
-     sections: Files Found, Flow Description, Integration Points")
-  3. **Tool/source guidance**: Which tools to use and how ("Use Grep for pattern matching,
-     Read for file content. Do not use Write or Edit.")
-  4. **Task boundaries**: What is and is not in scope ("Only examine the auth/ directory.
-     Do not modify any files. Report what you find without attempting fixes.")
-  5. **Verification criteria**: How to confirm the work is correct ("Run pytest and confirm
-     all tests pass. Verify the new endpoint returns 200 with valid auth token.")
+This topic defines how generated harnesses use Codex subagents. Custom agents are
+project-scoped TOML files under `.codex/agents/`.
 
-  Verification criteria is the single highest-leverage element. Claude performs dramatically
-  better when it can verify its own work -- run tests, compare outputs, validate results.
-  Without verification criteria, agents frequently declare success without confirming it.
-- **Anti-pattern**: Vague instructions like "research the authentication system." This causes
-  agents to diverge, duplicate work, or explore irrelevant areas. In testing, vague
-  delegation to research agents caused one to explore a 2021 crisis while two others
-  duplicated 2025 investigations.
+## 2.1 Custom Agent Schema
 
-## 2.2 Model Selection Table
+- **Source**: https://developers.openai.com/codex/subagents
+- **Required fields**:
+  - `name`
+  - `description`
+  - `developer_instructions`
+- **Recommended fields for generated harnesses**:
+  - `model = "gpt-5.5"`
+  - `model_reasoning_effort = "low" | "medium" | "high" | "xhigh"`
+  - `sandbox_mode = "read-only" | "workspace-write"`
 
-- **Established**: 2025-09
-- **Source**: multi-agent-research-system.md, platform-agent-patterns.md, opus-4-6-guide.md | Tier 1
-- **Recommendation**:
+Example:
 
-  | Agent Role | Model | Rationale | Typical maxTurns |
-  |-----------|-------|-----------|------------------|
-  | Orchestrator/Lead | opus | Complex reasoning, routing decisions | N/A (main thread) |
-  | Planner | opus | Architectural reasoning, multi-step planning | 40 |
-  | Debugger (complex) | opus | Multi-hypothesis investigation, deep reasoning | 40 |
-  | Implementer | sonnet | Near-Opus coding quality, speed advantage compounds | 50 |
-  | Reviewer | opus | Cross-model review catches implementer blind spots | 20 |
-  | Validator | sonnet | Checklist-driven, speed advantage | 30 |
-  | Explorer | sonnet | Fast scanning, more capable than haiku | 30 |
-  | Quick lookups | haiku | Simple fact retrieval only | 15 |
+```toml
+name = "code_mapper"
+description = "Read-only codebase explorer for locating relevant files and symbols before edits."
+model = "gpt-5.5"
+model_reasoning_effort = "low"
+sandbox_mode = "read-only"
+developer_instructions = """
+Map the relevant code paths.
+Return file paths, symbols, and concise evidence.
+Do not edit files.
+"""
+```
 
-  The Opus lead + Sonnet workers composition showed 90% improvement over single-agent
-  Claude Opus in Anthropic's internal research eval.
-- **Anti-pattern**: Using Opus for all agents. Sonnet 4.6 handles implementation,
-  validation, and exploration at near-Opus quality with significant speed and cost
-  advantages. Reserve Opus for orchestration, planning, and complex debugging where
-  deep novel reasoning is required. Conversely, Haiku should only be used for the
-  simplest lookups -- Sonnet 4.6 is fast enough to replace Haiku in most roles.
+## 2.2 Delegation Contract
 
-  Sonnet 4.6 update (Feb 2026): Sonnet 4.6 scores within 1.2% of Opus 4.6 on
-  SWE-bench Verified (79.6% vs 80.8%) at 5x lower cost, with significant speed
-  advantages that compound across agentic workflows. Default to Sonnet for tasks
-  following established patterns (implementation, validation, exploration).
-  Reserve Opus for tasks requiring deep reasoning (orchestration, planning,
-  complex debugging, review). Developers preferred Sonnet 4.6 over the previous Opus 4.5
-  59% of the time. Explorer upgrades from Haiku to Sonnet because Sonnet 4.6 is
-  fast enough and substantially more capable.
-  Cross-model diversity: pairing Sonnet implementation with Opus review creates
-  genuine cognitive diversity -- each model has different blind spots, so the
-  reviewer catches issues the implementer's model would consistently miss.
+Every delegation should include five elements:
 
-  `opusplan` alias (Mar 2026): The `opusplan` model alias automates the hybrid
-  approach -- uses Opus during plan mode for architecture/reasoning, then switches
-  to Sonnet for execution. This codifies the recommended Opus-plan + Sonnet-execute
-  pattern without manual model switching. Recommend `opusplan` as the default for
-  generated environments targeting complex projects.
+1. **Objective**: what the agent must accomplish.
+2. **Inputs**: files, prior notes, commands, or user constraints it should use.
+3. **Boundaries**: what is out of scope and whether it may write files.
+4. **Verification**: how it should check or support its answer.
+5. **Output**: the artifact or response shape expected.
 
-  Subagent model override: `CLAUDE_CODE_SUBAGENT_MODEL` env var controls the model
-  used for all subagent invocations. Useful for pinning subagents to Sonnet while
-  the main thread uses Opus. For generated environments, set this in settings.json
-  env block when explicit subagent model control is needed.
+Good delegation:
 
-## 2.3 maxTurns Enforcement
+```text
+Use the code_mapper agent to locate the auth refresh flow. Read only. Return
+the owning files, entry points, and a short flow summary with paths.
+```
 
-- **Established**: Baseline
-- **Source**: parallel-claudes-c-compiler.md, claude-code-docs.md | Tier 1
-- **Recommendation**: Every agent definition MUST include maxTurns. Without it, agents can
-  run indefinitely. Recommended ranges:
-  - Explorer/lookup: 15-30
-  - Reviewer/validator: 20-30
-  - Implementer: 40-50
-  - Planner/researcher: 30-40
-  - Complex debugger: 40-50
-- **Anti-pattern**: Omitting maxTurns. In the C compiler project (~2,000 sessions), agents
-  without time constraints ran tests indefinitely. The `--fast` test flag was invented
-  specifically to mitigate agent time-blindness.
+Poor delegation:
 
-## 2.4 disallowedTools
+```text
+Research auth.
+```
 
-- **Established**: Baseline
-- **Source**: claude-code-docs.md, platform-agent-patterns.md | Tier 1
-- **Recommendation**: Restrict agent tools to enforce separation of concerns:
-  - Reviewer: `disallowedTools: [Write, Edit]` (read-only analysis)
-  - Explorer: `disallowedTools: [Write, Edit]` (read-only discovery)
-  - Validator: `disallowedTools: [Edit]` (can write reports but not modify code)
-  - Implementer: full tool access
+## 2.3 Reasoning Effort By Role
 
-  Use the `tools` field to whitelist, or `disallowedTools` to blacklist. Whitelisting is
-  safer for restricted agents; blacklisting is easier for agents needing most tools.
-- **Anti-pattern**: Giving all agents full tool access. A reviewer with Write access may
-  "fix" issues it finds instead of just reporting them, conflating review and implementation.
+Use one model family (`gpt-5.5`) and vary effort by job.
 
-## 2.5 Subagent Delegation Guidance (4.6 vs 4.7 behaviors)
+| Role | Effort | Sandbox | Notes |
+|---|---|---|---|
+| Explorer / mapper | `low` | `read-only` | Fast file and symbol location |
+| Intake interviewer | `medium` | `workspace-write` | Writes structured intake artifacts |
+| Implementer | `medium` | `workspace-write` | Follows an approved plan and verifies |
+| Validator | `medium` | `read-only` or report-only write scope | Runs checklists and writes reports |
+| Planner / architect | `high` | `workspace-write` | Designs structure and tradeoffs |
+| Debugger | `high` | `workspace-write` | Multi-hypothesis investigation |
+| Reviewer | `high` | `read-only` | Finds regressions and missing tests |
+| High-stakes analyst | `high` or `xhigh` | Usually `read-only` | Legal, finance, security, medical, policy |
 
-- **Established**: 2025-09 (Opus 4.6); updated 2026-04-20 for Opus 4.7
-- **Source**: platform-agent-patterns.md, opus-4-6-guide.md,
-  platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-7 | Tier 1
-- **Recommendation**: Write subagent guidance that works for both models:
-  - Use subagents when: tasks can run in parallel, require isolated context, involve
-    independent workstreams, or require specialized model selection.
-  - Work directly for: simple tasks, sequential operations, single-file edits, or tasks
-    needing shared context.
-  - Dial back aggressive tool-triggering language. Replace "CRITICAL: You MUST use this
-    tool" with "Use this tool when..." -- both models perform better with measured phrasing.
+Use `xhigh` sparingly and document why the extra depth is worth the cost.
 
-  **Opus 4.6 bias**: Strong predilection for spawning subagents. Needs explicit brakes
-  (the "work directly for" list above).
+## 2.4 Sandbox Scope
 
-  **Opus 4.7 bias**: Spawns fewer subagents by default, uses reasoning more, and makes
-  fewer tool calls. If you WANT aggressive delegation on 4.7, state it explicitly: "When
-  a task spans multiple independent files, prefer spawning subagents in parallel."
-  Otherwise 4.7 may keep work in the main loop where 4.6 would have forked.
-- **Anti-pattern**:
-  - Letting 4.6 orchestrators spawn subagents for trivial tasks (burns tokens, ~4x chat).
-  - Assuming 4.7 will parallelize automatically -- it's more conservative. Explicit
-    delegation hints matter more on 4.7.
+- Use `sandbox_mode = "read-only"` when the agent should gather evidence,
+  review, research, or inspect.
+- Use `sandbox_mode = "workspace-write"` when the agent must create or edit
+  project files.
+- Keep sensitive path restrictions in `.codex/config.toml` permissions, not in
+  prose promises.
+- If an agent writes only a report, prefer a narrow instruction that names the
+  report path.
 
-## 2.6 Orchestrator Context Discipline
+Anti-pattern: a reviewer that can edit source files by default. Reviewers should
+report findings; implementation should be a separate step.
 
-- **Established**: 2026-02
-- **Source**: production game project production environment, production compliance project production environment | Tier 2
-- **Recommendation**: The orchestrator is a dispatcher, not a reader. It must consume as
-  little context as possible. Enforce a strict whitelist of what the orchestrator may Read:
+## 2.5 Description Quality
 
-  **Orchestrator MAY Read (small, pre-summarized files):**
-  - Docs/ wiki index files and overview pages (< 300 lines)
-  - Docs/_working/ state and session files
-  - .claude/ config and rules files
-  - CLAUDE.md, settings files, project config
+Descriptions are routing-critical. They should say when to use the agent, not
+only what it is.
 
-  **Orchestrator MUST DELEGATE reads of (large, raw source):**
-  - Source code files (any language) -- delegate to explorer, debugger, or implementer
-  - Config files > 100 lines -- delegate to explorer
-  - Build output -- delegate to debugger
-  - External documentation -- delegate to researcher
+Strong description:
 
-  **Disk-based subagent handoff** (keeps intermediate data out of orchestrator):
-  1. Subagent A writes findings to `Docs/_working/sessions/<slug>.md`
-  2. Orchestrator spawns Subagent B, telling it to READ that file as input
-  3. Subagent B builds on A's output, writes its own results to disk
-  4. Orchestrator reads only the final summary, not intermediate artifacts
+```text
+Reviews code changes for correctness, behavior regressions, missing tests, and
+security risk. Use after implementation or when the user asks for a review. Do
+not use for making changes.
+```
 
-  WHY: Every line read into the orchestrator's context stays until compaction.
-  A single 500-line source file consumes as much context as 10 subagent round-trips.
-  Subagent reads are free to the orchestrator -- they use separate context windows.
-- **Anti-pattern**: Orchestrator reading source code directly. This is the #1 cause of
-  premature context exhaustion in complex environments. Even "just checking one file"
-  accumulates across a session.
+Weak description:
 
-## 2.7 Agent Memory Persistence
+```text
+Helps with code quality.
+```
 
-- **Established**: Baseline
-- **Source**: claude-code-docs.md | Tier 1
-- **Recommendation**: Agents support persistent memory via the `memory` frontmatter field:
-  - `user` scope: stored at `~/.claude/agent-memory/<name>/`, persists across projects
-  - `project` scope: stored at `.claude/agent-memory/<name>/`, shared with team via VCS
-  - `local` scope: stored at `.claude/agent-memory-local/<name>/`, private per machine
+Include negative triggers when two agents are easy to confuse.
 
-  First 200 lines of MEMORY.md are loaded at startup. Read, Write, Edit tools are
-  auto-enabled when memory is active. Use for agents that accumulate domain knowledge
-  over time (researchers, reviewers with project-specific conventions).
-- **Anti-pattern**: Not using agent memory for agents that repeatedly need the same context.
-  Without memory, each invocation starts cold, repeating discovery work.
+## 2.6 Context Discipline
 
-## 2.8 Agent File Format
+The orchestrator should not read large source files directly when a subagent can
+map or inspect them in isolated context.
 
-- **Established**: Baseline; updated 2026-04-20 for Claude Code v2.1.73-v2.1.111
-- **Source**: claude-code-docs.md, code.claude.com/docs/en/changelog | Tier 1
-- **Recommendation**: Agent definitions are markdown files in `.claude/agents/`. Required
-  frontmatter fields: `name`, `description`. Supported optional fields: `tools`,
-  `disallowedTools`, `model`, `permissionMode`, `maxTurns`, `skills`, `mcpServers`,
-  `hooks`, `memory`, `effort`, `initialPrompt`. The markdown body is the system prompt.
+Pattern:
 
-  April 2026 additions:
-  - `model:` -- override model via frontmatter (v2.1.73/v2.1.74)
-  - `effort:` -- set effort level when agent is invoked (v2.1.76/v2.1.84). Use `low` for
-    bounded subagents; `xhigh` for agentic coding. Defaults to session effort.
-  - `initialPrompt:` -- agent auto-submits a first turn (v2.1.83). Useful for agents that
-    should immediately orient themselves (e.g., "read ARCHITECTURE.md, then wait").
-  - `maxTurns:` and `disallowedTools:` in frontmatter -- both formally documented in
-    frontmatter as of v2.1.98 (always supported but now canonical).
+1. Orchestrator delegates exploration.
+2. Explorer writes or returns concise findings with paths.
+3. Planner or implementer uses those findings.
+4. Reviewer checks the result independently.
 
-  The `description` field is critical -- Claude uses it to decide when to delegate. Write
-  descriptions that specify WHEN to delegate, not just WHAT the agent does. Include trigger
-  phrases that match how users or orchestrators describe the work.
+For long workflows, have agents write handoff notes under `Docs/_working/` so
+the main session reads summaries rather than raw exploratory material.
 
-  Location priority: CLI flag > `.claude/agents/` > `~/.claude/agents/` > Plugin agents.
-- **Anti-pattern**: Vague descriptions like "Helps with code." This prevents Claude from
-  routing correctly. Write specific triggers: "Reviews code changes for security
-  vulnerabilities, performance regressions, and adherence to project conventions. Delegate
-  when the user says 'review', 'check my code', or 'audit changes'."
+## 2.7 Generated-Agent Checklist
 
----
+Every generated `.codex/agents/*.toml` file must pass this checklist:
+
+- TOML parses.
+- `name` matches the filename stem.
+- `description` includes clear triggers and negative triggers where needed.
+- `developer_instructions` state objective, boundaries, verification, and output.
+- `model` is an OpenAI model ID.
+- `model_reasoning_effort` matches task complexity.
+- `sandbox_mode` matches write needs.
+- Read-only agents explicitly say they do not edit files.
+- Write-capable agents include scope and verification rules.
+
+## 2.8 Anti-Patterns
+
+- Creating agents "just in case" when routing can stay in the main session.
+- Using broad write scope for review, exploration, or research.
+- Writing agent instructions that repeat all of AGENTS.md.
+- Omitting verification criteria.
+- Letting subagents fan out recursively without an explicit reason.

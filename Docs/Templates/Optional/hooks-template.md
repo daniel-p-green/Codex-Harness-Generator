@@ -2,7 +2,7 @@
 
 <!-- ANNOTATION: Hooks are optional but powerful. Generate hook configuration
      when the project benefits from automated quality gates, audit trails,
-     or domain-specific protections. Hooks go in settings.json, not in a
+     or domain-specific protections. Hooks go in .codex/config.toml, not in a
      separate rule file. This template shows the component-generator how
      to design hooks for different domains. -->
 
@@ -19,7 +19,7 @@
 | Event | When | Can Block? | Common Use |
 |-------|------|-----------|------------|
 | SessionStart | Session begins/resumes | No | Environment setup, state loading |
-| InstructionsLoaded | CLAUDE.md/rules load | Yes | Self-learning trigger, context refresh |
+| InstructionsLoaded | AGENTS.md/rules load | Yes | Self-learning trigger, context refresh |
 | UserPromptSubmit | User submits prompt | Yes | Input validation, audit |
 | PreToolUse | Before tool executes | Yes (allow/deny/ask) | Safety gates, binary protection |
 | PermissionRequest | Permission dialog | Yes | Auto-approve known-safe ops |
@@ -28,16 +28,16 @@
 | Notification | Notification sent | No | External alerting |
 | SubagentStart | Subagent spawned | No | Logging, resource tracking |
 | SubagentStop | Subagent finishes | Yes | Result validation |
-| Stop | Claude finishes responding | Yes | Final checks |
+| Stop | Codex finishes responding | Yes | Final checks |
 | TeammateIdle | Teammate going idle | Yes | Task reassignment |
 | TaskCompleted | Task marked complete | Yes | Quality verification |
 | PreCompact | Before compaction | No | State preservation |
 | SessionEnd | Session terminates | No | Cleanup, final audit |
 
 **New events (2025+)**: `ConfigChange` (settings modified), `WorktreeCreate` /
-`WorktreeRemove` (git worktree lifecycle), `InstructionsLoaded` (CLAUDE.md or
+`WorktreeRemove` (git worktree lifecycle), `InstructionsLoaded` (AGENTS.md or
 rules load, includes `agent_id` and `agent_type` fields). These are available in
-Claude Code v2.1+ and useful for environments with worktree-based agent isolation
+Codex v2.1+ and useful for environments with worktree-based agent isolation
 or self-learning triggers.
 
 **Handler types**: Three handler types are available:
@@ -50,15 +50,15 @@ Use `prompt` or `agent` types for platform-independent hooks that work on all OS
 ## Exit Code 2 Feedback Pattern
 
 <!-- ANNOTATION: Exit code 2 is the key mechanism for hooks to communicate
-     with Claude. When a hook exits with code 2, stderr content is fed
-     back to Claude as context. This enables build-fix-rebuild loops,
+     with Codex. When a hook exits with code 2, stderr content is fed
+     back to Codex as context. This enables build-fix-rebuild loops,
      lint-fix cycles, and validation feedback. -->
 
 ```bash
 #!/bin/bash
 # Example: PostToolUse hook that runs linter after file edits
-# Exit 0 = success (no feedback to Claude)
-# Exit 2 = blocking feedback (stderr sent to Claude)
+# Exit 0 = success (no feedback to Codex)
+# Exit 2 = blocking feedback (stderr sent to Codex)
 # Other = non-blocking error (shown in verbose mode only)
 
 INPUT=$(cat)  # Read JSON from stdin
@@ -68,7 +68,7 @@ if [ "$TOOL_NAME" = "Edit" ] || [ "$TOOL_NAME" = "Write" ]; then
     RESULT=$(npm run lint 2>&1)
     if [ $? -ne 0 ]; then
         echo "$RESULT" >&2
-        exit 2  # Feed lint errors back to Claude
+        exit 2  # Feed lint errors back to Codex
     fi
 fi
 exit 0
@@ -78,7 +78,7 @@ exit 0
 
 <!-- ANNOTATION: PreToolUse hooks can make permission decisions on behalf
      of the user. This is how you implement domain-specific safety gates
-     without relying on settings.json alone. -->
+     without relying on .codex/config.toml alone. -->
 
 ```bash
 #!/bin/bash
@@ -104,7 +104,7 @@ exit 0
 
 ## PostToolUse Audit Pattern
 
-<!-- ANNOTATION: Audit hooks record what Claude does for compliance or
+<!-- ANNOTATION: Audit hooks record what Codex does for compliance or
      debugging. They should be async (non-blocking) to avoid slowing
      down the workflow. -->
 
@@ -116,7 +116,7 @@ TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name')
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 echo "$TIMESTAMP | $TOOL_NAME | $(echo "$INPUT" | jq -c '.tool_input')" \
-    >> "$CLAUDE_PROJECT_DIR/Docs/audit-log.txt"
+    >> "$CODEX_PROJECT_DIR/Docs/audit-log.txt"
 exit 0
 ```
 
@@ -165,7 +165,7 @@ exit 0
 ### Legal / Compliance: Audit trail
 
 <!-- VARIATION: Legal and compliance domains need a record of every action
-     Claude takes. Use async hooks to avoid blocking the workflow. -->
+     Codex takes. Use async hooks to avoid blocking the workflow. -->
 
 ```json
 {
@@ -210,7 +210,7 @@ exit 0
         "matcher": "Write|Edit",
         "hooks": [{
           "type": "command",
-          "command": ".claude/hooks/pii-scan.sh",
+          "command": ".codex/hooks/pii-scan.sh",
           "timeout": 10,
           "statusMessage": "Scanning for sensitive data..."
         }]
@@ -220,7 +220,7 @@ exit 0
 }
 ```
 
-Example hook script (`.claude/hooks/pii-scan.sh`):
+Example hook script (`.codex/hooks/pii-scan.sh`):
 
 ```bash
 #!/bin/bash
@@ -244,7 +244,7 @@ if [ -z "$CONTENT" ]; then
 fi
 
 # Load patterns from config (one regex per line, # comments allowed)
-PATTERN_FILE="$CLAUDE_PROJECT_DIR/.claude/hooks/pii-patterns.conf"
+PATTERN_FILE="$CODEX_PROJECT_DIR/.codex/hooks/pii-patterns.conf"
 if [ ! -f "$PATTERN_FILE" ]; then
     # Fallback: common PII patterns
     PATTERNS=(
@@ -279,7 +279,7 @@ fi
 exit 0
 ```
 
-Example pattern config file (`.claude/hooks/pii-patterns.conf`):
+Example pattern config file (`.codex/hooks/pii-patterns.conf`):
 
 ```
 # PII Detection Patterns -- one regex per line
@@ -319,7 +319,7 @@ Example pattern config file (`.claude/hooks/pii-patterns.conf`):
         "matcher": "Write|Edit",
         "hooks": [{
           "type": "command",
-          "command": "powershell -File .claude/hooks/pii-scan.ps1",
+          "command": "powershell -File .codex/hooks/pii-scan.ps1",
           "timeout": 10,
           "statusMessage": "Scanning for sensitive data..."
         }]
@@ -366,7 +366,7 @@ Example pattern config file (`.claude/hooks/pii-patterns.conf`):
       {
         "hooks": [{
           "type": "command",
-          "command": ".claude/hooks/pii-scan-input.sh",
+          "command": ".codex/hooks/pii-scan-input.sh",
           "timeout": 5,
           "statusMessage": "Checking input for sensitive data..."
         }]
@@ -431,7 +431,7 @@ PowerShell variant (Windows-primary):
       {
         "hooks": [{
           "type": "command",
-          "command": ".claude/hooks/pre-compact-save.sh",
+          "command": ".codex/hooks/pre-compact-save.sh",
           "timeout": 10,
           "statusMessage": "Saving state before compaction..."
         }]
@@ -441,12 +441,12 @@ PowerShell variant (Windows-primary):
 }
 ```
 
-Example hook script (`.claude/hooks/pre-compact-save.sh`):
+Example hook script (`.codex/hooks/pre-compact-save.sh`):
 
 ```bash
 #!/bin/bash
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-STATE_FILE="$CLAUDE_PROJECT_DIR/Docs/_working/state/SESSION_CONTEXT.md"
+STATE_FILE="$CODEX_PROJECT_DIR/Docs/_working/state/SESSION_CONTEXT.md"
 echo "" >> "$STATE_FILE"
 echo "## Auto-save before compaction ($TIMESTAMP)" >> "$STATE_FILE"
 echo "Session was compacted. Review above for pre-compaction context." >> "$STATE_FILE"
@@ -465,7 +465,7 @@ hook tracks turn count, and the status line script reads the state file to displ
 ```json
 {
   "env": {
-    "CLAUDE_CODE_STATUSLINE": ".claude/hooks/statusline.sh"
+    "CODEX_STATUSLINE": ".codex/hooks/statusline.sh"
   }
 }
 ```
@@ -501,7 +501,7 @@ simple checks a shell script can handle.
 
 <!-- ANNOTATION: This is the highest-leverage hook pattern. An independent agent
      reviews all work before the user sees it, creating a self-correcting quality
-     gate. Exit code 2 feeds issues back to Claude for correction. -->
+     gate. Exit code 2 feeds issues back to Codex for correction. -->
 
 ```json
 {
@@ -523,15 +523,15 @@ immediately. Alternatively, limit to one review iteration via a temp file flag.
 
 This pattern provides an independent second opinion on every task. The reviewing
 agent has a fresh context since it did not write the code. Validated as the
-highest-leverage quality practice by O'Reilly and Anthropic documentation.
+highest-leverage quality practice by O'Reilly and OpenAI documentation.
 
 ## Settings.json Integration
 
-<!-- ANNOTATION: Hooks are configured in settings.json alongside
+<!-- ANNOTATION: Hooks are configured in .codex/config.toml alongside
      permissions. The component-generator should merge hook config
      with the permissions config, not create a separate file. -->
 
-Hooks go in `.claude/settings.json` under the `"hooks"` key, at the same
+Hooks go in `.codex/config.toml` under the `"hooks"` key, at the same
 level as `"permissions"`. Most environments need at most 2-3 hook entries.
 Do not over-hook -- each hook adds latency to every matching operation.
 
@@ -551,4 +551,4 @@ Do not over-hook -- each hook adds latency to every matching operation.
 <!-- ANTI-PATTERN: Do not add hooks for every event. Most environments
      need 0-2 hooks. Do not use hooks to implement logic that belongs
      in rules (hooks are deterministic scripts, not advisory guidance).
-     Do not use synchronous hooks for logging (blocks Claude). -->
+     Do not use synchronous hooks for logging (blocks Codex). -->

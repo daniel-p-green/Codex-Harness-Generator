@@ -9,16 +9,17 @@ guidance is model-agnostic unless a header marks otherwise.
 ## 21.1 Codebase Retrieval Approaches [ALL]
 
 - **Established**: 2026-03
-- **Source**: Meta-RAG (arxiv 2508.02611), Aider docs, Claude Context MCP, web research | Tier 2
+- **Source**: Meta-RAG (arxiv 2508.02611), Aider docs, Codex Context MCP, web research | Tier 2
 - **Recommendation**: Three retrieval approaches exist; generated environments should match
   the approach to codebase size and user budget:
 
-  **Agentic search (Claude Code default)**: Glob -> Grep -> Read hierarchy with Explore
-  sub-agents. No index to maintain. Sufficient for codebases under ~50k lines or when
-  the user has Claude Code only. 92% prefix cache hit rate keeps costs manageable.
+  **Agentic search (Codex default)**: `rg --files` for file discovery, `rg` for
+  content search, then targeted file reads with explorer subagents when useful.
+  No index to maintain. Sufficient for codebases under ~50k lines or when
+  the user has Codex only. 92% prefix cache hit rate keeps costs manageable.
 
   **Hybrid (recommended for 50k+ lines)**: Supplement agentic search with semantic search
-  via MCP. Recommend Claude Context MCP (Zilliz) or Code-Graph-RAG as MCP servers.
+  via MCP. Recommend Codex Context MCP (Zilliz) or Code-Graph-RAG as MCP servers.
   ~40% token reduction under equivalent retrieval quality. Requires MCP setup.
 
   **Hierarchical summaries (recommended for 100k+ lines)**: Generate structured

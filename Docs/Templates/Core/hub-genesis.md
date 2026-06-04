@@ -14,7 +14,7 @@
   - Only include content that applies to every work area. Per-area
     specifics (domain, tools, workflows) belong in per-area GENESIS.md.
   - Work-area registry must be exhaustive -- every subfolder the user
-    wants Claude to treat as a separate area is listed here.
+    wants Codex to treat as a separate area is listed here.
   - HUB_STATUS must be COMPLETE before architect runs. INCOMPLETE halts
     the pipeline.
   - ASCII-only throughout.
@@ -57,16 +57,16 @@ Shared tools:
 Shared AI ecosystem:
 - Local model(s): <Ollama models, or "none">
 - Shared MCP servers: <list with server names and purposes>
-- Shared API providers: <e.g., "Anthropic API for all areas">
+- Shared API providers: <e.g., "OpenAI API for all areas">
 
 Token cost priority: <cost-conscious | balanced | quality-first>
 
 ## Work Area Registry
 
-<!-- Every subfolder the user wants Claude to treat as a separate area.
+<!-- Every subfolder the user wants Codex to treat as a separate area.
      Slug rules: lowercase, hyphen-separated, matches the directory name
      under <target>/. One-line description is what surfaces in the parent
-     CLAUDE.md "Work areas in this setup" section. -->
+     AGENTS.md "Work areas in this setup" section. -->
 
 | Area slug | Display name | One-line description | Profile | Folder |
 |---|---|---|---|---|

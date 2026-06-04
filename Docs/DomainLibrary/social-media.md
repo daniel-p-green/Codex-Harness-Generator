@@ -13,7 +13,7 @@ inline them.
   optional image-generation tool for visual concepts
 - **Complexity**: Standard | **Memory tier**: Standard | **Action default**: proactive | **VCS**: optional (Git only if deliverables are versioned)
 
-Scope note (carry into CLAUDE.md): this domain *plans and writes* content. Live
+Scope note (carry into AGENTS.md): this domain *plans and writes* content. Live
 account operations (posting, replies, DMs), paid-ad execution, analytics-API
 pulls, and influencer outreach are out of scope -- the assistant drafts, it does
 not publish.
@@ -24,11 +24,11 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| strategist | opus | Channel analysis, audience personas, content-pillar mix, monthly calendar, campaign design | planner.md |
-| copywriter | sonnet | Platform-optimized captions, threads, short-form scripts, CTAs, A/B alternates. Asks "is this sponsored/affiliate/incentivized?" and embeds a clear-and-conspicuous disclosure when yes; never asserts efficacy/health/income claims as fact; marks any hook statistic `[SOURCE NEEDED -- brand to verify]` | drafter.md |
-| visual-planner | sonnet | Image concepts, carousel/card-news layouts, Reels storyboards, image-gen prompts. Recommends the platform commercial/royalty-free audio library; does not assume trending-audio clearance for business accounts | custom (visual concept + storyboard planner; reads strategy + copy, writes no code) |
-| hashtag-analyst | sonnet | Pyramid hashtag sets, trend/competitor research, shadowban screening, reach prediction. Hashtag counts, competitor metrics, and reach/engagement figures are web-verified-with-source or labeled estimate, never fabricated | researcher.md |
-| reviewer | opus | Cross-validate strategy/copy/visuals/hashtags for KPI fit, brand + platform consistency (read-only QA). FAILS posts missing a required FTC disclosure, asserting unsubstantiated claims, newsjacking tragedies, or using unverified-clearance audio (see Brand Safety & Compliance) | reviewer.md |
+| strategist | high-effort | Channel analysis, audience personas, content-pillar mix, monthly calendar, campaign design | planner.md |
+| copywriter | medium-effort | Platform-optimized captions, threads, short-form scripts, CTAs, A/B alternates. Asks "is this sponsored/affiliate/incentivized?" and embeds a clear-and-conspicuous disclosure when yes; never asserts efficacy/health/income claims as fact; marks any hook statistic `[SOURCE NEEDED -- brand to verify]` | drafter.md |
+| visual-planner | medium-effort | Image concepts, carousel/card-news layouts, Reels storyboards, image-gen prompts. Recommends the platform commercial/royalty-free audio library; does not assume trending-audio clearance for business accounts | custom (visual concept + storyboard planner; reads strategy + copy, writes no code) |
+| hashtag-analyst | medium-effort | Pyramid hashtag sets, trend/competitor research, shadowban screening, reach prediction. Hashtag counts, competitor metrics, and reach/engagement figures are web-verified-with-source or labeled estimate, never fabricated | researcher.md |
+| reviewer | high-effort | Cross-validate strategy/copy/visuals/hashtags for KPI fit, brand + platform consistency (read-only QA). FAILS posts missing a required FTC disclosure, asserting unsubstantiated claims, newsjacking tragedies, or using unverified-clearance audio (see Brand Safety & Compliance) | reviewer.md |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy, context-management, self-learning, error-handling, memory-management.
@@ -110,13 +110,9 @@ brand. These are not optional for the domain; the reviewer enforces them and the
 
 Base + Universal Deny -- see `Docs/Templates/References/ecosystem-permissions.md`.
 This domain is content-not-code: no language ecosystem is needed by default. Add
-`Git` only if deliverables are versioned. Allow `WebSearch` / `WebFetch(*)` (in
-Base) for trend and algorithm checks. Pre-approve the deliverable output path so
-the agents do not prompt on every write:
-
-```json
-{ "permissions": { "allow": ["Edit(./Docs/_working/content/**)", "Write(./Docs/_working/content/**)"] } }
-```
+`Git` only if deliverables are versioned. Allow web search / browser/web retrieval
+for trend and algorithm checks. Add writable `Docs/_working/content/**` so the
+agents do not prompt on every deliverable write.
 
 If an image-generation tool is wired in (see Customization Points), add only its
 specific CLI/MCP allow rule -- never a blanket external-network allow.
@@ -183,11 +179,11 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 
 ## Cost / Model Notes
 
-Opus for strategist and reviewer (audience reasoning, campaign design,
-cross-deliverable QA judgment); Sonnet for copywriter, visual-planner, and
+GPT-5.5 for strategist and reviewer (audience reasoning, campaign design,
+cross-deliverable QA judgment); medium-effort GPT-5.5 for copywriter, visual-planner, and
 hashtag-analyst (established-pattern execution -- hook templates, spec tables,
-pyramid tiers). Defaults: balanced (Opus on reasoning roles, Sonnet on execution;
-compaction 95%; CLAUDE.md ~200 lines). Cost-conscious override: all-Sonnet with
+pyramid tiers). Defaults: balanced (high-effort GPT-5.5 on reasoning roles, medium-effort GPT-5.5 on execution;
+compaction 95%; AGENTS.md ~200 lines). Cost-conscious override: all medium-effort GPT-5.5 with
 reviewer still verifying, compaction 85%, full RTK in GETTING_STARTED. The full
 /content-pipeline is the expensive path (5 agents + rework loop) -- reserve it for
 "full management" requests; route single-deliverable asks to 1-2 agents.

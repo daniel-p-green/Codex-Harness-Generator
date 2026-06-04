@@ -59,7 +59,7 @@ test skill triggering with A/B evaluation.
 ## 15.3 Verification Commands [ALL]
 
 - **Established**: Baseline
-- **Source**: claude-code-best-practices.md | Tier 1
+- **Source**: https://developers.openai.com/codex/concepts/customization | Tier 1
 - **Recommendation**: This is the #1 highest-leverage intervention. Every generated
   environment must include domain-specific verification commands:
   - Software (Node): `npm test`, `npm run lint`, `npx tsc --noEmit`
@@ -68,10 +68,10 @@ test skill triggering with A/B evaluation.
   - Infrastructure: `terraform plan`, `terraform validate`
   - Documentation: style guide compliance script
 
-  Include in CLAUDE.md: "After making changes, always run [verification command] to verify
+  Include in AGENTS.md: "After making changes, always run [verification command] to verify
   your work. Fix any failures before proceeding."
 
-  Claude performs dramatically better with self-verification. Without it, the user becomes
+  Codex performs dramatically better with self-verification. Without it, the user becomes
   the only feedback loop.
 - **Anti-pattern**: Generated environments without verification commands. The user must
   manually verify every change, which is slow and error-prone.
@@ -79,7 +79,7 @@ test skill triggering with A/B evaluation.
 ## 15.4 Investigate-Before-Answering [ALL]
 
 - **Established**: Baseline
-- **Source**: guardrails.md, platform-agent-patterns.md | Tier 1
+- **Source**: guardrails.md, https://developers.openai.com/codex/subagents | Tier 1
 - **Recommendation**: Include this pattern in all generated agent prompts:
   ```xml
   <investigate_before_answering>
@@ -97,7 +97,7 @@ test skill triggering with A/B evaluation.
 ## 15.5 Stop Hook Self-Review [ALL]
 
 - **Established**: 2026-03
-- **Source**: Claude Code hooks docs, Trail of Bits config, Addy Osmani blog, community patterns | Tier 2
+- **Source**: Codex hooks docs, Trail of Bits config, Addy Osmani blog, community patterns | Tier 2
 - **Recommendation**: Every generated environment for code-producing projects SHOULD include
   a Stop hook that spawns an independent reviewer before work is presented to the user:
 
@@ -118,7 +118,7 @@ test skill triggering with A/B evaluation.
   - Checks for: compilation errors, style violations, incomplete implementations,
     introduced bugs, security issues
   - Returns clean status (exit 0) or rejection with specific issues (exit 2)
-  - Exit 2 feeds stderr to Claude, forcing self-correction before presenting to user
+  - Exit 2 feeds stderr to Codex, forcing self-correction before presenting to user
 
   production game project lesson: The environment had a /validate skill but no automatic self-review.
   Validation only happened when explicitly invoked. A Stop hook catches issues
@@ -187,7 +187,7 @@ test skill triggering with A/B evaluation.
 - **Recommendation**: When the orchestrator rule says "do not read source files directly,"
   enforce it technically where possible:
 
-  - Add deny patterns in settings.json for the orchestrator's direct file access
+  - Add deny patterns in .codex/config.toml for the orchestrator's direct file access
     to source directories (may not be technically feasible in all cases)
   - Use a PreToolUse hook that checks Read tool calls against an allowlist
   - At minimum, include a prominent warning in the orchestrator rule with the
@@ -500,7 +500,7 @@ test skill triggering with A/B evaluation.
   4. Select the best description on the **Test** set, not the Train set (avoid overfitting).
   5. Iterate up to 5 times.
 
-  This runs as an automation script (e.g. via `claude -p`). Token cost is high, so run it
+  This runs as an automation script (e.g. via `codex exec`). Token cost is high, so run it
   as a final step only after the skill is otherwise stable.
 
   ### Workspace structure

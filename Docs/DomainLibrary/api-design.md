@@ -23,11 +23,11 @@ Agents (adapt from `Docs/Templates/Agents/<template>`; do not copy verbatim):
 
 | name | model | role | template |
 |---|---|---|---|
-| api-architect | opus | Resource modeling, endpoint/URL design, versioning, auth, object-level/tenant authorization (per resource, who may read/write each instance), pagination strategy | custom (design specialist; seed from planner.md) |
-| schema-validator | sonnet | Generate OpenAPI 3.1 / GraphQL SDL, validate types, refs, backward compat | custom (schema authoring; seed from implementer.md) |
-| doc-writer | sonnet | Developer docs: quickstart, endpoint reference, curl/SDK examples, error refs | drafter.md |
-| mock-tester | sonnet | Mock server config + integration/contract/load/edge test plans | custom (test authoring; seed from implementer.md) |
-| review-auditor | opus | Cross-validate design/schema/docs/tests; security, consistency, REST compliance (read-only) | reviewer.md |
+| api-architect | high-effort | Resource modeling, endpoint/URL design, versioning, auth, object-level/tenant authorization (per resource, who may read/write each instance), pagination strategy | custom (design specialist; seed from planner.md) |
+| schema-validator | medium-effort | Generate OpenAPI 3.1 / GraphQL SDL, validate types, refs, backward compat | custom (schema authoring; seed from implementer.md) |
+| doc-writer | medium-effort | Developer docs: quickstart, endpoint reference, curl/SDK examples, error refs | drafter.md |
+| mock-tester | medium-effort | Mock server config + integration/contract/load/edge test plans | custom (test authoring; seed from implementer.md) |
+| review-auditor | high-effort | Cross-validate design/schema/docs/tests; security, consistency, REST compliance (read-only) | reviewer.md |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy, context-management, self-learning, error-handling (with diagnostic
@@ -116,7 +116,7 @@ rubric assigns (security gaps default to must-fix).
 Developer-doc and mock examples (doc-writer, mock-tester) MUST use placeholder
 tokens -- `YOUR_API_KEY`, `Bearer <token>`, `client_secret=YOUR_SECRET` -- never
 a real credential. Real keys, test accounts, and live endpoints stay in
-`_workspace/` (or `settings.local.json`) and never appear in committed docs,
+`_workspace/` (or `local config profile`) and never appear in committed docs,
 schemas, or the retro/state logs. A leaked example key is a published key.
 
 ## Error-shape decision (pick once, apply everywhere)
@@ -135,19 +135,16 @@ standard already mandates an envelope.
 Base + Universal Deny + Git -- all in
 `Docs/Templates/References/ecosystem-permissions.md`. Add the runtime the mock
 and test tooling uses (typically Node/TypeScript for Prism/MSW/k6, or Python for
-schemathesis) from that reference. Domain-specific allows not in the reference:
-
-```
-"Bash(spectral lint *)", "Bash(redocly lint *)", "Bash(swagger-cli validate *)",
-"Bash(openapi-generator *)", "Bash(prism mock *)", "Bash(prism proxy *)",
-"Bash(k6 run *)", "Bash(artillery run *)", "Bash(schemathesis run *)"
-```
+schemathesis) from that reference. Domain-specific commands to document when
+installed: `spectral lint`, `redocly lint`, `swagger-cli validate`,
+`openapi-generator`, `prism mock`, `prism proxy`, `k6 run`, `artillery run`,
+and `schemathesis run`.
 
 Mock/load servers bind local ports (e.g., Prism 4010). `prism mock` is local and
 read-only against the spec (no deny gate needed). `prism proxy` is NOT inert: it
 forwards requests to a live upstream -- bind it to localhost and confirm the proxy
 target before allowing it, and never point it at a production API. Generate
-`settings.local.json` for machine-specific schema-registry paths or local mock ports.
+`local config profile` for machine-specific schema-registry paths or local mock ports.
 
 ## Self-Learning Seed Entries
 
@@ -192,14 +189,14 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 
 ## Cost / Model Notes
 
-Opus for api-architect and review-auditor (the design-reasoning and
-cross-validation roles); Sonnet for schema-validator, doc-writer, mock-tester
+GPT-5.5 for api-architect and review-auditor (the design-reasoning and
+cross-validation roles); medium-effort GPT-5.5 for schema-validator, doc-writer, mock-tester
 (schema generation, doc drafting, and test authoring are established-pattern
-execution against the convention skills). Defaults: balanced (Opus on the two
-reasoning roles, Sonnet on the three execution roles; compaction 95%; CLAUDE.md
-~200 lines). Cost-conscious override: all-Sonnet with review-auditor kept on
-Opus for the security/consistency audit, compaction 85%, full RTK in
-GETTING_STARTED. Quality-first: Opus on schema-validator too (catches subtle
+execution against the convention skills). Defaults: balanced (GPT-5.5 on the two
+reasoning roles, medium-effort GPT-5.5 on the three execution roles; compaction 95%; AGENTS.md
+~200 lines). Cost-conscious override: all medium-effort GPT-5.5 with review-auditor kept on
+GPT-5.5 for the security/consistency audit, compaction 85%, full RTK in
+GETTING_STARTED. Quality-first: GPT-5.5 on schema-validator too (catches subtle
 backward-compat and $ref issues). Subagents ~4x direct; the full team ~15x --
 reserve the full pipeline for genuine from-scratch designs.
 

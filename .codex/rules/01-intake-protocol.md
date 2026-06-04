@@ -11,7 +11,7 @@ that playbook when running an interview.
 
 Say **"work area"** not "project" when asking about scope -- "project" is
 ambiguous (subject vs. unit-of-work). Say **"shared basics"** not "parent
-CLAUDE.md" or "inherited rules." "Hub" is an internal term -- never surface it
+AGENTS.md" or "inherited rules." "Hub" is an internal term -- never surface it
 to users.
 
 ## AskUserQuestion conventions

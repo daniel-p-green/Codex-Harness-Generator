@@ -48,7 +48,7 @@ Log observations to `Docs/_working/retro/YYYY-MM.md` using these categories:
 |---|---|---|
 | FRICTION | A workflow step caused notable delay or required workaround | "Had to manually find the test file because explorer returned wrong directory" |
 | WIN | Something worked surprisingly well | "Debugger correctly identified the N+1 query on first attempt" |
-| CORRECTION | User corrected Claude's behavior or output | "User said 'do not add type hints to test files' -- not in rules" |
+| CORRECTION | User corrected Codex's behavior or output | "User said 'do not add type hints to test files' -- not in rules" |
 | PATTERN | Same friction observed 2+ times | "Third time explorer missed the middleware directory" |
 | SKILL_UNDERTRIGGER | A skill should have triggered but did not | "/state-save not triggered when user said 'save my progress'" |
 | SKILL_OVERTRIGGER | A skill triggered when it should not have | "/health-check triggered when user said 'check this code'" |
@@ -61,18 +61,18 @@ Keep entries to one line. Do not log routine successful operations.
 ## Detection heuristics
 
 <!-- DETECTION HEURISTICS
-  WHY: Relying on Claude to remember to log friction is unreliable.
+  WHY: Relying on Codex to remember to log friction is unreliable.
   These heuristics trigger automatic logging based on observable signals.
 -->
 Automatically log when detecting:
 
-- **Negation words after Claude output**: "No, that's wrong", "Not what I meant", "Don't do that"
+- **Negation words after Codex output**: "No, that's wrong", "Not what I meant", "Don't do that"
   -> Log as CORRECTION with the user's correction
 - **Repeated request**: User asks the same thing a second time with different wording
   -> Log as FRICTION with "user had to rephrase"
 - **Explicit instruction**: "Remember this", "Always do X", "Never do Y"
   -> Log as CORRECTION with the new rule
-- **Skill invocation mismatch**: User types `/skill-name` manually after Claude did not auto-invoke
+- **Skill invocation mismatch**: User types `/skill-name` manually after Codex did not auto-invoke
   -> Log as SKILL_UNDERTRIGGER
 - **Agent redirect**: "No, use the researcher for this" or "Don't use debugger, just look at the code"
   -> Log as ROUTING_CORRECTION
@@ -90,7 +90,7 @@ their first real occurrence (threshold = 1 instead of the normal 3):
 ```
 - [PATTERN] (pre-seeded) Context exhaustion during large refactors -- consider splitting by module
 - [PATTERN] (pre-seeded) Routing ambiguity between "fix" and "refactor" -- check user intent
-- [PATTERN] (pre-seeded) Permission prompts for new file paths outside Docs/ -- update settings.json
+- [PATTERN] (pre-seeded) Permission prompts for new file paths outside Docs/ -- update .codex/config.toml
 - [PATTERN] (pre-seeded) Agent produces code mismatching project conventions -- add convention to rules
 - [PATTERN] (pre-seeded) State-load missing recently added files -- update state-save categories
 ```

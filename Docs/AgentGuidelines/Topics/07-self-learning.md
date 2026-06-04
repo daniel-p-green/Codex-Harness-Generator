@@ -3,7 +3,7 @@
 ### 7.1 Evaluation-Driven Development
 
 - **Established**: Baseline
-- **Source**: agent-skills-best-practices.md, test-and-evaluate.md | Tier 1
+- **Source**: https://developers.openai.com/codex/concepts/customization, test-and-evaluate.md | Tier 1
 - **Recommendation**: Self-improvement should follow a rigorous cycle:
   1. **Identify gap** from friction log (FRICTION, CORRECTION entries)
   2. **Build test scenario** targeting the gap (3 scenarios minimum)
@@ -22,8 +22,8 @@
 
 - **Established**: 2025-09
 - **Source**: multi-agent-research-system.md | Tier 1
-- **Recommendation**: Claude 4 models can diagnose failures and suggest improvements to their
-  own tool descriptions and prompts. In Anthropic's research system, a tool-testing agent
+- **Recommendation**: Codex 4 models can diagnose failures and suggest improvements to their
+  own tool descriptions and prompts. In OpenAI's research system, a tool-testing agent
   rewrote MCP tool descriptions after dozens of attempts, yielding a "40% decrease in task
   completion time for future agents."
 
@@ -35,7 +35,7 @@
 ### 7.3 Iteration Signals for Skills
 
 - **Established**: Baseline
-- **Source**: agent-skills-best-practices.md | Tier 1
+- **Source**: https://developers.openai.com/codex/concepts/customization | Tier 1
 - **Recommendation**: Track two specific skill performance signals:
   - **Undertriggering**: Skill should have fired but did not. Fix: add keywords or trigger
     phrases to the description. Log as SKILL_UNDERTRIGGER.
@@ -50,7 +50,7 @@
 ### 7.4 Cold Start Seeding
 
 - **Established**: Baseline
-- **Source**: Derived from multi-agent-research-system.md, claude-code-best-practices.md | Tier 1
+- **Source**: Derived from multi-agent-research-system.md, https://developers.openai.com/codex/concepts/customization | Tier 1
 - **Recommendation**: New environments have no friction history, so self-learning cannot
   function until patterns accumulate. Seed 3-5 known patterns from the starter profile,
   marked as `[PATTERN] (pre-seeded)`:

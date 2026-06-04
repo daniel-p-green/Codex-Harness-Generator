@@ -18,7 +18,7 @@
   - Integration with data-handling rule
 
   WHY THIS EXISTS:
-  Even in a local Claude Code environment, sensitive data can leak into session
+  Even in a local Codex environment, sensitive data can leak into session
   logs, memory files, retro entries, and context summaries. A data analyst
   processing healthcare claims or student records needs clear guardrails to
   prevent accidental exposure. This rule provides classification-based handling

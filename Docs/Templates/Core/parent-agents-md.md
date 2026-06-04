@@ -1,23 +1,23 @@
-# Template: Generated parent CLAUDE.md (hub mode)
+# Template: Generated parent AGENTS.md (hub mode)
 
 <!-- TEMPLATE ANNOTATION
   Used ONLY for hub-mode generation. The component-generator's "shell" pass
-  writes this file to <target>/CLAUDE.md. Per-area CLAUDE.md files are
-  generated separately under <target>/<area-slug>/CLAUDE.md using the
-  standard claude-md.md template.
+  writes this file to <target>/AGENTS.md. Per-area AGENTS.md files are
+  generated separately under <target>/<area-slug>/AGENTS.md using the
+  standard agents-md.md template.
 
   QUALITY CRITERIA:
   - Strict 80-line cap. The cumulative budget is 250 lines (parent + deepest
     child). Every extra parent line comes out of child budgets.
   - Contents: purpose, work-area registry, shared vocabulary, cross-area
     routing, compaction hint. Nothing else.
-  - Do NOT list child file paths -- Claude Code walks the tree automatically.
+  - Do NOT list child file paths -- Codex walks the tree automatically.
   - Do NOT duplicate area-specific constraints (those belong in per-area
-    CLAUDE.md).
+    AGENTS.md).
   - ASCII-only.
 
   WHY THIS STRUCTURE:
-  Claude Code loads both the parent CLAUDE.md and the area's CLAUDE.md when
+  Codex loads both the parent AGENTS.md and the area's AGENTS.md when
   a user works inside an area subfolder. Anything in the parent is paid for
   every turn in every area. Keep it ruthlessly shared.
 -->
@@ -30,9 +30,9 @@
 
 # Hub: AI Governance Practice
 
-This repository is a Claude Code hub -- one shared configuration layer
-covering three related but distinct work areas. Claude Code loads this
-file plus the CLAUDE.md of whichever work area subfolder you are in.
+This repository is a Codex hub -- one shared configuration layer
+covering three related but distinct work areas. Codex loads this
+file plus the AGENTS.md of whichever work area subfolder you are in.
 Other areas are NOT loaded, keeping context focused.
 
 ## Work areas in this setup
@@ -45,7 +45,7 @@ Other areas are NOT loaded, keeping context focused.
   a codebase rather than deliverable documents.
 
 Switch work areas by `cd`-ing into a subfolder and starting a fresh
-Claude Code session there. Do not try to work across two areas in a
+Codex session there. Do not try to work across two areas in a
 single session -- use separate sessions.
 
 ## Shared vocabulary
@@ -81,6 +81,6 @@ transient investigation notes first.
 
 ## Per-area instructions
 
-Each area has its own CLAUDE.md with domain constraints, routing tables,
+Each area has its own AGENTS.md with domain constraints, routing tables,
 and verification commands. Treat this file as the shared frame; the
 area's file is the operating manual.

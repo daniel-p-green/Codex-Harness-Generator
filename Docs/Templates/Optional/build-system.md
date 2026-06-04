@@ -7,14 +7,14 @@
 <!-- QUALITY: Must include the actual build command. Must define error
      parsing behavior. Must include retry policy. Under 120 lines. -->
 
-## Example: Build System Rule (`.claude/rules/build-system.md`)
+## Example: Build System Rule (`.codex/rules/build-system.md`)
 
 ```markdown
 # Build system
 
-<!-- ANNOTATION: State the build command explicitly. Claude cannot guess
+<!-- ANNOTATION: State the build command explicitly. Codex cannot guess
      project-specific build commands reliably. This is one of the most
-     valuable things to put in rules (per Anthropic best practices). -->
+     valuable things to put in rules (per OpenAI best practices). -->
 
 ## Build command
 
@@ -57,8 +57,8 @@ Do NOT build:
 
 ## Error handling
 
-<!-- ANNOTATION: This section teaches Claude how to interpret build
-     output. Without this, Claude may ignore warnings or retry
+<!-- ANNOTATION: This section teaches Codex how to interpret build
+     output. Without this, Codex may ignore warnings or retry
      endlessly on infrastructure errors. -->
 
 When a build fails:
@@ -91,7 +91,7 @@ These are faster than a full build and catch common issues early.
 
 ## Build artifacts
 
-<!-- ANNOTATION: Tell Claude where build output goes so it does not
+<!-- ANNOTATION: Tell Codex where build output goes so it does not
      accidentally read or modify build artifacts. -->
 
 Build output goes to: `dist/` (do not edit files in this directory)
@@ -107,6 +107,6 @@ Build output goes to: `dist/` (do not edit files in this directory)
 -->
 
 <!-- ANTI-PATTERN: Do not include CI/CD pipeline configuration. That
-     belongs in the project's CI config files, not in Claude's rules.
+     belongs in the project's CI config files, not in Codex's rules.
      Do not list every possible build flag -- only the ones the team
      actually uses. -->

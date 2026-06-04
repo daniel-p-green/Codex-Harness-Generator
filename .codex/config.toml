@@ -1,0 +1,74 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+model_verbosity = "medium"
+approval_policy = "on-request"
+default_permissions = "codex-harness-generator"
+
+[features]
+multi_agent = true
+hooks = true
+memories = true
+apps = true
+
+[agents]
+max_threads = 6
+max_depth = 1
+job_max_runtime_seconds = 1800
+
+[agents.intake-interviewer]
+description = "Conducts deep project intake when no preset fits, using the orchestrator question relay and writing GENESIS.md."
+config_file = "agents/intake-interviewer.toml"
+
+[agents.environment-architect]
+description = "Designs Codex environment architecture from GENESIS.md, official OpenAI guidance, profiles, and templates."
+config_file = "agents/environment-architect.toml"
+
+[agents.component-generator]
+description = "Generates one pass of Codex environment files from an approved architecture manifest."
+config_file = "agents/component-generator.toml"
+
+[agents.environment-validator]
+description = "Validates generated Codex environments and writes a report without modifying target files."
+config_file = "agents/environment-validator.toml"
+
+[agents.upgrade-analyzer]
+description = "Audits existing Codex environments and writes tiered upgrade recommendations."
+config_file = "agents/upgrade-analyzer.toml"
+
+[[skills.config]]
+path = "../.agents/skills/create"
+enabled = true
+
+[[skills.config]]
+path = "../.agents/skills/validate-environment"
+enabled = true
+
+[[skills.config]]
+path = "../.agents/skills/upgrade-environment"
+enabled = true
+
+[[skills.config]]
+path = "../.agents/skills/update"
+enabled = true
+
+[permissions.codex-harness-generator]
+description = "Workspace write access for generating Codex harness files, with sensitive and destructive operations denied."
+extends = ":workspace"
+
+[permissions.codex-harness-generator.filesystem.":workspace_roots"]
+"." = "write"
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"**/*secret*" = "deny"
+"**/*token*" = "deny"
+
+[permissions.codex-harness-generator.network]
+enabled = true
+mode = "limited"
+
+[permissions.codex-harness-generator.network.domains]
+"developers.openai.com" = "allow"
+"platform.openai.com" = "allow"
+"docs.github.com" = "allow"

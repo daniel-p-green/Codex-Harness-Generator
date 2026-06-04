@@ -14,7 +14,7 @@
      relatedness of criteria, engineer bias out of scoring, and name the governing
      law for the specific domain. Under 120 lines. -->
 
-## Example: Adverse-Decision & Fairness Rule (`.claude/rules/0X-fairness.md`)
+## Example: Adverse-Decision & Fairness Rule (`.codex/rules/0X-fairness.md`)
 
 ````markdown
 # Adverse decisions and fairness

@@ -1,11 +1,6 @@
 ---
 name: update
-description: Updates the Harness Generator's own knowledge base (Docs/AgentGuidelines/Topics/, AgentPlaybooks/, tool-registry) -- ingests pending ProvideKnowledge/ docs, then web-researches Anthropic docs and changelogs, incorporates validated findings with source attribution, and prunes superseded or deprecated entries (90-day tool-registry cadence). Supports a local-only mode that ingests ProvideKnowledge/ without web search. Use when the user says "update knowledge", "refresh best practices", "check for updates", "update the Harness Generator", "process knowledge", "I added some docs to ProvideKnowledge", "incorporate this research", "process my notes", or "/update". Do NOT use to upgrade a user's generated environment (use /upgrade-environment) or to validate one (use /validate-environment).
-context: fork
-allowed-tools: [Read, Write, Edit, Glob, Grep, WebSearch, WebFetch]
-metadata:
-  author: Claude Harness Generator
-  version: 1.0.0
+description: Updates the Harness Generator's own knowledge base (Docs/AgentGuidelines/Topics/, AgentPlaybooks/, tool-registry) -- ingests pending ProvideKnowledge/ docs, then web-researches OpenAI docs and changelogs, incorporates validated findings with source attribution, and prunes superseded or deprecated entries (90-day tool-registry cadence). Supports a local-only mode that ingests ProvideKnowledge/ without web search. Use when the user says "update knowledge", "refresh best practices", "check for updates", "update the Harness Generator", "process knowledge", "I added some docs to ProvideKnowledge", "incorporate this research", "process my notes", or "/update". Do NOT use to upgrade a user's generated environment (use /upgrade-environment) or to validate one (use /validate-environment).
 ---
 
 ## Critical
@@ -16,7 +11,7 @@ This updates the CREATOR'S OWN knowledge base (Docs/AgentGuidelines/ and Docs/Ag
 
 1. Ingest any pending user-contributed knowledge from ProvideKnowledge/ (scan, classify, validate, incorporate, move to Processed/)
 2. Check topic files in Docs/AgentGuidelines/Topics/ for staleness
-3. Research latest Claude Code documentation from the web
+3. Research latest Codex documentation from the web
 4. Incorporate validated findings into the appropriate topic files
 5. Review existing content for entries superseded by new findings
 6. Prune deprecated or contradicted content
@@ -38,7 +33,7 @@ For each unprocessed item:
 1. Read the full content
 2. Classify by topic: rules, agents, skills, teams, memory, context, routing, permissions, hooks, MCP, prompt engineering, or other
 3. Assess source reliability:
-   - Tier 1: Anthropic official documentation
+   - Tier 1: OpenAI official documentation
    - Tier 2: Validated community practices (multiple sources, evidence-backed)
    - Tier 3: Anecdotal or single-source
 4. Cross-reference against existing topic files in `Docs/AgentGuidelines/Topics/` (use INDEX.md for routing)
@@ -54,16 +49,16 @@ If any topic file has not been updated in 30+ days (or has no date), proceed to 
 
 ### Step 3: Research latest documentation
 
-Search for recent Claude Code updates from these sources:
-- Anthropic documentation site (docs.anthropic.com)
-- Claude Code changelog and release notes
+Search for recent Codex updates from these sources:
+- OpenAI documentation site (developers.openai.com)
+- Codex changelog and release notes
 - New skill, agent, or hook patterns
-- Changes to CLAUDE.md format, settings.json schema, or permission syntax
+- Changes to AGENTS.md format, .codex/config.toml schema, or permission syntax
 
 Focus on:
 - New features that affect environment design (new tool types, new frontmatter fields, new hook events)
 - Breaking changes (deprecated features, changed behavior)
-- New best practices from Anthropic (prompt engineering, agent patterns)
+- New best practices from OpenAI (prompt engineering, agent patterns)
 
 ### Step 3b: Verify tool registry
 
@@ -80,7 +75,7 @@ Verified is 90+ days old:
    with status Experimental, queue for Step 4 incorporation
 
 Also check for new tools in categories where the registry has few options:
-- Search: "Claude Code [category] plugin [current year]"
+- Search: "Codex [category] plugin [current year]"
 - Only add tools meeting the evaluation criteria in section 5.10 of
   Topics/05-memory.md (local-first, free, open-source, compatible)
 
@@ -121,7 +116,7 @@ covers the same topic with newer information:
 **5b. Deprecated features**: Search for references to features, APIs, or
 patterns that the web research (Step 3) identified as deprecated or removed.
 Common signals:
-- Claude Code changelog entries with "removed" or "deprecated"
+- Codex changelog entries with "removed" or "deprecated"
 - Documentation pages that no longer exist (404) or redirect
 - Model versions that are no longer available
 - Syntax or settings that have been replaced
@@ -141,11 +136,11 @@ UNVERIFIED markers that can now be resolved:
 **5d. Propagate changes**: When entries are removed or updated in topic files,
 check if downstream files reference them:
 - `Docs/AgentPlaybooks/*.md` -- update or remove references
-- `.claude/rules/02-generation-standards.md` -- verify standards still match
-- `.claude/rules/03-quality-gates.md` -- verify checks still match
+- `.codex/rules/02-generation-standards.md` -- verify standards still match
+- `.codex/rules/03-quality-gates.md` -- verify checks still match
 - `Docs/StarterProfiles/*.md` -- update profile recommendations if affected
 - `Docs/Templates/References/tool-registry.md` -- sync tool status changes
-- `.claude/agents/environment-architect.md` -- update matching rules if tools changed
+- `.codex/agents/environment-architect.toml` -- update matching rules if tools changed
 
 Only modify downstream files when the change is clear-cut (removed feature,
 renamed concept). Flag ambiguous downstream impacts for human review.

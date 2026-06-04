@@ -3,7 +3,7 @@
 Conditional components and detailed standards for environment generation.
 Loaded by the component-generator and environment-validator agents on demand.
 
-See .claude/rules/02-generation-standards.md for the always-loaded core standards.
+See .codex/rules/02-generation-standards.md for the always-loaded core standards.
 
 ## Conditional components (intake-driven)
 
@@ -33,18 +33,18 @@ See ARCHITECTURE.md Environment Complexity section for the user's decisions.
    Document which model for which task type in routing table comments.
    Configure MCP bridges for cross-model access where applicable.
 21. **Semantic search MCP** (for codebases 1000+ files): Recommend and document
-   Claude Context MCP or Code-Graph-RAG setup in GETTING_STARTED.md.
+   Codex Context MCP or Code-Graph-RAG setup in GETTING_STARTED.md.
 22. **Session-segmented working memory** (for parallel sessions or teams):
    Use `_working/state/<session-slug>/` instead of a single state file.
    /state-save creates a slug from the task or user-provided name.
    /state-load lists available sessions for the user to resume.
 23. **Multi-role support** (for teams with different roles sharing one project):
-   Generate `Docs/Roles/` with CLAUDE.local.md and settings.local.json
+   Generate `Docs/Roles/` with AGENTS.override.md and local config profile
    templates per role. Add role-prefixed routing entries. Add "Setting up
    your role" to GETTING_STARTED.md. Keep shared rules role-neutral.
 24. **Beads task tracker** (for complex multi-session projects with many
    interdependent subtasks, any domain, intermediate+ users): Include
-   `bd init` setup, Claude Code hooks, settings.json permissions. Requires
+   `bd init` setup, Codex hooks, .codex/config.toml permissions. Requires
    Git as persistence layer. For non-Git VCS projects, flag the trade-off
    of maintaining a parallel Git repo. Complements (does not replace)
    markdown wiki and /state-save. NOT for simple projects or beginners.
@@ -60,16 +60,16 @@ See ARCHITECTURE.md Environment Complexity section for the user's decisions.
 26. **Token optimization guidance** (when GENESIS.md indicates cost-conscious or
    balanced efficiency priority): Generate environment settings calibrated to
    the efficiency tier from GENESIS.md Token Efficiency Priority section.
-   - Cost-conscious: Set `CLAUDE_CODE_AUTOCOMPACT_PCT_OVERRIDE: "85"` in
-     settings.json env block. Default all agents to Sonnet. Target CLAUDE.md at
-     150 lines. Generate aggressive .claudeignore (domain + generic patterns).
+   - Cost-conscious: Set `CODEX_AUTOCOMPACT_PCT_OVERRIDE: "85"` in
+     .codex/config.toml env block. Default all agents to medium-effort GPT-5.5. Target AGENTS.md at
+     150 lines. Generate aggressive VCS ignore rules (domain + generic patterns).
      Include full RTK setup instructions in GETTING_STARTED.md. Consider agent
      consolidation where roles overlap.
-   - Balanced: Use standard model selection policy (Opus for plan/review, Sonnet
+   - Balanced: Use standard model selection policy (high-effort GPT-5.5 for plan/review, medium-effort GPT-5.5
      for implementation). Default compaction (95%). Standard domain-specific
-     .claudeignore. Mention RTK as an option in GETTING_STARTED.md.
-   - Quality-first: Opus available for all agents per standard policy. Default
-     compaction. Minimal .claudeignore (only binaries and build artifacts). No
+     VCS ignore rules. Mention RTK as an option in GETTING_STARTED.md.
+   - Quality-first: GPT-5.5 available for all agents per standard policy. Default
+     compaction. Minimal VCS ignore rules (only binaries and build artifacts). No
      RTK mention. No optimization pressure.
    Include a "Monitoring and Optimizing Costs" section in GETTING_STARTED.md
    scaled to the tier (full setup for cost-conscious, brief for balanced,
@@ -77,14 +77,14 @@ See ARCHITECTURE.md Environment Complexity section for the user's decisions.
 27. **Official plugin recommendations** (when ARCHITECTURE.md Recommended Plugins
    section lists matching plugins): Generate an "Optional Plugins" section in
    GETTING_STARTED.md with marketplace setup command and install commands for
-   each recommended collection from `github.com/anthropics/skills`. Include
+   each recommended collection from `developers.openai.com/codex/concepts/customization`. Include
    relevant bundled skills (/code-review, /batch, /debug) as "Built-in Skills"
    subsection. Do NOT auto-install; document commands for user choice. Match
    intake signals per Topics/20-plugins.md section 20.4 matching rules.
 28. **Skill eval recommendation** (when environment includes 3+ custom skills AND
    user is intermediate+): Include skill-creator install command and brief eval
    workflow in GETTING_STARTED.md "Refining Your Skills" section. Command:
-   `claude install-plugin anthropic/example-skills`. The skill-creator's Eval
+   `codex skill install example-skills`. The skill-creator's Eval
    mode validates that generated skills actually improve model behavior beyond
    the no-skill baseline.
 29. **Memory plugin recommendation** (when ARCHITECTURE.md Recommended Plugins
@@ -92,7 +92,7 @@ See ARCHITECTURE.md Environment Complexity section for the user's decisions.
    as an optional enhancement. Document: install/MCP registration command,
    one-sentence purpose, hook conflict notes if applicable. Frame as optional --
    the environment's /state-save and wiki structure work without it. Recommend
-   ONE plugin (Synabun, claude-mem, or mcp-memory-service) per Topics/05-memory.md
+   ONE plugin (Synabun, codex memories, or mcp-memory-service) per Topics/05-memory.md
    section 5.10 matching rules.
 
 30. **Status line configuration** (when intake reveals complex projects or large
@@ -109,14 +109,14 @@ See ARCHITECTURE.md Environment Complexity section for the user's decisions.
    ENABLE_TOOL_SEARCH setting in GETTING_STARTED.md with recommended threshold.
    Include guidance on writing server `instructions` fields to improve tool
    selection accuracy. See Topics/10-integration.md section 10.11.
-33. **Fast mode documentation** (when GENESIS.md indicates cost-conscious or
-   balanced tier): Document fast mode availability and cost trade-offs in
-   GETTING_STARTED.md. For cost-conscious: include `fastModePerSessionOptIn: true`
-   in settings.json to prevent cost runaway. For balanced: mention as optional
-   speed enhancement. See Topics/18-cost-awareness.md section 18.6.
+33. **Service tier documentation** (when GENESIS.md indicates cost-conscious or
+   balanced tier): Document available Codex service-tier trade-offs in
+   GETTING_STARTED.md. Do not auto-enable a premium or latency-focused tier in
+   shared `.codex/config.toml`; let the user opt in per project or session.
+   See Topics/18-cost-awareness.md section 18.6.
 
 34. **MCP server validation** (when any MCP servers in architecture): Every MCP
-   server in the generated `.mcp.json` or settings.json must reference a verified
+   server in the generated `.mcp.json` or .codex/config.toml must reference a verified
    server from `Docs/Templates/References/tool-registry.md` (section "Verified MCP
    Servers"). Do NOT generate MCP configurations for services without a verified
    server package. If the architecture references an unverified MCP server, flag it
@@ -150,14 +150,14 @@ Human-readable context (SESSION_CONTEXT) uses Markdown.
 ## Execution mode (required in every environment)
 
 Every generated environment MUST include all three execution modes in
-settings.json and the orchestrator rule:
+.codex/config.toml and the orchestrator rule:
 
 1. **Sequential subagents** (default): Serial pipeline (plan -> implement ->
    review -> build). Used for most tasks with natural dependencies.
-2. **Parallel subagents**: Multiple independent Task tool calls in a single
+2. **Parallel subagents**: Multiple independent Codex subagent tools calls in a single
    message. Used when work can be split into independent streams.
 3. **Agent Teams**: Experimental feature enabled via
-   `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "1"` in settings.json env block.
+   `CODEX_EXPERIMENTAL_AGENT_TEAMS: "1"` in .codex/config.toml env block.
    Used for large parallel investigations or multi-system work with
    non-overlapping file ownership.
 
@@ -176,7 +176,7 @@ for Teams) and prevent file conflicts entirely.
 ## Status line (recommended)
 
 When the intake reveals complex projects or large codebases, recommend configuring
-the Claude Code status line to display context health (used percentage, turn count).
+the Codex status line to display context health (used percentage, turn count).
 This provides zero-context-cost monitoring. Include setup instructions in
 GETTING_STARTED.md rather than auto-generating status line hooks (they require
 platform-specific shell scripts).

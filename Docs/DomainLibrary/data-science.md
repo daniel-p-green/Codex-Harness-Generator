@@ -9,7 +9,7 @@ no-leakage / reproducibility discipline**. Follows
 `Docs/StarterProfiles/PROFILE_FORMAT.md` (slim) -- a starting point the architect
 adapts; it points at templates, it does not inline them.
 
-Scope note (carry into CLAUDE.md): this domain does OFFLINE experimentation --
+Scope note (carry into AGENTS.md): this domain does OFFLINE experimentation --
 train and evaluate models on datasets you control. Building LLM/RAG/agent apps is
 the **llm-app** domain; productionizing pipelines that move data is
 **data-engineering**; serving/scaling a trained model is **devops-infrastructure**;
@@ -34,11 +34,11 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| researcher | opus | Look up appropriate algorithms, baselines, metrics, and statistical assumptions before modeling; cite sources | researcher.md |
-| eda-analyst | sonnet | Exploratory analysis, data profiling, feature engineering; executes Python over data, emits dated output files | analyst.md |
-| model-trainer | sonnet | Train/tune models, run cross-validation and hyperparameter search on the validation split, log each run | analyst.md (custom: training + experiment logging) |
-| model-reviewer | opus | Validate methodology read-only: leakage/contamination audit, metric appropriateness, overfitting, fairness across subgroups | reviewer.md |
-| drafter | sonnet | Write model cards, experiment reports, and findings summaries from results | drafter.md |
+| researcher | high-effort | Look up appropriate algorithms, baselines, metrics, and statistical assumptions before modeling; cite sources | researcher.md |
+| eda-analyst | medium-effort | Exploratory analysis, data profiling, feature engineering; executes Python over data, emits dated output files | analyst.md |
+| model-trainer | medium-effort | Train/tune models, run cross-validation and hyperparameter search on the validation split, log each run | analyst.md (custom: training + experiment logging) |
+| model-reviewer | high-effort | Validate methodology read-only: leakage/contamination audit, metric appropriateness, overfitting, fairness across subgroups | reviewer.md |
+| drafter | medium-effort | Write model cards, experiment reports, and findings summaries from results | drafter.md |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy (conservative), context-management (preserve dataset version, current
@@ -104,7 +104,7 @@ read-only cloud storage (`aws s3 cp/ls/sync *`; deny `aws s3 rm/mv *`). Add GPU 
 cloud-runtime perms only when the intake names them; gate long/expensive training
 or GPU jobs behind human approval. `.gitignore` data and model artifacts
 (`data/`, `*.csv`, `*.parquet`, `*.h5`, `*.pkl`, `*.pt`, `*.ckpt`, `mlruns/`,
-`wandb/`, `__pycache__/`, `.ipynb_checkpoints/`). Generate `settings.local.json`
+`wandb/`, `__pycache__/`, `.ipynb_checkpoints/`). Generate `local config profile`
 for machine-specific Python/GPU/DB paths -- never commit secrets.
 
 ## Self-Learning Seed Entries
@@ -145,14 +145,14 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 
 ## Cost / Model Notes
 
-Opus for researcher and model-reviewer (method choice, leakage/fairness audit);
-Sonnet for eda-analyst, model-trainer, and drafter (established-pattern execution).
+GPT-5.5 for researcher and model-reviewer (method choice, leakage/fairness audit);
+medium-effort GPT-5.5 for eda-analyst, model-trainer, and drafter (established-pattern execution).
 The main cost/time sink is COMPUTE (training runs), not tokens -- note GPU/runtime
 budget in GETTING_STARTED and prefer small/sampled runs while iterating. Defaults:
-balanced (Opus on reasoning roles, Sonnet on execution; compaction 95%; CLAUDE.md
-~200 lines). Cost-conscious override: all-Sonnet except model-reviewer on Opus (it
+balanced (high-effort GPT-5.5 on reasoning roles, medium-effort GPT-5.5 on execution; compaction 95%; AGENTS.md
+~200 lines). Cost-conscious override: all medium-effort GPT-5.5 except model-reviewer on GPT-5.5 (it
 owns the leakage/methodology audit -- do not downgrade it), compaction 85%,
-aggressive `.claudeignore` of data/artifacts, full RTK in GETTING_STARTED (filters
+aggressive `VCS ignore rules` of data/artifacts, full RTK in GETTING_STARTED (filters
 verbose training logs and tracebacks). Subagents ~4x vs direct; teams not
 recommended (the EDA -> train -> evaluate -> review loop is naturally serial).
 

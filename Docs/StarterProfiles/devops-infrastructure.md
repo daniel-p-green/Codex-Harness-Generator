@@ -18,11 +18,11 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| researcher | opus | Cloud services, IaC patterns, provider/version caveats, security benchmarks | researcher.md |
-| planner | opus | Plan infra changes with blast-radius analysis + rollback strategy, checkpointed | planner.md |
-| implementer | sonnet | Implement one checkpoint of IaC; validate/fmt/dry-run | implementer.md |
-| reviewer | opus | Review for security misconfig, cost, blast radius (read-only) | reviewer.md |
-| incident-responder | opus | Triage, gather signals, hypothesize, rollback or fix outages | debugger.md (adapt for ops triage) |
+| researcher | high-effort | Cloud services, IaC patterns, provider/version caveats, security benchmarks | researcher.md |
+| planner | high-effort | Plan infra changes with blast-radius analysis + rollback strategy, checkpointed | planner.md |
+| implementer | medium-effort | Implement one checkpoint of IaC; validate/fmt/dry-run | implementer.md |
+| reviewer | high-effort | Review for security misconfig, cost, blast radius (read-only) | reviewer.md |
+| incident-responder | high-effort | Triage, gather signals, hypothesize, rollback or fix outages | debugger.md (adapt for ops triage) |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy, context-management, self-learning, error-handling (with diagnostic
@@ -73,10 +73,11 @@ mutation gates) + Docker -- all in
 gates there are load-bearing: `terraform apply/destroy`, `kubectl apply/delete`,
 `helm install/upgrade`, and any cloud `* delete *`/`* terminate *` stay in deny;
 the `/deploy` skill performs them only after the approval gate. Add IaC file
-writes (`Edit/Write(./**/*.tf)`, `.tfvars`, `.yaml/.yml`, `.j2`, `Dockerfile*`)
-the implementer touches. Add per-tool CLI from intake (`cdk *` / `pulumi *` with
-their `destroy` denied). Generate `settings.local.json` for machine-specific tool
-paths and credential references; `.gitignore` it. `.claudeignore`: `*.tfstate*`,
+writable IaC paths for files the implementer touches (`**/*.tf`, `.tfvars`,
+`.yaml/.yml`, `.j2`, `Dockerfile*`). Add per-tool CLI guidance from intake
+(`cdk *` / `pulumi *` with
+their `destroy` denied). Generate `local config profile` for machine-specific tool
+paths and credential references; `.gitignore` it. `VCS ignore rules`: `*.tfstate*`,
 `.terraform/`, `*.pem`, `*.key`, `*credentials*`, `*secret*`, cloud caches.
 
 ## Self-Learning Seed Entries
@@ -93,7 +94,7 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
   force-unlock without approval.
 - [PATTERN] (pre-seeded) Credential exposure in IaC files -- implementer hardcodes
   keys/passwords/tokens in tfvars, manifests, or CI configs. Mitigation: reviewer
-  checks for hardcoded creds; .claudeignore excludes sensitive patterns; deny
+  checks for hardcoded creds; VCS ignore rules excludes sensitive patterns; deny
   rules block reading credential files.
 - [PATTERN] (pre-seeded) Blast radius underestimated -- plan shows "1 to change"
   but triggers a replacement (destroy+create) causing downtime. Mitigation:
@@ -119,11 +120,11 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 
 ## Cost / Model Notes
 
-Opus for planner/reviewer/researcher/incident-responder (reasoning prevents outage
-escalation and cost surprises); Sonnet for implementer (established-pattern IaC).
-Defaults: balanced (compaction 95%, CLAUDE.md ~200 lines). Cost-conscious override:
-all-Sonnet except incident-responder (keep Opus), consider merging researcher into
-planner, compaction 85%, CLAUDE.md ~150, full RTK in GETTING_STARTED (filters
+GPT-5.5 for planner/reviewer/researcher/incident-responder (reasoning prevents outage
+escalation and cost surprises); medium-effort GPT-5.5 for implementer (established-pattern IaC).
+Defaults: balanced (compaction 95%, AGENTS.md ~200 lines). Cost-conscious override:
+all medium-effort GPT-5.5 except incident-responder (keep GPT-5.5), consider merging researcher into
+planner, compaction 85%, AGENTS.md ~150, full RTK in GETTING_STARTED (filters
 verbose `terraform plan` / `kubectl describe` output). Infra workflows are serial,
 so subagents (~4x) are the default; teams ~15x. Summarize large plan output before
 passing to reviewer; incident response is Bash-call-heavy (10-20 calls). Monitor
@@ -144,7 +145,7 @@ with `/cost`.
 
 Cloud provider(s) + IaC tool (drives ecosystem permissions, validate/dry-run
 commands, hook matchers); production vs dev gating policy (auto-approve dev?);
-monitoring/alerting platform (Datadog/Grafana/PagerDuty -> WebFetch read-only);
+monitoring/alerting platform (Datadog/Grafana/PagerDuty -> read-only retrieval);
 secret backend (Vault/Secrets Manager -> read-only, never log values); GitHub
 Actions present (-> `/install-github-app`, validation workflows); team shape.
 

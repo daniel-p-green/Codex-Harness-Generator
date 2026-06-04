@@ -1,10 +1,10 @@
 # Orchestrator workflow (detailed pipeline choreography)
 
 Load this when actually running a `/create` or `/upgrade-environment` pipeline.
-CLAUDE.md holds the high-level step list; this playbook holds the detail (hub
+AGENTS.md holds the high-level step list; this playbook holds the detail (hub
 detection, architecture-confirmation sub-steps, shape conversions, progress
-reporting). Routing decisions live in `.claude/rules/00-creator-core.md`; intake
-procedure in `.claude/rules/01-intake-protocol.md` + `IntakeChecklist.md`.
+reporting). Routing decisions live in `.codex/rules/00-creator-core.md`; intake
+procedure in `.codex/rules/01-intake-protocol.md` + `IntakeChecklist.md`.
 
 ## /create pipeline
 
@@ -21,7 +21,7 @@ directory, then proceed to intake. The skill exists for the bare "/create" case.
    `Docs/Environment/CREATION_CONTEXT.md`.
 2. **Read context, handle conflicts.** Read CREATION_CONTEXT.md for target path
    and status. If `HAS_EXISTING_ENV`: offer to back up existing files to
-   `<target>/claude-backup-YYYYMMDD/`, run `/validate-environment` on it, or cancel.
+   `<target>/codex-backup-YYYYMMDD/`, run `/validate-environment` on it, or cancel.
 
    **Hub detection:** before intake, check whether the target or any parent
    directory contains `Docs/Environment/HUB_GENESIS.md`. If found, this is an
@@ -39,7 +39,7 @@ directory, then proceed to intake. The skill exists for the bare "/create" case.
      shape, shared tools, AI ecosystem extensions, work-area registry), write
      `<target>/Docs/Environment/HUB_GENESIS.md`, then loop per area writing
      `<target>/<area-slug>/Docs/Environment/GENESIS.md`.
-4. **Architect** (Task tool -> environment-architect): reads GENESIS.md (single)
+4. **Architect** (Codex subagent tools -> environment-architect): reads GENESIS.md (single)
    or HUB_GENESIS.md + per-area GENESIS.md (hub); writes ARCHITECTURE.md (single)
    or HUB_ARCHITECTURE.md + per-area ARCHITECTURE.md (hub). On the custom path,
    the architect first synthesizes a reusable `DOMAIN_PROFILE.md`.
@@ -54,18 +54,18 @@ directory, then proceed to intake. The skill exists for the bare "/create" case.
    d. If the user requests structural changes, update the component manifest and
       directory tree in ARCHITECTURE.md before generating.
    e. Get final confirmation: "Ready to generate these files?"
-6. **Generate** (Task tool -> component-generator):
+6. **Generate** (Codex subagent tools -> component-generator):
    - First check for an existing GENERATION_PROGRESS.md; if found with completed
      passes, offer to resume from the next incomplete pass.
    - Single-area: 5 invocations (1 Foundation, 2 Agents, 3 Skills, 4
      Infrastructure, 5 Documentation).
-   - Hub: one hub-shell invocation (parent CLAUDE.md + shared rules + work-area
-     registry in parent settings.json), then 5 passes per work area under its
-     subfolder. Each area gets its own `.claude/` and `Docs/`; shared skills and
+   - Hub: one hub-shell invocation (parent AGENTS.md + shared rules + work-area
+     registry in parent .codex/config.toml), then 5 passes per work area under its
+     subfolder. Each area gets its own `.codex/` and `Docs/`; shared skills and
      agents live at the parent and inherit.
    - Report progress between passes ("Creating foundation files... done (1/5)";
      hubs: "Creating shared basics... done. Creating area 'policy' (1/5)... done.").
-7. **Validate** (Task tool -> environment-validator): runs the full checklist
+7. **Validate** (Codex subagent tools -> environment-validator): runs the full checklist
    (see `validation-guide.md`). On critical failures: delegate targeted fixes to
    component-generator and re-validate (max 2 cycles).
 8. **Summary:** what was generated, how to get started, smoke-test instructions.
@@ -91,14 +91,14 @@ pain points, and implements approved improvements. Unlike `/validate-environment
 7. Delegate to component-generator for approved changes. **Shape conversions are
    handled first:**
    - *Convert to hub:* ask for an area slug for the current contents (default:
-     directory name); move `<target>/.claude/`, `<target>/CLAUDE.md`, and
+     directory name); move `<target>/.codex/`, `<target>/AGENTS.md`, and
      `<target>/Docs/` under `<target>/<area-slug>/` (keep
-     `claude-backup-YYYYMMDD/` at the parent); run hub intake for shared basics
+     `codex-backup-YYYYMMDD/` at the parent); run hub intake for shared basics
      (one round); delegate to environment-architect in hub mode; delegate to
      component-generator for the shell pass only.
    - *Collapse hub to single:* confirm exactly one area remains; move
      `<target>/<only-area>/*` up to `<target>/`; delete HUB_GENESIS.md,
-     HUB_ARCHITECTURE.md, and the parent `.claude/` / `CLAUDE.md`; no generator
+     HUB_ARCHITECTURE.md, and the parent `.codex/` / `AGENTS.md`; no generator
      pass needed.
    - *Declare hub structure* (HUB_LIKE_UNDECLARED): collect shared-basics intake
      (one round); run the hub architect to design the parent shell from a

@@ -1,15 +1,15 @@
----
-name: upgrade-analyzer
-description: Performs deep best-practice gap analysis on an existing Claude Code environment. Use after the user interview is complete and UPGRADE_CONTEXT.md has been written with interview answers. Produces UPGRADE_RECOMMENDATIONS.md with tiered, actionable recommendations.
-model: opus
-tools: [Read, Glob, Grep, Write]
-disallowedTools: [Edit]
-maxTurns: 30
----
+name = "upgrade-analyzer"
+description = "Performs deep best-practice gap analysis on an existing Codex environment. Use after the user interview is complete and UPGRADE_CONTEXT.md has been written with interview answers. Produces UPGRADE_RECOMMENDATIONS.md with tiered, actionable recommendations."
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+Analyze existing Codex environments and write tiered upgrade recommendations.
 
 ## Objective
 
-Analyze an existing Claude Code environment against every check in the UpgradeChecklist, cross-referenced with the topic files in Docs/AgentGuidelines/Topics/. Produce a tiered recommendation report (quick wins / medium / large) with specific file-level changes for each gap found.
+Analyze an existing Codex environment against every check in the UpgradeChecklist, cross-referenced with the topic files in Docs/AgentGuidelines/Topics/. Produce a tiered recommendation report (quick wins / medium / large) with specific file-level changes for each gap found.
 
 You are read-only with respect to the environment being analyzed. You write only the recommendation report.
 
@@ -41,7 +41,7 @@ Each recommendation includes: Gap, Best Practice reference, Effort, Files, Chang
 
 Read the `## Shape` field from UPGRADE_CONTEXT.md. Based on its value:
 
-- `SHAPE: SINGLE` and interview answers mention multiple distinct projects or "I wish Claude would forget about X while I'm on Y" -> add recommendation `[L*] Convert to multi-area hub`. Files: move all existing `.claude/`, `CLAUDE.md`, `Docs/` under `<target>/<area-slug>/`; generate parent shell via component-generator shell pass. User-facing copy: "You're working on multiple distinct projects from one environment. Splitting them into work areas would let Claude keep each separate while still sharing your rules and style."
+- `SHAPE: SINGLE` and interview answers mention multiple distinct projects or "I wish Codex would forget about X while I'm on Y" -> add recommendation `[L*] Convert to multi-area hub`. Files: move all existing `.codex/`, `AGENTS.md`, `Docs/` under `<target>/<area-slug>/`; generate parent shell via component-generator shell pass. User-facing copy: "You're working on multiple distinct projects from one environment. Splitting them into work areas would let Codex keep each separate while still sharing your rules and style."
 - `SHAPE: HUB` with exactly one work area remaining -> add recommendation `[M*] Collapse hub back to single area`. Files: move `<target>/<only-area-slug>/*` up to `<target>/`; delete HUB_GENESIS.md and HUB_ARCHITECTURE.md. User-facing copy: "Only one work area remains. Collapsing back to a single setup removes the parent layer you no longer need."
 - `SHAPE: HUB_LIKE_UNDECLARED` (sibling environments without declared hub) -> add recommendation `[L*] Declare hub structure`. Files: create HUB_GENESIS.md with work-area registry, generate parent shell, deduplicate any rules repeated across siblings. User-facing copy: "You already work this way -- declaring it as a hub lets the Harness Generator maintain shared basics for you and prevents drift between areas."
 
@@ -70,3 +70,4 @@ Return to the orchestrator:
 - DO NOT: Modify any environment files (read-only analysis)
 - DO NOT: Skip checks (run all even if early checks reveal issues)
 - DO NOT: Speculate about files you have not read
+"""

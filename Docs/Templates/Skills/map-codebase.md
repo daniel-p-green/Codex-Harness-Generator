@@ -3,7 +3,7 @@
 <!-- ANNOTATION: The map-codebase skill automates the scan-classify-update
      pipeline for populating area maps and symbol pages in the wiki. It
      replaces manual codebase exploration with a systematic scan that uses
-     Glob/Grep/Read (LLM reasoning needed for classification -- Bash alone
+     `rg --files`, `rg`, and targeted file reads (LLM reasoning needed for classification -- shell alone
      cannot determine which subsystem a class belongs to).
 
      This skill is ALWAYS included for game-development profiles and
@@ -12,8 +12,8 @@
 
 <!-- QUALITY: Must demonstrate the scan -> classify -> update pipeline.
      Must be re-runnable and non-destructive (preserve manual notes).
-     Must handle empty codebases gracefully. Must use only Glob/Grep/Read
-     (no Bash). SKILL.md under 500 lines. -->
+     Must handle empty codebases gracefully. Must use shell search and targeted
+     reads only, with no build or mutation commands. SKILL.md under 500 lines. -->
 
 ## Progressive Disclosure Structure
 
@@ -31,7 +31,7 @@ map-codebase/
      this because classification requires understanding inheritance, naming
      conventions, and domain semantics. -->
 
-## Example: Map Codebase Skill (`.claude/skills/map-codebase/SKILL.md`)
+## Example: Map Codebase Skill (`.agents/skills/map-codebase/SKILL.md`)
 
 ````markdown
 ---
@@ -44,7 +44,7 @@ description: >
   Do NOT use for exploring a single file or answering "where is X" (use the
   explorer for that). Do NOT use for code review or debugging.
 context: fork
-allowed-tools:
+tool access policy:
   - Read
   - Write
   - Edit
@@ -56,9 +56,9 @@ metadata:
 
 <!-- ANNOTATION: Frontmatter design decisions:
      - context: fork (scanning is token-heavy; isolate from main context)
-     - allowed-tools: Glob/Grep for discovery, Read for inspection,
-       Write/Edit for updating area pages. No Bash -- all scanning is
-       tool-based so the LLM can reason about classification.
+     - use `rg --files` for discovery, `rg` for declarations, targeted reads
+       for inspection, and scoped writes for updating area pages. Avoid build or
+       mutation commands so the LLM can reason about classification safely.
      - description: 6 trigger phrases, 2 negative triggers
      VARIATION: For very large codebases (1000+ files), consider adding
      a max-files-per-area cap to prevent context exhaustion. -->
@@ -328,7 +328,7 @@ Scanned: YYYY-MM-DD HH:MM
      - [ ] Description includes 6+ trigger phrases
      - [ ] Description includes 2+ negative triggers
      - [ ] context: fork specified
-     - [ ] allowed-tools: Read, Write, Edit, Glob, Grep (no Bash)
+     - [ ] tool access policy: Read, Write, Edit, Glob, Grep (no Bash)
      - [ ] Non-destructive update behavior documented
      - [ ] Empty codebase handling documented
      - [ ] Output format specified with summary table
@@ -339,8 +339,8 @@ Scanned: YYYY-MM-DD HH:MM
 -->
 
 <!-- ANTI-PATTERN: Do not load all source files into context at once.
-     Use Glob to discover file paths, Grep to extract declarations,
-     and Read only the headers/files needed for classification. A
+     Use `rg --files` to discover file paths, `rg` to extract declarations,
+     and read only the headers/files needed for classification. A
      project with 500 source files would exhaust context if all were
      read. Scan patterns first, read selectively. -->
 

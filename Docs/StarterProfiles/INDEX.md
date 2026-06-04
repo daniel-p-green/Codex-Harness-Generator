@@ -52,7 +52,7 @@ analysis rather than code.
 - Executive and technical output style templates
 - Minimal ecosystem permissions (broad document read/write, limited Bash)
 
-**Best for**: Professionals who need Claude to help with research, drafting,
+**Best for**: Professionals who need Codex to help with research, drafting,
 and review but do not write code as their primary work.
 
 ---

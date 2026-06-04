@@ -29,11 +29,11 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| solicitation-analyst | opus | Dissect the funding announcement: eligibility, scored criteria, keywords, deadlines | researcher.md (custom: web research + criteria extraction, read-only) |
-| proposal-writer | sonnet | Draft the narrative (need, approach, capability, outcomes) tuned to the rubric | drafter.md |
-| budget-designer | sonnet | Build line items, match/cost-share, ceilings, justification | analyst.md (custom: budget tables, no original-file edits) |
-| compliance-checker | opus | Cross-validate narrative + budget against the announcement; score-gap analysis | reviewer.md |
-| submission-verifier | opus | Final QA: completeness, format limits, cross-document consistency (read-only) | reviewer.md (custom: package QA, no edits) |
+| solicitation-analyst | high-effort | Dissect the funding announcement: eligibility, scored criteria, keywords, deadlines | researcher.md (custom: web research + criteria extraction, read-only) |
+| proposal-writer | medium-effort | Draft the narrative (need, approach, capability, outcomes) tuned to the rubric | drafter.md |
+| budget-designer | medium-effort | Build line items, match/cost-share, ceilings, justification | analyst.md (custom: budget tables, no original-file edits) |
+| compliance-checker | high-effort | Cross-validate narrative + budget against the announcement; score-gap analysis | reviewer.md |
+| submission-verifier | high-effort | Final QA: completeness, format limits, cross-document consistency (read-only) | reviewer.md (custom: package QA, no edits) |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy (conservative), context-management, self-learning, error-handling,
@@ -127,13 +127,13 @@ one critical safeguard:
 Base + Universal Deny only -- see `Docs/Templates/References/ecosystem-permissions.md`.
 This domain has no language ecosystem; deny programming tools (`pip`, `npm`,
 `node`, `python`) as in the knowledge-work pattern. Allow safe text utilities
-(`wc`, `diff`, `sort`, `date`) and `Bash(pandoc *)` for .docx/.pdf output. Add
-`Write(./Docs/_working/applications/**)` so the pipeline writes deliverables
-without prompts. Uses `WebSearch` + `WebFetch(*)` (in Base) for funder research
+(`wc`, `diff`, `sort`, `date`) and Pandoc for .docx/.pdf output when installed.
+Add writable `Docs/_working/applications/**` so the pipeline writes deliverables
+without prompts. Uses web search and browser/web retrieval (in Base) for funder research
 and, on US federal submissions, to confirm SAM.gov registration status (UEI) and
 Grants.gov readiness from the funder/registration portals. Use the MarkItDown MCP
 server (verified) to read inbound PDF/DOCX solicitations without enabling Python.
-Generate `settings.local.json` for machine-specific template or vault paths.
+Generate `local config profile` for machine-specific template or vault paths.
 
 ## Self-Learning Seed Entries
 
@@ -183,12 +183,12 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 
 ## Cost / Model Notes
 
-Opus for solicitation-analyst, compliance-checker, submission-verifier (judgment:
-criteria interpretation, score gaps, disqualifier risk); Sonnet for
+GPT-5.5 for solicitation-analyst, compliance-checker, submission-verifier (judgment:
+criteria interpretation, score gaps, disqualifier risk); medium-effort GPT-5.5 for
 proposal-writer and budget-designer (established-pattern drafting and table
-construction). Defaults: balanced (Opus on reasoning roles, Sonnet on
-execution; compaction 95%; CLAUDE.md ~200 lines). Cost-conscious override:
-analyst stays Opus, everything else Sonnet, compaction 85%. Subagents ~4x vs
+construction). Defaults: balanced (GPT-5.5 on reasoning roles, medium-effort GPT-5.5 on
+execution; compaction 95%; AGENTS.md ~200 lines). Cost-conscious override:
+analyst stays GPT-5.5, everything else medium-effort GPT-5.5, compaction 85%. Subagents ~4x vs
 direct; the full pipeline is the most expensive path -- reserve it for real
 submissions, use single-agent modes for analysis or review.
 

@@ -79,24 +79,24 @@ save/load symmetry).
 ### 5.3 Auto-Memory Integration [ALL]
 
 - **Established**: Baseline
-- **Source**: claude-code-docs.md | Tier 1
-- **Recommendation**: Claude Code has built-in auto-memory at
-  `~/.claude/projects/<project>/memory/`. First 200 lines of MEMORY.md are loaded into the
+- **Source**: https://developers.openai.com/codex | Tier 1
+- **Recommendation**: Codex has built-in auto-memory at
+  `~/.codex/projects/<project>/memory/`. First 200 lines of MEMORY.md are loaded into the
   system prompt each session. Topic files load on demand.
 
   Generated environments should document how their custom Docs/ wiki structure relates to
   this built-in auto-memory. The wiki (Docs/) is for structured, shared project knowledge.
-  Auto-memory is for Claude's own learnings per-user. Both complement each other.
+  Auto-memory is for Codex's own learnings per-user. Both complement each other.
 
-  Control: `CLAUDE_CODE_DISABLE_AUTO_MEMORY=0` (force on) or `=1` (force off). Use
+  Control: `CODEX_DISABLE_AUTO_MEMORY=0` (force on) or `=1` (force off). Use
   `/memory` command to open the file selector.
-- **Anti-pattern**: Ignoring auto-memory or fighting against it. Understand that Claude
+- **Anti-pattern**: Ignoring auto-memory or fighting against it. Understand that Codex
   already maintains its own memory alongside any custom memory structure.
 
 ### 5.4 Tiered Architecture [ALL]
 
 - **Established**: Baseline
-- **Source**: context-engineering.md, claude-code-best-practices.md | Tier 1
+- **Source**: context-engineering.md, https://developers.openai.com/codex/concepts/customization | Tier 1
 - **Recommendation**: Scale memory structure to project complexity:
 
   **Lite** (solo, quick tasks, <3 people casual):
@@ -188,7 +188,7 @@ save/load symmetry).
 ### 5.7 Code Landmarks [ALL]
 
 - **Established**: 2026-02
-- **Source**: claude-bootstrap project, community patterns | Tier 2
+- **Source**: codex-bootstrap project, community patterns | Tier 2
 - **Recommendation**: For large codebases, generate a lightweight "landmarks" file
   listing the most important files and their purposes. Unlike full wiki pages
   (from /map-codebase), landmarks are a quick-reference cheat sheet:
@@ -202,7 +202,7 @@ save/load symmetry).
   - tests/fixtures/ -- Shared test fixtures
   ```
 
-  Landmarks are small enough to stay in context (~20-30 lines) and help both Claude
+  Landmarks are small enough to stay in context (~20-30 lines) and help both Codex
   and humans navigate the codebase quickly. They complement detailed wiki pages by
   providing instant orientation.
 
@@ -214,45 +214,45 @@ save/load symmetry).
 ### 5.8 Multi-Role Environments [ALL]
 
 - **Established**: 2026-03
-- **Source**: production game project production analysis, Claude Code memory hierarchy | Tier 2
+- **Source**: production game project production analysis, Codex memory hierarchy | Tier 2
 - **Recommendation**: When multiple human roles work from the same project directory
   (developers, designers, QA, marketing, producers, etc.), each role needs different
   routing, context loading, permissions, and autonomy levels — but they share the same
   underlying data (source code, VCS history, assets, documents).
 
-  Claude Code does NOT support conditional rule loading — all `.claude/rules/*.md`
+  Codex does NOT support conditional rule loading — all `.codex/rules/*.md`
   files load for every user. This means multi-role support requires a layered approach
   using the native override hierarchy:
 
   **Layer 1 — Shared foundation (checked into VCS, everyone gets it):**
-  - `CLAUDE.md`: Project purpose, universal constraints, command reference
-  - `.claude/rules/`: Rules applicable to ALL roles (orchestrator, autonomy,
+  - `AGENTS.md`: Project purpose, universal constraints, command reference
+  - `.codex/rules/`: Rules applicable to ALL roles (orchestrator, autonomy,
     error handling, memory management). Keep role-specific detail OUT of shared rules.
-  - `.claude/agents/`: ALL agents for all roles. Each agent is small (~80 lines)
+  - `.codex/agents/`: ALL agents for all roles. Each agent is small (~80 lines)
     so unused agents have low context cost.
-  - `.claude/skills/`: ALL skills for all roles. Skills fork context on invocation
+  - `.agents/skills/`: ALL skills for all roles. Skills fork context on invocation
     so unused skills cost nothing.
-  - `settings.json`: Permissions safe for ALL roles (conservative — only allow what
-    every role needs). Role-specific permissions go in settings.local.json.
+  - `.codex/config.toml`: Permissions safe for ALL roles (conservative — only allow what
+    every role needs). Role-specific permissions go in local config profile.
   - `Docs/`: Shared wiki accessible to all roles.
 
   **Layer 2 — Role-specific overrides (NOT checked in, per-user):**
-  - `CLAUDE.local.md`: Role declaration, role-specific priorities, routing hints.
+  - `AGENTS.override.md`: Role declaration, role-specific priorities, routing hints.
     Each role gets a template from `Docs/Roles/<role-name>.local.md` that they
-    copy to the project root as `CLAUDE.local.md`.
-  - `settings.local.json`: Role-specific permissions (e.g., social media role
+    copy to the project root as `AGENTS.override.md`.
+  - `local config profile`: Role-specific permissions (e.g., social media role
     gets read-only P4 access, developers get full edit access).
-  - `~/.claude/CLAUDE.md`: User's global identity and preferences.
-  - Auto-memory (`~/.claude/projects/<project>/memory/`): Already per-user per-project.
+  - `~/.codex/AGENTS.md`: User's global identity and preferences.
+  - Auto-memory (`~/.codex/projects/<project>/memory/`): Already per-user per-project.
 
   **Layer 3 — Role-aware orchestrator:**
-  The routing rule should detect the user's role from `CLAUDE.local.md` and adjust
+  The routing rule should detect the user's role from `AGENTS.override.md` and adjust
   behavior. Include a role-detection section at the top of the orchestrator rule:
   ```
   ## Role Detection
-  If CLAUDE.local.md declares a role, use role-specific routing entries.
+  If AGENTS.override.md declares a role, use role-specific routing entries.
   If no role is declared, ask on first interaction: "What is your role on
-  this project?" and suggest the user set up CLAUDE.local.md.
+  this project?" and suggest the user set up AGENTS.override.md.
   ```
 
   The routing table includes role-prefixed entries:
@@ -269,13 +269,13 @@ save/load symmetry).
   - `Docs/Roles/` directory with a `.local.md` template per role
   - Role-prefixed routing entries in the orchestrator rule
   - GETTING_STARTED.md section: "Setting up your role" with copy instructions
-  - `settings.local.json` templates per role (in `Docs/Roles/<role>.settings.json`)
+  - `local config profile` templates per role (in `Docs/Roles/<role>..codex/config.toml`)
   - Role-appropriate wiki retrieval hints in each `.local.md` template
 
   **Context cost management:**
   All rules load for everyone — this is the hard constraint. Mitigate by:
   - Keeping shared rules lean and role-neutral
-  - Putting role-specific detail in `CLAUDE.local.md` (not shared rules)
+  - Putting role-specific detail in `AGENTS.override.md` (not shared rules)
   - Using skill descriptions to ensure role-irrelevant skills don't trigger
   - Documenting which wiki sections each role should load (in their `.local.md`)
 
@@ -284,7 +284,7 @@ save/load symmetry).
   - Completely different projects → separate environments
   - Different data sets, no shared context → separate environments
 
-- **Anti-pattern**: Putting role-specific instructions in shared CLAUDE.md or rules
+- **Anti-pattern**: Putting role-specific instructions in shared AGENTS.md or rules
   (wastes context for other roles). Also: creating separate environments for each role
   when they share the same project data (duplication, drift, maintenance burden). Also:
   assuming "team" means "everyone does the same thing" — team size and role diversity
@@ -308,7 +308,7 @@ save/load symmetry).
   Without VCS exclusion, working state from one developer bleeds into another's
   sessions, and state-save/state-load creates noisy commits on every session.
 
-  **2. Session segmentation (concurrent chats)**: When a user runs multiple Claude
+  **2. Session segmentation (concurrent chats)**: When a user runs multiple Codex
   Code sessions simultaneously on the same project (common for parallel work streams),
   each session's state can collide in `_working/state/`. Two strategies:
 
@@ -342,7 +342,7 @@ save/load symmetry).
   What gets promoted:
   - New architectural decisions -> `Docs/Decisions/`
   - Updated system/area knowledge -> `Docs/Areas/<area>/`
-  - New conventions or patterns discovered -> `Docs/` or CLAUDE.md
+  - New conventions or patterns discovered -> `Docs/` or AGENTS.md
   - Reusable session artifacts (scripts, templates) -> `Docs/` or appropriate location
 
   What stays in `_working/`:
@@ -363,31 +363,31 @@ save/load symmetry).
 ### 5.10 Third-Party Persistent Memory Plugins [ALL]
 
 - **Established**: 2026-03
-- **Source**: github.com/danilokhury/Synabun, github.com/thedotmack/claude-mem,
+- **Source**: github.com/danilokhury/Synabun, github.com/thedotmack/codex memories,
   github.com/doobidoo/mcp-memory-service | Tier 2
-- **Recommendation**: Several open-source memory plugins extend Claude Code's
+- **Recommendation**: Several open-source memory plugins extend Codex's
   built-in memory with semantic vector search, cross-session recall, and
   automated context capture. These complement (do not replace) the generated
   environment's markdown-based memory structure.
 
   **When to recommend during generation**: When intake reveals multi-session
   projects with complex context that exceeds what markdown files and /state-save
-  can track -- especially projects where the user reports "Claude keeps forgetting"
+  can track -- especially projects where the user reports "Codex keeps forgetting"
   or "I have to re-explain the architecture every session."
 
   **Evaluation criteria for recommending a plugin**:
   1. No external API dependencies (runs fully local)
   2. No paid subscription required for core features
   3. Open-source with permissive or copyleft license
-  4. Compatible with Claude Code's hook/MCP system
+  4. Compatible with Codex's hook/MCP system
   5. Does not conflict with the generated environment's own hooks and memory
 
   **Recommended plugins** (all free, local-first, open-source):
 
   | Plugin | Memory Model | Integration | Best For | Dependencies |
   |--------|-------------|-------------|----------|-------------|
-  | **Synabun** | Semantic vectors in SQLite via Transformers.js (all-MiniLM-L6-v2, fully local) | MCP server (11 tools) + Claude Code hooks + /synabun command | Projects needing semantic recall across sessions without any external API; multi-project support; visual memory graph (3D Neural Interface) | Node.js 22.5+ only |
-  | **claude-mem** | SQLite FTS5 + Chroma vector DB, AI-compressed summaries via Agent SDK | Plugin install + 5 lifecycle hooks + MCP tools | Long sessions hitting context limits; "Endless Mode" extends ~50 tool uses to ~1,000 via progressive 3-layer recall (~10x token efficiency) | Node.js 18+, Bun, uv (auto-installed) |
+  | **Synabun** | Semantic vectors in SQLite via Transformers.js (all-MiniLM-L6-v2, fully local) | MCP server (11 tools) + Codex hooks + /synabun command | Projects needing semantic recall across sessions without any external API; multi-project support; visual memory graph (3D Neural Interface) | Node.js 22.5+ only |
+  | **codex memories** | SQLite FTS5 + Chroma vector DB, AI-compressed summaries via Agent SDK | Plugin install + 5 lifecycle hooks + MCP tools | Long sessions hitting context limits; "Endless Mode" extends ~50 tool uses to ~1,000 via progressive 3-layer recall (~10x token efficiency) | Node.js 18+, Bun, uv (auto-installed) |
   | **mcp-memory-service** | SQLite + ONNX embeddings, knowledge graph with typed edges (causes, fixes, contradicts) | MCP server + REST API | Multi-agent pipelines needing structured knowledge with causal relationships; autonomous consolidation prevents unbounded growth | Python 3.10+ |
 
   **How to integrate with generated environments**: These plugins add a
@@ -395,7 +395,7 @@ save/load symmetry).
   They do NOT replace:
   - /state-save and /state-load (checkpoint-based session state)
   - Docs/ wiki structure (curated, promoted knowledge)
-  - .claude/auto-memory (Claude's built-in preference learning)
+  - .codex/auto-memory (Codex's built-in preference learning)
 
   They DO add:
   - Semantic recall across sessions ("what did we decide about X last week?")
@@ -407,12 +407,12 @@ save/load symmetry).
   install command and one-sentence description. The choice of plugin depends
   on the user's stack:
   - Node.js project or no coding: Synabun (zero external deps, visual UI)
-  - Heavy coding with long sessions: claude-mem (Endless Mode, compression)
+  - Heavy coding with long sessions: codex memories (Endless Mode, compression)
   - Python/multi-agent pipelines: mcp-memory-service (knowledge graph)
 
   **Hook conflicts**: If the generated environment uses SessionStart, Stop, or
   PreCompact hooks, document potential ordering issues with plugins that use
-  the same hooks. Claude Code runs hooks in registration order.
+  the same hooks. Codex runs hooks in registration order.
 
 - **Anti-pattern**: Recommending memory plugins for simple or short-session
   projects where file-based /state-save is sufficient. Adding a vector DB
@@ -423,31 +423,31 @@ save/load symmetry).
 ### 5.11 Personal Knowledge Management (PKM) Integration [ALL]
 
 - **Established**: 2026-03
-- **Source**: Community workflows (Obsidian + Claude Code pipelines) | Tier 2
+- **Source**: Community workflows (Obsidian + Codex pipelines) | Tier 2
 - **Recommendation**: Some users maintain a personal knowledge management system
   (Obsidian, Logseq, Notion local, etc.) as their long-term memory and research
-  hub. This is a different category from Claude-specific memory plugins (5.10):
+  hub. This is a different category from Codex-specific memory plugins (5.10):
 
-  | Approach | What it is | Claude's role | Persistence |
+  | Approach | What it is | Codex's role | Persistence |
   |----------|-----------|---------------|-------------|
-  | Memory plugins (5.10) | Claude-specific tools (Synabun, claude-mem) | Claude owns the memory store | Claude-managed |
-  | PKM integration (5.11) | User's existing knowledge tool (Obsidian, Logseq) | Claude reads/writes to user's vault | User-managed |
+  | Memory plugins (5.10) | Codex-specific tools (Synabun, codex memories) | Codex owns the memory store | Codex-managed |
+  | PKM integration (5.11) | User's existing knowledge tool (Obsidian, Logseq) | Codex reads/writes to user's vault | User-managed |
 
   **Pattern: PKM as Shared Knowledge Layer**
 
-  Claude writes structured markdown notes to the user's PKM vault. The PKM tool
-  indexes, links, and surfaces them. Claude reads them back in future sessions
+  Codex writes structured markdown notes to the user's PKM vault. The PKM tool
+  indexes, links, and surfaces them. Codex reads them back in future sessions
   for continuity. The user curates and extends the knowledge independently.
 
   **Integration approaches** (from lightest to heaviest):
-  1. **File-based** (simplest): Point Claude at the vault directory. Claude
+  1. **File-based** (simplest): Point Codex at the vault directory. Codex
      reads/writes markdown files directly. Works with any PKM tool.
-     Generated environment: add vault path to settings.json allowed paths,
-     add vault structure conventions to CLAUDE.md.
+     Generated environment: add vault path to .codex/config.toml allowed paths,
+     add vault structure conventions to AGENTS.md.
   2. **MCP-based**: Use a PKM-specific MCP server (e.g., obsidian-mcp) for
      richer integration (search, metadata, graph traversal).
      Generated environment: add MCP server config to .mcp.json.
-  3. **Pipeline**: Claude generates content -> formats for PKM conventions
+  3. **Pipeline**: Codex generates content -> formats for PKM conventions
      (frontmatter, tags, links) -> writes to vault -> PKM indexes.
      Generated environment: add formatting conventions to a rule file,
      generate a pipeline skill for structured knowledge capture.
@@ -455,7 +455,7 @@ save/load symmetry).
   **When to include PKM integration**:
   - User explicitly mentions Obsidian, Logseq, Notion, or "my notes"
   - User describes a research workflow where findings accumulate over time
-  - User says "I want Claude to add to my knowledge base"
+  - User says "I want Codex to add to my knowledge base"
 
   **When NOT to include**:
   - User doesn't mention a PKM tool (don't suggest one speculatively)
@@ -467,8 +467,8 @@ save/load symmetry).
   for the vault/workspace path and their conventions (tags, folder structure).
 
   **For generated environments**: Include vault path configuration in
-  settings.json, add PKM conventions to a rule file, and optionally generate
-  a `/capture-knowledge` skill that formats Claude's findings for the PKM tool.
+  .codex/config.toml, add PKM conventions to a rule file, and optionally generate
+  a `/capture-knowledge` skill that formats Codex's findings for the PKM tool.
 
 - **Anti-pattern**: Recommending Obsidian or Logseq to users who don't already
   use them. PKM integration is about connecting to the user's *existing* tool,
@@ -483,9 +483,9 @@ save/load symmetry).
 ### 5.12 Compaction Strategy [ALL]
 
 - **Established**: Baseline
-- **Source**: context-engineering.md, claude-code-best-practices.md, claude-code-docs.md | Tier 1
+- **Source**: context-engineering.md, https://developers.openai.com/codex/concepts/customization, https://developers.openai.com/codex | Tier 1
 - **Recommendation**: Auto-compaction triggers at ~95% context capacity (configurable via
-  `CLAUDE_CODE_AUTOCOMPACT_PCT_OVERRIDE`). Design environments with compaction in mind:
+  `CODEX_AUTOCOMPACT_PCT_OVERRIDE`). Design environments with compaction in mind:
 
   Preserve during compaction:
   - Architectural decisions
@@ -501,7 +501,7 @@ save/load symmetry).
   - Raw file contents that can be re-read
   - Exploratory tangents that did not lead anywhere
 
-  Include compaction hints in CLAUDE.md: "When compacting, always preserve the full list of
+  Include compaction hints in AGENTS.md: "When compacting, always preserve the full list of
   modified files, any test commands and results, and the current task status."
 
   Manual compaction: `/compact [focus instructions]` for targeted compaction with guidance
@@ -527,11 +527,11 @@ save/load symmetry).
 ### 5.14 Single-Feature-Per-Session [ALL]
 
 - **Established**: Baseline
-- **Source**: long-running-agent-harnesses.md, claude-code-best-practices.md | Tier 1
+- **Source**: long-running-agent-harnesses.md, https://developers.openai.com/codex/concepts/customization | Tier 1
 - **Recommendation**: Scope each session to one feature, one bugfix, or one refactor.
   This prevents context exhaustion. Use `/clear` between unrelated tasks.
 
-  Rule of thumb: if you have corrected Claude more than twice on the same issue, `/clear`
+  Rule of thumb: if you have corrected Codex more than twice on the same issue, `/clear`
   and start fresh with a better prompt. A clean session + better prompt almost always
   outperforms a long session + accumulated corrections.
 
@@ -562,14 +562,14 @@ save/load symmetry).
 ### 5.16 1M Context Window [ALL]
 
 - **Established**: 2026-03
-- **Source**: code.claude.com/docs/en/model-config | Tier 1
-- **Recommendation**: Opus 4.6 and Sonnet 4.6 support 1M token context windows (beta).
-  Use via the `sonnet[1m]` or model alias suffix. Standard rates apply up to 200K tokens;
-  long-context pricing applies beyond 200K.
+- **Source**: developers.openai.com/codex/config-reference | Tier 1
+- **Recommendation**: For large contexts, prefer GPT-5.5 with explicit
+  `model_reasoning_effort` and confirm the active context-window behavior in current
+  OpenAI docs before promising a specific limit or pricing tier.
 
   For generated environments with large codebases, mention 1M context in GETTING_STARTED.md
   as an option for sessions involving broad codebase analysis. Disable with
-  `CLAUDE_CODE_DISABLE_1M_CONTEXT=1` if cost control is a priority.
+  `CODEX_DISABLE_1M_CONTEXT=1` if cost control is a priority.
 
   1M context does NOT eliminate the need for good context management. Even with 1M tokens,
   signal-to-noise ratio degrades as context grows. Continue to use wiki retrieval, subagent
@@ -580,7 +580,7 @@ save/load symmetry).
 ### 5.17 Context Pressure Detection [ALL]
 
 - **Established**: Baseline
-- **Source**: platform-agent-patterns.md, context-engineering.md | Tier 1
+- **Source**: https://developers.openai.com/codex/subagents, context-engineering.md | Tier 1
 - **Recommendation**: Track multiple signals for context pressure:
   - Turn count threshold: ~30 turns suggests approaching limits
   - Delegation count: ~10 subagent invocations in one session
@@ -599,7 +599,7 @@ save/load symmetry).
 ### 5.18 PreCompact Auto-Save Hook [ALL]
 
 - **Established**: 2026-02
-- **Source**: production game project production environment, claude-code-docs.md | Tier 2
+- **Source**: production game project production environment, https://developers.openai.com/codex | Tier 2
 - **Recommendation**: Use the PreCompact hook event to automatically save session state
   before auto-compaction triggers. This is a safety net for progress that has not yet
   been written to disk.
@@ -614,7 +614,7 @@ save/load symmetry).
       "PreCompact": [{
         "hooks": [{
           "type": "command",
-          "command": ".claude/hooks/pre-compact-save.sh",
+          "command": ".codex/hooks/pre-compact-save.sh",
           "timeout": 10,
           "statusMessage": "Saving state before compaction..."
         }]
@@ -625,15 +625,15 @@ save/load symmetry).
 
   The hook should read the status line state file (if using status line monitoring)
   and append a timestamped summary to the session context file.
-- **Anti-pattern**: Relying solely on Claude to remember to save state before compaction.
+- **Anti-pattern**: Relying solely on Codex to remember to save state before compaction.
   Auto-compaction triggers at ~95% without warning. Only a deterministic hook guarantees
   state is saved.
 
 ### 5.19 Status Line Monitoring [ALL]
 
 - **Established**: 2026-02
-- **Source**: production game project production environment, claude-code-docs.md | Tier 2
-- **Recommendation**: Use the Claude Code status line feature to display context health
+- **Source**: production game project production environment, https://developers.openai.com/codex | Tier 2
+- **Recommendation**: Use the Codex status line feature to display context health
   passively. The status line shows information in the terminal without consuming
   conversation context.
 
@@ -643,8 +643,8 @@ save/load symmetry).
   - Current activity description (set by a UserPromptSubmit hook)
   - Session ID or task identifier
 
-  Status line is configured via `CLAUDE_CODE_STATUSLINE` environment variable pointing
-  to a script or via settings.json status line configuration.
+  Status line is configured via `CODEX_STATUSLINE` environment variable pointing
+  to a script or via .codex/config.toml status line configuration.
 
   **Portability note**: Status line scripts that use bash (.sh) require WSL on Windows.
   For cross-platform environments, consider PowerShell alternatives or document the WSL
@@ -693,7 +693,7 @@ gate 12).
   `SESSION_CONTEXT.md` (human-readable narrative for quick orientation).
 
   The JSON file is the source of truth for automated processing. The Markdown file provides
-  context for human review and for Claude's initial orientation on session load.
+  context for human review and for Codex's initial orientation on session load.
 - **Anti-pattern**: Using Markdown for all state files. Models corrupt Markdown more easily
   than JSON -- they may add content, reformat sections, or merge entries incorrectly during
   state updates.
@@ -718,8 +718,8 @@ gate 12).
 ### 5.23 Checkpoints (Built-in Rollback) [ALL]
 
 - **Established**: 2026-03
-- **Source**: anthropic.com/news/claude-sonnet-4-5 announcement, Claude Code v2.0 | Tier 1
-- **Recommendation**: Claude Code now supports built-in checkpoints that save progress and
+- **Source**: developers.openai.com/api/docs/guides/reasoning, Codex v2.0 | Tier 1
+- **Recommendation**: Codex now supports built-in checkpoints that save progress and
   allow instant rollback to a previous state. This is a native alternative to the /state-save
   skill for file-level rollback (not context-level).
 
@@ -781,16 +781,16 @@ gate 12).
   complexity. During intake, present this trade-off explicitly rather than silently
   excluding Beads.
 
-  **Integration with Claude Code** (three methods, in order of preference):
+  **Integration with Codex** (three methods, in order of preference):
   1. Plugin: `/plugin marketplace add steveyegge/beads` (simplest)
-  2. CLI + hooks: `bd setup claude` installs SessionStart and PreCompact hooks
+  2. CLI + hooks: `bd setup codex` installs SessionStart and PreCompact hooks
   3. MCP server: `beads-mcp` package (least efficient, 10-50k token schema overhead)
 
   **When generating with Beads, include:**
-  - `bd init` and `bd setup claude` in GETTING_STARTED.md setup steps
-  - `Bash(bd *)` in settings.json allowed commands
+  - `bd init` and `bd setup codex` in GETTING_STARTED.md setup steps
+  - `bd` command usage documented in AGENTS.md and GETTING_STARTED.md
   - Chain PreCompact hook: `bd sync && <existing state-save>`
-  - Note in CLAUDE.md: "Use `bd ready` to find next task, `bd create` for new tasks"
+  - Note in AGENTS.md: "Use `bd ready` to find next task, `bd create` for new tasks"
   - Keep /state-save and /state-load for cognitive state (decisions, blocked, drift)
   - Keep markdown wiki for knowledge management
 

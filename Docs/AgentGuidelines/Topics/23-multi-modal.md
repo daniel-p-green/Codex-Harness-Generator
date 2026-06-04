@@ -10,26 +10,26 @@
   **Current specializations (early 2026)**:
   | Task | Best Model | Tier |
   |---|---|---|
-  | Code implementation | Claude Opus 4.7 / Sonnet 4.6 | Any |
-  | Architecture/complex reasoning | GPT-5.2 or Claude Opus 4.7 | Mid+ |
+  | Code implementation | Codex GPT-5.5 at task-appropriate reasoning effort | Any |
+  | Architecture/complex reasoning | GPT-5.2 or Codex GPT-5.5 | Mid+ |
   | UI/Frontend work | Gemini 2.5 Pro | Mid+ |
   | Image/video understanding | Kimi K2.5 | Mid+ |
   | Budget/high-volume tasks | DeepSeek R1 / Gemini Flash | Any |
-  | Quick exploration | Haiku / Flash | Any |
+  | Quick exploration | low-effort GPT-5.5 / Flash | Any |
 
   **Budget tiers for intake recommendations**:
 
   | Tier | Monthly Cost | Strategy |
   |---|---|---|
-  | Claude Only | $20-200 | Claude Pro/Max, no external models |
-  | Claude + Free/Local | $20-50 | Claude Pro + Gemini free + local models (Ollama) |
-  | Claude + Limited Expense | $100-300 | Claude Max + ChatGPT Plus + Gemini Advanced |
+  | Codex Only | $20-200 | Codex Pro/Max, no external models |
+  | Codex + Free/Local | $20-50 | Codex Pro + Gemini free + local models (Ollama) |
+  | Codex + Limited Expense | $100-300 | Codex Max + ChatGPT Plus + Gemini Advanced |
   | Rolls Royce | $500+ | API-first with intelligent routing, all models |
 
   Generated environments should document the user's chosen tier in GENESIS.md and
   configure MCP servers, API keys, and routing accordingly.
 
-- **Anti-pattern**: Assuming the user only uses Claude. Ask during intake. Also: recommending
+- **Anti-pattern**: Assuming the user only uses Codex. Ask during intake. Also: recommending
   expensive multi-model setups to users with budget constraints.
 
 ## 23.2 Multi-Model Orchestration Patterns
@@ -39,14 +39,14 @@
 - **Recommendation**: Four orchestration patterns, matched to user sophistication:
 
   **Manual routing** (beginners/solo): Copy prompts between web interfaces (ChatGPT,
-  Claude, Gemini). No setup, surprisingly effective. Document which service to use for
+  Codex, Gemini). No setup, surprisingly effective. Document which service to use for
   which task type in the environment's routing table comments.
 
-  **CLI multi-tool** (intermediate): Use Claude Code for implementation, pipe output
+  **CLI multi-tool** (intermediate): Use Codex for implementation, pipe output
   to other CLIs (Gemini CLI, Codex CLI) for review. gitingest or repo2txt for context
   packaging. Document commands in GETTING_STARTED.md.
 
-  **MCP-bridged** (advanced): Use MCP servers to give Claude access to other models'
+  **MCP-bridged** (advanced): Use MCP servers to give Codex access to other models'
   capabilities (e.g., an MCP server wrapping Gemini's vision API for image understanding).
   Configure in .mcp.json.
 
@@ -56,28 +56,28 @@
 - **Anti-pattern**: Building complex orchestration for a solo developer who would be fine
   with manual model switching. Match complexity to actual need.
 
-## 23.3 AI Capability Extension (Beyond Claude's Native Abilities)
+## 23.3 AI Capability Extension (Beyond Codex's Native Abilities)
 
 - **Established**: 2026-03
 - **Source**: ComfyUI MCP ecosystem, ModelsLab API, Ollama integration docs,
   Google Nano Banana, community workflow patterns | Tier 2
-- **Recommendation**: Claude Code excels at text reasoning, code generation, and
+- **Recommendation**: Codex excels at text reasoning, code generation, and
   file processing, but cannot natively generate images, video, audio, or 3D content.
   When intake reveals the user's workflow requires these capabilities, the generated
-  environment should **extend Claude by integrating external AI tools**, not simply
+  environment should **extend Codex by integrating external AI tools**, not simply
   document them.
 
   **Philosophy: Proactive capability gap identification**
 
   During intake, don't just ask "what tools do you use?" -- identify what the
-  user's workflow *needs* and proactively check whether Claude can do it natively.
+  user's workflow *needs* and proactively check whether Codex can do it natively.
   If not, present options, walk through trade-offs, and help the user choose.
-  The generated environment then integrates the chosen tools so Claude can
+  The generated environment then integrates the chosen tools so Codex can
   orchestrate workflows that span its native abilities and external AI capabilities.
 
   **Capability gap categories**:
 
-  | Capability | Claude Native? | Extension Approach |
+  | Capability | Codex Native? | Extension Approach |
   |-----------|---------------|-------------------|
   | Text reasoning, code gen | Yes | N/A |
   | File processing (read/write) | Yes (with tools) | N/A |
@@ -92,15 +92,15 @@
 
   **Integration approaches** (from lightest to heaviest):
 
-  1. **MCP server** (preferred when available): Claude calls tools natively.
-     Example: ComfyUI MCP gives Claude `generate_image`, `run_workflow` tools.
+  1. **MCP server** (preferred when available): Codex calls tools natively.
+     Example: ComfyUI MCP gives Codex `generate_image`, `run_workflow` tools.
      Add to .mcp.json, no custom code needed.
   2. **CLI wrapping** (for tools with CLIs): Generate a skill that invokes the
      CLI via Bash and parses output. Example: `ollama run <model> <prompt>`.
-     Add Bash permission to settings.json.
+     Add Bash permission to .codex/config.toml.
   3. **API skill** (for cloud services): Generate a skill that makes HTTP calls
-     to the service API. Requires API key management (settings.local.json for
-     secrets, never settings.json).
+     to the service API. Requires API key management (local config profile for
+     secrets, never .codex/config.toml).
   4. **Hybrid local+cloud**: Use local tools (ComfyUI, Ollama) for iteration
      and drafting, cloud APIs (DALL-E, Nano Banana) for final quality output.
      The environment routing table specifies when to use which.
@@ -129,8 +129,8 @@
   - Local: ComfyUI + AnimateDiff / LTX Video / CogVideoX (GPU-intensive)
 
   **Local Model Inference**:
-  - Ollama (simplest setup, native Claude Code integration since v0.14,
-    Anthropic Messages API compatible)
+  - Ollama (simplest setup, native Codex integration since v0.14,
+    OpenAI Messages API compatible)
   - LM Studio (GUI-first, OpenAI-compatible endpoint)
   - vLLM / KTransformers (for larger models, production use)
   - Kimi K2.5 (1T MoE, 32B active, open weights, vision + agent swarm)
@@ -140,9 +140,9 @@
   - Local: Bark (Suno), Coqui TTS (open source), Whisper (transcription)
 
   **Budget-aware defaults**:
-  - Claude Only tier: Skip generative AI or use free local tools only
-  - Claude + Free/Local tier: ComfyUI for images, Ollama for local LLM, Bark for TTS
-  - Claude + Limited Expense tier: Add cloud APIs for higher quality (DALL-E, ElevenLabs)
+  - Codex Only tier: Skip generative AI or use free local tools only
+  - Codex + Free/Local tier: ComfyUI for images, Ollama for local LLM, Bark for TTS
+  - Codex + Limited Expense tier: Add cloud APIs for higher quality (DALL-E, ElevenLabs)
   - Rolls Royce tier: Best-in-class for each capability, intelligent routing
 
 - **Anti-pattern**: Recommending generative AI tools when the user's workflow
@@ -150,7 +150,7 @@
   alternatives exist and the user is budget-conscious. Also: generating complex
   multi-tool integration when the user would be fine opening a separate app
   (Midjourney in Discord, ComfyUI in browser). Integration should add value
-  by enabling Claude to orchestrate the workflow, not just add complexity.
+  by enabling Codex to orchestrate the workflow, not just add complexity.
 
 ## 23.4 Guided Tool Selection During Intake
 
@@ -160,7 +160,7 @@
   walk the user through selection rather than silently picking a tool:
 
   **Selection flow** (embedded in intake, not a separate step):
-  1. **Identify the gap**: "Your workflow involves [capability]. Claude can't
+  1. **Identify the gap**: "Your workflow involves [capability]. Codex can't
      do this natively, but it can orchestrate external tools that can."
   2. **Present options**: Show 2-3 options with a recommendation, formatted as:
      - Tool name, one-line description

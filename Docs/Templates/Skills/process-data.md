@@ -26,7 +26,7 @@ process-data/
      the detection logic may be inline Python. However, a reusable schema
      detection script saves tokens on repeated invocations. -->
 
-## Example: Process-Data Skill (`.claude/skills/process-data/SKILL.md`)
+## Example: Process-Data Skill (`.agents/skills/process-data/SKILL.md`)
 
 ````markdown
 ---
@@ -39,7 +39,7 @@ description: >
   data. Do NOT use for performing actual analysis (route to analyst agent) or
   for generating reports (route to drafter agent).
 context: fork
-allowed-tools:
+tool access policy:
   - Read
   - Write
   - Edit
@@ -52,7 +52,7 @@ metadata:
 
 <!-- ANNOTATION: Frontmatter design decisions:
      - context: fork (isolated context -- data files can be large)
-     - Write/Edit allowed because this skill produces the data inventory
+     - scoped workspace writes allowed because this skill produces the data inventory
      - Bash allowed for Python-based file detection and schema analysis
      - description: 6 trigger phrases and 2 negative triggers
      VARIATION: For knowledge-work profile, this skill might not exist
@@ -83,7 +83,7 @@ find . -maxdepth 3 -type f \( \
   -name "*.csv" -o -name "*.xlsx" -o -name "*.xls" \
   -o -name "*.json" -o -name "*.tsv" -o -name "*.parquet" \
   -o -name "*.xml" -o -name "*.txt" \) \
-  -not -path "./output/*" -not -path "./Docs/*" -not -path "./.claude/*" \
+  -not -path "./output/*" -not -path "./Docs/*" -not -path "./.codex/*" \
   | sort
 ```
 

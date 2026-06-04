@@ -20,10 +20,10 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| researcher | opus | Find and synthesize info; primary sources, cited claims, confidence levels (read-only) | researcher.md |
-| drafter | sonnet | Write/edit memos, reports, analyses in the chosen output style | drafter.md |
-| reviewer | opus | Check accuracy, completeness, citations, compliance; classify findings (read-only) | reviewer.md |
-| analyst | opus | (conditional) Read brand assets / data, refresh brand-rules.md (read-only) | analyst.md |
+| researcher | high-effort | Find and synthesize info; primary sources, cited claims, confidence levels (read-only) | researcher.md |
+| drafter | medium-effort | Write/edit memos, reports, analyses in the chosen output style | drafter.md |
+| reviewer | high-effort | Check accuracy, completeness, citations, compliance; classify findings (read-only) | reviewer.md |
+| analyst | high-effort | (conditional) Read brand assets / data, refresh brand-rules.md (read-only) | analyst.md |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing
 (conservative default, human-review gate for external-audience docs,
@@ -72,16 +72,16 @@ NO language ecosystems: this is document-centric, so deny programming tools
 (`pip`, `npm`, `node`, `python`) and all VCS commands. Domain-specific additions
 not in the reference:
 
-- allow: `Write(./Outbox/**)`, `Edit(./Outbox/**)`; safe text utilities
-  `Bash(wc *)`, `Bash(sort *)`, `Bash(diff *)`, `Bash(date *)`, `Bash(head *)`,
-  `Bash(tail *)`; `Bash(pandoc *)` when Pandoc is installed (outbound .docx/.pdf).
+- allow writable `Outbox/**`; safe text utilities
+  `wc`, `sort`, `diff`, `date`, `head`, and `tail`; `pandoc` when installed
+  for outbound .docx/.pdf.
 - File conversion: prefer the MarkItDown MCP server (`npx -y
-  @anthropic/markitdown-mcp`) over a Python dependency. If Python is unavoidable,
-  allow it narrowly: `Bash(markitdown *)`, `Bash(pip install markitdown*)`.
+  @openai/markitdown-mcp`) over a Python dependency. If Python is unavoidable,
+  document `markitdown` setup narrowly.
 - Data extension (only if intake flags CSV/JSON/structured files): add
-  `Bash(python3 -c *)`, `Bash(csvtool *)`, `Bash(jq *)`.
+  ad hoc Python snippets, `csvtool`, and `jq`.
 
-Generate `settings.local.json` for machine-specific tool paths (Pandoc/MarkItDown
+Generate `local config profile` for machine-specific tool paths (Pandoc/MarkItDown
 install dirs).
 
 ## Self-Learning Seed Entries
@@ -116,12 +116,12 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 
 ## Cost / Model Notes
 
-Opus for researcher/reviewer (deep reasoning, cross-model accuracy checks);
-Sonnet for drafter (established-pattern writing); analyst on Opus when included.
-Defaults: balanced (Opus on research/review, Sonnet on drafting; compaction 95%;
-CLAUDE.md ~200 lines). Cost-conscious override: all-Sonnet except reviewer on
-Opus for regulatory/compliance checks; consider merging reviewer into researcher
-for simpler work; compaction 85%; CLAUDE.md ~150; RTK noted but low priority
+high-effort GPT-5.5 for researcher/reviewer (deep reasoning, cross-model accuracy checks);
+medium-effort GPT-5.5 for drafter (established-pattern writing); analyst on GPT-5.5 when included.
+Defaults: balanced (GPT-5.5 on research/review, medium-effort GPT-5.5 on drafting; compaction 95%;
+AGENTS.md ~200 lines). Cost-conscious override: all medium-effort GPT-5.5 except reviewer on
+GPT-5.5 for regulatory/compliance checks; consider merging reviewer into researcher
+for simpler work; compaction 85%; AGENTS.md ~150; RTK noted but low priority
 (knowledge work uses few CLI commands). Subagents ~4x vs direct; teams not
 recommended (serial workflow is natural). Monitor with `/cost`.
 
@@ -144,16 +144,16 @@ recommended (serial workflow is natural). Monitor with `/cost`.
 ## MCP Suggestions
 
 Offer during intake only if the user names the service (verified servers, see
-tool-registry): MarkItDown (`@anthropic/markitdown-mcp` -- recommended,
+tool-registry): MarkItDown (`@openai/markitdown-mcp` -- recommended,
 Python-free inbound conversion); Notion; Google Docs (read-oriented); Zotero /
-reference manager via WebFetch; Confluence (team knowledge base).
+reference manager via browser/web retrieval; Confluence (team knowledge base).
 
 ## Customization Points
 
 Solo vs team (Lite vs Standard memory tier); output formats needed (Pandoc for
 .docx/.pdf/.pptx, MarkItDown for inbound); brand requirements (-> Brand/ dir +
 analyst); citation style (APA / Bluebook / Chicago); regulated/compliance work
-(-> reviewer on Opus, human-review gate, jurisdiction notes); structured-data
+(-> reviewer on GPT-5.5, human-review gate, jurisdiction notes); structured-data
 files (-> data permission extension).
 
 ## Team-architecture pattern

@@ -4,7 +4,7 @@ Single source of truth for all third-party tools, plugins, and services recommen
 by the Harness Generator. The environment-architect reads matching rules from here.
 The /update skill verifies tools against this registry for currency.
 
-**Last Updated:** 2026-05-31 (90-day verification pass; Kimi K2.5 -> K2.6, Nano Banana 2 reverified active, `/simplify` bundled skill renamed to `/code-review`; Opus 4.8 flagship)
+**Last Updated:** 2026-05-31 (90-day verification pass; Kimi K2.5 -> K2.6, Nano Banana 2 reverified active, `/simplify` bundled skill renamed to `/code-review`; GPT-5.5 flagship)
 
 ---
 
@@ -31,11 +31,11 @@ Every recommended tool appears here with key metadata. Status values:
 | BA-01 | Playwright CLI | Browser Automation | 2026-03 | Active | BA-02 (preferred) |
 | BA-02 | Playwright MCP | Browser Automation | 2026-03 | Active | -- |
 | BA-03 | Chrome DevTools MCP | Browser Automation | 2026-03 | Active | -- |
-| BA-04 | Claude in Chrome | Browser Automation | 2026-03 | Active | -- |
+| BA-04 | Codex browser/app workflows | Browser Automation | 2026-03 | Active | -- |
 | PM-01 | Synabun | Persistent Memory | 2026-03 | Active | -- |
-| PM-02 | claude-mem | Persistent Memory | 2026-03 | Active | -- |
+| PM-02 | codex memories | Persistent Memory | 2026-03 | Active | -- |
 | PM-03 | mcp-memory-service | Persistent Memory | 2026-03 | Active | -- |
-| CI-01 | Claude Context MCP | Codebase Intelligence | 2026-03 | Active | -- |
+| CI-01 | Codex Context MCP | Codebase Intelligence | 2026-03 | Active | -- |
 | CI-02 | Code-Graph-RAG | Codebase Intelligence | 2026-03 | Experimental | -- |
 | SD-01 | skill-creator | Skill Development | 2026-03 | Active | -- |
 | TT-01 | Beads | Task Tracking | 2026-03 | Active | -- |
@@ -56,9 +56,9 @@ Every recommended tool appears here with key metadata. Status values:
 | AG-01 | ElevenLabs | Audio Generation | 2026-03 | Active | -- |
 | AG-02 | Bark (Suno) | Audio Generation | 2026-03 | Active | -- |
 | AG-03 | Coqui TTS | Audio Generation | 2026-03 | Active | -- |
-| AP-01 | document-skills | Anthropic Official | 2026-03 | Active | -- |
-| AP-02 | example-skills | Anthropic Official | 2026-03 | Active | -- |
-| AP-03 | claude-api | Anthropic Official | 2026-03 | Active | -- |
+| AP-01 | document-skills | OpenAI Official | 2026-03 | Active | -- |
+| AP-02 | example-skills | OpenAI Official | 2026-03 | Active | -- |
+| AP-03 | openai-api | OpenAI Official | 2026-03 | Active | -- |
 | NB-01 | notebooklm-py | NotebookLM Integration | 2026-03 | Active | -- |
 | WS-01 | Context7 | Web/Search | 2026-03 | Active | -- |
 | WS-02 | Firecrawl | Web/Search | 2026-03 | Active | -- |
@@ -92,7 +92,7 @@ These tools convert complex documents to structured markdown for wiki ingestion.
 | DP-03 | Docling | `pip install docling` | Hierarchical document structure | IBM project, active development |
 
 **Matching rules**:
-- 1-5 reference docs, simple formats -> Skip (Claude's native Read handles PDFs)
+- 1-5 reference docs, simple formats -> Skip (Codex's native Read handles PDFs)
 - 5-20 reference docs, mostly PDF -> DP-01 (PaddleOCR) for scanned, DP-03 (Docling) for digital
 - 20+ reference docs or complex layouts -> DP-02 (MinerU) for bulk processing
 - Mixed quality (some scanned, some digital) -> DP-01 + DP-03 together
@@ -108,20 +108,20 @@ For environments needing web interaction: testing web apps, scraping, form autom
 
 | ID | Tool | Install | Token Cost | Best For |
 |----|------|---------|------------|----------|
-| BA-01 | Playwright CLI | `npm i -g @anthropic-ai/playwright-cli` | ~27K/session | Claude Code + browser testing (default) |
+| BA-01 | Playwright CLI | `npm i -g @playwright/test` | ~27K/session | Codex + browser testing (default) |
 | BA-02 | Playwright MCP | MCP server config | ~114K/session | Sandboxed agents without shell access |
 | BA-03 | Chrome DevTools MCP | MCP server config | Varies | Performance profiling, Core Web Vitals |
-| BA-04 | Claude in Chrome | Chrome extension | N/A | Authenticated workflows on logged-in sites |
+| BA-04 | Codex browser/app workflows | Chrome extension | N/A | Authenticated workflows on logged-in sites |
 
 **Key insight**: Playwright CLI is 4x more token-efficient than Playwright MCP
 (~27K vs ~114K tokens per session). It saves page snapshots to disk as YAML,
-keeping the context clean. Prefer BA-01 for Claude Code environments.
+keeping the context clean. Prefer BA-01 for Codex environments.
 
 **Matching rules**:
 - Frontend/web dev, testing, web scraping -> BA-01 (Playwright CLI, default)
 - Sandboxed agents, no shell access -> BA-02 (Playwright MCP, fallback only)
 - Performance profiling, Core Web Vitals -> BA-03 (Chrome DevTools MCP)
-- Authenticated browser workflows (logged-in sites) -> BA-04 (Claude in Chrome)
+- Authenticated browser workflows (logged-in sites) -> BA-04 (Codex browser/app workflows)
 - No web interaction mentioned -> Omit entirely
 
 **Architecture output**: Include in section 10b Recommended Plugins. Document
@@ -137,16 +137,16 @@ are insufficient. Never a requirement -- always framed as optional.
 | ID | Tool | Install | Best For | Key Feature |
 |----|------|---------|----------|-------------|
 | PM-01 | Synabun | `npm install -g synabun && synabun start` | Non-coding, visual users | Semantic vector memory, 46 MCP tools, 3D visualization |
-| PM-02 | claude-mem | `npm install -g claude-mem` | Heavy coding, long sessions | "Endless Mode" (~20x context), auto-summarize |
+| PM-02 | codex memories | `npm install -g codex memories` | Heavy coding, long sessions | "Endless Mode" (~20x context), auto-summarize |
 | PM-03 | mcp-memory-service | MCP server config | Multi-agent pipelines | Knowledge graph, ChromaDB backend |
 
 **Matching rules** (recommend ONE, not multiple):
 - Node.js or non-coding project, wants visual UI -> PM-01 (Synabun)
-- Heavy coding, long sessions, context limit issues -> PM-02 (claude-mem)
+- Heavy coding, long sessions, context limit issues -> PM-02 (codex memories)
 - Python project or multi-agent pipeline -> PM-03 (mcp-memory-service)
 
 **Trigger signals** (must have at least one):
-- User reports context loss between sessions ("Claude keeps forgetting")
+- User reports context loss between sessions ("Codex keeps forgetting")
 - Multi-session projects with complex architectural decisions
 - Large codebases (1000+ files)
 - Teams sharing context across developers
@@ -163,16 +163,16 @@ For large codebases where grep/glob are insufficient for navigation.
 
 | ID | Tool | Install | Best For | Maturity |
 |----|------|---------|----------|----------|
-| CI-01 | Claude Context MCP | MCP server config | Semantic code search, 1000+ files | Stable |
+| CI-01 | Codex Context MCP | MCP server config | Semantic code search, 1000+ files | Stable |
 | CI-02 | Code-Graph-RAG | Custom setup | Cross-file dependency analysis | Experimental |
 
 **Matching rules**:
 - 1000+ source files, frequent "where is X" questions -> CI-01
 - Complex dependency chains, architectural analysis -> CI-02 (with caveats)
-- < 1000 files -> Omit (built-in Glob/Grep + /map-codebase sufficient)
+- < 1000 files -> Omit (shell-first search + /map-codebase sufficient)
 
 **Architecture output**: Document in GETTING_STARTED.md. Include MCP config
-in settings.json suggestions.
+in .codex/config.toml suggestions.
 
 ---
 
@@ -180,7 +180,7 @@ in settings.json suggestions.
 
 | ID | Tool | Install | Purpose |
 |----|------|---------|---------|
-| SD-01 | skill-creator | `/plugin marketplace add anthropics/skills` then `/plugin install skill-creator@anthropics/skills` | Eval framework for validating and improving custom skills (from the anthropics/skills marketplace) |
+| SD-01 | skill-creator | `/plugin marketplace add openai/skills` then `/plugin install skill-creator` | Eval framework for validating and improving custom skills (from the openai/skills marketplace) |
 
 **What it does**: 4 modes (Create/Eval/Improve/Benchmark), 4 sub-agents
 (Executor/Grader/Comparator/Analyzer). Creates eval test suites that verify
@@ -208,15 +208,15 @@ with install command and brief workflow description.
 - Git required as persistence layer (non-Git VCS: flag trade-off)
 - Simple projects or single-session work -> Omit
 
-**Architecture output**: Include `bd init` setup, Claude Code hooks,
-settings.json permissions. Complements (does not replace) /state-save.
+**Architecture output**: Include `bd init` setup, Codex hooks,
+.codex/config.toml permissions. Complements (does not replace) /state-save.
 
 ---
 
 ### PKM Integration (PK-01 through PK-02)
 
-Personal knowledge management tools that Claude reads/writes to as a shared
-knowledge layer. Different from Claude-specific memory plugins (PM category):
+Personal knowledge management tools that Codex reads/writes to as a shared
+knowledge layer. Different from Codex-specific memory plugins (PM category):
 PKM tools are user-managed, general-purpose knowledge stores.
 
 | ID | Tool | Integration | Best For |
@@ -229,14 +229,14 @@ PKM tools are user-managed, general-purpose knowledge stores.
 - User describes research accumulation workflow -> Ask about PKM tool
 - User does NOT mention a PKM tool -> Omit entirely (never recommend speculatively)
 
-**Architecture output**: Vault path in settings.json, conventions rule file,
+**Architecture output**: Vault path in .codex/config.toml, conventions rule file,
 optional `/capture-knowledge` skill. See Pattern H in architect.
 
 ---
 
 ### Image Generation (IG-01 through IG-04)
 
-Extends Claude Code with image creation capabilities. Claude orchestrates:
+Extends Codex with image creation capabilities. Codex orchestrates:
 writes prompts, invokes the tool, analyzes results, iterates.
 
 | ID | Tool | Type | Cost | Integration | Best For |
@@ -254,7 +254,7 @@ writes prompts, invokes the tool, analyzes results, iterates.
 - Game dev / needs specific styles -> IG-01 (ComfyUI, LoRA/ControlNet support)
 
 **Architecture output**: MCP config or API skill in Pass 3. API keys in
-settings.local.json. Routing entry for image generation requests.
+local config profile. Routing entry for image generation requests.
 
 ---
 
@@ -283,7 +283,7 @@ Run open-source models locally for privacy, cost savings, or specialized tasks.
 
 | ID | Tool | Install | Integration | Best For |
 |----|------|---------|-------------|----------|
-| LI-01 | Ollama | `curl -fsSL https://ollama.ai/install.sh \| sh` | Native Claude Code (v0.14+), MCP server | Simplest setup, any model, 98% token savings |
+| LI-01 | Ollama | `curl -fsSL https://ollama.ai/install.sh \| sh` | Native Codex (v0.14+), MCP server | Simplest setup, any model, 98% token savings |
 | LI-02 | LM Studio | Desktop app download | OpenAI-compatible endpoint | GUI-first users, model browsing |
 | LI-03 | Kimi K2.6 | HuggingFace weights + vLLM/KTransformers | API endpoint | Vision + agent swarm, 1T MoE (32B active); K2.6 is the current production release (supersedes K2.5) |
 | LI-04 | vLLM | `pip install vllm` | OpenAI-compatible endpoint | Production serving, high throughput |
@@ -295,8 +295,8 @@ Run open-source models locally for privacy, cost savings, or specialized tasks.
 - Production/team serving -> LI-04 (vLLM)
 - No local GPU or simple project -> Omit
 
-**Architecture output**: MCP config (OllamaClaude MCP) or environment variables
-for Claude Code native Ollama support. Document model recommendations in
+**Architecture output**: MCP config (OllamaCodex MCP) or environment variables
+for Codex native Ollama support. Document model recommendations in
 GETTING_STARTED.md.
 
 ---
@@ -320,29 +320,29 @@ GETTING_STARTED.md.
 
 ---
 
-### Anthropic Official Skills (AP-01 through AP-03)
+### OpenAI Official Skills (AP-01 through AP-03)
 
-From `github.com/anthropics/skills`. Installed via marketplace, not statically copied.
+From `developers.openai.com/codex/concepts/customization`. Installed via marketplace, not statically copied.
 
 | ID | Collection | Key Skills | Matching Signals |
 |----|-----------|------------|------------------|
 | AP-01 | document-skills | Word/Excel/PDF processing | Office documents, spreadsheets |
 | AP-02 | example-skills | skill-creator, web testing, brand guide | Frontend dev, custom skills, brand guidelines |
-| AP-03 | claude-api | API/SDK development helpers | Building with Claude API |
+| AP-03 | openai-api | API/SDK development helpers | Building with OpenAI API |
 
 **Matching rules**:
 - Office documents (Excel, Word, PowerPoint, PDF) -> AP-01 (document-skills)
 - Frontend/web dev or web testing -> AP-02 (example-skills)
 - Building MCP servers -> AP-02 (example-skills)
 - Brand/design guidelines -> AP-02 (example-skills)
-- Claude API/SDK development -> AP-03 (claude-api)
+- OpenAI API/SDK development -> AP-03 (openai-api)
 - User wants to create custom skills -> AP-02 (example-skills, includes skill-creator)
 
 **Bundled skills** (no install needed, just mention in GETTING_STARTED.md):
 - `/code-review` -- Correctness review of changed files at chosen effort (`--fix`, `--comment`); renamed from `/simplify` (v2.1.147)
 - `/batch` -- Process multiple files with same operation (useful for 50k+ line codebases)
 - `/debug` -- Structured debugging workflow
-- `/claude-api` -- Claude API development helper
+- `/openai-api` -- OpenAI API development helper
 
 ---
 
@@ -361,10 +361,10 @@ server here, do NOT invent one. Instead, suggest browser/API/export workflows.
 | MC-03 | Notion (official) | `npx -y @notionhq/notion-mcp-server` | 2026-03 | Active | Pages, databases, blocks, search |
 | MC-04 | Brave Search (official) | `npx -y @brave/brave-search-mcp-server` | 2026-03 | Active | Web/news/image search |
 | MC-05 | Sentry (official) | `npx @sentry/mcp-server` or remote `https://mcp.sentry.dev/mcp` | 2026-03 | Active | Error tracking, stack traces |
-| MC-06 | Linear (official) | Remote: `claude mcp add linear -- npx -y mcp-remote https://mcp.linear.app/sse` | 2026-03 | Active | Issues, projects, teams |
-| MC-07 | Figma (official) | Remote: `claude mcp add --transport http figma https://mcp.figma.com/mcp` | 2026-03 | Active | Design files, components, tokens |
+| MC-06 | Linear (official) | Remote: `codex mcp add linear -- npx -y mcp-remote https://mcp.linear.app/sse` | 2026-03 | Active | Issues, projects, teams |
+| MC-07 | Figma (official) | Remote: `codex mcp add --transport http figma https://mcp.figma.com/mcp` | 2026-03 | Active | Design files, components, tokens |
 | MC-08 | Supabase (official) | `npx -y @supabase/mcp-server-supabase` | 2026-03 | Active | Database, auth, storage |
-| MC-09 | Vercel (official) | Remote: `claude mcp add --transport http vercel https://mcp.vercel.com` | 2026-03 | Active | Deployments, builds, domains |
+| MC-09 | Vercel (official) | Remote: `codex mcp add --transport http vercel https://mcp.vercel.com` | 2026-03 | Active | Deployments, builds, domains |
 | MC-10 | AWS (awslabs) | `uvx awslabs.core-mcp-server@latest` (router for all AWS servers) | 2026-03 | Active | AWS docs, CDK, ECS, Lambda, etc. |
 
 ### MCP Reference Servers (modelcontextprotocol org)
@@ -387,13 +387,13 @@ server here, do NOT invent one. Instead, suggest browser/API/export workflows.
 | MC-32 | mcp-memory-service | `npx -y mcp-memory-service` | 2026-03 | Active | ChromaDB-backed memory |
 | MC-33 | Obsidian MCP | `npx -y obsidian-mcp` | 2026-03 | Active | Obsidian vault access |
 | MC-34 | ComfyUI MCP | `npx -y comfyui-mcp` | 2026-03 | Experimental | Image generation |
-| MC-35 | Chrome DevTools | `npx -y @anthropic-ai/chrome-devtools-mcp` | 2026-03 | Active | Performance profiling |
+| MC-35 | Chrome DevTools | `npx -y chrome-devtools-mcp` | 2026-03 | Active | Performance profiling |
 | MC-36 | Context7 | `npx -y @upstash/context7-mcp` | 2026-03 | Active | Up-to-date library docs (48K stars) |
 | MC-37 | Firecrawl | `npx -y firecrawl-mcp` | 2026-03 | Active | Web scraping, site crawling |
 | MC-38 | Exa Search | `npx -y exa-mcp-server` | 2026-03 | Active | Semantic web/academic search |
 | MC-39 | Google Workspace | `uvx workspace-mcp` | 2026-03 | Community | Gmail, Drive, Docs, Sheets, Calendar |
 | MC-40 | Jira (community) | `npx @aashari/mcp-server-atlassian-jira` | 2026-03 | Community | Issues, projects, JQL search |
-| MC-41 | notebooklm-py | `pip install notebooklm-py` (Python library + Claude skills) | 2026-03 | Active | Google NotebookLM automation (3.7K stars) |
+| MC-41 | notebooklm-py | `pip install notebooklm-py` (Python library + Codex skills) | 2026-03 | Active | Google NotebookLM automation (3.7K stars) |
 
 ### Deprecated MCP Packages (DO NOT recommend)
 
@@ -483,7 +483,7 @@ When updating a tool, check all referenced files.
 | Codebase Intelligence | 21.x | -- | Item 21 | -- | Probe | SW, Game |
 | Skill Development | 3.10 | 10b | Item 28 | Check 37 | -- | -- |
 | Task Tracking | 9.5 | Pattern | Item 24 | Check 32 | Probe | -- |
-| Anthropic Official | 20.x | 10b | Item 27 | Check 36 | -- | -- |
+| OpenAI Official | 20.x | 10b | Item 27 | Check 36 | -- | -- |
 | Image Generation | 23.3 | Pattern I | -- | -- | Probe | -- |
 | Video Generation | 23.3 | Pattern I | -- | -- | Probe | -- |
 | Local Inference | 23.3 | Pattern I | -- | -- | Probe | -- |

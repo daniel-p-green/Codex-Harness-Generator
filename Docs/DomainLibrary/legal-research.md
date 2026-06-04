@@ -15,7 +15,7 @@ does not give legal advice and does not replace attorney judgment (Model Rules
 
 - **Target audience**: in-house counsel, paralegals, law clerks, legal researchers,
   compliance teams producing reference memos and dispute-response strategy
-- **Primary tools**: WebSearch/WebFetch (case-law lookup), Markdown deliverables;
+- **Primary tools**: web search/browser retrieval (case-law lookup), Markdown deliverables;
   no programming languages by default
 - **Complexity**: Standard | **Memory tier**: Lite (solo) or Standard (team) |
   **Action default**: conservative (confirm before overwriting filed work product;
@@ -28,10 +28,10 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| case-searcher | opus | Find precedents; for EACH cite record provenance (VERIFIED via a retrieved official/primary source with URL, vs UNVERIFIED-RECALL from memory), good-law status (overruled/superseded/reversed/vacated/good/unknown), and binding-in-forum vs persuasive vs non-precedential | researcher.md -- **grant Write/Edit scoped to `./_workspace/**`** (the template is read-only; this agent must write its handoff artifact) |
-| legal-analyst | opus | Issue-spot, build the issue tree, doctrinal analysis (separate ratio decidendi from dicta), state applicable standard of proof + who bears the burden per element, assess strength | analyst.md (prose-reasoning variant: opus, no Bash, doctrinal reasoning not data-cleaning; keeps scoped `./_workspace/**` Write as a producer) |
-| opinion-writer | sonnet | Draft IRAC opinions; populate the Rule slot ONLY with VERIFIED, good-law authority; state certainty (L1-L5); anticipate counterarguments; attach disclaimer | drafter.md |
-| strategy-advisor | opus | Strategy options (litigate/arbitrate/mediate/negotiate), risk + cost-benefit; cross-validate all deliverables AND audit that every cite carries a provenance + good-law tag | planner.md |
+| case-searcher | high-effort | Find precedents; for EACH cite record provenance (VERIFIED via a retrieved official/primary source with URL, vs UNVERIFIED-RECALL from memory), good-law status (overruled/superseded/reversed/vacated/good/unknown), and binding-in-forum vs persuasive vs non-precedential | researcher.md -- **grant scoped writes scoped to `./_workspace/**`** (the template is read-only; this agent must write its handoff artifact) |
+| legal-analyst | high-effort | Issue-spot, build the issue tree, doctrinal analysis (separate ratio decidendi from dicta), state applicable standard of proof + who bears the burden per element, assess strength | analyst.md (prose-reasoning variant: high reasoning effort, no Bash, doctrinal reasoning not data-cleaning; keeps scoped `./_workspace/**` Write as a producer) |
+| opinion-writer | medium-effort | Draft IRAC opinions; populate the Rule slot ONLY with VERIFIED, good-law authority; state certainty (L1-L5); anticipate counterarguments; attach disclaimer | drafter.md |
+| strategy-advisor | high-effort | Strategy options (litigate/arbitrate/mediate/negotiate), risk + cost-benefit; cross-validate all deliverables AND audit that every cite carries a provenance + good-law tag | planner.md |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy (conservative), context-management, self-learning, error-handling,
@@ -82,12 +82,12 @@ known-rule questions -- never emitting a fresh cite from memory) | Standard
 ## Ecosystem Permissions
 
 Base + Universal Deny only -- see `Docs/Templates/References/ecosystem-permissions.md`.
-No language ecosystem; document-centric. Uses `WebSearch` + `WebFetch(*)` (in
-Base) for retrieval-backed cite verification; `Write/Edit(./Docs/**)`,
-`Write/Edit(./_workspace/**)` (pipeline deliverables), `Write(./Outbox/**)`
-(exported memos). Deny programming runtimes (`Bash(python *)`, `Bash(node *)`,
-`Bash(pip *)`) and `git *`. MarkItDown via the MCP server (no Python). Generate
-`settings.local.json` for machine-specific paths.
+No language ecosystem; document-centric. Uses web search and browser/web retrieval
+for retrieval-backed cite verification; allow writes to `Docs/**`,
+`_workspace/**` (pipeline deliverables), and `Outbox/**` (exported memos).
+Deny programming runtimes and Git unless the intake explicitly needs them.
+MarkItDown via the MCP server (no Python). Generate
+`local config profile` for machine-specific paths.
 
 ## Safeguards (privilege, conflicts, citation integrity)
 
@@ -106,7 +106,7 @@ not optional for the domain:
   or the hub multi-area shape. Conflicts screening is a human-attorney duty the
   tool does not perform.
 - **Citation integrity (Rule 3.3 -- fabricated cites get practitioners sanctioned):**
-  every cite is tagged VERIFIED (retrieved via WebFetch from an official/primary
+  every cite is tagged VERIFIED (retrieved via browser/web retrieval from an official/primary
   source -- court site, official reporter, government legislation portal -- with the
   URL recorded; a secondary-web mention is a lead, not verification) or
   UNVERIFIED-RECALL. An UNVERIFIED-RECALL cite may NEVER populate the IRAC Rule
@@ -154,7 +154,7 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 - **PreCompact auto-save** (recommended) -- preserve issue tree, gathered cites
   (with their tags), draft status; exclude privileged matter content.
 - **PreToolUse legal gate** (domain-unique, **deterministic by default**): on
-  Write/Edit to Outbox/ or client-facing paths, block if (a) the disclaimer is
+  scoped writes to Outbox/ or client-facing paths, block if (a) the disclaimer is
   absent OR (b) any citation lacks a provenance tag / is UNVERIFIED-RECALL used as
   authority. Disclaimer-presence may downgrade to advisory only when the user
   confirms all output stays internal and attorney-reviewed; the citation check
@@ -162,21 +162,21 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 
 ## Cost / Model Notes
 
-Opus for case-searcher, legal-analyst, strategy-advisor (reasoning, multi-source
-judgment, cross-validation); Sonnet for opinion-writer (established IRAC once
-verified analysis exists). Balanced default (Opus on the three reasoning roles,
-compaction 95%, CLAUDE.md ~200). Cost-conscious: all-Sonnet except legal-analyst
-on high-stakes/compliance issues, compaction 85%, CLAUDE.md ~150. Full pipeline ~4x
+GPT-5.5 for case-searcher, legal-analyst, strategy-advisor (reasoning, multi-source
+judgment, cross-validation); medium-effort GPT-5.5 for opinion-writer (established IRAC once
+verified analysis exists). Balanced default (GPT-5.5 on the three reasoning roles,
+compaction 95%, AGENTS.md ~200). Cost-conscious: all medium-effort GPT-5.5 except legal-analyst
+on high-stakes/compliance issues, compaction 85%, AGENTS.md ~150. Full pipeline ~4x
 direct chat; route single-purpose asks to one agent.
 
 ## MCP Suggestions
 
 Offer during intake only if the user names the service (verified servers in
 `tool-registry.md`): **MarkItDown** (recommended -- inbound contracts/filings to
-Markdown, no Python; config in `settings.local.json`); **Notion/Confluence** (read
+Markdown, no Python; config in `local config profile`); **Notion/Confluence** (read
 access to a matter KB or precedent library). Direct legal-database (Westlaw/Lexis-
 class) integration is explicitly out of scope -- do NOT invent an MCP server for it;
-WebSearch + retrieval-backed verification + good-law flags are the documented
+web search + retrieval-backed verification + good-law flags are the documented
 fallback, and case-searcher must name the jurisdiction's authoritative free source.
 
 ## Customization Points

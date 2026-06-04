@@ -8,7 +8,7 @@
      Must include commit message guidance. Must include PR workflow if
      the user collaborates with others. Must not exceed 120 lines. -->
 
-## Example: Git VCS Rule (`.claude/rules/vcs-git.md`)
+## Example: Git VCS Rule (`.codex/rules/vcs-git.md`)
 
 ```markdown
 # Git integration
@@ -31,12 +31,12 @@ These commands are read-only or locally reversible. Run them immediately:
 - `git rebase` (local, non-interactive)
 
 <!-- ANTI-PATTERN: Do not list every possible git command. Focus on the
-     commands Claude actually uses. Listing obscure commands wastes tokens. -->
+     commands Codex actually uses. Listing obscure commands wastes tokens. -->
 
 ## Dangerous commands (ask first)
 
 <!-- ANNOTATION: These are hard-to-reverse or visible to others.
-     Include the WHY so Claude understands the risk, not just the rule. -->
+     Include the WHY so Codex understands the risk, not just the rule. -->
 
 Never run without explicit user request:
 - `git push --force` / `git push --force-with-lease` -- rewrites remote history
@@ -55,7 +55,7 @@ Ask before running:
 
 ## Commit workflow
 
-<!-- ANNOTATION: This section teaches Claude how to make good commits.
+<!-- ANNOTATION: This section teaches Codex how to make good commits.
      Adapt the message format to the team's conventions (identified in intake). -->
 
 When asked to commit:

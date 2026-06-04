@@ -6,38 +6,26 @@
      implementer, but its output is analysis results rather than code changes.
      Key concern: NEVER modify original data files. -->
 
-<!-- QUALITY: Must include full frontmatter with Bash access. Must enforce
+<!-- QUALITY: Must include Codex subagent TOML with workspace write access. Must enforce
      data integrity (never modify originals). Must require methodology
      documentation. Must include reproducibility requirement. Must handle
      large files safely. Agent body under 80 lines. -->
 
-## Example: Analyst Agent (`.claude/agents/analyst.md`)
+## Example: Analyst Agent (`.codex/agents/analyst.toml`)
 
-````markdown
----
-name: analyst
-description: >
-  Process, analyze, and transform data files. Delegate to this agent for
-  computation, data cleaning, statistical analysis, and structured output.
-  Triggers: "analyze this spreadsheet", "calculate", "process this data",
-  "find trends", "compare actuals vs budget", "clean this data", "run the
-  numbers", "reconcile these files". Do NOT delegate for research, report
-  writing, or review -- use the appropriate specialized agent.
-model: sonnet
-tools:
-  - Read
-  - Write
-  - Edit
-  - Glob
-  - Grep
-  - Bash
-maxTurns: 50
----
-
+````toml
+name = "analyst"
+description = """
+Process, analyze, and transform data files. Delegate to this agent for computation, data cleaning, statistical analysis, and structured output. Triggers: "analyze this spreadsheet", "calculate", "process this data", "find trends", "compare actuals vs budget", "clean this data", "run the numbers", "reconcile these files". Do NOT delegate for research, report writing, or review -- use the appropriate specialized agent.
+"""
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
+developer_instructions = """
 <!-- ANNOTATION: Key design decisions:
-     - model: sonnet (calculation accuracy and methodology reasoning matter)
-     - maxTurns: 50 (data processing often requires iterative Python runs)
-     - Full tool access including Bash for Python scripts
+     - model: gpt-5.5 (calculation accuracy and methodology reasoning matter)
+     - model_reasoning_effort: medium (data processing often requires iterative Python runs)
+     - Workspace-write sandbox; shell access is available when Codex grants it for Python scripts
      - The analyst is the ONLY agent that should run Python in a data
        environment -- keep Python out of other agents' toolkits
      VARIATION: If the project uses R instead of Python, adapt the
@@ -108,10 +96,11 @@ Out of scope:
 - Research or web searches (use the researcher agent)
 - Review or verification of other agents' work (use the reviewer)
 - Modifying original data files (create new output instead)
+"""
 ````
 
 <!-- QUALITY: Validation checklist for the generator:
-     - [ ] Frontmatter includes: name, description, model, tools, maxTurns
+     - [ ] TOML includes: name, description, model, model_reasoning_effort, sandbox_mode, developer_instructions
      - [ ] Description includes 3+ trigger phrases
      - [ ] Description includes negative trigger
      - [ ] "Never modify originals" rule present and prominent
@@ -134,12 +123,12 @@ Out of scope:
 
 <!-- VARIATION (prose-reasoning analyst, e.g. legal/policy/doctrinal): when the
      "analysis" is prose reasoning rather than data computation, change model to
-     opus, REMOVE Bash from tools (no Python), drop the data-cleaning triggers and
-     the "never overwrite source data files" rule, and keep only Read/Write/Edit
-     (scoped to _workspace/ for pipeline handoff). The role still produces a
+     a non-Python workflow, avoid shell commands, drop the data-cleaning triggers and
+     the "never overwrite source data files" rule, and keep only scoped read/write
+     access to `_workspace/` for pipeline handoff. The role still produces a
      written artifact -- it is a producer, not a read-only reviewer. -->
 
-<!-- ANTI-PATTERN: Do not give the analyst agent WebSearch or WebFetch.
+<!-- ANTI-PATTERN: Do not give the analyst agent open-ended web retrieval.
      If the analyst needs to look up a formula or standard, it should
      request that information from the orchestrator, which delegates to
      the researcher. Giving the analyst web access leads to it spending

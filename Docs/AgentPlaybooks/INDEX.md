@@ -10,7 +10,7 @@ Last Updated: 2026-05-31
 
 | File | Loaded By | Purpose |
 |------|-----------|---------|
-| OrchestratorWorkflow.md | orchestrator | Detailed /create and /upgrade-environment pipeline choreography (hub detection, architecture-confirmation sub-steps, shape conversions, progress reporting). CLAUDE.md holds the high-level step list. |
+| OrchestratorWorkflow.md | orchestrator | Detailed /create and /upgrade-environment pipeline choreography (hub detection, architecture-confirmation sub-steps, shape conversions, progress reporting). AGENTS.md holds the high-level step list. |
 | IntakeChecklist.md | orchestrator, intake-interviewer | Step-by-step intake protocol: profile-first + deep interview paths, work-area shape (incl. "not sure" branch), preset-vs-custom flow, question relay protocol, GENESIS.md format, validation criteria, edge cases |
 | EnvironmentValidation.md | environment-validator | Functional test scenarios, smoke-test template, and edge-case checklist. The check list itself is the SoT in validation-guide.md (referenced, not duplicated). |
 | ComponentQuality.md | component-generator, environment-validator | Quality standards per component type, file size limits, include/exclude rubrics, anti-overengineering checks |
@@ -20,7 +20,7 @@ Last Updated: 2026-05-31
 ## Usage
 
 Playbooks are NOT loaded into the orchestrator's main context (too large).
-They are passed to agents via the Task tool prompt or read by agents at the
+They are passed to agents via the Codex subagent tools prompt or read by agents at the
 start of their execution.
 
 - Orchestrator loads OrchestratorWorkflow.md when running a /create or /upgrade pipeline.

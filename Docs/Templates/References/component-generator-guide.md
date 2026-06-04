@@ -25,56 +25,59 @@ under each `<area-slug>/` subfolder.
 
 ### Pass 1: Foundation
 
-**Topic files to load**: `Docs/AgentGuidelines/Topics/` -- 01-rules, 05-memory, 08-routing, 11-permissions, 13-opus, 16-hooks, 18-cost
+**Topic files to load**: `Docs/AgentGuidelines/Topics/` -- 01-rules, 05-memory, 08-routing, 11-permissions, 13-models, 16-hooks, 18-cost
 
-Files: CLAUDE.md, all rule files, settings.json, .claudeignore, hooks (if specified in ARCHITECTURE.md)
+Files: AGENTS.md, all rule files, .codex/config.toml, ignore guidance, hooks (if specified in ARCHITECTURE.md)
 
 Key requirements:
-- CLAUDE.md must be under 250 lines. Every line must earn its place.
-- CLAUDE.md must include: purpose (not role-setting), first-run onboarding, non-negotiable constraints with WHY, autonomy reference, command reference, orchestrator contract, 2-3 canonical behavior examples, compaction hints, verification patterns, self-improvement note.
-- CLAUDE.md must NOT include role-setting prompts ("Act as...", "You are a senior...").
+- AGENTS.md must be under 250 lines. Every line must earn its place.
+- AGENTS.md must include: purpose (not role-setting), first-run onboarding, non-negotiable constraints with WHY, autonomy reference, command reference, orchestrator contract, 2-3 canonical behavior examples, compaction hints, verification patterns, self-improvement note.
+- AGENTS.md must NOT include role-setting prompts ("Act as...", "You are a senior...").
 - Each rule file must be under 120 lines.
 - The orchestrator rule must contain the FULL routing table from ARCHITECTURE.md.
-- settings.json must include both allow and deny rules from ARCHITECTURE.md.
-- settings.json must be valid JSON.
-- .claudeignore must cover patterns from ARCHITECTURE.md. If ARCHITECTURE.md Token
-  Optimization section specifies "aggressive" .claudeignore, include both domain-specific
+- .codex/config.toml must include both allow and deny rules from ARCHITECTURE.md.
+- .codex/config.toml must be valid TOML.
+- Ignore guidance must cover patterns from ARCHITECTURE.md. If ARCHITECTURE.md Token
+  Optimization section specifies "aggressive" ignores, include both domain-specific
   AND generic patterns (node_modules, dist, build, .cache, coverage, lock files). If
-  "minimal", include only binary assets and build output.
+  "minimal", include only binary assets and build output. Prefer the project's existing
+  VCS ignore file for repository artifacts.
 - If ARCHITECTURE.md Token Optimization section specifies a compaction threshold (e.g.,
-  85% for cost-conscious), set `CLAUDE_CODE_AUTOCOMPACT_PCT_OVERRIDE` in settings.json
+  85% for cost-conscious), set `CODEX_AUTOCOMPACT_PCT_OVERRIDE` in .codex/config.toml
   env block. If balanced or quality-first, omit the override (let the 95% default apply).
-- Target CLAUDE.md line count from ARCHITECTURE.md Token Optimization section (150/200/250).
+- Target AGENTS.md line count from ARCHITECTURE.md Token Optimization section (150/200/250).
   Every line must earn its place; cost-conscious environments require extra discipline.
 - VCS ignore file (.gitignore or .p4ignore) must exclude `Docs/_working/` so working
   state is not committed. If generating for a Git project, add to .gitignore. For
   Perforce, add to .p4ignore. Document this in GETTING_STARTED.md either way.
 
 Reference templates:
-- `Docs/Templates/Core/claude-md.md`
+- `Docs/Templates/Core/agents-md.md`
 - `Docs/Templates/Core/orchestrator-rule.md`
 - `Docs/Templates/Core/routing-rule.md`
 - `Docs/Templates/Core/autonomy-rule.md`
 - `Docs/Templates/Core/context-management-rule.md`
 - `Docs/Templates/Core/self-learning-rule.md`
 - `Docs/Templates/Core/error-handling-rule.md`
-- `Docs/Templates/Core/settings-json.md`
+- `Docs/Templates/Core/codex-config-toml.md`
 - `Docs/Templates/Optional/hooks-template.md` (if hooks are specified)
 
 ### Pass 2: Agents
 
-**Topic files to load**: `Docs/AgentGuidelines/Topics/` -- 02-agents, 13-opus, 18-cost
+**Topic files to load**: `Docs/AgentGuidelines/Topics/` -- 02-agents, 13-models, 18-cost
 
-Files: All agent definition files in `.claude/agents/`
+Files: All `.toml` agent definition files in `.codex/agents/`
 
 Key requirements:
-- Each agent file must be under 80 lines.
-- Every agent must have valid YAML frontmatter with: name, description, model, tools, maxTurns.
-- Include disallowedTools where specified in ARCHITECTURE.md.
+- Each agent file must be under 80 lines when practical.
+- Every agent TOML file must include: `name`, `description`, `developer_instructions`,
+  `model`, `model_reasoning_effort`, and `sandbox_mode`.
+- Use `sandbox_mode = "read-only"` for analysis-only agents and
+  `sandbox_mode = "workspace-write"` only when the agent must create or edit files.
 - The description must state WHEN to delegate to this agent, not just what it does.
 - Instructions must include: objective, output format, tool guidance, task boundaries.
 - Instructions must include: "Never speculate about files you have not read."
-- For Opus agents: include anti-overengineering instruction.
+- For GPT-5.5 agents: include anti-overengineering instruction.
 - Long reference content goes at the TOP, operational instructions at the BOTTOM.
 
 Read agent templates from `Docs/Templates/Agents/` for patterns. Select the template closest to each agent being generated.
@@ -89,9 +92,10 @@ Key requirements:
 - Each skill folder uses kebab-case naming.
 - NO README.md inside skill folders.
 - SKILL.md must be under 500 lines and 5,000 words.
-- SKILL.md frontmatter must include: name, description (with 3+ trigger phrases), context, allowed-tools.
+- SKILL.md frontmatter must include: `name` and `description` with 3+ trigger phrases
+  and clear negative triggers when another skill could be confused.
 - Critical instructions go at the TOP of SKILL.md with ## Critical or ## Important headers.
-- Skills with side effects that should not trigger model invocation use `disable-model-invocation: true`.
+- Skills with side effects must state explicit invocation triggers and safety checks.
 - Each skill must check its own state independently (composability -- do not assume prior skill execution).
 - Skills referencing MCP tools must use fully qualified tool names.
 - Include scripts/ for deterministic validation/capture where applicable.
@@ -116,13 +120,13 @@ Key requirements:
 - Wiki structure must match the tier specified in ARCHITECTURE.md (Lite/Standard/Enterprise).
 - `Docs/index.md` is the ONLY wiki file loaded by default. All others are loaded on demand.
 - Each wiki page must start with a blockquote summary and include `Last Updated` date.
-- Wiki content must be documentation-quality (useful to both Claude and human developers).
+- Wiki content must be documentation-quality (useful to both Codex and human developers).
 - Working memory (`Docs/_working/`) contains transient state:
   - `Docs/_working/state/` must include empty SESSION_SNAPSHOT.json and SESSION_CONTEXT.md.
   - `Docs/_working/sessions/` directory for session history (auto-pruned after 30 days).
   - `Docs/_working/retro/` must include initial monthly log with seed entries.
 - Seed entries from ARCHITECTURE.md must be pre-populated and marked `[PATTERN] (pre-seeded)`.
-- Auto-memory integration note: explain how the Docs/ wiki relates to ~/.claude auto memory.
+- Auto-memory integration note: explain how the Docs/ wiki relates to ~/.codex auto memory.
 
 Read `Docs/Templates/Core/memory-scaffold.md` for guidance.
 
@@ -142,14 +146,14 @@ Key requirements:
   - How the environment improves with use
   - "Optional Plugins" section: If ARCHITECTURE.md Recommended Plugins section lists
     any plugins, generate an install guide with marketplace setup command
-    (`claude /plugin marketplace add anthropics/skills`) followed by install commands
+    (`codex skill install`) followed by install commands
     for each recommended collection. Include a brief description of what each plugin
     adds and when to use it. If ARCHITECTURE.md also mentions relevant bundled skills
     (/code-review, /batch, /debug), list them separately as "Built-in Skills (no install
     needed)" with one-line descriptions. If no plugins are recommended, omit the section.
   - "Refining Your Skills" section: If the environment includes 3+ custom skills AND
     GENESIS.md indicates intermediate+ user, include skill-creator install command
-    (`claude install-plugin anthropic/example-skills`) and brief eval workflow:
+    (`codex skill install example-skills`) and brief eval workflow:
     run `/skill-creator` in Eval mode to test each custom skill against synthetic
     prompts, review HTML comparison report, iterate with Improve mode. Explain that
     this validates skills actually improve model behavior. If fewer than 3 custom
@@ -158,16 +162,16 @@ Key requirements:
     ARCHITECTURE.md Token Optimization section:
     - **Cost-conscious**: Full section with `/cost` command usage, RTK install
       instructions (`brew install rtk && rtk init --global` or platform equivalent),
-      compaction explanation, .claudeignore maintenance tips, guidance on when to use
+      compaction explanation, VCS ignore rules maintenance tips, guidance on when to use
       `/clear` between tasks, and `--max-budget-usd` for automation
     - **Balanced**: Brief section mentioning `/cost` for monitoring, RTK as an optional
-      tool for reducing token usage, and a note about `.claudeignore` maintenance
+      tool for reducing token usage, and a note about `VCS ignore rules` maintenance
     - **Quality-first**: Single paragraph noting `/cost` is available for cost
       awareness, no optimization recommendations
   - If GENESIS.md indicates the user is a beginner with AI or command-line tools (experience level: "Just getting started"), include a "Getting Started with the Terminal" section at the top of GETTING_STARTED.md that explains:
     - How to open a terminal on their operating system
     - How to navigate to their project directory (cd command)
-    - How to run `claude` to start the assistant
+    - How to run `codex` to start the assistant
     - What the assistant prompt looks like and how to type commands
     - Keep this section concise (10-15 lines) and friendly
   - If GENESIS.md indicates the user's primary tools are web/cloud-based (Google Docs, Figma, Notion, etc.) and their project involves no local coding, include a "What This Assistant Can and Cannot Do" note explaining:
@@ -178,16 +182,16 @@ Key requirements:
 - VERSION.md must include:
   - Environment version (1.0.0 -- this is the initial version of the generated environment, tracked by the user)
   - Date generated (YYYY-MM-DD)
-  - Harness Generator version used (1.1.0) -- this is the version of the Claude Harness Generator that produced this environment
+  - Harness Generator version used (1.1.0) -- this is the version of the Codex Harness Generator that produced this environment
   - Profile used (the starter profile name from GENESIS.md, or "Custom" if the deep interview path was used)
   - Changelog placeholder for the user to track their own modifications
-  - Claude Code compatibility note
+  - Codex compatibility note
   - A note that users can re-run `/validate-environment` to check for structural issues, broken references, or staleness in their environment
 - README.md: Brief project-level README if one does not already exist (do not overwrite existing).
 - Cross-reference verification: Read every generated file and verify:
-  - All file paths referenced in CLAUDE.md exist
+  - All file paths referenced in AGENTS.md exist
   - All agent names referenced in routing rules exist
-  - All skill names referenced in CLAUDE.md commands exist
+  - All skill names referenced in AGENTS.md commands exist
   - All memory paths referenced in rules exist
   - Fix any broken references by updating the referencing file
 
@@ -195,18 +199,18 @@ Key requirements:
 
 Triggered when the orchestrator invokes the generator with `pass_number: "shell"`.
 
-**Topic files to load**: 01-rules, 05-memory, 08-routing, 11-permissions, 13-opus-specifics, 16-hooks (same as Pass 1 but trimmed -- no hooks beyond PreCompact at the parent).
+**Topic files to load**: 01-rules, 05-memory, 08-routing, 11-permissions, 13-gpt-5-5-specifics, 16-hooks (same as Pass 1 but trimmed -- no hooks beyond PreCompact at the parent).
 
 Files generated at `<target>/`:
-- Parent CLAUDE.md (thin orchestrator, 80 lines max). Must include a "Work areas in this setup" section listing each area-slug and its one-line description from HUB_ARCHITECTURE.md. Do NOT list child file paths -- Claude Code discovers them by walking the tree.
-- Shared rules only: vocabulary, autonomy, cross-area routing. Under `<target>/.claude/rules/`.
-- Shared skills and agents (only those HUB_ARCHITECTURE.md's Shared Skills/Agents section lists). Under `<target>/.claude/skills/` and `<target>/.claude/agents/`.
-- Parent settings.json: shared permissions, shared MCP servers, PreCompact hook. Under `<target>/.claude/settings.json`.
-- Parent .claudeignore covering hub-wide patterns.
+- Parent AGENTS.md (thin orchestrator, 80 lines max). Must include a "Work areas in this setup" section listing each area-slug and its one-line description from HUB_ARCHITECTURE.md. Do NOT list child file paths -- Codex discovers them by walking the tree.
+- Shared rules only: vocabulary, autonomy, cross-area routing. Under `<target>/.codex/rules/`.
+- Shared skills and agents (only those HUB_ARCHITECTURE.md's Shared Skills/Agents section lists). Under `<target>/.agents/skills/` and `<target>/.codex/agents/`.
+- Parent .codex/config.toml: shared permissions, shared MCP servers, PreCompact hook. Under `<target>/.codex/config.toml`.
+- Parent VCS ignore rules covering hub-wide patterns.
 
 Key requirements:
-- Parent CLAUDE.md budget: 80 lines. This leaves ~170 for the longest per-area CLAUDE.md before the cumulative 250-line limit is reached.
-- Parent CLAUDE.md must NOT duplicate instructions that belong in per-area CLAUDE.md (area-specific routing, domain vocabulary, etc.).
+- Parent AGENTS.md budget: 80 lines. This leaves ~170 for the longest per-area AGENTS.md before the cumulative 250-line limit is reached.
+- Parent AGENTS.md must NOT duplicate instructions that belong in per-area AGENTS.md (area-specific routing, domain vocabulary, etc.).
 - Cross-area routing at the parent must only direct the user to switch focus to a different area -- it must not encode any area's internal file structure.
 
 Per-area passes (pass_number `<area-slug>:1` through `<area-slug>:5`) run the normal Pass 1-5 spec above, writing under `<target>/<area-slug>/` instead of `<target>/`. Any component declared in HUB_ARCHITECTURE.md's Shared Skills/Agents is skipped at the area level unless the area's manifest lists it as an override (frontmatter `overrides: <parent-component-name>`).
@@ -225,14 +229,14 @@ Read GENESIS.md to determine the user's technical level and domain vocabulary:
 When ARCHITECTURE.md includes Pattern E (File Processing Pipeline), apply these
 rules during the relevant passes:
 
-### Pass 1 (settings.json)
+### Pass 1 (.codex/config.toml)
 Include ONLY the tool permissions matching the architect's selection in ARCHITECTURE.md.
 Reference `Docs/Templates/References/tool-registry.md` for exact permission patterns
-and `Docs/Templates/Core/settings-json.md` for the File Processing Tool Configuration
+and `Docs/Templates/Core/codex-config-toml.md` for the File Processing Tool Configuration
 section. Do not merge permissions from tools the architect did not select.
 
 MCP vs CLI decision: prefer the MCP server approach for MarkItDown when the target
-environment's settings.json supports mcpServers. Fall back to CLI permissions if MCP
+environment's .codex/config.toml supports mcpServers. Fall back to CLI permissions if MCP
 is not suitable (e.g., user indicated uvx is unavailable).
 
 Anti-pattern: Do NOT include Pandoc permissions if the architect did not select Pandoc.
@@ -242,7 +246,7 @@ Do NOT include Python permissions for environments that don't use Python-based t
 If the Inbox/Outbox pattern is active in ARCHITECTURE.md, generate a `/process-inbox`
 skill that:
 - Scans Inbox/ for new files
-- Converts via MarkItDown (MCP tool or CLI, matching the settings.json approach)
+- Converts via MarkItDown (MCP tool or CLI, matching the .codex/config.toml approach)
 - Processes per user instructions
 - Outputs results to Outbox/
 
@@ -321,32 +325,30 @@ its brand knowledge automatically.
 - Do NOT hardcode specific brand rules -- the whole point is auto-extraction
   from user-provided assets
 
-## Opus 4.8 / 4.7 Prompt Engineering in Generated Content
+## GPT-5.5 Prompt Engineering in Generated Content
 
-Opus 4.8 (`claude-opus-4-8`, released 2026-05-28) is the current flagship and the default
-Claude Code model; 4.7 remains supported and these principles apply unchanged to both
-(and to 4.6).
-All generated files that contain instructions for Claude must follow these:
+GPT-5.5 (`gpt-5.5`, released 2026-05-28) is the current flagship and the default
+Codex model for generated environments.
+All generated files that contain instructions for Codex must follow these:
 
 - State purpose directly. No role-setting ("Act as...", "You are a senior...").
-- State each instruction once. Opus maintains consistency without repetition.
+- State each instruction once. GPT-5.5 maintains consistency without repetition.
 - Include intent behind constraints (WHY, not just WHAT).
 - Use few-shot examples over exhaustive rule lists where appropriate.
-- Write instructions LITERALLY. Opus 4.7 does not silently generalize -- be explicit about
-  scope ("for every file matching X", not "for similar files"). Re-baseline scaffolding
-  inherited from 4.6 prompts (e.g., "double-check before returning", "think carefully
-  first") -- often unnecessary on 4.7 and can degrade output.
-- Include anti-overengineering instructions for Opus agents. Opus 4.7 is less prone than
-  4.6 but occasional overbuilding still occurs on open-ended asks.
-- Dial back aggressive tool-triggering language. Opus does not need "ALWAYS use X tool" --
-  it follows instructions reliably with moderate emphasis. 4.7 defaults to fewer tool
-  calls; explicitly request delegation/parallelism when you want it.
+- Write instructions LITERALLY. GPT-5.5 does not silently generalize -- be explicit about
+  scope ("for every file matching X", not "for similar files").
+- Include anti-overengineering instructions for GPT-5.5 agents; open-ended asks can
+  still invite unnecessary files or abstractions.
+- Dial back aggressive tool-triggering language. GPT-5.5 does not need "ALWAYS use X tool" --
+  it follows instructions reliably with moderate emphasis. Explicitly request
+  delegation or parallelism when you want it.
 - Use XML tags for structured sections where they aid parsing.
-- Do NOT emit `temperature`, `top_p`, `top_k`, or `budget_tokens` for 4.7 projects (API
-  returns 400). Control behavior via `effort` (low/medium/high/xhigh/max) and adaptive
-  thinking (`thinking: {type: "adaptive"}`) only.
-- Recommend `effort: xhigh` as the starting point for Claude Code coding/agentic sessions
-  on 4.7 (this matches the Claude Code default on 4.7).
+- Do NOT emit `temperature`, `top_p`, `top_k`, or `budget_tokens` for GPT-5.5
+  Codex examples. Control depth with `model_reasoning_effort` in Codex config
+  and agent TOML, or with the Responses API reasoning controls in application
+  code.
+- Recommend `effort: xhigh` as the starting point for Codex coding/agentic sessions
+  only when the task is genuinely complex; otherwise prefer the project default.
 
 ## Anti-Overengineering
 

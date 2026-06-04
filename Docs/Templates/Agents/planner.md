@@ -1,42 +1,32 @@
 # Planner Agent (Template)
 
 <!-- ANNOTATION: The planner agent designs implementation strategies with
-     checkpoints. It uses opus because planning requires complex reasoning
+     checkpoints. It uses GPT-5.5 with high reasoning effort because planning requires complex reasoning
      about architecture, dependencies, and risk. The planner produces a
      task document that the implementer follows step by step. -->
 
-<!-- QUALITY: Must use opus model. Must produce checkpoint-based plans.
+<!-- QUALITY: Must use GPT-5.5 with high reasoning effort. Must produce checkpoint-based plans.
      Must include assumptions section for validator. Must be architecture-
      aware. Must include Write for task file creation. Agent body under
      80 lines. -->
 
-## Example: Planner Agent (`.claude/agents/planner.md`)
+## Example: Planner Agent (`.codex/agents/planner.toml`)
 
-````markdown
----
-name: planner
-description: >
-  Create implementation plans with checkpoints for features, refactors, or
-  bug fixes. Delegate to this agent when a task needs to be broken down
-  before implementation. Triggers: "plan this", "break this down", "how
-  should we implement", "create a plan for", "design the approach".
-  Do NOT delegate for quick fixes that need no planning.
-model: opus
-tools:
-  - Read
-  - Glob
-  - Grep
-  - Write
-maxTurns: 40
----
-
+````toml
+name = "planner"
+description = """
+Create implementation plans with checkpoints for features, refactors, or bug fixes. Delegate to this agent when a task needs to be broken down before implementation. Triggers: "plan this", "break this down", "how should we implement", "create a plan for", "design the approach". Do NOT delegate for quick fixes that need no planning.
+"""
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
+developer_instructions = """
 <!-- ANNOTATION: Key design decisions:
-     - model: opus (planning requires architectural reasoning)
-     - tools: Write included so the planner can create the task file
-     - disallowedTools: Edit not included (planner may update existing plans)
-     - maxTurns: 40 (planning requires reading many files to understand context)
-     VARIATION: For simpler projects, sonnet may suffice for planning.
-     Use opus when the codebase is large or architecturally complex. -->
+     - model: gpt-5.5 (planning requires architectural reasoning)
+     - sandbox_mode: workspace-write so the planner can create or update task files
+     - model_reasoning_effort: high (planning requires reading many files to understand context)
+     VARIATION: For simpler projects, GPT-5.5 may suffice for planning.
+     Use GPT-5.5 when the codebase is large or architecturally complex. -->
 
 ## Objective
 
@@ -123,11 +113,12 @@ Out of scope:
 - Implementing the plan (that is the implementer's job)
 - Reviewing existing code (that is the reviewer's job)
 - Researching external documentation (that is the researcher's job)
+"""
 ````
 
 <!-- QUALITY: Validation checklist for the generator:
-     - [ ] Frontmatter includes: name, description, model, tools, maxTurns
-     - [ ] Model is opus (planning requires complex reasoning)
+     - [ ] TOML includes: name, description, model, model_reasoning_effort, sandbox_mode, developer_instructions
+     - [ ] model_reasoning_effort is high for planning complexity
      - [ ] Description includes 3+ trigger phrases and negative trigger
      - [ ] Checkpoint-based plan structure defined
      - [ ] Assumptions section required (for validator to check)

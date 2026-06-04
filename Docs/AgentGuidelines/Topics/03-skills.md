@@ -3,12 +3,12 @@
 ### 3.1 Five Canonical Patterns
 
 - **Established**: Baseline
-- **Source**: agent-skills-best-practices.md, platform-agent-patterns.md | Tier 1
+- **Source**: https://developers.openai.com/codex/concepts/customization, https://developers.openai.com/codex/subagents | Tier 1
 - **Recommendation**: Choose the pattern matching your skill's use case:
   1. **High-level guide with references**: SKILL.md contains quick start + links to detailed
-     files. Claude loads referenced files only when needed.
+     files. Codex loads referenced files only when needed.
   2. **Domain-specific organization**: Separate reference files by domain (finance.md,
-     sales.md). Claude loads only the relevant domain file.
+     sales.md). Codex loads only the relevant domain file.
   3. **Conditional details**: Basic content in SKILL.md, linked advanced content for edge
      cases.
   4. **Workflow + feedback loop**: Checklist with validation steps. Agent tracks progress,
@@ -21,9 +21,9 @@
 ### 3.2 Progressive Disclosure
 
 - **Established**: Baseline
-- **Source**: agent-skills-best-practices.md, context-engineering.md | Tier 1
+- **Source**: https://developers.openai.com/codex/concepts/customization, context-engineering.md | Tier 1
 - **Recommendation**: Skills use 3-level progressive disclosure:
-  - Level 1 (always loaded, ~100 tokens): Metadata -- name + description from YAML frontmatter
+  - Level 1 (always loaded, ~100 tokens): Metadata -- name + description from Codex TOML
   - Level 2 (loaded when triggered, target <500 lines): SKILL.md body
   - Level 3+ (loaded as needed, unlimited): Referenced files, scripts, examples
 
@@ -37,14 +37,14 @@
   Keep references ONE level deep from SKILL.md. Bad: SKILL.md -> advanced.md -> details.md.
   Good: SKILL.md -> advanced.md, SKILL.md -> reference.md (all direct).
   For reference files >100 lines, include a table of contents at the top.
-- **Anti-pattern**: Deeply nested file references. Claude partially reads files referenced
+- **Anti-pattern**: Deeply nested file references. Codex partially reads files referenced
   from other referenced files. Keep the reference graph flat and one level deep.
 
 ### 3.3 Description Triggers
 
 - **Established**: Baseline
-- **Source**: agent-skills-best-practices.md, platform-agent-patterns.md | Tier 1
-- **Recommendation**: The description field is the critical discovery mechanism. Claude uses
+- **Source**: https://developers.openai.com/codex/concepts/customization, https://developers.openai.com/codex/subagents | Tier 1
+- **Recommendation**: The description field is the critical discovery mechanism. Codex uses
   it to choose from 100+ available skills. Format:
   ```
   [What it does]. [When to use it with 3+ trigger phrases]. [Negative triggers if ambiguity risk].
@@ -61,12 +61,12 @@
   - Include negative triggers when ambiguity risk exists (e.g., "save" could mean save state
     or save file)
 - **Anti-pattern**: Vague descriptions like "Helps with documents" or "Processes data."
-  These fail at discovery when Claude must choose among many skills.
+  These fail at discovery when Codex must choose among many skills.
 
 ### 3.4 Degrees of Freedom Matching
 
 - **Established**: Baseline
-- **Source**: agent-skills-best-practices.md, guardrails.md | Tier 1
+- **Source**: https://developers.openai.com/codex/concepts/customization, guardrails.md | Tier 1
 - **Recommendation**: Match instruction specificity to task fragility:
   - **High freedom** (text instructions): Creative tasks, multiple valid approaches, decisions
     depend on context. Example: code review guidelines.
@@ -85,7 +85,7 @@
 ### 3.5 Script Bundling
 
 - **Established**: Baseline
-- **Source**: agent-skills-best-practices.md | Tier 1
+- **Source**: https://developers.openai.com/codex/concepts/customization | Tier 1
 - **Recommendation**: Bundle deterministic scripts in the `scripts/` directory within skill
   folders. Benefits:
   - More reliable than generated code
@@ -99,19 +99,19 @@
 
   Error handling in scripts: handle errors explicitly, provide fallback behavior, document
   all configuration constants (no "voodoo constants" -- magic numbers without explanation).
-- **Anti-pattern**: Having Claude generate code each invocation for tasks that could be
+- **Anti-pattern**: Having Codex generate code each invocation for tasks that could be
   deterministic scripts. This wastes tokens and introduces non-determinism.
 
 ### 3.6 Composability
 
 - **Established**: Baseline
-- **Source**: agent-skills-best-practices.md | Tier 1
+- **Source**: https://developers.openai.com/codex/concepts/customization | Tier 1
 - **Recommendation**: Each skill should check state independently and not assume prior skill
   execution. Skills must be usable in any order. State-save should not assume state-load ran
   first. Health-check should not assume update ran recently.
 
   For skills with side effects, use `disable-model-invocation: true` so only explicit user
-  invocation triggers them. This prevents Claude from autonomously running potentially
+  invocation triggers them. This prevents Codex from autonomously running potentially
   destructive workflows.
 - **Anti-pattern**: Building skill chains where skill B assumes skill A has already run.
   Users invoke skills in unexpected orders, and crashed sessions lose intermediate state.
@@ -119,34 +119,34 @@
 ### 3.7 Portability and Naming
 
 - **Established**: Baseline
-- **Source**: agent-skills-best-practices.md, claude-code-docs.md | Tier 1
+- **Source**: https://developers.openai.com/codex/concepts/customization, https://developers.openai.com/codex | Tier 1
 - **Recommendation**: Skill names: max 64 chars, lowercase letters/numbers/hyphens only.
-  No XML tags, no reserved words ("anthropic", "claude"). Prefer gerund form
+  No XML tags, no reserved words ("openai", "codex"). Prefer gerund form
   (processing-pdfs, analyzing-data). Use forward slashes in all paths, even on Windows.
 
   No README.md inside skill folders. The SKILL.md body serves as documentation.
 
   Critical instructions go at TOP of SKILL.md with `## Critical` or `## Important` headers.
-  Claude reads from top down; late-appearing critical instructions may be missed.
+  Codex reads from top down; late-appearing critical instructions may be missed.
 - **Anti-pattern**: Vague names (helper, utils, tools). Windows-style paths (backslash).
   README.md alongside SKILL.md (creates confusion about which file is primary).
 
 ### 3.8 Agent Skills Open Specification
 
 - **Established**: 2026-03
-- **Source**: agentskills.io/specification, github.com/anthropics/skills | Tier 1
-- **Recommendation**: Claude Code skills follow the Agent Skills open specification
+- **Source**: agentskills.io/specification, developers.openai.com/codex/concepts/customization | Tier 1
+- **Recommendation**: Codex skills follow the Agent Skills open specification
   (agentskills.io), which works across multiple AI tools. Generated skills should
   conform to the spec for maximum portability:
 
   Required frontmatter: `name` (max 64 chars, lowercase+hyphens, must match directory
   name) and `description` (max 1024 chars). Optional: `license`, `compatibility`
   (max 500 chars, environment requirements), `metadata` (key-value pairs),
-  `allowed-tools` (space-delimited pre-approved tools).
+  `tool access policy` (space-delimited pre-approved tools).
 
-  Claude Code extends the spec with additional frontmatter:
+  Codex extends the spec with additional frontmatter:
   - `disable-model-invocation: true`: Only user can invoke (use for side-effect skills)
-  - `user-invocable: false`: Only Claude can invoke (background knowledge)
+  - `user-invocable: false`: Only Codex can invoke (background knowledge)
   - `context: fork`: Run in isolated subagent context (honored as of v2.1.101)
   - `context: agent`: Run in a long-lived agent context (honored as of v2.1.101)
   - `agent`: Which subagent type for forked context (Explore, Plan, general-purpose, or custom)
@@ -156,10 +156,10 @@
   - `argument-hint`: Autocomplete hint (e.g., `[issue-number]`)
   - `hooks`: Skill-scoped lifecycle hooks
   - `paths:`: YAML list of globs (v2.1.84+)
-  - `disallowed-tools:`: Remove specific tools from the model WHILE the skill is active
-    (v2.1.152). Complements `allowed-tools` (which pre-approves) -- use this to narrow the
-    model's surface during a focused skill (e.g., a read-only analysis skill that disallows
-    Write/Edit).
+  - `distool access policy:`: Remove specific tools from the model WHILE the skill is active
+    (v2.1.152). Complements `tool access policy` (which pre-approves) -- use this to narrow the
+    model's surface during a focused skill (e.g., a read-only analysis skill that blocks
+    workspace writes).
 
   Skill reload: `/reload-skills` re-scans skill directories without restarting the session
   (v2.1.152); a SessionStart hook can trigger the same via `reloadSkills: true`. The
@@ -168,38 +168,38 @@
   the description to save context).
 
   String substitutions: `$ARGUMENTS` (all args), `$ARGUMENTS[N]` or `$N` (positional),
-  `${CLAUDE_SESSION_ID}`, `${CLAUDE_SKILL_DIR}`.
+  `${CODEX_SESSION_ID}`, `${CODEX_SKILL_DIR}`.
 
   Dynamic context injection: `!`command`` syntax runs shell commands before skill content
-  is sent to Claude, replacing the placeholder with command output. Useful for injecting
+  is sent to Codex, replacing the placeholder with command output. Useful for injecting
   live data (git status, PR info, API responses) into skill prompts.
 
   Validate skills with: `skills-ref validate ./my-skill` (from agentskills/agentskills).
 
-- **Anti-pattern**: Using non-spec frontmatter fields that only work in Claude Code when
+- **Anti-pattern**: Using non-spec frontmatter fields that only work in Codex when
   the skill is intended for cross-platform use. If portability matters, stick to the base
-  spec fields and note Claude Code extensions separately.
+  spec fields and note Codex extensions separately.
 
 ### 3.9 Bundled Skills and Official Skill Ecosystem
 
 - **Established**: 2026-03; updated 2026-05-31
-- **Source**: code.claude.com/docs/en/skills, github.com/anthropics/skills | Tier 1
-- **Recommendation**: Claude Code ships bundled skills that are always available:
+- **Source**: developers.openai.com/codex/concepts/customization, developers.openai.com/codex/concepts/customization | Tier 1
+- **Recommendation**: Codex ships bundled skills that are always available:
   - `/code-review`: Reports correctness bugs in recently changed files at the chosen
     effort level. `--fix` applies findings; `--comment` posts them as inline PR comments.
     Renamed from `/simplify` (v2.1.147); the old cleanup-only behavior was removed and the
     old `/simplify` invocation no longer works.
   - `/batch <instruction>`: Orchestrates large-scale parallel changes across a codebase.
     Decomposes work into 5-30 units, each in an isolated git worktree with its own PR.
-  - `/debug [description]`: Troubleshoots the current Claude Code session via debug log.
-  - `/claude-api`: Loads Claude API/SDK reference. Auto-activates on Anthropic SDK imports.
+  - `/debug [description]`: Troubleshoots the current Codex session via debug log.
+  - `/openai-api`: Loads OpenAI API/SDK reference. Auto-activates on OpenAI SDK imports.
 
   For generated environments: document relevant bundled skills in GETTING_STARTED.md.
   These do not need to be installed or configured. The `/batch` skill is particularly
   valuable for large codebase migrations and refactors -- mention it in environments
   for projects with 50k+ lines of code.
 
-  Anthropic also maintains an official skills repository (github.com/anthropics/skills)
+  OpenAI also maintains an official skills repository (developers.openai.com/codex/concepts/customization)
   with installable skill collections. See section 20.3 for the full catalog and 20.4
   for the matching rules used during environment generation.
 
@@ -214,8 +214,8 @@
 ### 3.10 Skill Validation with Eval Framework
 
 - **Established**: 2026-03
-- **Source**: github.com/anthropics/skills/tree/main/skills/skill-creator,
-  tessl.io/blog/anthropic-brings-evals-to-skill-creator, hboon.com | Tier 1 + Tier 2
+- **Source**: developers.openai.com/codex/concepts/customization/tree/main/skills/skill-creator,
+  developers.openai.com/codex/concepts/customization, hboon.com | Tier 1 + Tier 2
 - **Recommendation**: The skill-creator plugin provides four modes (Create, Eval,
   Improve, Benchmark) backed by four sub-agents (Executor, Grader, Comparator,
   Analyzer). The eval framework generates synthetic test prompts with assertion
@@ -247,7 +247,7 @@
 
   Include skill-creator install command in GETTING_STARTED.md for generated
   environments when the user is intermediate+ and the environment includes 3+
-  custom skills: `claude install-plugin anthropic/example-skills`
+  custom skills: `codex skill install example-skills`
 
 - **Anti-pattern**: Generating skills without any validation that they actually
   improve model behavior. Structural checks (frontmatter, line count, triggers)
@@ -318,11 +318,11 @@
      pandoc", "I use jq to process JSON")
   2. **Determine the I/O contract**: What goes in (query, file, URL)? What comes
      out (structured data, file, text)?
-  3. **Generate the skill**: SKILL.md with steps that invoke the CLI tool via Bash,
+  3. **Generate the skill**: SKILL.md with steps that invoke the CLI tool via shell commands,
      parse the output, and present it in a structured format
   4. **Include install verification**: Step 1 of the skill checks if the tool is
      installed (`which <tool>` or equivalent), offers install instructions if not
-  5. **Add to settings.json**: `Bash(<tool> *)` permission for the generated skill
+  5. **Document command policy**: list safe commands in AGENTS.md/GETTING_STARTED.md and keep destructive commands behind explicit approval
 
   **When the architect detects an unknown CLI tool in GENESIS.md** (not in the
   tool registry): Generate a lightweight wrapper skill rather than just documenting

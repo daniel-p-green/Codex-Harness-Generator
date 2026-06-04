@@ -9,7 +9,7 @@
      Must define diff-based review process. Must include self-review
      guidance. Under 120 lines. -->
 
-## Example: Review Workflow Rule (`.claude/rules/review-workflow.md`)
+## Example: Review Workflow Rule (`.codex/rules/review-workflow.md`)
 
 ```markdown
 # Review workflow
@@ -89,7 +89,7 @@ When asked to review changes:
 ## Self-review before submit
 
 <!-- ANNOTATION: Self-review catches obvious issues before involving
-     another person or agent. This is especially valuable when Claude
+     another person or agent. This is especially valuable when Codex
      is both the implementer and the reviewer (different agent instances). -->
 
 Before declaring implementation complete:

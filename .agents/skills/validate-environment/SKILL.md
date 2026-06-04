@@ -1,11 +1,6 @@
 ---
 name: validate-environment
-description: Validates an existing Claude Code environment against structural correctness and quality standards (file references resolve, frontmatter is valid, size limits hold, routing is complete, hub registry matches disk). Use when user says "validate environment", "check my environment", "is my setup correct", "validate my config", "audit my environment", "run the validator", or "/validate-environment". Do NOT use for creating new environments or for best-practice upgrade recommendations (use /upgrade-environment for the latter).
-context: fork
-allowed-tools: [Read, Glob, Grep, Write]
-metadata:
-  author: Claude Harness Generator
-  version: 1.0.0
+description: Validates an existing Codex environment against structural correctness and quality standards (file references resolve, frontmatter is valid, size limits hold, routing is complete, hub registry matches disk). Use when user says "validate environment", "check my environment", "is my setup correct", "validate my config", "audit my environment", "run the validator", or "/validate-environment". Do NOT use for creating new environments or for best-practice upgrade recommendations (use /upgrade-environment for the latter).
 ---
 
 ## Critical
@@ -25,14 +20,14 @@ This skill validates an EXISTING environment. It is read-only with respect to th
 
 ### Step 1: Get the environment path
 
-Ask the user for the path to the environment to validate. If the current directory contains a `.claude/` directory or `CLAUDE.md`, offer to validate it.
+Ask the user for the path to the environment to validate. If the current directory contains a `.codex/` directory or `AGENTS.md`, offer to validate it.
 
 Verify the path exists and contains at least one of:
-- `.claude/` directory
-- `CLAUDE.md` file
-- `Docs/Environment/HUB_GENESIS.md` (hub case -- directory itself may not have `.claude/`)
+- `.codex/` directory
+- `AGENTS.md` file
+- `Docs/Environment/HUB_GENESIS.md` (hub case -- directory itself may not have `.codex/`)
 
-If none is found, report "No Claude Code environment found at this path" and stop.
+If none is found, report "No Codex environment found at this path" and stop.
 
 ### Step 2: Detect shape
 
@@ -40,7 +35,7 @@ Check for `<target>/Docs/Environment/HUB_GENESIS.md`.
 - If present: shape is HUB. Read HUB_GENESIS.md and HUB_ARCHITECTURE.md (if it exists) plus every per-area GENESIS.md and ARCHITECTURE.md listed in the work-area registry.
 - If absent: shape is SINGLE. Read `<target>/Docs/Environment/GENESIS.md` and `ARCHITECTURE.md` if they exist.
 
-Also detect HUB_LIKE_UNDECLARED: sibling environments (each a full `.claude/` + `CLAUDE.md`) under the target without a parent HUB_GENESIS.md. Report this in the output so the user can consider declaring a hub via `/upgrade-environment`.
+Also detect HUB_LIKE_UNDECLARED: sibling environments (each a full `.codex/` + `AGENTS.md`) under the target without a parent HUB_GENESIS.md. Report this in the output so the user can consider declaring a hub via `/upgrade-environment`.
 
 ### Step 3: Load the current validation checklist
 

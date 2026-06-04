@@ -2,7 +2,7 @@
 
 <!-- TEMPLATE ANNOTATION
   This template defines how the generated environment manages context window
-  pressure. Context exhaustion is the #1 operational constraint for Claude Code.
+  pressure. Context exhaustion is the #1 operational constraint for Codex.
   This rule provides multi-signal tracking, proactive summarization, and
   auto-save triggers to prevent context-related failures.
 
@@ -18,7 +18,7 @@
   WHY THIS EXISTS:
   The context window holds the entire conversation: every message, file read,
   command output. A single debugging session can consume tens of thousands of
-  tokens. Without proactive management, Claude hits the wall mid-task and loses
+  tokens. Without proactive management, Codex hits the wall mid-task and loses
   critical context during auto-compaction.
 -->
 
@@ -30,7 +30,7 @@
 # Context management
 
 <!-- CORE PRINCIPLE
-  WHY: This framing helps Claude understand context as a finite resource
+  WHY: This framing helps Codex understand context as a finite resource
   that requires active management, not something that just happens.
 -->
 Context is a finite resource. Monitor it actively and save state before it runs out.
@@ -87,7 +87,7 @@ Do not stop the current task early. Complete the current atomic unit of work
 ## Compaction preservation hints
 
 <!-- COMPACTION HINTS
-  WHY: When auto-compaction triggers at ~95% capacity, Claude summarizes the
+  WHY: When auto-compaction triggers at ~95% capacity, Codex summarizes the
   conversation. Without hints, critical domain-specific context may be lost.
   These hints tell the compaction process what to preserve.
 -->
@@ -194,7 +194,7 @@ Do not stop tasks early to avoid compaction. Instead:
   This is a safety net for progress not yet written to disk.
 -->
 A PreCompact hook automatically saves session state before auto-compaction.
-This is configured in settings.json (not in this rule file). The hook
+This is configured in .codex/config.toml (not in this rule file). The hook
 appends current activity and modified files to SESSION_CONTEXT.md.
 
 If the hook is not configured, manually save state when context pressure

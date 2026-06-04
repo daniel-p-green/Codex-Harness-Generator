@@ -22,7 +22,7 @@ anything reaches a customer.
 
 - **Target audience**: CS leads, support-ops managers, customer-experience teams
   standing up or improving a support knowledge base
-- **Primary tools**: Markdown deliverables; WebSearch/WebFetch (grounding against
+- **Primary tools**: Markdown deliverables; web search/browser retrieval (grounding against
   the user's published policy/help pages); MarkItDown (inbound docs), Pandoc
   (outbound .docx/.pdf) when formatted handoffs are needed
 - **Complexity**: Standard | **Memory tier**: Standard | **Action default**:
@@ -35,11 +35,11 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| faq-builder | sonnet | Build categorized FAQs; map customer search language; 80/20 coverage; ground every factual answer in a user-supplied source, bracket unknowns [VERIFY] | drafter.md |
-| response-specialist | sonnet | Write scenario scripts, tone-and-manner guide, channel + emotional-response protocols; insert identity-verification + safety-critical routing where required | drafter.md |
-| escalation-manager | opus | Design L1-L4 tiers, routing/trigger matrix, SLAs, crisis + breach protocols, authority matrix -- monetary/SLA values as [PROPOSED -- requires owner approval] | custom (policy design; closest planner.md) |
-| cs-analyst | opus | Define CSAT/NPS/CES/FCR/AHT metrics, VOC framework, reporting/dashboard design; benchmark numbers as [PROPOSED] | analyst.md |
-| cs-reviewer | opus | Cross-validate FAQ <-> manual <-> escalation <-> analytics; audit grounding, [PROPOSED] markers, identity-verification gates, safety-critical routing; customer-journey simulation (read-only) | reviewer.md |
+| faq-builder | medium-effort | Build categorized FAQs; map customer search language; 80/20 coverage; ground every factual answer in a user-supplied source, bracket unknowns [VERIFY] | drafter.md |
+| response-specialist | medium-effort | Write scenario scripts, tone-and-manner guide, channel + emotional-response protocols; insert identity-verification + safety-critical routing where required | drafter.md |
+| escalation-manager | high-effort | Design L1-L4 tiers, routing/trigger matrix, SLAs, crisis + breach protocols, authority matrix -- monetary/SLA values as [PROPOSED -- requires owner approval] | custom (policy design; closest planner.md) |
+| cs-analyst | high-effort | Define CSAT/NPS/CES/FCR/AHT metrics, VOC framework, reporting/dashboard design; benchmark numbers as [PROPOSED] | analyst.md |
+| cs-reviewer | high-effort | Cross-validate FAQ <-> manual <-> escalation <-> analytics; audit grounding, [PROPOSED] markers, identity-verification gates, safety-critical routing; customer-journey simulation (read-only) | reviewer.md |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy (conservative), context-management, self-learning, error-handling,
@@ -100,13 +100,13 @@ Base + Universal Deny -- see `Docs/Templates/References/ecosystem-permissions.md
 This is a document workflow with **no language ecosystem and no VCS**: deny the
 programming tool families (`pip`, `npm`, `node`, `python`, `go`, `cargo`) as the
 Knowledge Work profile does, and allow only safe text utilities (`wc`, `sort`,
-`diff`, `date`, `ls`, `find`, `head`, `tail`). Allow `Write/Edit` to `Docs/**`
-and an `Outbox/**` deliverable folder. **Keep `WebSearch` + `WebFetch(*)` (in
+`diff`, `date`, `ls`, `find`, `head`, `tail`). Allow `scoped writes` to `Docs/**`
+and an `Outbox/**` deliverable folder. **Keep web search and browser/web retrieval (in
 Base) enabled** -- they are the grounding mechanism for verifying a customer-facing
 fact against the user's published policy/ToS/help pages; without them every fact
-is an unsourced assertion. Add `Bash(pandoc *)` only if Pandoc is installed;
+is an unsourced assertion. Document `pandoc` only if Pandoc is installed;
 prefer the MarkItDown MCP server over enabling Python for inbound conversion.
-Generate `settings.local.json` for machine-specific tool paths.
+Generate `local config profile` for machine-specific tool paths.
 
 ## Safeguards (grounding, commitments, safety, sensitive data)
 
@@ -221,8 +221,8 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
   facts, sources, and review findings before compaction; EXCLUDE customer PII
   (opaque ticket/customer-ID only). See `Docs/Templates/Optional/hooks-template.md`.
 - **PreToolUse PII-content gate** (domain-unique, optional, advisory-by-default):
-  on `Write/Edit` to `Docs/**` and `Outbox/**`, scan content against
-  `.claude/hooks/pii-patterns.conf` (email, phone, card_number, SSN/national ID,
+  on `scoped writes` to `Docs/**` and `Outbox/**`, scan content against
+  `.codex/hooks/pii-patterns.conf` (email, phone, card_number, SSN/national ID,
   postal address). Warns when a real-looking PII string lands in a deliverable.
   Upgrade to deterministic (block, not warn) for environments that handle real
   customer data -- see Customization. Template in `hooks-template.md`.
@@ -231,13 +231,13 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 
 ## Cost / Model Notes
 
-Opus for the reasoning/judgment roles -- escalation-manager (policy design),
+GPT-5.5 for the reasoning/judgment roles -- escalation-manager (policy design),
 cs-analyst (metric reasoning), cs-reviewer (cross-validation + safeguard audit).
-Sonnet for the established-pattern drafting roles -- faq-builder,
-response-specialist. Defaults: balanced (Opus on reasoning, Sonnet on drafting;
-compaction 95%; CLAUDE.md ~200 lines). Cost-conscious override: all-Sonnet except
-cs-reviewer on Opus (it owns the safeguard audit, so do not downgrade it),
-compaction 85%, CLAUDE.md ~150, brief `/cost` + RTK mention in GETTING_STARTED.
+medium-effort GPT-5.5 for the established-pattern drafting roles -- faq-builder,
+response-specialist. Defaults: balanced (high-effort GPT-5.5 on reasoning, medium-effort GPT-5.5 on drafting;
+compaction 95%; AGENTS.md ~200 lines). Cost-conscious override: all medium-effort GPT-5.5 except
+cs-reviewer on GPT-5.5 (it owns the safeguard audit, so do not downgrade it),
+compaction 85%, AGENTS.md ~150, brief `/cost` + RTK mention in GETTING_STARTED.
 CS sessions are document-length, so subagent fan-out (full-system build) is the
 main cost driver (~4x vs direct); a full package touches all five agents once.
 

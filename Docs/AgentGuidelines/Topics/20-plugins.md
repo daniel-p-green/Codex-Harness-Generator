@@ -3,14 +3,14 @@
 ## 20.1 Plugin Architecture
 
 - **Established**: 2026-03
-- **Source**: claude.com/blog/claude-code-plugins, code.claude.com/docs/en/plugins | Tier 1
+- **Source**: developers.openai.com/codex/concepts/customization, developers.openai.com/codex/config-reference | Tier 1
 - **Recommendation**: Plugins are lightweight packages bundling slash commands, subagents,
   MCP servers, and hooks into a single installable unit. Install via `/plugin` command.
 
   Plugin directory structure:
   ```
   my-plugin/
-  +-- .claude-plugin/
+  +-- .codex-plugin/
   |   +-- plugin.json       # manifest (name, description, version, author)
   +-- skills/
   |   +-- my-skill/
@@ -19,7 +19,7 @@
   +-- hooks/                # optional hook definitions
   ```
 
-  Plugin marketplaces: git/GitHub repos with `.claude-plugin/marketplace.json`.
+  Plugin marketplaces: git/GitHub repos with `.codex-plugin/marketplace.json`.
   Add via `/plugin marketplace add user-or-org/repo-name`.
 
   For generated environments: recommend relevant community plugins in GETTING_STARTED.md
@@ -28,12 +28,12 @@
 
   Test during development: `--plugin-dir` flag loads plugins without installation.
 - **Anti-pattern**: Building complex custom skills when a well-maintained plugin already
-  exists. Check the official Anthropic plugin marketplace first.
+  exists. Check the official OpenAI plugin marketplace first.
 
 ## 20.2 Plugin Considerations for Environment Generation
 
 - **Established**: 2026-03
-- **Source**: code.claude.com/docs/en/plugins | Tier 1
+- **Source**: developers.openai.com/codex/concepts/customization | Tier 1
 - **Recommendation**: When generating environments, consider whether functionality would be
   better delivered as a plugin (shareable, toggleable) or as project-local skills/agents
   (tightly coupled to project). Rules of thumb:
@@ -44,23 +44,23 @@
   - Enterprise: Use `strictKnownMarketplaces` to restrict plugin sources to approved repos
   - Skill folder name becomes the command name, prefixed with the plugin namespace
 - **Anti-pattern**: Distributing project-specific configuration as a plugin. Plugins should
-  be project-agnostic; project-specific rules belong in `.claude/rules/` and project skills.
+  be project-agnostic; project-specific rules belong in `.codex/rules/` and project skills.
 
-## 20.3 Anthropic Official Skills Repository
+## 20.3 OpenAI Official Skills Repository
 
 - **Established**: 2026-03
-- **Source**: github.com/anthropics/skills, agentskills.io/specification | Tier 1
-- **Recommendation**: Anthropic maintains an official skills repository at
-  `github.com/anthropics/skills` containing production-quality skills organized into three
+- **Source**: developers.openai.com/codex/concepts/customization, agentskills.io/specification | Tier 1
+- **Recommendation**: OpenAI maintains an official skills repository at
+  `developers.openai.com/codex/concepts/customization` containing production-quality skills organized into three
   plugin collections installable via the marketplace system:
 
-  **Document skills** (`document-skills@anthropic-agent-skills`):
+  **Document skills** (`document-skills`):
   - `xlsx`: Excel spreadsheet creation and manipulation
   - `docx`: Word document generation and editing
   - `pptx`: PowerPoint presentation creation
   - `pdf`: PDF extraction, form filling, and merging
 
-  **Example skills** (`example-skills@anthropic-agent-skills`):
+  **Example skills** (`example-skills`):
   - `skill-creator`: Meta-skill for creating, testing, benchmarking, and optimizing skills.
     Includes eval framework with grader/analyzer/comparator agents, test case management,
     variance analysis, and description optimization for triggering accuracy.
@@ -77,12 +77,12 @@
   - `slack-gif-creator`: Slack-compatible GIF creation.
   - `theme-factory`: Theme and design system generation.
 
-  **Claude API skill** (`claude-api@anthropic-agent-skills`):
-  - `claude-api`: SDK reference for Python, TypeScript, Java, Go, Ruby, C#, PHP, cURL.
-    Also a bundled skill that auto-activates on Anthropic SDK imports.
+  **OpenAI API skill** (`openai-api`):
+  - `openai-api`: SDK reference for Python, TypeScript, Java, Go, Ruby, C#, PHP, cURL.
+    Also a bundled skill that auto-activates on OpenAI SDK imports.
 
-  Installation: `claude /plugin marketplace add anthropics/skills` then
-  `claude /plugin install <collection>@anthropic-agent-skills`.
+  Installation: `codex skill install` then
+  `codex skill install <skill>`.
 
   These skills follow the Agent Skills open specification (agentskills.io). Key spec
   constraints: name max 64 chars (lowercase, hyphens), description max 1024 chars,
@@ -99,39 +99,39 @@
 ## 20.4 Plugin Recommendations During Environment Generation
 
 - **Established**: 2026-03
-- **Source**: github.com/anthropics/skills, code.claude.com/docs/en/skills | Tier 1
+- **Source**: developers.openai.com/codex/concepts/customization, developers.openai.com/codex/concepts/customization | Tier 1
 - **Recommendation**: During environment generation, match intake answers to available
   official plugins and recommend installation in GETTING_STARTED.md. Matching rules:
 
   | Intake Signal | Recommended Plugin | Install Command |
   |---|---|---|
-  | Works with spreadsheets/CSV/Excel | document-skills | `/plugin install document-skills@anthropic-agent-skills` |
-  | Produces Word documents | document-skills | `/plugin install document-skills@anthropic-agent-skills` |
-  | Creates presentations | document-skills | `/plugin install document-skills@anthropic-agent-skills` |
-  | Works with PDFs | document-skills | `/plugin install document-skills@anthropic-agent-skills` |
-  | Frontend/web development | example-skills (frontend-design, web-artifacts-builder) | `/plugin install example-skills@anthropic-agent-skills` |
-  | Web application testing | example-skills (webapp-testing) | `/plugin install example-skills@anthropic-agent-skills` |
-  | Building MCP servers | example-skills (mcp-builder) | `/plugin install example-skills@anthropic-agent-skills` |
-  | Brand/design guidelines | example-skills (brand-guidelines, theme-factory) | `/plugin install example-skills@anthropic-agent-skills` |
-  | Internal communications | example-skills (internal-comms) | `/plugin install example-skills@anthropic-agent-skills` |
-  | Building with Claude API/SDK | claude-api | `/plugin install claude-api@anthropic-agent-skills` |
-  | Wants to create custom skills | example-skills (skill-creator) | `/plugin install example-skills@anthropic-agent-skills` |
+  | Works with spreadsheets/CSV/Excel | document-skills | `codex skill install document-skills` |
+  | Produces Word documents | document-skills | `codex skill install document-skills` |
+  | Creates presentations | document-skills | `codex skill install document-skills` |
+  | Works with PDFs | document-skills | `codex skill install document-skills` |
+  | Frontend/web development | example-skills (frontend-design, web-artifacts-builder) | `codex skill install example-skills` |
+  | Web application testing | example-skills (webapp-testing) | `codex skill install example-skills` |
+  | Building MCP servers | example-skills (mcp-builder) | `codex skill install example-skills` |
+  | Brand/design guidelines | example-skills (brand-guidelines, theme-factory) | `codex skill install example-skills` |
+  | Internal communications | example-skills (internal-comms) | `codex skill install example-skills` |
+  | Building with OpenAI API/SDK | openai-api | `codex skill install openai-api` |
+  | Wants to create custom skills | example-skills (skill-creator) | `codex skill install example-skills` |
 
   Format in GETTING_STARTED.md as an "Optional Plugins" section:
   ```
   ## Optional Plugins
 
-  These official Anthropic plugins add capabilities to your environment. Install
+  These official OpenAI plugins add capabilities to your environment. Install
   the marketplace first, then install the plugins you need:
 
-  claude /plugin marketplace add anthropics/skills
-  claude /plugin install <collection>@anthropic-agent-skills
+  codex skill install
+  codex skill install <skill>
 
   | Plugin | What It Adds | Install When |
   |--------|-------------|--------------|
   | document-skills | Excel, Word, PowerPoint, PDF tools | You work with office documents |
   | example-skills | Web testing, frontend design, MCP builder, skill creator | You build web apps or want to create custom skills |
-  | claude-api | Claude SDK reference for all languages | You build applications using the Claude API |
+  | openai-api | Codex SDK reference for all languages | You build applications using the OpenAI API |
   ```
 
   Do NOT auto-install plugins during generation. Document the commands and let the user
@@ -147,7 +147,7 @@
 ## 20.5 Plugin Enhancements (April 2026)
 
 - **Established**: 2026-04-20
-- **Source**: code.claude.com/docs/en/changelog v2.1.80-v2.1.105 | Tier 1
+- **Source**: developers.openai.com/codex v2.1.80-v2.1.105 | Tier 1
 - **Recommendation**: Several plugin capabilities expanded in April 2026:
 
   **Plugin monitors (v2.1.105)**: Plugins can declare a `monitors` key in manifest that
@@ -162,7 +162,7 @@
   as bare commands from Bash. Useful for Pipeline pattern skills that wrap CLIs.
 
   **Inline plugin declarations (v2.1.80)**: `source: 'settings'` lets you declare plugin
-  entries directly in settings.json without a separate manifest. Useful for
+  entries directly in .codex/config.toml without a separate manifest. Useful for
   environment-local custom plugins.
 
   **Skill name stability (v2.1.94)**: Plugin skills with `"skills": ["./"]` use
@@ -172,24 +172,24 @@
 ## 20.6 Plugin Enhancements (May 2026)
 
 - **Established**: 2026-05-31
-- **Source**: code.claude.com/docs/en/changelog v2.1.118-v2.1.157 | Tier 1
+- **Source**: developers.openai.com/codex v2.1.118-v2.1.157 | Tier 1
 - **Recommendation**: Plugin authoring got simpler in May 2026:
 
-  **Auto-load from `.claude/skills` (v2.1.157)**: Plugins placed in a `.claude/skills`
+  **Auto-load from `.agents/skills` (v2.1.157)**: Plugins placed in a `.agents/skills`
   directory now load automatically -- no marketplace registration required. This is the
   most common-case win: a generated environment can ship a local plugin under
-  `.claude/skills/` and it just works. Plugins with a root-level `SKILL.md` and no
+  `.agents/skills/` and it just works. Plugins with a root-level `SKILL.md` and no
   `skills/` subdirectory are surfaced as skills (v2.1.142).
 
-  **`claude plugin init <name>` (v2.1.157)**: Scaffolds a new plugin in `.claude/skills/`.
+  **`codex plugin init <name>` (v2.1.157)**: Scaffolds a new plugin in `.agents/skills/`.
   Mention in GETTING_STARTED.md when the environment encourages users to author their own
   skills.
 
   **`defaultEnabled: false` (v2.1.154)**: Set in `plugin.json` or a marketplace entry to
-  ship a plugin disabled; the user enables it with `/plugin` or `claude plugin enable`.
+  ship a plugin disabled; the user enables it with `/plugin` or `codex plugin enable`.
   Use for optional/heavy plugins so generated environments don't auto-activate everything.
 
-  **Dependency enforcement (v2.1.143, v2.1.121)**: `claude plugin disable` refuses when an
+  **Dependency enforcement (v2.1.143, v2.1.121)**: `codex plugin disable` refuses when an
   enabled plugin depends on the target; `enable` force-enables transitive deps; `prune`
   removes orphaned auto-installed deps. Declare plugin dependencies explicitly so this
   works.

@@ -35,11 +35,11 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| jd-writer | sonnet | Job analysis, competency definition, internal JD + external posting, assessment-criteria plan (every criterion mapped to a bona fide job competency) | drafter.md |
-| sourcing-specialist | sonnet | Channel strategy, Boolean search, outreach templates, lawful sourcing-reach plan, sourcing KPIs | drafter.md (custom: channel + outreach drafting, web research) |
-| screening-expert | opus | Resume/portfolio rubric, take-home design, phone-screen guide, scorecard -- redacts bias-correlated fields, fixes rubric + weights before any candidate, scores each candidate independently against anchored levels with a job-related rationale per score | analyst.md (custom: bias-controlled rubric + funnel design) |
-| interview-designer | opus | Structured-interview design, STAR/BEI competency questions, interviewer guide, evaluation form, ADA-accommodating formats | planner.md (custom: interview structure + scorecards) |
-| offer-coordinator | opus | Evidence SYNTHESIS to support a human decision (no verdict), comp package, offer-letter draft, negotiation guide, pipeline consistency QA (read-only) | reviewer.md (custom: decision-support synthesis + offer drafting) |
+| jd-writer | medium-effort | Job analysis, competency definition, internal JD + external posting, assessment-criteria plan (every criterion mapped to a bona fide job competency) | drafter.md |
+| sourcing-specialist | medium-effort | Channel strategy, Boolean search, outreach templates, lawful sourcing-reach plan, sourcing KPIs | drafter.md (custom: channel + outreach drafting, web research) |
+| screening-expert | high-effort | Resume/portfolio rubric, take-home design, phone-screen guide, scorecard -- redacts bias-correlated fields, fixes rubric + weights before any candidate, scores each candidate independently against anchored levels with a job-related rationale per score | analyst.md (custom: bias-controlled rubric + funnel design) |
+| interview-designer | high-effort | Structured-interview design, STAR/BEI competency questions, interviewer guide, evaluation form, ADA-accommodating formats | planner.md (custom: interview structure + scorecards) |
+| offer-coordinator | high-effort | Evidence SYNTHESIS to support a human decision (no verdict), comp package, offer-letter draft, negotiation guide, pipeline consistency QA (read-only) | reviewer.md (custom: decision-support synthesis + offer drafting) |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy (conservative), context-management, self-learning, error-handling,
@@ -212,7 +212,7 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
   `Docs/Templates/Optional/hooks-template.md`.
 - **PreToolUse PII + adverse-action gate** (recommended by default,
   DETERMINISTIC) -- pairs with `pii-patterns.conf` (resume emails, phone
-  numbers, postal addresses, DOB, government IDs, comp figures). On Write/Edit
+  numbers, postal addresses, DOB, government IDs, comp figures). On scoped writes
   to any adverse-action or offer artifact, BLOCK if (a) the human-review /
   not-legal-advice disclaimer is absent, OR (b) the file contains a hire/no-hire
   verdict or an ordinal candidate ranking without a recorded human reviewer.
@@ -243,25 +243,25 @@ PII into a summary, a retro entry, or state.
 Base + Universal Deny only -- see `Docs/Templates/References/ecosystem-permissions.md`.
 This domain has no language ecosystem; deny programming tools (`pip`, `npm`,
 `node`, `python`) as in the knowledge-work pattern. Allow safe text utilities
-(`wc`, `diff`, `sort`, `date`) and `Bash(pandoc *)` for .docx/.pdf output. Add
-`Write(./Docs/_working/reqs/**)` so the pipeline writes deliverables without
+(`wc`, `diff`, `sort`, `date`) and Pandoc for .docx/.pdf output when installed.
+Add writable `Docs/_working/reqs/**` so the pipeline writes deliverables without
 prompts. Use the MarkItDown MCP server (verified) to read inbound resume/JD
 PDF/DOCX without enabling Python. Candidate data is Restricted PII -- keep the
 Base deny on `secrets/`/`credentials` and add a deny on any raw applicant-data
-directory the intake flags immutable. Generate `settings.local.json` for
+directory the intake flags immutable. Generate `local config profile` for
 machine-specific template, ATS-export, or vault paths.
 
 ## Cost / Model Notes
 
-Opus for screening-expert, interview-designer, offer-coordinator (judgment:
+GPT-5.5 for screening-expert, interview-designer, offer-coordinator (judgment:
 bias-controlled rubric calibration, structured-interview design, evidence
-synthesis, consistency QA, negotiation risk); Sonnet for jd-writer and
+synthesis, consistency QA, negotiation risk); medium-effort GPT-5.5 for jd-writer and
 sourcing-specialist (established-pattern drafting -- JD/posting/outreach
-templates and channel tables). Defaults: balanced (Opus on reasoning roles,
-Sonnet on execution; compaction 95%; CLAUDE.md ~200 lines). Cost-conscious
-override: keep screening-expert and interview-designer Opus (the
+templates and channel tables). Defaults: balanced (GPT-5.5 on reasoning roles,
+medium-effort GPT-5.5 on execution; compaction 95%; AGENTS.md ~200 lines). Cost-conscious
+override: keep screening-expert and interview-designer GPT-5.5 (the
 bias/adverse-impact judgment is load-bearing -- do not downgrade), move the
-rest to Sonnet, compaction 85%. Subagents ~4x vs direct; the full pipeline is
+rest to medium-effort GPT-5.5, compaction 85%. Subagents ~4x vs direct; the full pipeline is
 the most expensive path -- reserve it for a real open req, use single-agent
 modes for a JD, a question set, or an offer.
 

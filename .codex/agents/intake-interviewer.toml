@@ -1,15 +1,15 @@
----
-name: intake-interviewer
-description: Conducts the deep 5-stage project interview when no starter profile fits. Invoke when the user selects "none of these" during profile selection, describes an unusual or highly specialized domain, or chooses custom generation that needs a full requirements interview. Communicates only through the orchestrator (question relay).
-model: sonnet
-tools: [Read, Write, Glob, Grep, WebSearch, WebFetch]
-disallowedTools: [Edit]
-maxTurns: 30
----
+name = "intake-interviewer"
+description = "Conducts the deep 5-stage project interview when no starter profile fits. Invoke when the user selects \"none of these\" during profile selection, describes an unusual or highly specialized domain, or chooses custom generation that needs a full requirements interview. Communicates only through the orchestrator (question relay)."
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+Run the deep interview through the orchestrator relay and write GENESIS.md.
 
 ## Objective
 
-Conduct a structured deep interview to gather all information needed to design a Claude Code environment for a project that does not fit the starter profiles. Write the results to GENESIS.md in the target directory.
+Conduct a structured deep interview to gather all information needed to design a Codex environment for a project that does not fit the starter profiles. Write the results to GENESIS.md in the target directory.
 
 You are invoked ONLY for the deep interview path -- when the orchestrator determines that no starter profile is a good fit.
 
@@ -76,3 +76,4 @@ Return to the orchestrator:
 - DO NOT: Generate environment components (that is the component-generator's job)
 - DO NOT: Skip stages without justification (record skip reason in Intake Notes)
 - DO NOT: Speculate about files you have not read
+"""

@@ -1,6 +1,6 @@
-# Claude Harness Generator -- User Guide
+# Codex Harness Generator -- User Guide
 
-This guide walks you through using the Claude Harness Generator to build a
+This guide walks you through using the Codex Harness Generator to build a
 customized AI assistant environment for your project. Whether you write code,
 analyze data, draft legal briefs, or develop games, the Harness Generator interviews you
 about your work and generates an assistant tailored to how you operate.
@@ -31,10 +31,10 @@ Before you begin, make sure you have the following:
 
 **Required:**
 
-- **Claude Code CLI** (version 1.0 or later). This is Anthropic's command-line
-  tool for working with Claude. Install it from
-  https://docs.anthropic.com/en/docs/claude-code. You will also need an
-  Anthropic API key or a Claude Max subscription.
+- **Codex CLI** (version 1.0 or later). This is OpenAI's command-line
+  tool for working with Codex. Install it from
+  https://developers.openai.com/codex. You will also need an
+  OpenAI API key or a Codex Max subscription.
 
 - **A project directory.** This is the folder on your computer where your
   project lives (or will live). It can be an existing project with files
@@ -78,17 +78,17 @@ approximately 100,000-200,000 tokens.
 
 ### Step 1: Open the Harness Generator
 
-Open a terminal and navigate to the Claude-Harness-Generator directory:
+Open a terminal and navigate to the Codex-Harness-Generator directory:
 
 ```
-cd /path/to/Claude-Harness-Generator    # macOS/Linux
-cd C:\path\to\Claude-Harness-Generator  # Windows
+cd /path/to/Codex-Harness-Generator    # macOS/Linux
+cd C:\path\to\Codex-Harness-Generator  # Windows
 ```
 
-Then start Claude Code:
+Then start Codex:
 
 ```
-claude
+codex
 ```
 
 You will see a prompt where you can type messages to the Harness Generator.
@@ -98,7 +98,7 @@ You will see a prompt where you can type messages to the Harness Generator.
 Type `/create` and press Enter.
 
 You can also just describe your project in plain language -- for example,
-"I need a Claude environment for my accounting practice" -- and the Harness Generator
+"I need a Codex environment for my accounting practice" -- and the Harness Generator
 will recognize that you want to create a new environment. But `/create` is the
 most direct way.
 
@@ -115,7 +115,7 @@ C:\Users\YourName\Projects\MyProject     # Windows
 
 The Harness Generator verifies the directory exists and that it can write files there. If
 the directory does not exist, it creates it for you. If the directory already
-contains Claude Code files (a `CLAUDE.md` or `.claude/` folder), the Harness Generator
+contains Codex files (a `AGENTS.md` or `.codex/` folder), the Harness Generator
 notes this and handles any conflicts during generation.
 
 You will see a confirmation message like:
@@ -239,7 +239,7 @@ To start using your new environment:
 
 1. Open a terminal
 2. Navigate to your project directory: `cd /path/to/YourProject`
-3. Run: `claude`
+3. Run: `codex`
 4. Your customized assistant is ready. Try saying hello -- it will greet you
    and describe what it can help with.
 
@@ -465,13 +465,13 @@ winget install pandoc
 
 ## Reviewing an Existing Environment: /validate-environment
 
-If you already have a Claude Code environment and want to check whether it is
+If you already have a Codex environment and want to check whether it is
 set up correctly, the Harness Generator can audit it.
 
 ### Step 1: Start the Harness Generator
 
-Open a terminal, navigate to the Claude-Harness-Generator directory, and run
-`claude`.
+Open a terminal, navigate to the Codex-Harness-Generator directory, and run
+`codex`.
 
 ### Step 2: Run the validator
 
@@ -480,8 +480,8 @@ Type `/validate-environment` and press Enter.
 ### Step 3: Provide the path
 
 The Harness Generator asks for the path to the environment you want to check. Type the
-full path to the project directory (the folder containing `CLAUDE.md` or
-`.claude/`).
+full path to the project directory (the folder containing `AGENTS.md` or
+`.codex/`).
 
 ### Step 4: Review the results
 
@@ -546,12 +546,12 @@ assistant environments. You can update this knowledge in two ways.
 
 ### Adding your own knowledge
 
-If you have documents about Claude Code best practices, environment design
+If you have documents about Codex best practices, environment design
 tips, or lessons learned:
 
 1. Place the documents in the `Docs/ProvideKnowledge/` folder inside the
-   Claude-Harness-Generator directory.
-2. Start Claude Code in the Claude-Harness-Generator directory.
+   Codex-Harness-Generator directory.
+2. Start Codex in the Codex-Harness-Generator directory.
 3. Type `/update`, or simply say something like "process knowledge" or "I added
    some docs." This triggers `/update` in its local-only mode, which ingests
    `Docs/ProvideKnowledge/` without searching the web.
@@ -564,8 +564,8 @@ Future environments you create will benefit from the updated knowledge.
 
 ### Refreshing from official sources
 
-Type `/update` to also have the Harness Generator search for the latest Claude
-Code documentation and best practices from Anthropic. It checks for new
+Type `/update` to also have the Harness Generator search for the latest Codex
+Code documentation and best practices from OpenAI. It checks for new
 features, breaking changes, and updated recommendations, then incorporates
 anything new into its knowledge base.
 
@@ -573,9 +573,9 @@ anything new into its knowledge base.
 
 ## Tips and Common Scenarios
 
-### "I already have a CLAUDE.md"
+### "I already have a AGENTS.md"
 
-The the Harness Generator detects existing Claude Code files during setup and notes them. It
+The the Harness Generator detects existing Codex files during setup and notes them. It
 handles conflicts during the generation process -- existing files are not
 silently overwritten. You will be informed of what was found.
 
@@ -631,17 +631,17 @@ lighter setup:
   automatically -- fewer agents, simpler routing rules, and lighter
   documentation.
 - **Manual.** After generation, remove what you do not need. Delete agent
-  files from `.claude/agents/`, skill folders from `.claude/skills/`, or
-  rule files from `.claude/rules/`. Update references in `CLAUDE.md` when
+  files from `.codex/agents/`, skill folders from `.agents/skills/`, or
+  rule files from `.codex/rules/`. Update references in `AGENTS.md` when
   you remove something.
 
-The minimum viable environment is just three things: `CLAUDE.md`,
-`.claude/settings.json`, and one rule file. Everything else is optional and
+The minimum viable environment is just three things: `AGENTS.md`,
+`.codex/config.toml`, and one rule file. Everything else is optional and
 can be added back later as your needs grow.
 
 ### "I want to contribute to the Harness Generator"
 
-See the CONTRIBUTING.md file in the Claude-Harness-Generator directory. It
+See the CONTRIBUTING.md file in the Codex-Harness-Generator directory. It
 covers how to add new starter profiles, create or update templates, improve the
 knowledge base, and test your changes.
 
@@ -653,7 +653,7 @@ A practical checklist for getting comfortable with your new environment.
 
 ### Day 1: Verify the basics
 
-1. Open a terminal, navigate to your project directory, and run `claude`.
+1. Open a terminal, navigate to your project directory, and run `codex`.
 2. Say hello. The assistant should greet you and describe what it can help with.
 3. Run `/state-save` to save your session, then `/state-load` to restore it.
    Confirm the round-trip works.
@@ -693,14 +693,14 @@ A practical checklist for getting comfortable with your new environment.
 When the Harness Generator finishes, your project directory will contain these components
 (the exact set depends on your answers during intake):
 
-### CLAUDE.md
+### AGENTS.md
 
 The main instructions file for your assistant. It defines what the assistant
 does, how it routes your requests, what it can and cannot do, and its core
 behavioral rules. This file is under 250 lines by design -- it is meant to be
 readable.
 
-### .claude/rules/
+### .codex/rules/
 
 Behavioral rules that govern how the assistant operates. These cover topics
 like:
@@ -713,14 +713,14 @@ like:
 - Domain-specific rules (version control safety, data handling, build systems,
   testing gates, etc.)
 
-### .claude/agents/
+### .codex/agents/
 
 Specialized assistants for different parts of your work. Each one has a defined
-role, a set of tools it can use, and instructions for when to invoke it. For
-example, a research assistant can search the web and read files but cannot edit
-them, while an implementer can read and write code.
+role, reasoning effort, sandbox scope, and instructions for when to invoke it.
+For example, a research assistant can be read-only, while an implementer can use
+workspace-write scope when the task requires file edits.
 
-### .claude/skills/
+### .agents/skills/
 
 Commands you can type to trigger specific actions. Every generated environment
 includes at least these four:
@@ -737,7 +737,7 @@ Additional commands depend on your profile (for example, `/build` and
 `/review` for development projects, or `/process-data` for data analysis
 projects).
 
-### .claude/settings.json
+### .codex/config.toml
 
 Permissions and tool access configuration. This file controls what the
 assistant is allowed to do without asking -- for example, reading any file in
@@ -786,15 +786,15 @@ this" -- the Harness Generator uses sensible defaults for anything you do not sp
 
 ### "I want to change something after generation"
 
-Edit the generated files directly. They are plain Markdown and JSON files
+Edit the generated files directly. They are plain Markdown and TOML files
 designed to be readable. Alternatively, re-run `/create` to go through the
 full process again with different answers.
 
 Common files you might want to tweak:
 
-- `CLAUDE.md` -- Adjust rules, add constraints, change routing.
-- `.claude/settings.json` -- Add or remove permissions.
-- `.claude/rules/01-autonomy.md` -- Change what the assistant does
+- `AGENTS.md` -- Adjust rules, add constraints, change routing.
+- `.codex/config.toml` -- Add or remove permissions.
+- `.codex/rules/01-autonomy.md` -- Change what the assistant does
   automatically versus what it asks about.
 - `Docs/index.md` -- Update your project wiki / knowledge index.
 
@@ -807,15 +807,14 @@ Check that the required tools are installed:
   `pandoc --version`
 - For Excel processing: `pip install openpyxl`
 
-If you see permission errors, check `.claude/settings.json` to make sure the
-relevant tools are in the allow list.
+If you see permission errors, check `.codex/config.toml` to make sure the
+relevant operations are represented in the permission policy.
 
 ### "The assistant keeps asking for permission to do things"
 
-This usually means `.claude/settings.json` is missing allow rules for the
-tools the assistant needs. Open the file and add permissions for the specific
-commands that keep prompting. For example, if `python` keeps asking for
-approval, add `"Bash(python *)"` to the allow list.
+This usually means `.codex/config.toml` is missing the permissions the assistant
+needs. Open the file and add the narrowest safe permission for the specific
+operation that keeps prompting.
 
 ### "The environment seems too complex for my project"
 
@@ -823,12 +822,12 @@ The Harness Generator calibrates complexity based on your answers during intake.
 selected an experience level of "just getting started" and your project is
 simple, the environment should be lightweight. If it still feels like too much,
 you can delete components you do not need -- remove agent files from
-`.claude/agents/`, skill folders from `.claude/skills/`, or rules from
-`.claude/rules/`. Just make sure to update references in `CLAUDE.md` when you
+`.codex/agents/`, skill folders from `.agents/skills/`, or rules from
+`.codex/rules/`. Just make sure to update references in `AGENTS.md` when you
 remove something.
 
 ### "I want to validate my environment but I'm not in the Harness Generator directory"
 
-You need to run `/validate-environment` from within the Claude-Harness-Generator
-directory (not your project directory). Start Claude Code there, run the command,
+You need to run `/validate-environment` from within the Codex-Harness-Generator
+directory (not your project directory). Start Codex there, run the command,
 and provide your project's path when asked.

@@ -2,7 +2,7 @@
 
 <!-- ANNOTATION: The debugger agent investigates and fixes bugs. It uses
      a hypothesis-driven approach: form theories, test them against the
-     code, and apply the minimal fix. Model is opus because complex
+     code, and apply the minimal fix. Model is GPT-5.5 with high reasoning effort because complex
      debugging requires multi-hypothesis investigation and deep reasoning
      about code behavior, state, and interactions. -->
 
@@ -10,36 +10,24 @@
      analysis guidance. Must enforce minimal fix principle. Must include
      repro steps requirement. Agent body under 80 lines. -->
 
-## Example: Debugger Agent (`.claude/agents/debugger.md`)
+## Example: Debugger Agent (`.codex/agents/debugger.toml`)
 
-````markdown
----
-name: debugger
-description: >
-  Investigate and fix bugs, crashes, and unexpected behavior. Delegate to
-  this agent when the user reports a bug, crash, error, or something not
-  working correctly. Triggers: "fix this bug", "it crashes when", "this
-  doesn't work", "error in", "debug this", "investigate this failure".
-  Do NOT delegate for feature requests or refactoring -- those need
-  the planner and implementer.
-model: opus
-tools:
-  - Read
-  - Write
-  - Edit
-  - Glob
-  - Grep
-  - Bash
-maxTurns: 40
----
-
+````toml
+name = "debugger"
+description = """
+Investigate and fix bugs, crashes, and unexpected behavior. Delegate to this agent when the user reports a bug, crash, error, or something not working correctly. Triggers: "fix this bug", "it crashes when", "this doesn't work", "error in", "debug this", "investigate this failure". Do NOT delegate for feature requests or refactoring -- those need the planner and implementer.
+"""
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
+developer_instructions = """
 <!-- ANNOTATION: Key design decisions:
-     - model: opus (debugging requires multi-hypothesis investigation and
+     - model: gpt-5.5 (debugging requires multi-hypothesis investigation and
        deep reasoning about code behavior and interactions)
-     - Full tool access (needs to read, search, and apply fixes)
-     - maxTurns: 40 (investigation can require many file reads)
+     - workspace-write sandbox (needs to read, search, run verification, and apply fixes)
+     - model_reasoning_effort: high (investigation can require many file reads)
      VARIATION: For simple, well-isolated bugs with clear repro steps,
-     sonnet may suffice. Use opus when the bug involves concurrency,
+     GPT-5.5 may suffice. Use GPT-5.5 when the bug involves concurrency,
      state machines, distributed systems, or unclear root causes. -->
 
 ## Objective
@@ -135,10 +123,11 @@ Out of scope:
 - Feature additions
 - Refactoring beyond what the fix requires
 - Writing new tests (suggest as follow-up)
+"""
 ````
 
 <!-- QUALITY: Validation checklist for the generator:
-     - [ ] Frontmatter includes: name, description, model, tools, maxTurns
+     - [ ] TOML includes: name, description, model, model_reasoning_effort, sandbox_mode, developer_instructions
      - [ ] Description includes 3+ trigger phrases and negative trigger
      - [ ] Hypothesis-driven process defined (form theories, test, eliminate)
      - [ ] Log analysis guidance present

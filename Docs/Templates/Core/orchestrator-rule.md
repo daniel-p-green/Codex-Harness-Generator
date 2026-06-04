@@ -15,7 +15,7 @@
   - Proactive vs conservative default set per domain
 
   WHY THIS EXISTS:
-  Without explicit routing, Claude either does everything in one context (exhausting it)
+  Without explicit routing, Codex either does everything in one context (exhausting it)
   or delegates randomly. The orchestrator rule ensures intent is classified correctly,
   work is delegated to the right agent with the right instructions, and fallbacks
   prevent dead ends when routing is wrong.
@@ -163,8 +163,8 @@ The orchestrator MUST NOT read source code files directly.
 **May read (small, pre-summarized):**
 - Docs/ wiki pages (< 300 lines)
 - Docs/_working/ state files
-- .claude/ config and rules
-- CLAUDE.md and project config files
+- .codex/ config and rules
+- AGENTS.md and project config files
 
 **Must delegate reads of:**
 - Source code (any language) -- to explorer, debugger, or implementer
@@ -179,7 +179,7 @@ The orchestrator MUST NOT read source code files directly.
 
 <!-- TEAMS VS SUBAGENTS
   WHY: Agent Teams cost ~15x chat. Use them only when parallelism provides real benefit.
-  Sequential subagents (Task tool) are cheaper and simpler for serial work.
+  Sequential subagents (Codex subagent tools) are cheaper and simpler for serial work.
 -->
 ## Teams vs subagents
 
@@ -283,7 +283,7 @@ The orchestrator returns: short summary + artifact paths + next action.
   [ ] Delegate mode mentioned
   [ ] Teams vs subagents matrix present
   [ ] Artifact-first handoff rules present
-  [ ] Anti-overengineering note present (via CLAUDE.md reference or direct)
+  [ ] Anti-overengineering note present (via AGENTS.md reference or direct)
   [ ] All routing entries use domain vocabulary (not generic terms)
   [ ] Context discipline section present (what orchestrator may/must-not read)
   [ ] Subagent handoff pattern documented (disk-based, not through orchestrator)

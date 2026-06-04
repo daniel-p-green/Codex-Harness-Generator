@@ -1,4 +1,4 @@
-# Contributing to Claude Harness Generator
+# Contributing to Codex Harness Generator
 
 Thank you for your interest in improving the Harness Generator. This guide covers the main ways to contribute.
 
@@ -89,7 +89,7 @@ Each recommendation follows this format:
 ```
 
 Source tiers:
-- Tier 1: Anthropic official documentation
+- Tier 1: OpenAI official documentation
 - Tier 2: Validated community practice (multiple independent sources)
 - Tier 3: Anecdotal (single source, unverified)
 
@@ -104,8 +104,8 @@ ingests pending docs without web research -- trigger it with phrasings like
 4. Move processed files to `Processed/`
 
 Good contributions include:
-- Anthropic documentation updates
-- Claude Code changelog analysis
+- OpenAI documentation updates
+- Codex changelog analysis
 - Proven workflow patterns with evidence
 - Industry-specific agent configurations that worked well
 
@@ -126,8 +126,8 @@ Include: what you expected, what happened, which profile you used, and the gener
 Generate an environment from each affected profile and verify:
 
 ```bash
-cd Claude-Harness-Generator
-claude
+cd Codex-Harness-Generator
+codex
 
 # Generate from the profile you changed
 /create
@@ -140,11 +140,11 @@ claude
 
 ### What to Check
 
-1. **Structural**: All files exist, cross-references resolve, settings.json is valid
-2. **Quality**: CLAUDE.md < 250 lines, rules < 120 lines, agents < 80 lines
+1. **Structural**: All files exist, cross-references resolve, .codex/config.toml is valid
+2. **Quality**: AGENTS.md < 250 lines, rules < 120 lines, agents < 80 lines
 3. **Routing**: Table has 10-16 domain-specific entries with fallback chains
 4. **Skills**: Descriptions have 3+ trigger phrases and negative triggers
-5. **Permissions**: settings.json covers all operations agents/skills will attempt
+5. **Permissions**: .codex/config.toml covers all operations agents/skills will attempt
 6. **First run**: The generated environment's first-run greeting works
 
 ### Validation Checklist
@@ -163,4 +163,4 @@ Be respectful, constructive, and focused on improving the tool for everyone. We 
 
 ## Questions?
 
-Open an issue or start a discussion. For questions about Claude Code itself, see the [Anthropic documentation](https://docs.anthropic.com/en/docs/claude-code).
+Open an issue or start a discussion. For questions about Codex itself, see the [OpenAI documentation](https://developers.openai.com/codex).

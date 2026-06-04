@@ -17,18 +17,18 @@ than inlining them.
 Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verbatim).
 The five harness analysts collapse onto two reusable templates -- one research
 specialist parameterized per analysis stream, one read-only reviewer. The four
-analysts each land a deliverable, so grant them Write/Edit scoped to
+analysts each land a deliverable, so grant them scoped writes scoped to
 `./_workspace/**` -- `researcher.md` is read-only by default and must be widened
 for these producer roles. research-reviewer stays read-only:
 
 | name | model | role | template |
 |---|---|---|---|
-| industry-analyst | opus | Market size (TAM/SAM/SOM), CAGR, value chain, Porter 5 Forces, regulatory | researcher.md |
-| competitor-analyst | opus | Competitor mapping, strategic groups, SWOT, positioning, moat analysis | researcher.md |
-| consumer-analyst | sonnet | Segmentation, journey mapping, jobs-to-be-done, personas, research methods | researcher.md |
-| trend-analyst | opus | PESTLE, technology/micro trends, scenario analysis, 3-5 year outlook | researcher.md |
-| research-reviewer | opus | Cross-stream consistency, insight synthesis, strategic recs (read-only) | reviewer.md |
-| report-writer | sonnet | Assemble analyst outputs into the integrated report deliverable | drafter.md |
+| industry-analyst | high-effort | Market size (TAM/SAM/SOM), CAGR, value chain, Porter 5 Forces, regulatory | researcher.md |
+| competitor-analyst | high-effort | Competitor mapping, strategic groups, SWOT, positioning, moat analysis | researcher.md |
+| consumer-analyst | medium-effort | Segmentation, journey mapping, jobs-to-be-done, personas, research methods | researcher.md |
+| trend-analyst | high-effort | PESTLE, technology/micro trends, scenario analysis, 3-5 year outlook | researcher.md |
+| research-reviewer | high-effort | Cross-stream consistency, insight synthesis, strategic recs (read-only) | reviewer.md |
+| report-writer | medium-effort | Assemble analyst outputs into the integrated report deliverable | drafter.md |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy (conservative), context-management, self-learning, error-handling, and
@@ -107,14 +107,13 @@ the failure mode that destroys its value. This is lighter than the legal domain
 ## Ecosystem Permissions
 
 Base + Universal Deny -- see `Docs/Templates/References/ecosystem-permissions.md`.
-No language ecosystem (research/writing domain, no code). Allow `WebSearch` and
-`WebFetch(*)` (core to every analyst). Add `Write(./_workspace/**)` and
-`Edit(./_workspace/**)` so the four analysts land deliverables (00_input through
+No language ecosystem (research/writing domain, no code). Allow web search and
+browser/web retrieval (core to every analyst). Add writable `_workspace/**` so the four analysts land deliverables (00_input through
 05_research_report) without prompts -- the `researcher.md` template is read-only
-by default, so widen Write/Edit to `./_workspace/**` for these producer roles
+by default, so widen scoped writes to `./_workspace/**` for these producer roles
 (research-reviewer stays read-only). If the intake adds inbound report files,
-include `Bash(markitdown *)` per the document-parsing note in tool-catalog.
-Generate `settings.local.json` for any machine-specific paths or MCP keys.
+document `markitdown` setup per the document-parsing note in tool-catalog.
+Generate `local config profile` for any machine-specific paths or MCP keys.
 
 ## Self-Learning Seed Entries
 
@@ -162,18 +161,18 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
   and CRITICAL findings (unsourced/recalled/inferred-as-reported figures) were
   resolved before reporting done.
 - Optional **PreToolUse source-integrity gate** (advisory by default, NOT
-  generated unless the intake asks): on Write/Edit to `_workspace/05_*` or an
+  generated unless the intake asks): on scoped writes to `_workspace/05_*` or an
   exported report, warn if a figure lacks a source/date/tag. The legal domain's
   deterministic blocking version is deliberately not the default here.
 
 ## Cost / Model Notes
 
-Opus for the reasoning-heavy streams (industry, competitor, trend) and the
-research-reviewer; Sonnet for consumer-analyst and report-writer (segmentation
-and assembly follow established structure). Default: balanced (Opus on the three
-analytical streams + reviewer, Sonnet on execution; compaction 95%; CLAUDE.md
-~200 lines). Cost-conscious override: all-Sonnet except research-reviewer on
-Opus, compaction 85%, CLAUDE.md ~150. The full fan-out pipeline runs four
+GPT-5.5 for the reasoning-heavy streams (industry, competitor, trend) and the
+research-reviewer; medium-effort GPT-5.5 for consumer-analyst and report-writer (segmentation
+and assembly follow established structure). Default: balanced (GPT-5.5 on the three
+analytical streams + reviewer, medium-effort GPT-5.5 on execution; compaction 95%; AGENTS.md
+~200 lines). Cost-conscious override: all medium-effort GPT-5.5 except research-reviewer on
+GPT-5.5, compaction 85%, AGENTS.md ~150. The full fan-out pipeline runs four
 analysts plus a reviewer -- the most expensive path; reserve it for genuine
 full-research requests and route single-stream asks to one agent.
 

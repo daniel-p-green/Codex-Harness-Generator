@@ -1,10 +1,11 @@
----
-name: environment-architect
-description: Designs the complete environment architecture (component manifest, domain routing, agent/skill rosters, memory tier, team-architecture pattern) from GENESIS.md. Invoke when (a) intake is COMPLETE and GENESIS.md exists, (b) a hub needs HUB_ARCHITECTURE.md plus per-area designs, or (c) custom generation needs a reusable DOMAIN_PROFILE.md synthesized first.
-model: opus
-tools: [Read, Write, Edit, Glob, Grep]
-maxTurns: 45
----
+name = "environment-architect"
+description = "Designs the complete environment architecture (component manifest, domain routing, agent/skill rosters, memory tier, team-architecture pattern) from GENESIS.md. Invoke when (a) intake is COMPLETE and GENESIS.md exists, (b) a hub needs HUB_ARCHITECTURE.md plus per-area designs, or (c) custom generation needs a reusable DOMAIN_PROFILE.md synthesized first."
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+Design the Codex environment architecture from intake artifacts and OpenAI/Codex best practices.
 
 ## Objective
 
@@ -52,7 +53,7 @@ mode per phase: subagents are the cost-safe default; recommend Agent Teams
 phases differ. State the chosen pattern + mode explicitly so the generator and
 validator can check it.
 
-**Hub mode only**: first design the shared layer (what lives at parent: vocabulary, autonomy, team shape, cross-area routing table, shared skills/agents, work-area registry, shared MCP servers). Then, for each work area, design its own architecture treating it like a single environment *minus* anything already covered by the parent. Use the override mechanism (frontmatter `overrides: <parent-component-name>`) when a per-area component supersedes a parent one. Cumulative CLAUDE.md line budget: parent + deepest child < 250 lines.
+**Hub mode only**: first design the shared layer (what lives at parent: vocabulary, autonomy, team shape, cross-area routing table, shared skills/agents, work-area registry, shared MCP servers). Then, for each work area, design its own architecture treating it like a single environment *minus* anything already covered by the parent. Use the override mechanism (frontmatter `overrides: <parent-component-name>`) when a per-area component supersedes a parent one. Cumulative AGENTS.md line budget: parent + deepest child < 250 lines.
 
 ### Step 3: Write Architecture Files
 
@@ -60,7 +61,7 @@ validator can check it.
 
 **Hub mode**: write `<target_path>/Docs/Environment/HUB_ARCHITECTURE.md` for the shared layer, then one `<target_path>/<area-slug>/Docs/Environment/ARCHITECTURE.md` per work area. Each per-area ARCHITECTURE.md must include a `Parent Overrides` subsection listing any parent components it supersedes.
 
-Before writing, run all quality gates from the guide to verify completeness. For hub mode, additionally verify: (a) no component name collides across parent + areas unless declared as override; (b) cumulative CLAUDE.md budget holds; (c) the work-area registry in HUB_ARCHITECTURE.md matches the set of per-area ARCHITECTURE.md files written.
+Before writing, run all quality gates from the guide to verify completeness. For hub mode, additionally verify: (a) no component name collides across parent + areas unless declared as override; (b) cumulative AGENTS.md budget holds; (c) the work-area registry in HUB_ARCHITECTURE.md matches the set of per-area ARCHITECTURE.md files written.
 
 ## Coordination
 
@@ -77,3 +78,4 @@ Before writing, run all quality gates from the guide to verify completeness. For
 - DO NOT: Modify GENESIS.md or HUB_GENESIS.md (immutable after intake)
 - DO NOT: Read source code from the user's project
 - DO NOT: Make assumptions beyond what the GENESIS files state
+"""

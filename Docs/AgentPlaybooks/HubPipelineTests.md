@@ -6,7 +6,7 @@ Harness Generator, and verify the specified output. Run after any change to the
 intake protocol, architect, component-generator, or validator that
 touches hub mode.
 
-These are not automated -- run them by launching `claude` in a scratch
+These are not automated -- run them by launching `codex` in a scratch
 directory and following the steps. Each scenario notes what to verify
 after each step so regressions surface immediately rather than at the end.
 
@@ -17,7 +17,7 @@ Create a dedicated scratch folder:
 mkdir ~/ccc-test && cd ~/ccc-test
 ```
 
-Keep the Harness Generator project path handy (e.g., `C:\ai\Claude-Harness-Generator`).
+Keep the Harness Generator project path handy (e.g., `C:\ai\Codex-Harness-Generator`).
 When running `/create` inside the scratch folder, the Harness Generator uses the
 Harness Generator project as its engine and writes the generated environment into
 the scratch folder subdirectory.
@@ -33,7 +33,7 @@ the scratch folder subdirectory.
 2. Provide target: `~/ccc-test/governance-hub/`.
 3. Experience level: intermediate.
 4. Work-area shape: choose *"A set of separate work areas that share some basics"*.
-5. Collect shared basics: solo, git, Anthropic API, cost-conscious.
+5. Collect shared basics: solo, git, OpenAI API, cost-conscious.
 6. Work-area registry: list three areas -- `policy`, `training`, `audit-tool`.
 7. Per-area intake round for `policy` (Knowledge Work profile), `training` (Knowledge Work), `audit-tool` (Software Development, Python).
 8. Confirm architecture (shared + per-area).
@@ -42,15 +42,15 @@ the scratch folder subdirectory.
 **Verify**:
 - `governance-hub/Docs/Environment/HUB_GENESIS.md` exists and has `HUB_STATUS: COMPLETE`.
 - `governance-hub/Docs/Environment/HUB_ARCHITECTURE.md` exists with a work-area registry matching the three area names.
-- `governance-hub/CLAUDE.md` exists, is under 80 lines, includes a "Work areas in this setup" section.
-- `governance-hub/policy/`, `governance-hub/training/`, `governance-hub/audit-tool/` each contain `.claude/`, `CLAUDE.md`, `Docs/Environment/GENESIS.md`, and `Docs/Environment/ARCHITECTURE.md`.
-- Parent CLAUDE.md + longest per-area CLAUDE.md is under 250 lines.
+- `governance-hub/AGENTS.md` exists, is under 80 lines, includes a "Work areas in this setup" section.
+- `governance-hub/policy/`, `governance-hub/training/`, `governance-hub/audit-tool/` each contain `.codex/`, `AGENTS.md`, `Docs/Environment/GENESIS.md`, and `Docs/Environment/ARCHITECTURE.md`.
+- Parent AGENTS.md + longest per-area AGENTS.md is under 250 lines.
 - `governance-hub/Docs/Environment/GENERATION_PROGRESS.md` shows shell + every per-area pass COMPLETE.
 - `governance-hub/Docs/Environment/VALIDATION_REPORT.md` verdict is PASS or WARN (no FAIL).
 
 **Common failures to watch for**:
 - Generator writes a rule file at both parent and an area without an override declaration (check #48 should FAIL).
-- Parent CLAUDE.md over 80 lines (check #47 should WARN).
+- Parent AGENTS.md over 80 lines (check #47 should WARN).
 - Work-area registry lists an area that has no subfolder (check #46 should FAIL).
 
 ## Scenario 2: Add a new area to an existing hub
@@ -70,13 +70,13 @@ the scratch folder subdirectory.
 - `governance-hub/stakeholder-comms/` is fully populated.
 - `HUB_GENESIS.md` work-area registry has been updated to include the new area.
 - `HUB_ARCHITECTURE.md` registry has been updated.
-- Parent CLAUDE.md "Work areas in this setup" section now lists 4 areas.
+- Parent AGENTS.md "Work areas in this setup" section now lists 4 areas.
 - Validator passes all hub checks including registry-matches-disk.
 
 **Common failures**:
 - the Harness Generator runs full shared-basics intake instead of add-area intake (hub detection broken).
 - `HUB_GENESIS.md` not updated to include the new slug.
-- Parent CLAUDE.md not updated with the new area entry.
+- Parent AGENTS.md not updated with the new area entry.
 
 ## Scenario 3: Convert single environment to hub
 
@@ -86,7 +86,7 @@ the scratch folder subdirectory.
 
 **Steps**:
 1. Run `/upgrade-environment` on `~/ccc-test/single-env/`.
-2. During interview, mention: "I'm actually working on two separate things from this setup -- the original X and a new Y. I wish Claude would keep them apart."
+2. During interview, mention: "I'm actually working on two separate things from this setup -- the original X and a new Y. I wish Codex would keep them apart."
 3. Expect analyzer to recommend `[L*] Convert to multi-area hub`.
 4. Approve that recommendation.
 5. Orchestrator asks for slug for the current contents -- accept `main` or override.
@@ -94,9 +94,9 @@ the scratch folder subdirectory.
 7. Architect runs hub mode, generator runs shell pass only.
 
 **Verify**:
-- `single-env/.claude/` and `single-env/CLAUDE.md` have MOVED into `single-env/main/` (or whatever slug).
-- `single-env/claude-backup-YYYYMMDD/` contains the original structure as safety net.
-- New `single-env/CLAUDE.md` is the thin parent (under 80 lines).
+- `single-env/.codex/` and `single-env/AGENTS.md` have MOVED into `single-env/main/` (or whatever slug).
+- `single-env/codex-backup-YYYYMMDD/` contains the original structure as safety net.
+- New `single-env/AGENTS.md` is the thin parent (under 80 lines).
 - `single-env/Docs/Environment/HUB_GENESIS.md` exists.
 - `single-env/main/Docs/Environment/GENESIS.md` still exists with original content intact.
 - Per-area ARCHITECTURE.md was NOT regenerated (still original).
@@ -123,13 +123,13 @@ the scratch folder subdirectory.
 **Verify**:
 - `governance-hub/policy/*` contents are moved up to `governance-hub/`.
 - `governance-hub/HUB_GENESIS.md` and `HUB_ARCHITECTURE.md` are deleted.
-- The thin parent `governance-hub/CLAUDE.md` is deleted and replaced by `policy/`'s CLAUDE.md.
-- `governance-hub/.claude/` (the parent `.claude/`) is gone; `policy/`'s `.claude/` is now at the root.
+- The thin parent `governance-hub/AGENTS.md` is deleted and replaced by `policy/`'s AGENTS.md.
+- `governance-hub/.codex/` (the parent `.codex/`) is gone; `policy/`'s `.codex/` is now at the root.
 - Validator passes in single-environment mode.
 
 **Common failures**:
 - Contents not moved up (area still lives in subfolder).
-- Parent CLAUDE.md overwrites the area's CLAUDE.md (should replace parent with area's version).
+- Parent AGENTS.md overwrites the area's AGENTS.md (should replace parent with area's version).
 - Validator still thinks it's a hub because `HUB_GENESIS.md` wasn't removed.
 
 ## Scenario 5: Declare hub on undeclared sibling environments
@@ -141,12 +141,12 @@ the scratch folder subdirectory.
 ```
 ~/ccc-test/declared-hub/
   game-shooter/
-    .claude/
-    CLAUDE.md
+    .codex/
+    AGENTS.md
     Docs/
   game-racing/
-    .claude/
-    CLAUDE.md
+    .codex/
+    AGENTS.md
     Docs/
 ```
 
@@ -158,26 +158,26 @@ Each sibling was generated via plain `/create` earlier.
 3. Analyzer recommends `[L*] Declare hub structure`.
 4. Approve.
 5. Collect shared-basics intake (one round).
-6. Architect runs hub mode against the existing siblings (reads their CLAUDE.md / rules for deduplication analysis).
+6. Architect runs hub mode against the existing siblings (reads their AGENTS.md / rules for deduplication analysis).
 7. Generator runs shell pass only.
 
 **Verify**:
 - `declared-hub/Docs/Environment/HUB_GENESIS.md` exists.
-- `declared-hub/CLAUDE.md` is the thin parent.
+- `declared-hub/AGENTS.md` is the thin parent.
 - Rules duplicated across siblings have been deduplicated: a shared version at parent, and the sibling versions have `overrides: <parent-name>` frontmatter where they differ, or are removed where they match.
 - Siblings' content not otherwise touched.
 - Validator passes.
 
 **Common failures**:
-- Siblings' CLAUDE.md duplicated the parent without override declaration.
+- Siblings' AGENTS.md duplicated the parent without override declaration.
 - Shared rules not actually deduplicated.
-- Parent's CLAUDE.md picks up content that should have stayed per-area.
+- Parent's AGENTS.md picks up content that should have stayed per-area.
 
-## Scenario 6: Hub CLAUDE.md budget overflow
+## Scenario 6: Hub AGENTS.md budget overflow
 
-**Goal**: verify that an attempt to push cumulative CLAUDE.md over 250 lines is blocked or warned.
+**Goal**: verify that an attempt to push cumulative AGENTS.md over 250 lines is blocked or warned.
 
-**Setup**: manually edit a per-area CLAUDE.md to push it to 180 lines (parent is 80 -> cumulative 260).
+**Setup**: manually edit a per-area AGENTS.md to push it to 180 lines (parent is 80 -> cumulative 260).
 
 **Steps**:
 1. Run `/validate-environment` on the hub.
@@ -194,9 +194,9 @@ Each sibling was generated via plain `/create` earlier.
 
 **Goal**: verify that a per-area routing table cannot reference a sibling's internal file paths.
 
-**Setup**: from Scenario 1, manually edit `policy/.claude/rules/00-orchestrator.md` and add a routing entry like:
+**Setup**: from Scenario 1, manually edit `policy/.codex/rules/00-orchestrator.md` and add a routing entry like:
 ```
-| Check audit tool config | Read ../audit-tool/.claude/skills/foo/SKILL.md | ... |
+| Check audit tool config | Read ../audit-tool/.agents/skills/foo/SKILL.md | ... |
 ```
 
 **Steps**:

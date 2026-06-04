@@ -30,11 +30,11 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| curriculum-designer | opus | Set learning objectives (Bloom's/ABCD), structure modules -> lessons, map prerequisites, estimate time | planner.md |
-| content-writer | sonnet | Write lesson plans, slide outlines, instructor notes, learner handouts from the curriculum; apply UDL (multiple means of representation/engagement/expression), write alt text for every image, caption notes for media, readable heading structure; use inclusive, non-biased examples; use original or CC/public-domain media and cite third-party sources (no copyrighted reproduction) | drafter.md |
-| quiz-maker | sonnet | Author formative + summative items mapped to objectives, with distractors and feedback | drafter.md (custom: assessment authoring) |
-| lab-designer | sonnet | Design labs, mini projects, capstone, rubrics, scaffolding/starter code | drafter.md (custom: lab authoring) |
-| course-reviewer | opus | Cross-validate objective alignment, difficulty curve, coverage gaps; check verb-level constructive alignment (each assessment's cognitive demand matches its objective's Bloom level); enforce the accessibility target (alt text, captions, readable structure, UDL) and the accuracy guardrail (flag unverified factual/statistical/version claims) (read-only QA) | reviewer.md |
+| curriculum-designer | high-effort | Set learning objectives (Bloom's/ABCD), structure modules -> lessons, map prerequisites, estimate time | planner.md |
+| content-writer | medium-effort | Write lesson plans, slide outlines, instructor notes, learner handouts from the curriculum; apply UDL (multiple means of representation/engagement/expression), write alt text for every image, caption notes for media, readable heading structure; use inclusive, non-biased examples; use original or CC/public-domain media and cite third-party sources (no copyrighted reproduction) | drafter.md |
+| quiz-maker | medium-effort | Author formative + summative items mapped to objectives, with distractors and feedback | drafter.md (custom: assessment authoring) |
+| lab-designer | medium-effort | Design labs, mini projects, capstone, rubrics, scaffolding/starter code | drafter.md (custom: lab authoring) |
+| course-reviewer | high-effort | Cross-validate objective alignment, difficulty curve, coverage gaps; check verb-level constructive alignment (each assessment's cognitive demand matches its objective's Bloom level); enforce the accessibility target (alt text, captions, readable structure, UDL) and the accuracy guardrail (flag unverified factual/statistical/version claims) (read-only QA) | reviewer.md |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy (conservative), context-management, self-learning, error-handling,
@@ -109,13 +109,13 @@ not heavy regulatory machinery:
 
 Base + Universal Deny (always) -- see
 `Docs/Templates/References/ecosystem-permissions.md`. This domain is
-document-centric: keep broad `Read(./**)`, restrict `Write/Edit` to `./Docs/**`,
-`./_workspace/**`, and `./Outbox/**`. Add Git only when the course lives in a
-repo. Domain-specific (not in the reference): allow `Bash(pandoc *)` for
-deliverable export; if MarkItDown is used for inbound docs, prefer its MCP server
-over enabling Python broadly, or allow `Bash(markitdown *)` narrowly. Deny
+document-centric: allow project reads and restrict writes to `Docs/**`,
+`_workspace/**`, and `Outbox/**`. Add Git only when the course lives in a
+repo. Domain-specific (not in the reference): document `pandoc` for
+deliverable export when installed; if MarkItDown is used for inbound docs, prefer its MCP server
+over enabling Python broadly, or document `markitdown` narrowly. Deny
 programming-language toolchains unless the course teaches code AND the labs are
-run/verified locally. Generate `settings.local.json` for machine-specific
+run/verified locally. Generate `local config profile` for machine-specific
 Pandoc/MarkItDown paths.
 
 ## Self-Learning Seed Entries
@@ -171,14 +171,14 @@ Pre-seed `Docs/_working/retro/YYYY-MM.md` (bootstrapping threshold 1 for 30 days
 
 ## Cost / Model Notes
 
-Opus for the reasoning/QA roles (curriculum-designer, course-reviewer); Sonnet
+high-effort GPT-5.5 for the reasoning/QA roles (curriculum-designer, course-reviewer); medium-effort GPT-5.5
 for the established-pattern authoring roles (content-writer, quiz-maker,
-lab-designer). Defaults: balanced (Opus on design + review, Sonnet on authoring;
-compaction 95%; CLAUDE.md ~200 lines). Cost-conscious override: all-Sonnet except
-course-reviewer stays Opus for the alignment pass; compaction 85%; CLAUDE.md ~150;
+lab-designer). Defaults: balanced (high-effort GPT-5.5 on design + review, medium-effort GPT-5.5 on authoring;
+compaction 95%; AGENTS.md ~200 lines). Cost-conscious override: all medium-effort GPT-5.5 except
+course-reviewer stays GPT-5.5 for the alignment pass; compaction 85%; AGENTS.md ~150;
 mention Pandoc-batch over per-file export. The three authoring agents run in
 parallel after curriculum, so a full build is ~4x a direct chat per agent --
-budget accordingly. Quality-first: keep Opus on curriculum-designer and
+budget accordingly. Quality-first: keep GPT-5.5 on curriculum-designer and
 course-reviewer; do not downgrade the coverage matrix step.
 
 ## Customization Points

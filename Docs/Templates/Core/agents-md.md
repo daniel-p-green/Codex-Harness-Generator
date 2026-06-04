@@ -1,7 +1,7 @@
-# Template: Generated CLAUDE.md
+# Template: Generated AGENTS.md
 
 <!-- TEMPLATE ANNOTATION
-  This template is an annotated reference implementation of a generated CLAUDE.md file.
+  This template is an annotated reference implementation of a generated AGENTS.md file.
   The component-generator reads this as guidance and composes content adapted to the
   specific project's GENESIS.md and ARCHITECTURE.md.
 
@@ -16,16 +16,16 @@
   - ASCII-only throughout
 
   INCLUDE/EXCLUDE RUBRIC:
-  Include: commands Claude cannot guess, style rules differing from defaults,
+  Include: commands Codex cannot guess, style rules differing from defaults,
   testing/verification instructions, architectural decisions, dev environment quirks,
   common gotchas, workflow constraints unique to this project
-  Exclude: anything Claude can infer from code, standard language conventions,
+  Exclude: anything Codex can infer from code, standard language conventions,
   detailed API docs (link instead), frequently-changing info, self-evident practices
 
   WHY THIS STRUCTURE:
-  Opus 4.7 follows instructions stated once without degradation. Front-load the most
+  GPT-5.5 follows instructions stated once without degradation. Front-load the most
   important constraints. Use few-shot examples instead of exhaustive rule lists.
-  Keep it concise -- bloated CLAUDE.md files cause Claude to IGNORE instructions.
+  Keep it concise -- bloated AGENTS.md files cause Codex to IGNORE instructions.
 -->
 
 <!-- ============================================================
@@ -39,7 +39,7 @@
 <!-- PURPOSE AND CONSTRAINTS
   State purpose directly. No role-setting. One paragraph maximum.
   Include the single most important constraint the project has.
-  WHY: Opus 4.7 does not need "Act as..." prompts. Stating purpose once
+  WHY: GPT-5.5 does not need "Act as..." prompts. Stating purpose once
   is sufficient -- the model maintains consistency across extended conversations.
 -->
 This is a FastAPI backend with a React frontend managing customer analytics dashboards.
@@ -74,11 +74,11 @@ Check `Docs/index.md` for the `Status: NEW_ENVIRONMENT` marker. If present:
 
 <!-- AUTONOMY REFERENCE
   Brief summary pointing to the full rule file.
-  WHY: Keeps CLAUDE.md concise while ensuring autonomy boundaries are known.
+  WHY: Keeps AGENTS.md concise while ensuring autonomy boundaries are known.
 -->
 ## Autonomy
 
-See `.claude/rules/01-autonomy.md` for full boundaries. Summary:
+See `.codex/rules/01-autonomy.md` for full boundaries. Summary:
 - Local file reads/writes, searches, test runs: autonomous (just do it)
 - Destructive operations, pushes, external service calls: ask first
 - Do not overengineer. Only make changes directly requested or clearly necessary.
@@ -96,14 +96,14 @@ See `.claude/rules/01-autonomy.md` for full boundaries. Summary:
 
 <!-- ORCHESTRATOR CONTRACT
   How the main assistant should behave. Delegation rules.
-  WHY: Without this, Claude tries to do everything in one context, leading to
+  WHY: Without this, Codex tries to do everything in one context, leading to
   context exhaustion on complex tasks. Delegation keeps context lean.
 -->
 ## Orchestrator contract
 
 Keep context lean. Delegate complex work to agents.
 
-- Route by intent using `.claude/rules/00-orchestrator.md`
+- Route by intent using `.codex/rules/00-orchestrator.md`
 - Write durable output to disk, return short summaries
 - Never read source files directly to answer questions -- delegate to explorer or implementer
 - After meaningful progress, update `Docs/_working/state/SESSION_CONTEXT.md`
@@ -151,7 +151,7 @@ Expected behavior:
 </example>
 
 <!-- COMPACTION HINTS
-  Tell Claude what to preserve when context is automatically compacted.
+  Tell Codex what to preserve when context is automatically compacted.
   WHY: Auto-compaction at ~95% capacity may discard critical context.
   These hints ensure the most important information survives compaction.
 -->
@@ -165,9 +165,9 @@ When compacting, always preserve:
 - Database migration state if applicable
 
 <!-- VERIFICATION PATTERNS
-  Domain-specific commands that Claude should use to verify its work.
+  Domain-specific commands that Codex should use to verify its work.
   WHY: Verification is the #1 highest-leverage intervention for agent quality.
-  These commands let Claude self-check without relying on the user.
+  These commands let Codex self-check without relying on the user.
 -->
 ## Verification
 
@@ -227,28 +227,28 @@ in `Docs/_working/retro/`. Run `/update` periodically to review and apply improv
 
 <!-- ANTI-PATTERNS
 
-  1. BLOATED CLAUDE.MD (>250 lines)
-     Problem: Claude ignores instructions buried in long files.
+  1. BLOATED AGENTS.MD (>250 lines)
+     Problem: Codex ignores instructions buried in long files.
      Fix: Apply include/exclude rubric. Move reference material to rules or skills.
 
   2. ROLE-SETTING PROMPTS
-     Problem: "Act as a senior engineer" wastes tokens, unnecessary with Opus 4.7.
+     Problem: "Act as a senior engineer" wastes tokens, unnecessary with GPT-5.5.
      Fix: State purpose and constraints directly.
 
   3. REPEATING INSTRUCTIONS
-     Problem: "Remember to always..." mid-file. Opus 4.7 follows instructions stated once.
+     Problem: "Remember to always..." mid-file. GPT-5.5 follows instructions stated once.
      Fix: State each instruction exactly once, clearly.
 
   4. BARE RULES WITHOUT INTENT
-     Problem: "Always use TypeScript strict mode" -- Claude may override if it seems unnecessary.
+     Problem: "Always use TypeScript strict mode" -- Codex may override if it seems unnecessary.
      Fix: "Always use TypeScript strict mode because our CI rejects non-strict files."
 
   5. GENERIC EXAMPLES
-     Problem: Examples that could apply to any project do not help Claude understand THIS project.
+     Problem: Examples that could apply to any project do not help Codex understand THIS project.
      Fix: Use domain-specific examples with real endpoint names, real file paths, real commands.
 
   6. MISSING VERIFICATION
-     Problem: No way for Claude to self-check. User becomes the only feedback loop.
+     Problem: No way for Codex to self-check. User becomes the only feedback loop.
      Fix: Always include domain-specific verification commands.
 
   7. KITCHEN-SINK FIRST-RUN
@@ -271,6 +271,6 @@ in `Docs/_working/retro/`. Run `/update` periodically to review and apply improv
   [ ] Orchestrator contract includes anti-overengineering
   [ ] Self-improvement note present
   [ ] ASCII-only
-  [ ] No instructions that Claude would follow by default anyway
-  [ ] For each line: "Would removing this cause Claude to make mistakes?" -- if no, cut it
+  [ ] No instructions that Codex would follow by default anyway
+  [ ] For each line: "Would removing this cause Codex to make mistakes?" -- if no, cut it
 -->

@@ -2,22 +2,22 @@
 
 <!-- TEMPLATE ANNOTATION
   This template defines the act-vs-ask boundaries for the generated environment.
-  It uses a reversibility/impact classification to determine when Claude should
+  It uses a reversibility/impact classification to determine when Codex should
   act autonomously versus when it should ask for confirmation.
 
   QUALITY CRITERIA:
   - Under 120 lines in generated output
   - Reversibility/impact classification with concrete examples
   - Domain-specific customization
-  - Overengineering prevention prompt for Opus 4.7
+  - Overengineering prevention prompt for GPT-5.5
   - Clear examples for each classification level
 
   WHY THIS EXISTS:
-  Without explicit autonomy boundaries, Claude either asks permission for everything
+  Without explicit autonomy boundaries, Codex either asks permission for everything
   (frustrating) or acts on everything (dangerous). The reversibility framework gives
-  Claude a simple heuristic: "Can I undo this easily? Then just do it."
+  Codex a simple heuristic: "Can I undo this easily? Then just do it."
 
-  Opus 4.7 also has a known tendency to overengineer -- adding extra features,
+  GPT-5.5 also has a known tendency to overengineer -- adding extra features,
   documentation, and abstractions beyond what was asked. The overengineering
   prevention section counteracts this directly.
 -->
@@ -30,7 +30,7 @@
 # Autonomy boundaries
 
 <!-- CORE PRINCIPLE
-  WHY: This single sentence gives Claude the heuristic for any situation
+  WHY: This single sentence gives Codex the heuristic for any situation
   not explicitly covered by the classification table below.
 -->
 Act on local, reversible operations. Ask before hard-to-reverse or externally visible actions.
@@ -38,9 +38,9 @@ Act on local, reversible operations. Ask before hard-to-reverse or externally vi
 ## Classification
 
 <!-- REVERSIBILITY/IMPACT TABLE
-  WHY: Concrete examples prevent ambiguity. Claude sees "edit a source file"
-  and knows it is autonomous. Claude sees "git push" and knows to ask.
-  Without examples, Claude must reason about reversibility each time.
+  WHY: Concrete examples prevent ambiguity. Codex sees "edit a source file"
+  and knows it is autonomous. Codex sees "git push" and knows to ask.
+  Without examples, Codex must reason about reversibility each time.
 -->
 
 ### Autonomous (just do it, report what you did)
@@ -57,7 +57,7 @@ These actions are local, reversible, and low-risk:
 - Search the codebase (grep, glob, find)
 - Search the web for documentation
 - Write to `Docs/` directory (wiki, working state, retro logs)
-- Edit `.claude/` files (rules, agents, skills)
+- Edit `.codex/` files (rules, agents, skills)
 - Create git branches
 - Stage files (`git add`)
 - Make git commits (with descriptive messages)
@@ -103,12 +103,12 @@ These actions are hard to reverse, destructive, or visible to others:
 ## Overengineering prevention
 
 <!-- OVERENGINEERING PREVENTION
-  WHY: Opus 4.7 is known to overengineer -- adding features, abstractions, and
+  WHY: GPT-5.5 is known to overengineer -- adding features, abstractions, and
   documentation beyond what was requested. This section directly counteracts
   that tendency with explicit instructions.
 
-  Evidence: platform-agent-patterns.md and guardrails.md both document this behavior.
-  The prompt text below is adapted from Anthropic's recommended guardrails.
+  Evidence: https://developers.openai.com/codex/subagents and guardrails.md both document this behavior.
+  The prompt text below is adapted from OpenAI's recommended guardrails.
 -->
 Avoid over-engineering. Only make changes directly requested or clearly necessary.
 Keep solutions simple and focused:
@@ -166,21 +166,21 @@ that introduces risk or scope creep.
 <!-- ANTI-PATTERNS
 
   1. ASK FOR EVERYTHING
-     Problem: Claude asks "May I read this file?" or "Can I search the codebase?"
+     Problem: Codex asks "May I read this file?" or "Can I search the codebase?"
      User gets frustrated by constant interruptions for safe operations.
      Fix: Classify local reversible operations as autonomous.
 
   2. NEVER ASK FOR ANYTHING
-     Problem: Claude pushes to main, deletes branches, runs migrations without asking.
+     Problem: Codex pushes to main, deletes branches, runs migrations without asking.
      Fix: Classify externally visible and hard-to-reverse operations as ask-first.
 
   3. MISSING OVERENGINEERING PREVENTION
-     Problem: User asks for a one-line fix. Claude adds 200 lines of error handling,
+     Problem: User asks for a one-line fix. Codex adds 200 lines of error handling,
      creates new utility files, and adds documentation for unchanged functions.
-     Fix: Include the overengineering prevention section. Especially important for Opus 4.7.
+     Fix: Include the overengineering prevention section. Especially important for GPT-5.5.
 
   4. GENERIC BOUNDARIES WITHOUT EXAMPLES
-     Problem: "Ask before destructive operations" -- Claude is unsure what counts.
+     Problem: "Ask before destructive operations" -- Codex is unsure what counts.
      Fix: List concrete examples (git push, rm -rf, database migration).
 
   5. NO DOMAIN-SPECIFIC RULES

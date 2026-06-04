@@ -9,7 +9,7 @@ checks them after generation.
 
 ---
 
-## CLAUDE.md Quality Criteria
+## AGENTS.md Quality Criteria
 
 ### Size Limit
 - Target: 150-200 lines
@@ -30,31 +30,31 @@ checks them after generation.
 
 ### Include/Exclude Rubric
 
-**INCLUDE in CLAUDE.md** (things Claude cannot guess or infer):
+**INCLUDE in AGENTS.md** (things Codex cannot guess or infer):
 - Commands the user wants available and their exact trigger words
-- Style rules that differ from Claude's defaults (e.g., "never use emoji",
+- Style rules that differ from Codex's defaults (e.g., "never use emoji",
   "always write in passive voice for this legal project")
 - Testing instructions specific to this project
-- Architectural decisions that affect how Claude should work
+- Architectural decisions that affect how Codex should work
 - Dev environment quirks (non-standard paths, custom tools, platform constraints)
 - Common gotchas that have caused problems before
 - Hard safety constraints (what to never do)
 - Domain vocabulary that has specific meaning in this project
 - The intent (WHY) behind every constraint
 
-**EXCLUDE from CLAUDE.md** (wastes tokens, adds noise):
-- Anything Claude can infer from reading the code or files
-- Standard conventions for the language/framework (Claude already knows these)
+**EXCLUDE from AGENTS.md** (wastes tokens, adds noise):
+- Anything Codex can infer from reading the code or files
+- Standard conventions for the language/framework (Codex already knows these)
 - Detailed API documentation (link to it instead)
 - Frequently-changing information (put in memory files instead)
 - Redundant restatements of the same rule
-- General coding best practices (Claude already follows these)
+- General coding best practices (Codex already follows these)
 - Lengthy examples that belong in reference files
-- Information that belongs in a rule or agent file (CLAUDE.md references them)
+- Information that belongs in a rule or agent file (AGENTS.md references them)
 
 ### Intent-Behind-Rules Enforcement
 
-Every constraint in CLAUDE.md must explain WHY, not just WHAT.
+Every constraint in AGENTS.md must explain WHY, not just WHAT.
 
 Bad:
 ```
@@ -68,8 +68,8 @@ Good:
   overwritten on next deploy.
 ```
 
-Check: For each constraint, ask "would Claude understand why this matters?"
-If the answer is "only if Claude already knows our project," the intent
+Check: For each constraint, ask "would Codex understand why this matters?"
+If the answer is "only if Codex already knows our project," the intent
 is missing.
 
 ### Few-Shot Example Requirements
@@ -123,7 +123,7 @@ Include which agent to delegate to, what to check first, etc.]
 ### Content Standards
 
 - Each rule must be specific enough to act on
-- Each rule must include WHY (same intent-behind-rules requirement as CLAUDE.md)
+- Each rule must include WHY (same intent-behind-rules requirement as AGENTS.md)
 - Avoid overlap with other rule files (check for duplication)
 - Link to other rules rather than restating their content
 - Use domain-specific vocabulary from GENESIS.md
@@ -139,7 +139,7 @@ Include which agent to delegate to, what to check first, etc.]
 
 **Autonomy rule (01-autonomy.md)**:
 - Must classify actions by reversibility and impact
-- Must include the overengineering prevention instruction (Opus 4.6)
+- Must include the overengineering prevention instruction (GPT-5.5)
 - Must list specific examples for "act" vs. "ask" in this domain
 - Must not contradict the orchestrator's routing decisions
 
@@ -176,24 +176,23 @@ Include which agent to delegate to, what to check first, etc.]
 - Target: 40-60 lines
 - Hard maximum: 80 lines
 
-### Frontmatter Requirements
+### TOML Field Requirements
 
 All fields are enforced:
-```yaml
----
-name: agent-name          # Required. Matches filename stem.
-description: ...          # Required. Includes WHEN to delegate.
-model: sonnet             # Required. opus | sonnet | haiku
-tools: [Read, Write, ...]# Required. List of tools.
-maxTurns: 30              # Required. Integer 10-100.
----
+```toml
+name = "agent-name"          # Required. Matches filename stem.
+description = "..."          # Required. Includes WHEN to delegate.
+model = "gpt-5.5"            # Required unless user chose a different OpenAI model.
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
+developer_instructions = """
+Focused operating instructions for this subagent.
+"""
 ```
 
-Optional but recommended:
-```yaml
-disallowedTools: []       # Tools this agent must not use
-permissionMode: default   # default | bypassPermissions
-```
+Do not add unsupported tool allow/deny fields to Codex subagent TOML. Scope the
+agent through `sandbox_mode`, concise `description`, and explicit task boundaries
+inside `developer_instructions`.
 
 ### Description Standards
 
@@ -209,7 +208,7 @@ a task has a clear plan and specific files to modify."
 
 ### Instruction Body Standards
 
-After the frontmatter, the agent instructions must include:
+Inside `developer_instructions`, the agent instructions must include:
 
 1. **Objective**: What this agent accomplishes (1-2 sentences)
 2. **Output format**: What the agent writes to disk and returns
@@ -224,9 +223,9 @@ After the frontmatter, the agent instructions must include:
 ### Model Selection Justification
 
 Each agent's model should match its work type:
-- Opus: Complex reasoning, architectural decisions, multi-step planning
-- Sonnet: Following clear procedures, code implementation, structured review
-- Haiku: Quick lookups, file exploration, simple queries
+- GPT-5.5: Complex reasoning, architectural decisions, multi-step planning
+- medium-effort GPT-5.5: Following clear procedures, code implementation, structured review
+- low-effort GPT-5.5: Quick lookups, file exploration, simple queries
 
 If an agent's model does not match these guidelines, the validator flags a WARN
 (not FAIL -- the architect may have domain-specific reasons).
@@ -247,9 +246,9 @@ If an agent's model does not match these guidelines, the validator flags a WARN
 name: skill-name
 description: [What]. [When/triggers 3+]. [Negative triggers if ambiguous].
 context: fork
-allowed-tools: [Read, Write, Bash]
+tool access policy: [Read, Write, Bash]
 metadata:
-  author: Claude Harness Generator
+  author: Codex Harness Generator
   version: 1.0.0
   generated: YYYY-MM-DD
 ---
@@ -375,56 +374,66 @@ Consider Lite tier."
 
 ---
 
-## settings.json Quality Criteria
+## .codex/config.toml Quality Criteria
 
 ### Structure
 
-```json
-{
-  "permissions": {
-    "allow": [...],
-    "deny": [...]
-  }
-}
+The file must be valid TOML and follow the current Codex config reference:
+
+```toml
+#:schema https://developers.openai.com/codex/config-schema.json
+
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+approval_policy = "on-request"
+
+[permissions.generated-environment]
+extends = ":workspace"
+
+[permissions.generated-environment.filesystem.":workspace_roots"]
+"." = "write"
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"**/secrets/**" = "deny"
+
+default_permissions = "generated-environment"
 ```
 
 ### Permission Coverage
 
 Must include at minimum:
-- `Read(./**)` -- allow reading all project files
-- `Write(./Docs/**)` and `Edit(./Docs/**)` -- allow memory/docs operations
-- `Write(./.claude/**)` and `Edit(./.claude/**)` -- allow self-modification
-- `Write(./CLAUDE.md)` and `Edit(./CLAUDE.md)` -- allow CLAUDE.md updates
-- Domain-specific permissions (Bash commands for build, test, VCS)
+- Schema reference.
+- `model = "gpt-5.5"` unless the user chose another OpenAI model.
+- `model_reasoning_effort`.
+- A named permission profile.
+- Sensitive-path denies for `.env`, secrets, credentials, and private keys.
+- Network mode and allowlisted domains when network access is needed.
 
-### Deny Rule Requirements
-
-Must include at minimum:
-- At least one dangerous Bash command denial (rm -rf, sudo, etc.)
-- At least one sensitive file read denial (.env, secrets, credentials)
-
-Should include:
-- Denials specific to the project's ecosystem
-- Denials for destructive VCS operations (force push, hard reset)
+Must not include:
+- JSON permission arrays.
+- Unsupported command allow/deny lists.
+- Top-level `sandbox_mode` when `default_permissions` is present.
+- Hardcoded secrets or machine-local absolute paths.
 
 ### Ecosystem-Specific Additions
 
 Based on GENESIS.md technical environment:
 
-| Ecosystem | Additional Allow | Additional Deny |
-|-----------|-----------------|-----------------|
-| Node.js | `Bash(npm *)`, `Bash(npx *)` | `Bash(npm publish *)` |
-| Python | `Bash(python *)`, `Bash(pip *)` | `Bash(pip install --user *)` (if not desired) |
-| Git | `Bash(git *)` | `Bash(git push --force *)`, `Bash(git reset --hard *)` |
-| Perforce | `Bash(p4 *)` | `Bash(p4 submit *)`, `Bash(p4 obliterate *)` |
-| Docker | `Bash(docker *)` | `Bash(docker rm -f *)` |
-| Database | `Bash(psql *)`, `Bash(mysql *)` | `Bash(* DROP DATABASE *)` |
+| Ecosystem | Config addition | Documentation addition |
+|-----------|----------------|------------------------|
+| Node.js | allow official npm/node domains if needed | list build/test/lint commands |
+| Python | allow official Python/package domains if needed | list test/type/lint commands |
+| Git | no special config unless an MCP/API integration is selected | document safe status/diff/log commands and approval for destructive operations |
+| Perforce | optional local profile for tool paths | document edit/diff/sync workflow and human-only submit |
+| Docker | usually none | document build/test commands and require approval for prune/remove |
+| Database | network domains only for approved services | require approval for mutations and production access |
 
 ### Sandbox Configuration
 
-If relevant to the project, include sandbox settings:
-- `CLAUDE_CODE_AUTOCOMPACT_PCT_OVERRIDE` tuning recommendation
-- Hook configurations for quality gates (PostToolUse for lint/test)
+If relevant to the project, include:
+- `CODEX_AUTOCOMPACT_PCT_OVERRIDE` tuning recommendation under `[env]`
+- Hook configurations only when verified against the current Codex hook schema
+- Service-tier guidance in GETTING_STARTED.md instead of forced shared config
 
 ---
 
@@ -434,13 +443,13 @@ Quick reference for all generated component size limits:
 
 | Component | Target Lines | Hard Max Lines | Hard Max Words |
 |-----------|-------------|----------------|----------------|
-| CLAUDE.md | 150-200 | 250 | -- |
+| AGENTS.md | 150-200 | 250 | -- |
 | Rule file | 60-100 | 120 | -- |
 | Agent definition | 40-60 | 80 | -- |
 | SKILL.md | 100-300 | 500 | 5,000 |
 | Wiki index.md (Docs/index.md) | 20-50 | 100 | -- |
 | GETTING_STARTED.md | 30-60 | 100 | -- |
-| settings.json | -- | -- | -- (valid JSON) |
+| .codex/config.toml | -- | -- | -- (valid TOML) |
 
 Total rule files: 5-8 (flag if outside this range).
 Total agent definitions: minimum 1, typical 3-7 (flag if >10).

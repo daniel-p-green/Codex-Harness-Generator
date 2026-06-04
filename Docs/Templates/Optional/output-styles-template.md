@@ -4,17 +4,17 @@
      communication preferences identified during intake. Common for
      knowledge work (executive summaries), consulting (structured reports),
      and technical leadership (data-first analysis). Output style can be
-     set via settings.json "outputStyle" or via CLAUDE.md instructions. -->
+     set via .codex/config.toml "outputStyle" or via AGENTS.md instructions. -->
 
 <!-- QUALITY: Must include at least 2 style definitions. Must show how
-     to configure via settings.json. Must include anti-Markdown option.
+     to configure via .codex/config.toml. Must include anti-Markdown option.
      Under 120 lines. -->
 
 ## How Output Styles Work
 
-Claude Code supports an `outputStyle` setting in settings.json that provides
+Codex supports an `outputStyle` setting in .codex/config.toml that provides
 high-level guidance. For more specific control, include style instructions
-directly in CLAUDE.md or a rule file.
+directly in AGENTS.md or a rule file.
 
 ```json
 {
@@ -23,7 +23,7 @@ directly in CLAUDE.md or a rule file.
 ```
 
 <!-- ANNOTATION: The outputStyle setting is a free-text string. It is
-     loaded into Claude's system prompt. Keep it short (1-2 sentences)
+     loaded into Codex's system prompt. Keep it short (1-2 sentences)
      because it applies to every response. -->
 
 ## Style Definitions
@@ -33,7 +33,7 @@ directly in CLAUDE.md or a rule file.
 <!-- VARIATION: Common for knowledge work, consulting, business analysis.
      Users who read many reports and need quick answers. -->
 
-For CLAUDE.md or a rule file:
+For AGENTS.md or a rule file:
 ```markdown
 ## Communication style
 
@@ -49,7 +49,7 @@ Keep responses under 200 words unless asked for detail.
 Use tables for comparisons. Use bullet points, not paragraphs.
 ```
 
-For settings.json:
+For .codex/config.toml:
 ```json
 {
   "outputStyle": "Executive style. Lead with the answer. Brief supporting evidence. Under 200 words. Tables for comparisons."
@@ -61,7 +61,7 @@ For settings.json:
 <!-- VARIATION: Common for engineering teams, data science, research.
      Users who need to verify methodology and reproduce results. -->
 
-For CLAUDE.md or a rule file:
+For AGENTS.md or a rule file:
 ```markdown
 ## Communication style
 
@@ -77,7 +77,7 @@ Include exact file paths, line numbers, and command output.
 Prefer precision over brevity.
 ```
 
-For settings.json:
+For .codex/config.toml:
 ```json
 {
   "outputStyle": "Technical style. Data-first. Include file paths and line numbers. Methodology before conclusions."
@@ -89,7 +89,7 @@ For settings.json:
 <!-- VARIATION: Common for content creation, marketing, writing projects.
      Users who want natural-sounding prose, not structured reports. -->
 
-For CLAUDE.md or a rule file:
+For AGENTS.md or a rule file:
 ```markdown
 ## Communication style
 
@@ -103,12 +103,12 @@ Match the tone of the project (formal for academic, casual for blog posts).
 
 ### Anti-Markdown (Prose Mode)
 
-<!-- ANNOTATION: Some users find Claude's default heavy use of markdown
+<!-- ANNOTATION: Some users find Codex's default heavy use of markdown
      headers, bullet points, and bold text distracting. This prompt
      suppresses that behavior for conversational responses while
      preserving formatting for actual deliverables. -->
 
-For CLAUDE.md:
+For AGENTS.md:
 ```markdown
 ## Communication style
 
@@ -124,7 +124,7 @@ In conversation, write naturally. A short paragraph is better than a
 bulleted list.
 ```
 
-For settings.json:
+For .codex/config.toml:
 ```json
 {
   "outputStyle": "Plain prose in conversation. No markdown formatting except for deliverables and code. Short paragraphs."
@@ -136,7 +136,7 @@ For settings.json:
 <!-- VARIATION: Common for consulting, professional services, legal, agencies.
      Users who need to produce client-facing documents with clear deliverables. -->
 
-For CLAUDE.md or a rule file:
+For AGENTS.md or a rule file:
 ```markdown
 ## Communication style: Client deliverable
 
@@ -155,7 +155,7 @@ Characteristics:
 <!-- VARIATION: Common for cybersecurity, financial services, healthcare,
      legal compliance. Users who produce audit reports or gap analyses. -->
 
-For CLAUDE.md or a rule file:
+For AGENTS.md or a rule file:
 ```markdown
 ## Communication style: Regulatory compliance
 
@@ -174,7 +174,7 @@ Characteristics:
 <!-- VARIATION: Common for finance, accounting, FP&A, business analysis.
      Users who work with financial statements, budgets, and forecasts. -->
 
-For CLAUDE.md or a rule file:
+For AGENTS.md or a rule file:
 ```markdown
 ## Communication style: Financial tabular
 

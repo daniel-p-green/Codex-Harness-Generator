@@ -1,110 +1,122 @@
 # Ecosystem Permissions Reference
 
-Reusable `settings.json` permission sets per language/tool ecosystem. Slim
-starter profiles and bundled domains reference this file instead of inlining the
-JSON. The component-generator composes a project's `settings.json` from the Base
-set + Universal Deny + the ecosystems the intake identified. Pair with
-`Docs/Templates/Core/settings-json.md` (structure) and topic 11 (permissions).
+Reusable Codex permission-profile guidance for generated `.codex/config.toml`
+files. Profiles should add only filesystem and network policy that the official
+Codex config schema supports. Command-level safety belongs in AGENTS.md,
+GETTING_STARTED.md, and validator checks unless the current config reference adds
+a verified command-policy surface.
 
-Ordering rule: deny -> ask -> allow. Always include the Universal Deny set.
+Pair with:
+- `Docs/Templates/Core/codex-config-toml.md`
+- `Docs/AgentGuidelines/Topics/11-permissions.md`
+- https://developers.openai.com/codex/config-reference
 
-## Base (all projects)
+## Base Profile
 
-```json
-{
-  "permissions": {
-    "allow": [
-      "Read(./**)",
-      "Edit(./Docs/**)", "Write(./Docs/**)",
-      "Edit(./.claude/**)", "Write(./.claude/**)",
-      "Edit(./CLAUDE.md)", "Write(./CLAUDE.md)",
-      "WebSearch", "WebFetch(*)"
-    ],
-    "deny": [
-      "Read(./.env)", "Read(./.env.*)", "Read(./secrets/**)",
-      "Read(./**/*credentials*)", "Read(./**/*secret*)"
-    ]
-  }
-}
+Use this as the starting point for normal generated environments.
+
+```toml
+default_permissions = "generated-environment"
+
+[permissions.generated-environment]
+description = "Workspace write access with sensitive paths and network access constrained."
+extends = ":workspace"
+
+[permissions.generated-environment.filesystem.":workspace_roots"]
+"." = "write"
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"**/secrets/**" = "deny"
+"**/*secret*" = "deny"
+"**/*credential*" = "deny"
+"**/*.pem" = "deny"
+"**/*.key" = "deny"
+
+[permissions.generated-environment.network]
+enabled = true
+mode = "limited"
+
+[permissions.generated-environment.network.domains]
+"developers.openai.com" = "allow"
+"docs.github.com" = "allow"
 ```
 
-## Universal Deny (all languages -- always include)
+## Conservative Profile
 
-```json
-{
-  "permissions": {
-    "deny": [
-      "Bash(rm -rf /)", "Bash(rm -rf /*)", "Bash(sudo *)", "Bash(chmod 777 *)",
-      "Bash(curl * | bash)", "Bash(curl * | sh)", "Bash(wget * | bash)",
-      "Bash(wget * | sh)", "Bash(mkfs *)", "Bash(dd if=*)", "Bash(:(){ :|:& };:)"
-    ]
-  }
-}
+Use this when the project handles regulated data, legal/financial claims,
+production infrastructure, or highly sensitive customer material.
+
+```toml
+default_permissions = "conservative-environment"
+
+[permissions.conservative-environment]
+description = "Conservative workspace policy for sensitive projects."
+extends = ":workspace"
+
+[permissions.conservative-environment.filesystem.":workspace_roots"]
+"Docs/**" = "write"
+"_workspace/**" = "write"
+".codex/**" = "write"
+"AGENTS.md" = "write"
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"**/secrets/**" = "deny"
+"**/*secret*" = "deny"
+"**/*credential*" = "deny"
+"**/*.pem" = "deny"
+"**/*.key" = "deny"
+"data/raw/**" = "read"
+"exports/private/**" = "read"
+
+[permissions.conservative-environment.network]
+enabled = true
+mode = "limited"
+
+[permissions.conservative-environment.network.domains]
+"developers.openai.com" = "allow"
 ```
 
-## Git
+## Domain Network Additions
 
-allow: `git status/diff/log/branch/add/commit/checkout/switch/stash/fetch/pull/show/blame *`,
-`git push`, `git push origin *`, `git merge/rebase/cherry-pick/tag *`.
-deny: `git push --force *`, `git push -f *`, `git reset --hard *`, `git clean -f *`,
-`git checkout -- .`, `git branch -D *`.
+Add only domains justified by GENESIS.md or ARCHITECTURE.md.
 
-## Python
+| Domain | Typical allowed domains |
+|---|---|
+| Python/data | `pypi.org`, `files.pythonhosted.org`, `docs.python.org` |
+| Node/web | `registry.npmjs.org`, `nodejs.org`, `developer.mozilla.org` |
+| Cloud/DevOps | official provider docs and APIs for the selected provider only |
+| Research/writing | official source domains selected during intake |
+| Security audit | `nvd.nist.gov`, `osv.dev`, `github.com`, `docs.github.com` |
 
-allow: `python *`, `python3 *`, `pip install/list/show/freeze *`, `pytest *`,
-`mypy *`, `ruff *`, `black *`, `isort *`, `flake8 *`, `poetry *`, `uv *`.
-deny: `pip install --user *`, `python -m pip install --break-system-packages *`.
-Verify: `pytest`, `mypy .`, `ruff check .`
+Do not add broad wildcard domains unless the user explicitly needs them.
 
-## Node / TypeScript
+## Command Guidance by Ecosystem
 
-allow: `node *`, `npm install/run/test/list *`, `npx *`, `yarn *`, `pnpm *`,
-`tsc *`, `eslint *`, `prettier *`, `vitest *`, `jest *`.
-deny: `npm publish/unpublish/deprecate *`, `yarn publish *`, `pnpm publish *`.
-Verify: `npm test`, `npx tsc --noEmit`, `npx eslint .`
+Document these commands in AGENTS.md and GETTING_STARTED.md as project-specific
+verification or operational commands. Do not encode them as unsupported TOML
+permission arrays.
 
-## Go
+| Ecosystem | Safe verification commands | Require explicit approval |
+|---|---|---|
+| Git | `git status`, `git diff`, `git log`, `git show`, `git blame` | force push, hard reset, clean, branch deletion |
+| Python | `python -m pytest`, `ruff check`, `mypy`, `python -m compileall` | arbitrary package installs, system package changes |
+| Node / TypeScript | `npm test`, `npm run build`, `npm run lint`, `npx tsc --noEmit` | publish, unpublish, destructive dependency changes |
+| Go | `go test ./...`, `go vet ./...`, `gofmt` | release publishing, destructive clean operations |
+| Rust | `cargo test`, `cargo check`, `cargo clippy`, `cargo fmt` | publish, yank, destructive clean operations |
+| Java | `mvn test`, `mvn verify`, `./gradlew test` | deploy, publish, credentialed release actions |
+| .NET | `dotnet test`, `dotnet build`, `dotnet format --verify-no-changes` | package publishing, production deploys |
+| Docker | image inspection and local build commands | pruning, removing running containers, registry push |
+| Infrastructure | `terraform plan`, `terraform validate`, `kubectl get`, logs/describe | apply, destroy, delete, production mutations |
 
-allow: `go build/test/run/vet/mod/fmt/generate *`, `golangci-lint *`, `staticcheck *`.
-Verify: `go test ./...`, `go vet ./...`, `golangci-lint run`
+## Data Files
 
-## Rust
+When intake marks raw data as immutable, add read-only guidance in AGENTS.md and
+deny or constrain write paths in the permission profile. Generated workflows
+should write derived outputs to `Docs/_working/`, `_workspace/`, `output/`, or
+`Outbox/`, not back into raw source directories.
 
-allow: `cargo build/test/run/check/clippy/fmt/doc *`, `rustfmt *`.
-deny: `cargo publish *`, `cargo yank *`.
-Verify: `cargo test`, `cargo clippy -- -D warnings`, `cargo check`
+## Local Profile
 
-## Java
-
-allow: `mvn *`, `gradle *`, `./gradlew *`, `java *`, `javac *`.
-deny: `mvn deploy *`, `gradle publish *`, `./gradlew publish *`.
-Verify: `mvn test`, `./gradlew test`, `mvn verify`
-
-## C# / .NET
-
-allow: `dotnet build/test/run/restore/format *`.
-deny: `dotnet nuget push *`, `dotnet nuget delete *`.
-Verify: `dotnet test`, `dotnet build --no-restore`, `dotnet format --verify-no-changes`
-
-## Docker (when containerized)
-
-allow: `docker *`, `docker-compose *`. deny: `docker system prune -a *`.
-
-## Data / Python-analysis (pandas, notebooks)
-
-allow (in addition to Python): `jupyter *`, `papermill *`. Treat large data files
-as read-mostly; deny writes to raw-data directories if the intake flags them
-immutable.
-
-## Infrastructure (Terraform / Kubernetes / cloud CLIs)
-
-allow: `terraform plan/validate/fmt *`, `kubectl get/describe/logs *`,
-`aws *` / `gcloud *` / `az *` (read-oriented subcommands).
-deny (gate behind human approval): `terraform apply *`, `terraform destroy *`,
-`kubectl delete *`, `kubectl apply *`, any `* delete *` / `* rm *` cloud mutation.
-These are the infrastructure safety gates -- never auto-approve state mutation.
-
-## settings.local.json
-
-Generate `settings.local.json` for machine-specific paths detected in intake
-(custom tool dirs, local DB connection strings). Never commit secrets.
+Machine-specific paths, local database URLs, and service credentials belong in a
+gitignored local profile or environment variables. Shared `.codex/config.toml`
+must never contain secrets or absolute paths unique to one developer's machine.

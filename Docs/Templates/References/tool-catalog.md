@@ -1,6 +1,6 @@
 # File Processing Tool Catalog
 
-**Purpose:** Reference for component-generator when building file processing capabilities. Contains the definitive information about each tool -- what it does, how to install it, when to use it, and how to configure it in a Claude Code environment.
+**Purpose:** Reference for component-generator when building file processing capabilities. Contains the definitive information about each tool -- what it does, how to install it, when to use it, and how to configure it in a Codex environment.
 
 **Last Updated:** 2026-02-16
 
@@ -47,7 +47,7 @@ Map user needs to tool selections. Read left-to-right: identify the need, then s
 }
 ```
 
-This gives Claude a native `convert_to_markdown` tool -- the most seamless integration path.
+This gives Codex a native `convert_to_markdown` tool -- the most seamless integration path.
 
 **CLI usage:**
 
@@ -66,7 +66,7 @@ print(result.text_content)
 
 - **When to use:** ALWAYS for file-processing environments. This is the universal inbound converter.
 - **When NOT to use:** Never skip this for environments that process non-text files.
-- **Note:** Claude Code's native Read tool already handles PDFs (up to 20 pages) and images. MarkItDown adds Excel, Word, PowerPoint, audio, and richer PDF extraction.
+- **Note:** Codex's native Read tool already handles PDFs (up to 20 pages) and images. MarkItDown adds Excel, Word, PowerPoint, audio, and richer PDF extraction.
 
 ---
 
@@ -88,7 +88,7 @@ pandoc slides.md -t pptx -o deck.pptx --reference-doc=template.pptx
 pandoc paper.md -o paper.pdf
 ```
 
-**PPTX workflow:** Claude writes Markdown with `---` slide breaks, Pandoc produces formatted slides. Approximately 20 lines of Markdown for a 10-slide deck.
+**PPTX workflow:** Codex writes Markdown with `---` slide breaks, Pandoc produces formatted slides. Approximately 20 lines of Markdown for a 10-slide deck.
 
 **Template support:** Custom .docx/.pptx templates for branding and consistent formatting. Place templates in the environment's `Templates/` directory and reference them with `--reference-doc`.
 
@@ -114,7 +114,7 @@ doc.save("output.docx")
 
 - **When to use:** When user needs basic internal .docx output and Pandoc is not installed.
 - **When NOT to use:** When professional formatting matters -- use Pandoc instead.
-- **Limitation:** Requires Claude to build document structure programmatically. More code, less natural than Pandoc's Markdown-to-docx pipeline.
+- **Limitation:** Requires Codex to build document structure programmatically. More code, less natural than Pandoc's Markdown-to-docx pipeline.
 
 ---
 
@@ -188,7 +188,7 @@ with pdfplumber.open("report.pdf") as pdf:
 ```
 
 - **When to use:** ONLY when MarkItDown's PDF handling is not sufficient for complex tabular data (multi-column layouts, merged cells, nested tables).
-- **When NOT to use:** For general PDF reading. MarkItDown or Claude's native Read tool handles standard PDFs.
+- **When NOT to use:** For general PDF reading. MarkItDown or Codex's native Read tool handles standard PDFs.
 
 ---
 
@@ -225,7 +225,7 @@ For environments that do both quick analysis AND formatted output, include both 
 | "Create a board presentation" | Quality | MarkItDown | Pandoc -> .pptx | Medium |
 | "Update formulas in this spreadsheet" | Fidelity | openpyxl | openpyxl | Higher |
 
-**Routing logic for CLAUDE.md or agent instructions:**
+**Routing logic for AGENTS.md or agent instructions:**
 
 ```
 If the user asks to READ/ANALYZE/SUMMARIZE a file:
@@ -247,11 +247,11 @@ For environments with file processing, generate this directory structure:
 ```
 <project>/
   Inbox/           # User drops files here for processing
-    README.md      # "Place files here for Claude to process"
-  Outbox/          # Claude places results here
+    README.md      # "Place files here for Codex to process"
+  Outbox/          # Codex places results here
     README.md      # "Find your processed files here"
   Data/            # Working data (intermediate, reference)
-    README.md      # "Working data files -- managed by Claude"
+    README.md      # "Working data files -- managed by Codex"
 ```
 
 Each README.md should contain a one-line purpose description so the directories are self-documenting and not empty (which some version control systems ignore).
@@ -277,7 +277,7 @@ Brand/
   - Content is formatted according to those styles automatically
 - .pptx template: `pandoc slides.md -t pptx -o deck.pptx --reference-doc=Brand/Templates/company-deck.pptx`
   - Pandoc uses the template's slide layouts, theme colors, fonts, and backgrounds
-  - Claude writes plain Markdown with slide breaks; Pandoc applies the brand look
+  - Codex writes plain Markdown with slide breaks; Pandoc applies the brand look
 
 **brand-rules.md structure:**
 ```markdown
@@ -349,7 +349,7 @@ pip install python-docx                             # Basic Word generation (if 
 
 ### How to use:
 1. Drop files in the `Inbox/` folder
-2. Tell Claude what you want: "Summarize the report in Inbox/" or "Create a presentation from the data in Inbox/"
+2. Tell Codex what you want: "Summarize the report in Inbox/" or "Create a presentation from the data in Inbox/"
 3. Find your results in the `Outbox/` folder
 ```
 

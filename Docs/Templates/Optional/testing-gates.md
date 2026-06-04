@@ -10,7 +10,7 @@
      if automated tests exist. Must include manual test protocol if
      applicable. Under 120 lines. -->
 
-## Example: Testing Gates Rule (`.claude/rules/testing-gates.md`)
+## Example: Testing Gates Rule (`.codex/rules/testing-gates.md`)
 
 ```markdown
 # Testing gates
@@ -63,7 +63,7 @@ When fixing a bug:
 
 <!-- ANNOTATION: This is the critical gate for projects where automated
      tests cannot verify the change (UI, gameplay, visual output). The
-     STOP-and-wait pattern is essential -- Claude must not continue past
+     STOP-and-wait pattern is essential -- Codex must not continue past
      this point without user confirmation. -->
 
 <!-- VARIATION: Include this section for game dev, UI-heavy projects,

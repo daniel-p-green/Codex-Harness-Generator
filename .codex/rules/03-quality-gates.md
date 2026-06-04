@@ -14,7 +14,7 @@ Do not re-list the checks here; keep the validation guide the single source of t
 Before writing any files to the target directory:
 
 1. **Directory writability**: create and delete a temp file; stop and report if it fails.
-2. **Existing files**: if `.claude/` or `CLAUDE.md` exists, warn and offer backup / overwrite / cancel.
+2. **Existing files**: if `.codex/` or `AGENTS.md` exists, warn and offer backup / overwrite / cancel.
 3. **Disk space**: verify reasonable free space on the target drive.
 
 ## Gate 2: File preview gate
@@ -42,7 +42,7 @@ read-only; it never fixes issues itself.
 Two boundary-crossing checks (guide v2) catch what existence checks miss: 16b
 cross-validates the ARCHITECTURE.md Component Manifest against files actually
 written (planned-but-not-written, or written-but-unplanned); 20b confirms the
-GENESIS domain vocabulary actually appears in the generated CLAUDE.md (intake
+GENESIS domain vocabulary actually appears in the generated AGENTS.md (intake
 absorbed, not generic).
 
 ## Skill description quality bar

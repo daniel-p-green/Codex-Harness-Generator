@@ -29,7 +29,7 @@
   Domain: FastAPI + React web application
 
   File structure:
-  .claude/skills/health-check/
+  .agents/skills/health-check/
     SKILL.md              (this file -- core instructions)
     scripts/
       validate.sh           (deterministic structural validation)
@@ -44,9 +44,9 @@
 name: health-check
 description: Validate environment integrity and freshness. Use when the user says "health check", "validate environment", "check my setup", "is everything working", "run diagnostics", or "/health-check". Do NOT use for checking code quality or running tests.
 context: fork
-allowed-tools: [Read, Glob, Grep, Bash]
+tool access policy: [Read, Glob, Grep, Bash]
 metadata:
-  author: Claude Harness Generator
+  author: Codex Harness Generator
   version: 1.0.0
 ---
 ```
@@ -73,18 +73,18 @@ Run `scripts/validate.sh` from the project root. The script checks:
 
 | Check | What it validates | Severity |
 |---|---|---|
-| S1: CLAUDE.md exists | `./CLAUDE.md` or `./.claude/CLAUDE.md` present | FAIL |
-| S2: Settings valid JSON | `.claude/settings.json` parses without errors | FAIL |
-| S3: Skill folders | Each `.claude/skills/*/` has a `SKILL.md` file | FAIL |
+| S1: AGENTS.md exists | `./AGENTS.md` or `./.codex/AGENTS.md` present | FAIL |
+| S2: Config valid TOML | `.codex/config.toml` parses without errors | FAIL |
+| S3: Skill folders | Each `.agents/skills/*/` has a `SKILL.md` file | FAIL |
 | S4: Skill naming | Skill folder names are kebab-case (lowercase + hyphens) | WARN |
 | S5: No skill README | No `README.md` inside skill folders | WARN |
-| S6: Agent frontmatter | Each `.claude/agents/*.md` has name, description, maxTurns in frontmatter | FAIL |
+| S6: Agent TOML | Each `.codex/agents/*.toml` has name, description, developer_instructions, model, model_reasoning_effort, sandbox_mode | FAIL |
 | S7: Wiki index | `Docs/index.md` exists | FAIL |
 | S8: State directory | `Docs/_working/state/` directory exists | WARN |
 | S9: Retro directory | `Docs/_working/retro/` directory exists | WARN |
-| S10: File size limits | CLAUDE.md < 250 lines, rules < 120 lines, agents < 80 lines | WARN |
+| S10: File size limits | AGENTS.md < 250 lines, rules < 120 lines, agents < 80 lines | WARN |
 | S11: SKILL.md size | Each SKILL.md < 500 lines | WARN |
-| S12: Settings deny rules | `settings.json` has non-empty `permissions.deny` array | WARN |
+| S12: Config deny rules | `.codex/config.toml` has non-empty deny rules | WARN |
 
 ### Script output format
 
@@ -94,9 +94,9 @@ The script outputs JSON:
 {
   "timestamp": "2026-02-14T15:30:00Z",
   "checks": [
-    {"id": "S1", "name": "CLAUDE.md exists", "status": "PASS", "detail": ""},
-    {"id": "S2", "name": "Settings valid JSON", "status": "PASS", "detail": ""},
-    {"id": "S10", "name": "File size limits", "status": "WARN", "detail": "CLAUDE.md is 267 lines (limit: 250)"}
+    {"id": "S1", "name": "AGENTS.md exists", "status": "PASS", "detail": ""},
+    {"id": "S2", "name": "Config valid TOML", "status": "PASS", "detail": ""},
+    {"id": "S10", "name": "File size limits", "status": "WARN", "detail": "AGENTS.md is 267 lines (limit: 250)"}
   ],
   "summary": {"pass": 10, "warn": 2, "fail": 0}
 }
@@ -114,7 +114,7 @@ After the script completes, perform these LLM-based checks:
 
 | Check | What it validates | Severity |
 |---|---|---|
-| L1: Cross-references | All file paths referenced in CLAUDE.md actually exist | FAIL |
+| L1: Cross-references | All file paths referenced in AGENTS.md actually exist | FAIL |
 | L2: Routing completeness | Routing table covers: bugs, features, exploration, refactor, ambiguous (at minimum) | WARN |
 | L3: Routing specificity | Routing entries use domain-specific terms (not generic "bug -> debugger") | WARN |
 | L4: Rule consistency | No contradictory rules across rule files (e.g., autonomy says "ask" but routing says "act") | FAIL |
@@ -122,7 +122,7 @@ After the script completes, perform these LLM-based checks:
 | L6: Stale documents | Documents with "Last Updated" older than 30 days | WARN |
 | L7: Retro patterns | Friction entries with 3+ occurrences that have no corresponding proposal | WARN |
 | L8: State symmetry | State-save covers all 6 taxonomy categories AND state-load reads all of them | WARN |
-| L9: Permission coverage | settings.json allows all tools referenced by agents and skills | WARN |
+| L9: Permission coverage | .codex/config.toml allows all tools referenced by agents and skills | WARN |
 | L10: Orphan components | Agents or skills referenced in routing but whose files do not exist | FAIL |
 
 ## Output format
@@ -146,10 +146,10 @@ WARN: 3 warnings
 FAIL: 1 failure
 
 ### Failures (action required)
-- [FAIL] L10: Orphan component -- .claude/agents/perf-analyst.md referenced in routing but file missing
+- [FAIL] L10: Orphan component -- .codex/agents/perf-analyst.toml referenced in routing but file missing
 
 ### Warnings
-- [WARN] S10: CLAUDE.md is 267 lines (limit: 250) -- consider trimming
+- [WARN] S10: AGENTS.md is 267 lines (limit: 250) -- consider trimming
 - [WARN] L6: Docs/Areas/auth.md last updated 45 days ago
 - [WARN] L7: 4 ROUTING_CORRECTION entries without a proposal
 
@@ -177,7 +177,7 @@ If the user asks for details on any check, provide:
 ```bash
 #!/usr/bin/env bash
 # Health check: deterministic structural validation
-# Usage: bash .claude/skills/health-check/scripts/validate.sh
+# Usage: bash .agents/skills/health-check/scripts/validate.sh
 # Output: JSON to stdout
 
 set -euo pipefail
@@ -198,26 +198,26 @@ add_check() {
   esac
 }
 
-# S1: CLAUDE.md exists
-if [ -f "./CLAUDE.md" ] || [ -f "./.claude/CLAUDE.md" ]; then
-  add_check "S1" "CLAUDE.md exists" "PASS"
+# S1: AGENTS.md exists
+if [ -f "./AGENTS.md" ] || [ -f "./.codex/AGENTS.md" ]; then
+  add_check "S1" "AGENTS.md exists" "PASS"
 else
-  add_check "S1" "CLAUDE.md exists" "FAIL" "No CLAUDE.md found"
+  add_check "S1" "AGENTS.md exists" "FAIL" "No AGENTS.md found"
 fi
 
-# S2: Settings valid JSON
-if [ -f ".claude/settings.json" ]; then
-  if python3 -c "import json; json.load(open('.claude/settings.json'))" 2>/dev/null; then
-    add_check "S2" "Settings valid JSON" "PASS"
+# S2: Config valid TOML
+if [ -f ".codex/config.toml" ]; then
+  if python3 -c "import tomllib; tomllib.load(open('.codex/config.toml','rb'))" 2>/dev/null; then
+    add_check "S2" "Config valid TOML" "PASS"
   else
-    add_check "S2" "Settings valid JSON" "FAIL" "Invalid JSON in settings.json"
+    add_check "S2" "Config valid TOML" "FAIL" "Invalid TOML in .codex/config.toml"
   fi
 else
-  add_check "S2" "Settings valid JSON" "WARN" "No settings.json found"
+  add_check "S2" "Config valid TOML" "WARN" "No .codex/config.toml found"
 fi
 
 # S3: Skill folders have SKILL.md
-for dir in .claude/skills/*/; do
+for dir in .agents/skills/*/; do
   [ -d "$dir" ] || continue
   name=$(basename "$dir")
   if [ -f "${dir}SKILL.md" ]; then
@@ -228,7 +228,7 @@ for dir in .claude/skills/*/; do
 done
 
 # S4: Skill naming (kebab-case)
-for dir in .claude/skills/*/; do
+for dir in .agents/skills/*/; do
   [ -d "$dir" ] || continue
   name=$(basename "$dir")
   if echo "$name" | grep -qE '^[a-z][a-z0-9-]*$'; then
@@ -239,7 +239,7 @@ for dir in .claude/skills/*/; do
 done
 
 # S5: No README.md in skill folders
-for dir in .claude/skills/*/; do
+for dir in .agents/skills/*/; do
   [ -d "$dir" ] || continue
   name=$(basename "$dir")
   if [ -f "${dir}README.md" ]; then
@@ -255,22 +255,22 @@ else
 fi
 
 # S10: File size limits
-if [ -f "./CLAUDE.md" ]; then
-  lines=$(wc -l < "./CLAUDE.md")
+if [ -f "./AGENTS.md" ]; then
+  lines=$(wc -l < "./AGENTS.md")
   if [ "$lines" -le 250 ]; then
-    add_check "S10-claude" "CLAUDE.md size" "PASS" "$lines lines"
+    add_check "S10-agents-md" "AGENTS.md size" "PASS" "$lines lines"
   else
-    add_check "S10-claude" "CLAUDE.md size" "WARN" "$lines lines (limit: 250)"
+    add_check "S10-agents-md" "AGENTS.md size" "WARN" "$lines lines (limit: 250)"
   fi
 fi
 
 # S12: Settings deny rules
-if [ -f ".claude/settings.json" ]; then
-  deny_count=$(python3 -c "import json; d=json.load(open('.claude/settings.json')); print(len(d.get('permissions',{}).get('deny',[])))" 2>/dev/null || echo 0)
+if [ -f ".codex/config.toml" ]; then
+  deny_count=$(python3 -c "import json; d=json.load(open('.codex/config.toml')); print(len(d.get('permissions',{}).get('deny',[])))" 2>/dev/null || echo 0)
   if [ "$deny_count" -gt 0 ]; then
     add_check "S12" "Settings deny rules" "PASS" "$deny_count deny rules"
   else
-    add_check "S12" "Settings deny rules" "WARN" "No deny rules in settings.json"
+    add_check "S12" "Settings deny rules" "WARN" "No deny rules in .codex/config.toml"
   fi
 fi
 

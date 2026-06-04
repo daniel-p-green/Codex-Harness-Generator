@@ -10,7 +10,7 @@
      task sizing guidance. Must include file ownership rules. Must include
      scaling recommendations. Under 120 lines. -->
 
-## Example: Team Coordination Rule (`.claude/rules/team-coordination.md`)
+## Example: Team Coordination Rule (`.codex/rules/team-coordination.md`)
 
 ```markdown
 # Team coordination

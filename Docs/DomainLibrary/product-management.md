@@ -18,11 +18,11 @@ Agents (definitions: `Docs/Templates/Agents/<name>.md`; adapt, do not copy verba
 
 | name | model | role | template |
 |---|---|---|---|
-| strategist | opus | Product vision, OKRs, theme-based roadmap (Now/Next/Later), RICE/ICE prioritization | researcher.md (reframe research output as strategy reasoning) |
-| prd-writer | sonnet | Author the PRD: problem, solution, scoped functional + non-functional requirements, success metrics; tag the problem source (user-reported / research-backed / PM-hypothesis) and mark user-not-supplied impact/scope figures unverified | drafter.md |
-| story-writer | sonnet | Decompose PRD into INVEST user stories with Given-When-Then AC and story points | drafter.md |
-| sprint-planner | sonnet | Capacity calc, sprint-goal setting, story allocation, risk buffer, retro template | analyst.md (reframe data work as capacity/velocity math) |
-| pm-reviewer | opus | Cross-validate roadmap->PRD->stories->sprint consistency, traceability, feasibility; flag vanity/gameable success metrics and dark-pattern engagement targets (read-only) | reviewer.md |
+| strategist | high-effort | Product vision, OKRs, theme-based roadmap (Now/Next/Later), RICE/ICE prioritization | researcher.md (reframe research output as strategy reasoning) |
+| prd-writer | medium-effort | Author the PRD: problem, solution, scoped functional + non-functional requirements, success metrics; tag the problem source (user-reported / research-backed / PM-hypothesis) and mark user-not-supplied impact/scope figures unverified | drafter.md |
+| story-writer | medium-effort | Decompose PRD into INVEST user stories with Given-When-Then AC and story points | drafter.md |
+| sprint-planner | medium-effort | Capacity calc, sprint-goal setting, story allocation, risk buffer, retro template | analyst.md (reframe data work as capacity/velocity math) |
+| pm-reviewer | high-effort | Cross-validate roadmap->PRD->stories->sprint consistency, traceability, feasibility; flag vanity/gameable success metrics and dark-pattern engagement targets (read-only) | reviewer.md |
 
 Rules (templates in `Docs/Templates/Core|Optional/`): orchestrator/routing,
 autonomy, context-management, self-learning, error-handling, memory-management;
@@ -78,11 +78,11 @@ plan-product pipeline with cross-verification and rework loop).
 
 Base + Universal Deny -- see `Docs/Templates/References/ecosystem-permissions.md`.
 Add **Git** only if PM deliverables live in a versioned docs repo. No language
-ecosystem needed (no build/test). Add `Write(./_working/**)` and
-`Write(./Docs/**)` for the staged deliverables (`00_input.md` through
+ecosystem needed (no build/test). Add writable `_working/**` and `Docs/**`
+for the staged deliverables (`00_input.md` through
 `05_review_report.md`). If a tracker MCP is approved (see MCP suggestions),
 allow only its read + create-issue tools; gate bulk delete/close behind human
-approval. Generate `settings.local.json` for any machine-specific vault or
+approval. Generate `local config profile` for any machine-specific vault or
 tracker path.
 
 ## Evidence Integrity
@@ -155,12 +155,12 @@ regulatory machinery:
 
 ## Cost / Model Notes
 
-Opus for the reasoning roles (strategist, pm-reviewer) where prioritization
-judgment and cross-document consistency matter; Sonnet for the execution roles
+GPT-5.5 for the reasoning roles (strategist, pm-reviewer) where prioritization
+judgment and cross-document consistency matter; medium-effort GPT-5.5 for the execution roles
 that fill established templates (prd-writer, story-writer, sprint-planner).
-Defaults: balanced (Opus on strategy/review, Sonnet on authoring; compaction 95%;
-CLAUDE.md ~200 lines). Cost-conscious override: all-Sonnet, compaction 85%, brief
-RTK note in GETTING_STARTED. Quality-first: Opus on prd-writer too (PRD clarity is
+Defaults: balanced (high-effort GPT-5.5 on strategy/review, medium-effort GPT-5.5 on authoring; compaction 95%;
+AGENTS.md ~200 lines). Cost-conscious override: all medium-effort GPT-5.5, compaction 85%, brief
+RTK note in GETTING_STARTED. Quality-first: GPT-5.5 on prd-writer too (PRD clarity is
 the cost center downstream). Subagents ~4x direct; the full Agent-Team pipeline ~15x.
 
 ## Customization Points
