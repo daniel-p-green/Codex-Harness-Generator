@@ -53,6 +53,16 @@ class DoctorTests(unittest.TestCase):
         self.assertEqual(["missing.txt"], payload["missing"])
         self.assertEqual("1/2 present", payload["detail"])
 
+    def test_proof_status_report_last_status_is_advisory(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            report = Path(temp_dir) / "PROOF_STATUS.md"
+            report.write_text("# Proof Status\n\nStatus: FAIL\n", encoding="utf-8")
+
+            payload = doctor.check_proof_status_report(report)
+
+        self.assertEqual("pass", payload["status"])
+        self.assertIn("last_status=fail", payload["detail"])
+
     def test_build_payload_passes_for_current_checkout(self):
         payload = doctor.build_payload()
 

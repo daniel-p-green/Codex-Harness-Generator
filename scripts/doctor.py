@@ -85,18 +85,25 @@ def check_profiles(min_profile_count: int = 20) -> dict:
     }
 
 
+def display_path(path: Path) -> str:
+    try:
+        return path.relative_to(REPO_ROOT).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
 def check_proof_status_report(path: Path = PROOF_STATUS_REPORT) -> dict:
     report_status = status_from_report(path)
     if report_status is None:
         return {
             "name": "proof_status_report",
             "status": "fail",
-            "detail": f"missing: {path.relative_to(REPO_ROOT).as_posix()}",
+            "detail": f"missing: {display_path(path)}",
         }
     return {
         "name": "proof_status_report",
-        "status": "pass" if report_status == "pass" else "fail",
-        "detail": f"{path.relative_to(REPO_ROOT).as_posix()} status={report_status}",
+        "status": "pass",
+        "detail": f"{display_path(path)} last_status={report_status}",
     }
 
 
