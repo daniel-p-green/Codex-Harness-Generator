@@ -36,6 +36,19 @@ and limits.
 
 ## Maintainer Conversion
 
+When the reporter can share a copied generated harness directory privately, ask
+them to record task trials and export a public-safe packet first:
+
+```bash
+python scripts/codex_harness.py local-eval /path/to/generated-harness
+python scripts/codex_harness.py evidence-packet /path/to/generated-harness \
+  --harness-label "public-safe harness label" \
+  --out /tmp/HARNESS_EVIDENCE_PACKET.md
+```
+
+Review the packet for concrete evidence, verification, privacy boundaries, and
+limitations before turning it into a checked-in usage record.
+
 Maintainers can convert a usable public issue into a checked-in usage record by
 saving the issue body to a local Markdown file and running:
 

@@ -29,6 +29,8 @@ Already proven:
 - Generated harness local eval reports that run copied-harness smoke checks and
   task-trial and improvement-backlog summaries without depending on this
   generator repo.
+- Public-safe evidence packets that summarize copied-harness local eval and
+  task-trial evidence before converting it into checked-in usage records.
 - Checked-in deterministic, create-acceptance, brief-acceptance, and live-create
   examples.
 - Privacy-checked usage-record validation.

@@ -210,6 +210,37 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_evidence_packet_delegates_to_exporter(self):
+        command, _ = self.run_cli(
+            [
+                "evidence-packet",
+                "/tmp/harness",
+                "--out",
+                "/tmp/HARNESS_EVIDENCE_PACKET.md",
+                "--harness-label",
+                "public harness label",
+                "--min-successes",
+                "1",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/export_evidence_packet.py",
+                "/tmp/harness",
+                "--out",
+                "/tmp/HARNESS_EVIDENCE_PACKET.md",
+                "--harness-label",
+                "public harness label",
+                "--min-successes",
+                "1",
+                "--json",
+            ],
+            command,
+        )
+
     def test_profiles_details_delegates_to_profile_catalog(self):
         command, _ = self.run_cli(["profiles", "--details"])
 

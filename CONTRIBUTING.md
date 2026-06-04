@@ -186,6 +186,9 @@ will be ideal.
 For external evidence, ask reporters to use the GitHub **External usage report**
 issue template. Maintainers can convert privacy-safe reports into checked-in
 records using `Docs/Environment/EXTERNAL_USAGE_EVIDENCE.md`.
+If a copied generated harness is available, run
+`python scripts/codex_harness.py evidence-packet <harness>` first and review the
+packet before creating a usage record.
 
 ### Validation Checklist
 

@@ -334,6 +334,18 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("usage_from_harness.py", command)
 
+    if args.command == "evidence-packet":
+        command = [args.harness]
+        if args.out:
+            command.extend(["--out", args.out])
+        if args.harness_label:
+            command.extend(["--harness-label", args.harness_label])
+        if args.min_successes is not None:
+            command.extend(["--min-successes", str(args.min_successes)])
+        if args.json:
+            command.append("--json")
+        return python_script("export_evidence_packet.py", command)
+
     if args.command == "usage-from-issue":
         command = [
             args.issue_body,
@@ -572,6 +584,13 @@ def make_parser() -> argparse.ArgumentParser:
     usage_from_harness.add_argument("--report", help="Usage-record Markdown report path")
     usage_from_harness.add_argument("--force", action="store_true", help="Replace existing record with same slug")
     usage_from_harness.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    evidence_packet = subparsers.add_parser("evidence-packet", help="Export a public-safe evidence packet from a generated harness")
+    evidence_packet.add_argument("harness", help="Generated harness directory")
+    evidence_packet.add_argument("--out", help="Packet path; defaults inside the harness Docs/Environment directory")
+    evidence_packet.add_argument("--harness-label", help="Public-safe harness label; defaults to directory name")
+    evidence_packet.add_argument("--min-successes", type=int, default=0, help="Minimum passing success task trials expected")
+    evidence_packet.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     usage_from_issue = subparsers.add_parser("usage-from-issue", help="Create usage evidence from a GitHub issue-form body")
     usage_from_issue.add_argument("issue_body", help="Markdown issue body path, or '-' for stdin")

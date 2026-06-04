@@ -93,8 +93,8 @@ replacement. What is proven today:
 - `scripts/codex_harness.py` gives users one thin local entry point for
   profile listing, profile descriptions, project inspection, generation,
   inspected generation, acceptance, eval, smoke, copied local eval reports,
-  migration audit, gate, demo-capture, live-trial, source-freshness, and
-  snapshot workflows.
+  migration audit, evidence-packet, gate, demo-capture, live-trial,
+  source-freshness, and snapshot workflows.
 - `pyproject.toml` exposes that wrapper as an installable `codex-harness`
   console command, and the release gate smokes the non-editable install path.
 - `scripts/record_eval_snapshot.py` records eval-gate snapshots under
@@ -112,6 +112,9 @@ replacement. What is proven today:
 - `scripts/usage_from_harness.py` and `codex-harness usage-from-harness`
   convert a generated harness's local eval report and task trials into a
   privacy-checked usage record.
+- `scripts/export_evidence_packet.py` and `codex-harness evidence-packet`
+  write a public-safe Markdown packet from a copied harness's local eval report
+  and task trials before maintainers decide whether a usage record is justified.
 - `scripts/usage_from_issue.py` and `codex-harness usage-from-issue` convert a
   sanitized GitHub external-usage issue body into a privacy-checked usage
   record.
@@ -391,10 +394,14 @@ python scripts/codex_harness.py usage-record \
 ```
 
 After recording task trials in a copied generated harness, refresh its local
-eval report and create a usage record from that local evidence:
+eval report, export a review packet, and create a usage record from that local
+evidence:
 
 ```bash
 python scripts/codex_harness.py local-eval /tmp/codex-rag-harness
+python scripts/codex_harness.py evidence-packet /tmp/codex-rag-harness \
+  --harness-label "RAG harness private repo" \
+  --out /tmp/HARNESS_EVIDENCE_PACKET.md
 python scripts/codex_harness.py usage-from-harness /tmp/codex-rag-harness \
   --slug rag-harness-trial \
   --title "RAG harness trial" \
@@ -502,6 +509,7 @@ Common subcommands:
 | `semantic-alignment` | `check_semantic_alignment.py` | Checks local guidance against official Codex doc concepts. |
 | `usage-record` | `record_usage_case.py` | Records sanitized generated-harness usage evidence. |
 | `usage-from-harness` | `usage_from_harness.py` | Converts copied-harness task trials and eval reports into a privacy-checked usage record. |
+| `evidence-packet <path>` | `export_evidence_packet.py` | Exports a public-safe Markdown evidence packet from copied-harness local eval and task trials. |
 | `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record. |
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
 | `proof-status` | `proof_status.py` | Summarizes checked-in proof readiness, live task-trial coverage, and usage evidence. |

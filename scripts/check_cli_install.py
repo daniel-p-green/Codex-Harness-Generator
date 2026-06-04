@@ -60,6 +60,7 @@ def build_payload() -> dict:
         adoption_report = temp_root / "ADOPTION_PLAN.md"
         adoption_blueprint = temp_root / "adoption-blueprint"
         adoption_copy_script = temp_root / "copy-adds.sh"
+        evidence_packet = temp_root / "HARNESS_EVIDENCE_PACKET.md"
         usage_records = temp_root / "usage-records"
         usage_report = temp_root / "USAGE_RECORDS.md"
         issue_body = temp_root / "external-usage-issue.md"
@@ -212,6 +213,19 @@ def build_payload() -> dict:
                 ],
             ),
             ("local_eval", [(venv / "bin" / "codex-harness").as_posix(), "local-eval", generated.as_posix(), "--json"]),
+            (
+                "evidence_packet",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "evidence-packet",
+                    generated.as_posix(),
+                    "--out",
+                    evidence_packet.as_posix(),
+                    "--harness-label",
+                    "install-smoke generated harness",
+                    "--json",
+                ],
+            ),
             (
                 "usage_from_harness",
                 [
