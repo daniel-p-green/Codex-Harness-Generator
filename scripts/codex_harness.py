@@ -1109,6 +1109,8 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.extend(["--min-usage-records", str(args.min_usage_records)])
         if args.include_install_smoke:
             command.append("--include-install-smoke")
+        if args.beta_exit:
+            command.append("--beta-exit")
         if args.json:
             command.append("--json")
         return python_script("doctor.py", command)
@@ -1808,6 +1810,7 @@ def make_parser() -> argparse.ArgumentParser:
     doctor.add_argument("--record-dir", help="Directory where usage record JSON files are read")
     doctor.add_argument("--min-usage-records", type=int, help="Minimum valid usage records required")
     doctor.add_argument("--include-install-smoke", action="store_true", help="Also run the slower non-editable CLI install smoke")
+    doctor.add_argument("--beta-exit", action="store_true", help="Apply beta-exit usage evidence thresholds")
     doctor.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     subparsers.add_parser("snapshot", help="Record an eval trend snapshot")

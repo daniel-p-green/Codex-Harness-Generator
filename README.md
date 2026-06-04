@@ -829,7 +829,7 @@ Common subcommands:
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
 | `usage-gaps` | `usage_gaps.py` | Reports remaining beta-exit usage evidence gaps and writes `Docs/Environment/USAGE_GAPS.md`. |
 | `proof-status` | `proof_status.py` | Summarizes checked-in proof readiness, live task-trial coverage, and usage evidence; add `--beta-exit` to apply the roadmap exit thresholds. |
-| `doctor` | `doctor.py` | Runs a fast local readiness check and prints the next useful commands. |
+| `doctor` | `doctor.py` | Runs a fast local readiness check and prints the next useful commands; add `--beta-exit` to apply the roadmap's external-evidence thresholds. |
 | `snapshot` | `record_eval_snapshot.py` | Records an eval trend snapshot. |
 
 ## Presets

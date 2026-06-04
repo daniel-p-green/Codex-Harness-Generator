@@ -2416,6 +2416,7 @@ class CodexHarnessCliTests(unittest.TestCase):
                 "--min-usage-records",
                 "5",
                 "--include-install-smoke",
+                "--beta-exit",
                 "--json",
             ]
         )
@@ -2429,6 +2430,7 @@ class CodexHarnessCliTests(unittest.TestCase):
                 "--min-usage-records",
                 "5",
                 "--include-install-smoke",
+                "--beta-exit",
                 "--json",
             ],
             command,

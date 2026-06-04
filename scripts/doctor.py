@@ -14,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from check_cli_install import build_payload as build_cli_install_payload
 from check_example_inventory import check_inventory
 from generate_minimal_harness import PROFILES
+from usage_gaps import DEFAULT_TARGETS
 from validate_usage_records import DEFAULT_RECORD_DIR, validate_record_dir
 
 
@@ -53,6 +54,14 @@ NEXT_COMMANDS = (
     'codex-harness init /tmp/codex-rag-harness --brief "RAG app with prompts, evals, and retrieval checks" --force',
     "codex-harness validate /tmp/codex-rag-harness",
     "codex-harness proof-next",
+    "codex-harness gate",
+)
+
+BETA_EXIT_NEXT_COMMANDS = (
+    "codex-harness usage-gaps --no-write",
+    "codex-harness pilot-next-action --no-write",
+    "codex-harness beta-exit-audit --no-write",
+    "codex-harness proof-status --beta-exit --no-write",
     "codex-harness gate",
 )
 
@@ -117,22 +126,42 @@ def check_proof_status_report(path: Path = PROOF_STATUS_REPORT) -> dict:
     }
 
 
-def check_usage_records(record_dir: Path, min_usage_records: int) -> tuple[dict, dict]:
+def check_usage_records(record_dir: Path, min_usage_records: int, beta_exit: bool = False) -> tuple[dict, dict]:
+    min_records = DEFAULT_TARGETS["min_records"] if beta_exit else min_usage_records
+    min_external_or_multi_project = DEFAULT_TARGETS["min_external_or_multi_project"] if beta_exit else 0
+    min_domains = DEFAULT_TARGETS["min_domains"] if beta_exit else 0
+    min_installed_init_brief = DEFAULT_TARGETS["min_installed_init_brief"] if beta_exit else 0
     payload = validate_record_dir(
         record_dir,
-        min_records=min_usage_records,
+        min_records=min_records,
         require_non_synthetic=True,
         require_success=True,
+        min_external_or_multi_project=min_external_or_multi_project,
+        min_domains=min_domains,
+        min_installed_init_brief=min_installed_init_brief,
     )
     summary = payload["summary"]
+    if beta_exit:
+        detail = (
+            "records={total}/{min_records} external_or_multi_project={external_or_multi_project}/{min_external} "
+            "domains={distinct_domains}/{min_domains} installed_brief_generation={installed_brief_generation}/{min_installed}"
+        ).format(
+            min_records=min_records,
+            min_external=min_external_or_multi_project,
+            min_domains=min_domains,
+            min_installed=min_installed_init_brief,
+            **summary,
+        )
+    else:
+        detail = "records={total} non_synthetic={non_synthetic} success={success}; required >= {required}".format(
+            required=min_usage_records,
+            **summary,
+        )
     return (
         {
             "name": "usage_records",
             "status": payload["status"],
-            "detail": "records={total} non_synthetic={non_synthetic} success={success}; required >= {required}".format(
-                required=min_usage_records,
-                **summary,
-            ),
+            "detail": detail,
             "requirement_errors": payload["requirement_errors"],
         },
         payload,
@@ -229,9 +258,10 @@ def build_payload(
     record_dir: Path = DEFAULT_RECORD_DIR,
     min_usage_records: int = 2,
     include_install_smoke: bool = False,
+    beta_exit: bool = False,
 ) -> dict:
     inventory = check_inventory()
-    usage_check, usage_payload = check_usage_records(record_dir, min_usage_records)
+    usage_check, usage_payload = check_usage_records(record_dir, min_usage_records, beta_exit=beta_exit)
     checks = [
         check_python_version(),
         check_required_files(),
@@ -250,17 +280,28 @@ def build_payload(
         checks.append(install_check)
 
     status = "pass" if all(check["status"] == "pass" for check in checks) else "fail"
+    readiness = (
+        "beta-exit evidence gate is ready"
+        if status == "pass" and beta_exit
+        else "local checkout is ready for generation and release-gate work"
+        if status == "pass"
+        else "beta-exit evidence gate needs attention"
+        if beta_exit
+        else "local checkout needs attention"
+    )
     return {
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "status": status,
-        "readiness": "local checkout is ready for generation and release-gate work" if status == "pass" else "local checkout needs attention",
+        "readiness": readiness,
+        "beta_exit": beta_exit,
         "checks": checks,
         "example_inventory": inventory,
         "usage_records": usage_payload,
         "installable_cli": install_payload,
-        "next_commands": list(NEXT_COMMANDS),
+        "next_commands": list(BETA_EXIT_NEXT_COMMANDS if beta_exit else NEXT_COMMANDS),
         "notes": [
             "doctor is fast by default and does not replace the full release gate.",
+            "Use --beta-exit to apply the roadmap's external-evidence thresholds.",
             "Use --include-install-smoke before publishing packaging or console-script changes.",
         ],
     }
@@ -287,6 +328,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--record-dir", default=DEFAULT_RECORD_DIR.as_posix(), help="Directory where usage record JSON files are read")
     parser.add_argument("--min-usage-records", type=int, default=2, help="Minimum valid usage records required")
     parser.add_argument("--include-install-smoke", action="store_true", help="Also run the slower non-editable CLI install smoke")
+    parser.add_argument("--beta-exit", action="store_true", help="Apply beta-exit usage evidence thresholds")
     parser.add_argument("--json", action="store_true", help="Emit JSON payload")
     args = parser.parse_args(argv)
 
@@ -294,6 +336,7 @@ def main(argv: list[str] | None = None) -> int:
         record_dir=Path(args.record_dir),
         min_usage_records=args.min_usage_records,
         include_install_smoke=args.include_install_smoke,
+        beta_exit=args.beta_exit,
     )
     if args.json:
         print(json.dumps(payload, indent=2))

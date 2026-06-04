@@ -101,6 +101,9 @@ The project can stop calling itself a beta only when all of these are true:
 - `python scripts/codex_harness.py proof-status --beta-exit` passes.
 - `python scripts/codex_harness.py beta-exit-audit` reports
   `beta-exit-ready-for-final-gate`.
+- `python scripts/codex_harness.py doctor --beta-exit` passes, proving the
+  local checkout satisfies the roadmap usage-evidence thresholds instead of
+  only the contributor-readiness threshold.
 - `python scripts/codex_harness.py gate` passes on CI and locally.
 - `python scripts/codex_harness.py source-freshness` and
   `python scripts/codex_harness.py semantic-alignment` have current PASS reports

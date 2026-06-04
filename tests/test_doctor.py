@@ -23,6 +23,36 @@ spec.loader.exec_module(doctor)
 
 
 class DoctorTests(unittest.TestCase):
+    def write_usage_record(
+        self,
+        record_dir: Path,
+        slug: str,
+        domain: str,
+        source_type: str = "external",
+        generation_path: str = "installed-init-brief",
+        evidence_type: str = "private-summary",
+    ) -> None:
+        payload = {
+            "slug": slug,
+            "title": f"{slug} usage record",
+            "generated": "2026-06-04T12:00:00Z",
+            "domain": domain,
+            "harness_path": f"/tmp/{slug}",
+            "task_summary": "Generated and used a Codex harness for a representative pilot task.",
+            "outcome": "success",
+            "evidence_type": evidence_type,
+            "source_type": source_type,
+            "generation_path": generation_path,
+            "evidence": [
+                "Private reporter summary confirmed the generated harness was used.",
+                "The pilot record included a concrete task outcome and verification summary.",
+            ],
+            "verification": ["Reporter-provided verification steps were completed without blocking failures."],
+            "privacy_review": "Private details were summarized and no secrets or personal data are included.",
+            "limitations": ["Evidence is a privacy-preserving summary rather than raw workspace contents."],
+        }
+        (record_dir / f"{slug}.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
     def fake_install_payload(self):
         return {
             "status": "pass",
@@ -90,9 +120,62 @@ class DoctorTests(unittest.TestCase):
 
         self.assertEqual("pass", payload["status"], payload)
         self.assertIn("doctor is fast by default", payload["notes"][0])
+        self.assertFalse(payload["beta_exit"])
         self.assertIn("codex-harness gate", payload["next_commands"])
         self.assertIn("example_inventory", [check["name"] for check in payload["checks"]])
         self.assertIsNone(payload["installable_cli"])
+
+    def test_beta_exit_mode_applies_external_evidence_thresholds(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            payload = doctor.build_payload(record_dir=Path(temp_dir), beta_exit=True)
+
+        self.assertEqual("fail", payload["status"])
+        self.assertTrue(payload["beta_exit"])
+        self.assertEqual("beta-exit evidence gate needs attention", payload["readiness"])
+        self.assertIn("codex-harness proof-status --beta-exit --no-write", payload["next_commands"])
+        usage_check = next(check for check in payload["checks"] if check["name"] == "usage_records")
+        self.assertEqual("fail", usage_check["status"])
+        self.assertIn("records=0/5", usage_check["detail"])
+        self.assertIn("external_or_multi_project=0/3", usage_check["detail"])
+        self.assertIn("domains=0/4", usage_check["detail"])
+        self.assertIn("installed_brief_generation=0/2", usage_check["detail"])
+        self.assertTrue(any("external or multi-project" in error for error in usage_check["requirement_errors"]))
+
+    def test_beta_exit_mode_passes_when_evidence_thresholds_are_met(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            record_dir = Path(temp_dir)
+            self.write_usage_record(record_dir, "external-rag", "RAG apps")
+            self.write_usage_record(record_dir, "external-security", "Security audit")
+            self.write_usage_record(record_dir, "multi-support", "Customer support", source_type="multi-project")
+            self.write_usage_record(
+                record_dir,
+                "dogfood-api",
+                "API design",
+                source_type="self-dogfood",
+                generation_path="repo-dogfood",
+                evidence_type="sanitized",
+            )
+            self.write_usage_record(
+                record_dir,
+                "dogfood-evals",
+                "Model evals",
+                source_type="self-dogfood",
+                generation_path="repo-dogfood",
+                evidence_type="sanitized",
+            )
+
+            payload = doctor.build_payload(record_dir=record_dir, beta_exit=True)
+
+        self.assertEqual("pass", payload["status"], payload)
+        self.assertTrue(payload["beta_exit"])
+        self.assertEqual("beta-exit evidence gate is ready", payload["readiness"])
+        usage_check = next(check for check in payload["checks"] if check["name"] == "usage_records")
+        self.assertEqual("pass", usage_check["status"])
+        self.assertIn("records=5/5", usage_check["detail"])
+        self.assertIn("external_or_multi_project=3/3", usage_check["detail"])
+        self.assertIn("domains=5/4", usage_check["detail"])
+        self.assertIn("installed_brief_generation=3/2", usage_check["detail"])
+        self.assertEqual([], usage_check["requirement_errors"])
 
     def test_include_install_smoke_adds_install_check(self):
         with patch.object(doctor, "build_cli_install_payload", return_value=self.fake_install_payload()):
@@ -145,6 +228,19 @@ class DoctorTests(unittest.TestCase):
         usage_check = next(check for check in payload["checks"] if check["name"] == "usage_records")
         self.assertEqual("fail", usage_check["status"])
         self.assertTrue(usage_check["requirement_errors"])
+
+    def test_main_beta_exit_json_returns_failure_for_missing_external_evidence(self):
+        output = io.StringIO()
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with redirect_stdout(output):
+                status = doctor.main(["--record-dir", temp_dir, "--beta-exit", "--json"])
+
+        payload = json.loads(output.getvalue())
+        self.assertEqual(1, status)
+        self.assertEqual("fail", payload["status"])
+        self.assertTrue(payload["beta_exit"])
+        self.assertIn("usage-gaps --no-write", " ".join(payload["next_commands"]))
 
     def test_text_output_includes_next_commands(self):
         output = io.StringIO()
