@@ -267,6 +267,7 @@ def main() -> int:
                     "tests/test_codex_harness_cli.py",
                     "tests/test_eval_codex_port.py",
                     "tests/test_example_inventory.py",
+                    "tests/test_external_usage_evidence.py",
                     "tests/test_generated_harness_contract.py",
                     "tests/test_live_example_task_trials.py",
                     "tests/test_proof_status.py",

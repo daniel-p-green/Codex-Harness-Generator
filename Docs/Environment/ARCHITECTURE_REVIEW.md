@@ -61,8 +61,9 @@ transcript.
   against official OpenAI docs and records a review signal.
 - Real usage evidence: a privacy-checked usage-record workflow now exists, and
   stricter validation flags can require successful non-synthetic records before
-  maintainers make real-world usage claims. The first checked-in record is
-  sanitized self-dogfood evidence from this public repo's Codex work.
+  maintainers make real-world usage claims. Current checked-in records are
+  sanitized self-dogfood evidence from this public repo's Codex work; external
+  reports now have a privacy-safe issue-template intake path.
 - Claim calibration: README language now describes utility and limits without
   implying deterministic perfection.
 

@@ -178,6 +178,10 @@ the installable CLI smoke, live task trials, and sanitized usage evidence; it
 does not prove broad external adoption or that every future live `/create` run
 will be ideal.
 
+For external evidence, ask reporters to use the GitHub **External usage report**
+issue template. Maintainers can convert privacy-safe reports into checked-in
+records using `Docs/Environment/EXTERNAL_USAGE_EVIDENCE.md`.
+
 ### Validation Checklist
 
 The environment-validator agent runs the full validation checklist automatically (see `Docs/Templates/References/validation-guide.md`, the single source of truth -- 22 core + 27 conditional + 6 hub checks, plus a Phase-0 drift audit and boundary-crossing checks). All checks should PASS. WARN is acceptable for non-critical items. FAIL must be fixed before merging.

@@ -83,7 +83,8 @@ What still needs product proof:
 
 - More real use of generated harnesses on real Codex tasks over time, especially
   external or multi-project usage, recorded as sanitized or private-summary
-  evidence.
+  evidence. External users can start with the GitHub **External usage report**
+  issue template; see `Docs/Environment/EXTERNAL_USAGE_EVIDENCE.md`.
 - More live examples for specialized domains as new public-safe briefs become
   available.
 
@@ -303,6 +304,10 @@ Validate checked-in usage records before release:
 ```bash
 python scripts/codex_harness.py usage-validate
 ```
+
+To collect privacy-safe evidence from outside this repository, use the
+**External usage report** GitHub issue template and
+`Docs/Environment/EXTERNAL_USAGE_EVIDENCE.md`.
 
 Require actual non-synthetic success evidence before making real-world usage
 claims:

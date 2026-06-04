@@ -1,0 +1,85 @@
+name: External usage report
+description: Share privacy-safe evidence from using a generated Codex harness.
+title: "[usage] "
+labels: ["usage-evidence"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping prove where this project is useful.
+
+        Do not include secrets, customer data, candidate data, proprietary source, private repository paths, local machine paths, email addresses, access tokens, logs with credentials, or raw private transcripts. Summaries are welcome.
+  - type: input
+    id: domain
+    attributes:
+      label: Domain or project type
+      description: Example: Python CLI, LLM app, legal research, customer support, security audit.
+      placeholder: LLM app
+    validations:
+      required: true
+  - type: dropdown
+    id: evidence_type
+    attributes:
+      label: Evidence type
+      description: Choose the safest public category.
+      options:
+        - sanitized
+        - private-summary
+        - synthetic
+    validations:
+      required: true
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: Outcome
+      options:
+        - success
+        - partial
+        - inconclusive
+        - failed
+    validations:
+      required: true
+  - type: textarea
+    id: task_summary
+    attributes:
+      label: Public-safe task summary
+      description: What did the generated harness help you do?
+      placeholder: The generated harness helped us organize prompts, eval cases, and source-grounded review steps for a RAG app.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Provide at least two public-safe evidence bullets for real or private-summary usage.
+      placeholder: |
+        - Generated AGENTS.md and .codex/config.toml matched our project shape.
+        - The harness made verification steps explicit and produced a usable review checklist.
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification performed
+      description: What checks, reviews, or artifacts prove the outcome?
+      placeholder: |
+        - Ran the generated smoke check successfully.
+        - Completed one real task using the generated reviewer guidance.
+    validations:
+      required: true
+  - type: textarea
+    id: privacy_review
+    attributes:
+      label: Privacy review
+      description: Confirm what you removed or summarized before posting.
+      placeholder: Removed private repo names, local paths, customer details, credentials, and raw logs.
+    validations:
+      required: true
+  - type: textarea
+    id: limitations
+    attributes:
+      label: Limitations
+      description: What does this report not prove?
+      placeholder: This was one project, one team, and one task; it does not prove every generated harness will fit.
+    validations:
+      required: true
