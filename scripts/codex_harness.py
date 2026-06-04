@@ -825,6 +825,38 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("sync_pilot_github_issues.py", command)
 
+    if args.command == "pilot-next-action":
+        command = []
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.usage_record_dir:
+            command.extend(["--usage-record-dir", args.usage_record_dir])
+        if args.usage_report:
+            command.extend(["--usage-report", args.usage_report])
+        if args.pilot_board_report:
+            command.extend(["--pilot-board-report", args.pilot_board_report])
+        if args.sync_report:
+            command.extend(["--sync-report", args.sync_report])
+        if args.report:
+            command.extend(["--report", args.report])
+        if args.followup_dir:
+            command.extend(["--followup-dir", args.followup_dir])
+        if args.repo:
+            command.extend(["--repo", args.repo])
+        if args.gh_bin:
+            command.extend(["--gh-bin", args.gh_bin])
+        if args.generated:
+            command.extend(["--generated", args.generated])
+        for status in args.status or []:
+            command.extend(["--status", status])
+        for slug in args.slug or []:
+            command.extend(["--slug", slug])
+        if args.no_write:
+            command.append("--no-write")
+        if args.json:
+            command.append("--json")
+        return python_script("pilot_next_action.py", command)
+
     if args.command == "beta-exit-audit":
         command = []
         if args.record_dir:
@@ -1566,6 +1598,22 @@ def make_parser() -> argparse.ArgumentParser:
     pilot_github_sync.add_argument("--slug", action="append", help="Pilot slug to include; repeatable")
     pilot_github_sync.add_argument("--no-write", action="store_true", help="Do not write the Markdown sync report")
     pilot_github_sync.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    pilot_next_action = subparsers.add_parser("pilot-next-action", help="Summarize the next live pilot GitHub issue action")
+    pilot_next_action.add_argument("--record-dir", help="Directory where prepared pilot JSON records are read")
+    pilot_next_action.add_argument("--usage-record-dir", help="Directory where usage record JSON files are read")
+    pilot_next_action.add_argument("--usage-report", help="Usage-record Markdown report path for conversion commands")
+    pilot_next_action.add_argument("--pilot-board-report", help="Pilot-board Markdown report path for conversion commands")
+    pilot_next_action.add_argument("--sync-report", help="GitHub issue sync Markdown report path")
+    pilot_next_action.add_argument("--report", help="Pilot next-action Markdown report path")
+    pilot_next_action.add_argument("--followup-dir", help="Directory for per-issue reporter follow-up Markdown files")
+    pilot_next_action.add_argument("--repo", help="Optional GitHub repository in owner/name form")
+    pilot_next_action.add_argument("--gh-bin", help="GitHub CLI executable")
+    pilot_next_action.add_argument("--generated", help="UTC timestamp override for previewed records")
+    pilot_next_action.add_argument("--status", choices=["completed", "converted", "dropped", "invited", "prepared"], action="append", help="Pilot status to include; repeatable")
+    pilot_next_action.add_argument("--slug", action="append", help="Pilot slug to include; repeatable")
+    pilot_next_action.add_argument("--no-write", action="store_true", help="Do not write the Markdown next-action report")
+    pilot_next_action.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     beta_exit_audit = subparsers.add_parser("beta-exit-audit", help="Write a non-gating beta-exit readiness audit")
     beta_exit_audit.add_argument("--record-dir", help="Directory where usage record JSON files are read")

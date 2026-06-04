@@ -904,6 +904,73 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_pilot_next_action_delegates_to_next_action_script(self):
+        command, _ = self.run_cli(
+            [
+                "pilot-next-action",
+                "--record-dir",
+                "/tmp/pilot-records",
+                "--usage-record-dir",
+                "/tmp/usage-records",
+                "--usage-report",
+                "/tmp/USAGE_RECORDS.md",
+                "--pilot-board-report",
+                "/tmp/PILOT_BOARD.md",
+                "--sync-report",
+                "/tmp/PILOT_GITHUB_SYNC.md",
+                "--report",
+                "/tmp/PILOT_NEXT_ACTION.md",
+                "--followup-dir",
+                "/tmp/followups",
+                "--repo",
+                "example/repo",
+                "--gh-bin",
+                "/tmp/fake-gh",
+                "--generated",
+                "2026-06-04T00:00:00Z",
+                "--status",
+                "invited",
+                "--slug",
+                "llm-app-pilot",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/pilot_next_action.py",
+                "--record-dir",
+                "/tmp/pilot-records",
+                "--usage-record-dir",
+                "/tmp/usage-records",
+                "--usage-report",
+                "/tmp/USAGE_RECORDS.md",
+                "--pilot-board-report",
+                "/tmp/PILOT_BOARD.md",
+                "--sync-report",
+                "/tmp/PILOT_GITHUB_SYNC.md",
+                "--report",
+                "/tmp/PILOT_NEXT_ACTION.md",
+                "--followup-dir",
+                "/tmp/followups",
+                "--repo",
+                "example/repo",
+                "--gh-bin",
+                "/tmp/fake-gh",
+                "--generated",
+                "2026-06-04T00:00:00Z",
+                "--status",
+                "invited",
+                "--slug",
+                "llm-app-pilot",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
     def test_beta_exit_audit_delegates_to_auditor(self):
         command, _ = self.run_cli(
             [

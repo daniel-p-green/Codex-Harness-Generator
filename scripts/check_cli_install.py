@@ -83,6 +83,7 @@ def build_payload() -> dict:
         pilot_github_issues_root = temp_root / "pilot-github-issues"
         pilot_github_issues_report = temp_root / "PILOT_GITHUB_ISSUES.md"
         pilot_github_sync_report = temp_root / "PILOT_GITHUB_SYNC.md"
+        pilot_next_action_report = temp_root / "PILOT_NEXT_ACTION.md"
         beta_exit_audit_report = temp_root / "BETA_EXIT_AUDIT.md"
         usage_records = temp_root / "usage-records"
         usage_report = temp_root / "USAGE_RECORDS.md"
@@ -697,6 +698,30 @@ def build_payload() -> dict:
                     pilot_board_report.as_posix(),
                     "--report",
                     pilot_github_sync_report.as_posix(),
+                    "--followup-dir",
+                    (temp_root / "pilot-github-followups").as_posix(),
+                    "--gh-bin",
+                    fake_gh.as_posix(),
+                    "--json",
+                ],
+            ),
+            (
+                "pilot_next_action",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "pilot-next-action",
+                    "--record-dir",
+                    pilot_records.as_posix(),
+                    "--usage-record-dir",
+                    usage_records.as_posix(),
+                    "--usage-report",
+                    usage_report.as_posix(),
+                    "--pilot-board-report",
+                    pilot_board_report.as_posix(),
+                    "--sync-report",
+                    pilot_github_sync_report.as_posix(),
+                    "--report",
+                    pilot_next_action_report.as_posix(),
                     "--followup-dir",
                     (temp_root / "pilot-github-followups").as_posix(),
                     "--gh-bin",
