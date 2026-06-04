@@ -31,6 +31,7 @@ class DoctorTests(unittest.TestCase):
                 {"name": "doctor", "status": "pass"},
                 {"name": "init", "status": "pass"},
                 {"name": "validate", "status": "pass"},
+                {"name": "local_eval", "status": "pass"},
                 {"name": "migration_audit", "status": "pass"},
                 {"name": "eval", "status": "pass"},
             ],
@@ -64,6 +65,7 @@ class DoctorTests(unittest.TestCase):
         self.assertEqual("pass", payload["installable_cli"]["status"])
         install_check = next(check for check in payload["checks"] if check["name"] == "installable_cli")
         self.assertIn("validate=pass", install_check["detail"])
+        self.assertIn("local_eval=pass", install_check["detail"])
         self.assertIn("migration_audit=pass", install_check["detail"])
         self.assertIn("installable_cli", [check["name"] for check in payload["checks"]])
 

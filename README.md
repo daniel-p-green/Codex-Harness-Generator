@@ -82,8 +82,8 @@ replacement. What is proven today:
   support scenarios.
 - `scripts/codex_harness.py` gives users one thin local entry point for
   profile listing, profile descriptions, generation, acceptance, eval, smoke,
-  migration audit, gate, demo-capture, live-trial, source-freshness, and
-  snapshot workflows.
+  copied local eval reports, migration audit, gate, demo-capture, live-trial,
+  source-freshness, and snapshot workflows.
 - `pyproject.toml` exposes that wrapper as an installable `codex-harness`
   console command, and the release gate smokes the non-editable install path.
 - `scripts/record_eval_snapshot.py` records eval-gate snapshots under
@@ -194,6 +194,7 @@ codex-harness init /tmp/codex-rag-harness \
   --project-name "RAG Quality Harness" \
   --force
 codex-harness validate /tmp/codex-rag-harness
+codex-harness local-eval /tmp/codex-rag-harness
 python scripts/codex_harness.py profiles --details
 python scripts/codex_harness.py recommend "RAG app with prompts, evals, and retrieval checks"
 python scripts/codex_harness.py profile security-audit
@@ -207,6 +208,7 @@ python scripts/codex_harness.py demo-capture /tmp/codex-demo-harness \
   --force
 python scripts/codex_harness.py generate /tmp/codex-harness-example --force
 python scripts/codex_harness.py validate /tmp/codex-harness-example
+python scripts/codex_harness.py local-eval /tmp/codex-harness-example
 python scripts/codex_harness.py eval /tmp/codex-harness-example
 python scripts/codex_harness.py smoke /tmp/codex-harness-example
 ```
@@ -416,6 +418,7 @@ Common subcommands:
 | `eval <paths...>` | `eval_generated_harness.py` | Checks generated harness contract quality. |
 | `smoke <paths...>` | `smoke_generated_harness.py` | Parses config, resolves agents and skills, optionally runs Codex live smoke. |
 | `validate <paths...>` | `validate_generated_harness.py` | Runs eval, offline smoke, and the generated local self-check together. |
+| `local-eval <path>` | generated `scripts/run-harness-evals.py` | Runs the copied harness's embedded eval report without depending on this generator repo. |
 | `migration-audit <paths...>` | `migration_audit.py` | Audits legacy harness artifacts and lists the Codex-native migration work. |
 | `gate` | `run_evals.py` | Runs the repo release gate. |
 | `live-trials` | `run_live_example_task_trials.py` | Runs authenticated Codex tasks against checked-in live examples. |

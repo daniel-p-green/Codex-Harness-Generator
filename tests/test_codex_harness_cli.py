@@ -342,6 +342,30 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_local_eval_delegates_to_generated_harness_eval_runner(self):
+        command, _ = self.run_cli(
+            [
+                "local-eval",
+                "/tmp/example",
+                "--min-successes",
+                "2",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "/tmp/example/scripts/run-harness-evals.py",
+                "--min-successes",
+                "2",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
     def test_migration_audit_delegates_to_migration_audit_script(self):
         command, _ = self.run_cli(["migration-audit", "/tmp/example", "--json"])
 

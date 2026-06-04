@@ -151,6 +151,16 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("validate_generated_harness.py", command)
 
+    if args.command == "local-eval":
+        command = [(Path(args.path) / "scripts" / "run-harness-evals.py").as_posix()]
+        if args.min_successes is not None:
+            command.extend(["--min-successes", str(args.min_successes)])
+        if args.no_write:
+            command.append("--no-write")
+        if args.json:
+            command.append("--json")
+        return [sys.executable, *command]
+
     if args.command == "migration-audit":
         command = list(args.paths)
         if args.json:
@@ -357,6 +367,12 @@ def make_parser() -> argparse.ArgumentParser:
     validate.add_argument("--codex-live", action="store_true", help="Also run authenticated Codex CLI smoke")
     validate.add_argument("--prompt", help="Prompt to use with --codex-live")
     validate.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    local_eval = subparsers.add_parser("local-eval", help="Run a generated harness's copied-local eval report")
+    local_eval.add_argument("path", help="Generated harness directory path")
+    local_eval.add_argument("--min-successes", type=int, help="Minimum passing task-trial successes required")
+    local_eval.add_argument("--no-write", action="store_true", help="Do not rewrite Docs/Environment/EVAL_REPORT.md")
+    local_eval.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     migration_audit = subparsers.add_parser("migration-audit", help="Audit legacy harness directories for Codex migration work")
     migration_audit.add_argument("paths", nargs="+", help="Harness directories to audit")
