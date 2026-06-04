@@ -331,6 +331,32 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertEqual("fail", result["status"])
         self.assert_has_check(result, "permission_globs")
 
+    def test_custom_permission_profile_without_extends_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        config = target / ".codex/config.toml"
+        config.write_text(
+            config.read_text(encoding="utf-8").replace('extends = ":workspace"\n', ""),
+            encoding="utf-8",
+        )
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"])
+        self.assert_has_check(result, "config_permissions")
+
+    def test_invalid_filesystem_permission_value_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        config = target / ".codex/config.toml"
+        config.write_text(
+            config.read_text(encoding="utf-8").replace('"." = "write"', '"." = "allow"'),
+            encoding="utf-8",
+        )
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"])
+        self.assert_has_check(result, "permission_values")
+
     def test_hooks_flag_without_hook_config_fails(self):
         temp_dir, target = self.copy_fixture()
         self.addCleanup(temp_dir.cleanup)
@@ -343,6 +369,33 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         result = eval_generated_harness.evaluate(target)
         self.assertEqual("fail", result["status"])
         self.assert_has_check(result, "hooks_config")
+
+    def test_hook_event_singleton_table_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        config = target / ".codex/config.toml"
+        config.write_text(
+            config.read_text(encoding="utf-8")
+            + '\n[features]\nhooks = true\n\n[hooks.InstructionsLoaded]\ncommand = "echo loaded"\n',
+            encoding="utf-8",
+        )
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"])
+        self.assert_has_check(result, "hooks_config")
+
+    def test_skill_config_without_enabled_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        config = target / ".codex/config.toml"
+        config.write_text(
+            config.read_text(encoding="utf-8").replace("enabled = true\n", ""),
+            encoding="utf-8",
+        )
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"])
+        self.assert_has_check(result, "skills_config")
 
     def test_legacy_runtime_path_fails(self):
         temp_dir, target = self.copy_fixture()

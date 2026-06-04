@@ -8,10 +8,14 @@ default_permissions = "project_workspace"
 CODEX_EXPERIMENTAL_AGENT_TEAMS = "1"
 CODEX_AUTOCOMPACT_PCT_OVERRIDE = "90"
 
+[permissions.project_workspace]
+extends = ":workspace"
+
 [permissions.project_workspace.filesystem]
 glob_scan_max_depth = 6
 
 [permissions.project_workspace.filesystem.":workspace_roots"]
+"." = "write"
 "**/.env" = "deny"
 "**/.env.*" = "deny"
 "**/*secret*" = "deny"
@@ -19,10 +23,10 @@ glob_scan_max_depth = 6
 "**/*credential*" = "deny"
 "**/*.pem" = "deny"
 "**/*.key" = "deny"
-"**/Docs/_working/**" = "allow"
+"**/Docs/_working/**" = "write"
 
 [permissions.project_workspace.network]
-"enabled" = false
+enabled = false
 
 [agents.markdown-auditor]
 config_file = "agents/markdown-auditor.toml"
@@ -32,6 +36,8 @@ config_file = "agents/summary-writer.toml"
 
 [[skills.config]]
 path = "../.agents/skills/audit-todos"
+enabled = true
 
 [[skills.config]]
 path = "../.agents/skills/write-cleanup-summary"
+enabled = true

@@ -78,8 +78,8 @@ enabled = true
 path = "../.agents/skills/process-inbox"
 enabled = true
 
-[hooks.InstructionsLoaded]
+[[hooks.InstructionsLoaded]]
 command = "sh -c 'count=$(find Docs/_working/retro -type f -name \"*.md\" 2>/dev/null | wc -l | tr -d \" \"); if [ \"$count\" -ge 5 ]; then echo \"Retro notes are accumulating; consider /update.\"; fi'"
 
-[hooks.PreCompact]
+[[hooks.PreCompact]]
 command = "sh -c 'mkdir -p Docs/_working/state && date -u +%Y-%m-%dT%H:%M:%SZ >> Docs/_working/state/SESSION_CONTEXT.md'"

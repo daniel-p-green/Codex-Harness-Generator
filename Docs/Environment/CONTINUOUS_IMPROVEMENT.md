@@ -58,6 +58,16 @@ the capture under `examples/live-create/`. The capture helper requires
 `--allow-missing-creation-context` only for explicitly labeled non-`/create`
 experiments that should not be treated as product proof.
 
+For authenticated usefulness checks against checked-in live examples:
+
+```bash
+python scripts/run_live_example_task_trials.py
+```
+
+This copies each live example to a temporary workspace, seeds synthetic inputs,
+runs `codex exec`, verifies concrete output files, and writes
+`examples/live-create/TASK_TRIALS.md`.
+
 ## Fixture Coverage
 
 The current golden fixtures cover:

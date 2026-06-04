@@ -19,6 +19,12 @@ python scripts/smoke_generated_harness.py examples/live-create/synthetic-*
 python scripts/run_evals.py
 ```
 
+Run representative live task trials against temporary copies:
+
+```bash
+python scripts/run_live_example_task_trials.py
+```
+
 Run authenticated smoke checks separately when local Codex CLI auth is available:
 
 ```bash

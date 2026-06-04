@@ -269,7 +269,12 @@ def check_config(root: Path, findings: list[Finding]) -> dict:
 
     for profile_name, profile in permissions.items():
         filesystem = profile.get("filesystem", {}) if isinstance(profile, dict) else {}
+        if profile_name not in BUILT_IN_PERMISSION_PROFILES and isinstance(profile, dict) and not profile.get("extends"):
+            add(findings, "config_permissions", "safety_privacy", "fail", ".codex/config.toml", f"Permission profile {profile_name} must declare extends for Codex portability.")
         workspace_rules = filesystem.get(":workspace_roots", {})
+        for pattern, access in workspace_rules.items():
+            if access not in {"read", "write", "deny"}:
+                add(findings, "permission_values", "codex_compatibility", "fail", ".codex/config.toml", f"Permission profile {profile_name} filesystem rule {pattern} has invalid access value: {access}")
         deny_patterns = [
             pattern
             for pattern, access in workspace_rules.items()
@@ -286,6 +291,15 @@ def check_config(root: Path, findings: list[Finding]) -> dict:
     features = config.get("features", {})
     if isinstance(features, dict) and features.get("hooks") is True and "hooks" not in config and not (root / ".codex/hooks.json").exists():
         add(findings, "hooks_config", "codex_compatibility", "fail", ".codex/config.toml", "features.hooks is true but no hooks.json or inline [hooks] config exists.")
+    hooks = config.get("hooks", {})
+    if isinstance(hooks, dict):
+        for event_name, event_hooks in hooks.items():
+            if not isinstance(event_hooks, list):
+                add(findings, "hooks_config", "codex_compatibility", "fail", ".codex/config.toml", f"hooks.{event_name} must be an array of hook command objects.")
+                continue
+            for index, hook in enumerate(event_hooks, 1):
+                if not isinstance(hook, dict) or not isinstance(hook.get("command"), str):
+                    add(findings, "hooks_config", "codex_compatibility", "fail", ".codex/config.toml", f"hooks.{event_name} entry {index} must include a command string.")
 
     return config
 
@@ -375,6 +389,10 @@ def check_skill_contracts(root: Path, config: dict, findings: list[Finding]) -> 
         if not isinstance(skill_path, str):
             add(findings, "skills_config", "codex_compatibility", "fail", ".codex/config.toml", f"skills.config entry {index} must include path.")
             continue
+        if "enabled" not in skill_config:
+            add(findings, "skills_config", "codex_compatibility", "fail", ".codex/config.toml", f"skills.config entry {index} must include enabled.")
+        elif not isinstance(skill_config.get("enabled"), bool):
+            add(findings, "skills_config", "codex_compatibility", "fail", ".codex/config.toml", f"skills.config entry {index} enabled must be boolean.")
         resolved = (root / ".codex" / skill_path).resolve()
         if not resolved.exists():
             add(findings, "skills_config", "codex_compatibility", "fail", ".codex/config.toml", f"skills.config path does not exist: {skill_path}")

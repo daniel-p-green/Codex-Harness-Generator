@@ -504,7 +504,24 @@ def check_toml_contracts(root: Path) -> list[dict]:
     permissions = config.get("permissions", {})
     for profile_name, profile in permissions.items():
         filesystem = profile.get("filesystem", {}) if isinstance(profile, dict) else {}
+        if profile_name not in BUILT_IN_PERMISSION_PROFILES and isinstance(profile, dict) and not profile.get("extends"):
+            failures.append(
+                {
+                    "check": "codex_config_permissions",
+                    "path": ".codex/config.toml",
+                    "message": f"Permission profile {profile_name} must declare extends for Codex portability.",
+                }
+            )
         workspace_rules = filesystem.get(":workspace_roots", {})
+        for pattern, access in workspace_rules.items():
+            if access not in {"read", "write", "deny"}:
+                failures.append(
+                    {
+                        "check": "codex_config_permissions",
+                        "path": ".codex/config.toml",
+                        "message": f"Permission profile {profile_name} filesystem rule {pattern} has invalid access value: {access}",
+                    }
+                )
         deny_patterns = [
             pattern
             for pattern, access in workspace_rules.items()
@@ -543,6 +560,27 @@ def check_toml_contracts(root: Path) -> list[dict]:
                 "message": "features.hooks is true but no hooks.json or inline [hooks] config exists.",
             }
         )
+    hooks = config.get("hooks", {})
+    if isinstance(hooks, dict):
+        for event_name, event_hooks in hooks.items():
+            if not isinstance(event_hooks, list):
+                failures.append(
+                    {
+                        "check": "codex_config_hooks",
+                        "path": ".codex/config.toml",
+                        "message": f"hooks.{event_name} must be an array of hook command objects.",
+                    }
+                )
+                continue
+            for index, hook in enumerate(event_hooks, 1):
+                if not isinstance(hook, dict) or not isinstance(hook.get("command"), str):
+                    failures.append(
+                        {
+                            "check": "codex_config_hooks",
+                            "path": ".codex/config.toml",
+                            "message": f"hooks.{event_name} entry {index} must include a command string.",
+                        }
+                    )
 
     skills_config = config.get("skills", {}).get("config", [])
     if skills_config and not isinstance(skills_config, list):
@@ -575,7 +613,15 @@ def check_toml_contracts(root: Path) -> list[dict]:
                 }
             )
             continue
-        if enabled is not None and not isinstance(enabled, bool):
+        if enabled is None:
+            failures.append(
+                {
+                    "check": "codex_config_skills",
+                    "path": ".codex/config.toml",
+                    "message": f"skills.config entry {index} must include enabled.",
+                }
+            )
+        elif not isinstance(enabled, bool):
             failures.append(
                 {
                     "check": "codex_config_skills",

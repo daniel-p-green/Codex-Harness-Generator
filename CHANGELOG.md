@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Added `scripts/capture_live_create_example.py` and `examples/live-create/README.md` for sanitized live `/create` capture packaging.
 - Added a checked-in sanitized live `/create` capture and offline eval/smoke coverage for live-create examples.
 - Added three checked-in sanitized live `/create` captures covering knowledge work, Python CLI, and data analysis.
+- Added authenticated live example task trials to verify generated harnesses can steer Codex through representative work.
 
 ### Changed
 

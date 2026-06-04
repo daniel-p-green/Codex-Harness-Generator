@@ -8,21 +8,24 @@ default_permissions = "synthetic_workspace"
 hooks = true
 
 [permissions.synthetic_workspace]
+extends = ":workspace"
+
 [permissions.synthetic_workspace.filesystem]
 glob_scan_max_depth = 6
 [permissions.synthetic_workspace.filesystem.":workspace_roots"]
+"." = "write"
 "**/.env*" = "deny"
 "**/*secret*" = "deny"
 "**/*token*" = "deny"
 "**/*credential*" = "deny"
 "**/*.pem" = "deny"
 "**/*.key" = "deny"
-"Docs/_working/**" = "allow"
-"data/**" = "allow"
-"reports/**" = "allow"
-"*.md" = "allow"
-".codex/**" = "allow"
-".agents/**" = "allow"
+"Docs/_working/**" = "write"
+"data/**" = "write"
+"reports/**" = "write"
+"*.md" = "write"
+".codex/**" = "write"
+".agents/**" = "write"
 
 [[hooks.InstructionsLoaded]]
 command = "python .codex/hooks/self_learning_check.py"
@@ -38,16 +41,20 @@ config_file = "agents/report-note-writer.toml"
 
 [[skills.config]]
 path = "../.agents/skills/data-quality-check"
+enabled = true
 
 [[skills.config]]
 path = "../.agents/skills/summarize-week"
+enabled = true
 
 [[skills.config]]
 path = "../.agents/skills/chart-notes"
+enabled = true
 
 [[skills.config]]
 path = "../.agents/skills/state-save"
+enabled = true
 
 [[skills.config]]
 path = "../.agents/skills/state-load"
-
+enabled = true

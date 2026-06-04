@@ -44,6 +44,9 @@ replacement. What is proven today:
   for sanitized live `/create` outputs.
 - `examples/live-create/` contains three sanitized live model-mediated `/create`
   captures: knowledge work, Python CLI, and data analysis.
+- `scripts/run_live_example_task_trials.py` runs authenticated Codex task trials
+  against temporary copies of those generated harnesses and verifies concrete
+  output files.
 
 What still needs product proof:
 
@@ -183,6 +186,16 @@ python scripts/capture_live_create_example.py /tmp/codex-live-target \
 The capture helper requires `Docs/Environment/CREATION_CONTEXT.md` by default so
 live examples prove the `/create` handoff, not just a valid generated harness.
 
+To prove checked-in live examples can steer Codex through representative tasks:
+
+```bash
+python scripts/run_live_example_task_trials.py
+```
+
+This uses authenticated local Codex CLI access, copies each live example to a
+temporary workspace, seeds synthetic inputs, runs `codex exec`, and writes
+`examples/live-create/TASK_TRIALS.md`.
+
 ## Commands
 
 | Command | What it does |
@@ -272,6 +285,8 @@ This runs:
 - Checked-in live-create example evaluation and smoke checks when live captures
   exist.
 - Live-create capture helper tests.
+- Live-create task-trial helper tests. Authenticated maintainers can run the
+  full task trials separately with `python scripts/run_live_example_task_trials.py`.
 - Contract and mutation tests.
 - Python compile checks.
 

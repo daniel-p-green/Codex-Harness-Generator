@@ -341,6 +341,24 @@ class EvalCodexPortTests(unittest.TestCase):
         failures = self.run_eval(mutate)
         self.assert_fails_check(failures, "codex_config_permissions")
 
+    def test_custom_permission_profile_without_extends_fails(self):
+        def mutate(root: Path) -> None:
+            path = root / ".codex/config.toml"
+            text = path.read_text(encoding="utf-8")
+            path.write_text(text.replace('extends = ":workspace"\n', ""))
+
+        failures = self.run_eval(mutate)
+        self.assert_fails_check(failures, "codex_config_permissions")
+
+    def test_invalid_filesystem_permission_value_fails(self):
+        def mutate(root: Path) -> None:
+            path = root / ".codex/config.toml"
+            text = path.read_text(encoding="utf-8")
+            path.write_text(text.replace('"." = "write"', '"." = "allow"'))
+
+        failures = self.run_eval(mutate)
+        self.assert_fails_check(failures, "codex_config_permissions")
+
     def test_agent_web_search_requires_broad_network_policy(self):
         def mutate(root: Path) -> None:
             path = root / ".codex/agents/intake-interviewer.toml"
@@ -360,6 +378,24 @@ class EvalCodexPortTests(unittest.TestCase):
 
         failures = self.run_eval(mutate)
         self.assert_fails_check(failures, "codex_config_hooks")
+
+    def test_hook_event_singleton_table_fails(self):
+        def mutate(root: Path) -> None:
+            path = root / ".codex/config.toml"
+            text = path.read_text(encoding="utf-8")
+            path.write_text(text + '\n[features]\nhooks = true\n\n[hooks.InstructionsLoaded]\ncommand = "echo loaded"\n')
+
+        failures = self.run_eval(mutate)
+        self.assert_fails_check(failures, "codex_config_hooks")
+
+    def test_skill_config_without_enabled_fails(self):
+        def mutate(root: Path) -> None:
+            path = root / ".codex/config.toml"
+            text = path.read_text(encoding="utf-8")
+            path.write_text(text.replace("enabled = true\n", ""))
+
+        failures = self.run_eval(mutate)
+        self.assert_fails_check(failures, "codex_config_skills")
 
     def test_legacy_text_in_python_source_fails(self):
         def mutate(root: Path) -> None:

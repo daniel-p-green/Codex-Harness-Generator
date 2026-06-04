@@ -15,6 +15,9 @@ capture from a generic generated harness.
 
 See `INDEX.md` for the checked-in capture matrix.
 
+Use `scripts/run_live_example_task_trials.py` to run authenticated task trials
+against temporary copies of these examples and write `TASK_TRIALS.md`.
+
 Use the capture helper to package a generated target:
 
 ```bash
