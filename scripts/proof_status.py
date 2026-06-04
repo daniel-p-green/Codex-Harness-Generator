@@ -143,7 +143,7 @@ def check_ci_workflow(workflow_path: Path = CI_WORKFLOW, pyproject_path: Path = 
         errors.append("workflow does not capture JSON eval gate payload")
     if "set -o pipefail" not in text:
         errors.append("workflow may hide eval gate failures through tee")
-    if "actions/upload-artifact@v4" not in text:
+    if "actions/upload-artifact@v5" not in text:
         errors.append("workflow does not upload eval gate payload")
 
     return {

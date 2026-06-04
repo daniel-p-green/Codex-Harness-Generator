@@ -33,7 +33,9 @@ class CiWorkflowTests(unittest.TestCase):
         self.assertIn("python -m pip install .", text)
         self.assertIn("set -o pipefail", text)
         self.assertIn("python scripts/run_evals.py --json | tee eval-gate-${{ matrix.python-version }}.json", text)
-        self.assertIn("actions/upload-artifact@v4", text)
+        self.assertIn("actions/checkout@v5", text)
+        self.assertIn("actions/setup-python@v6", text)
+        self.assertIn("actions/upload-artifact@v5", text)
         self.assertIn("eval-gate-python-${{ matrix.python-version }}", text)
 
     def test_tomli_fallback_has_python_310_runtime_dependency(self):
