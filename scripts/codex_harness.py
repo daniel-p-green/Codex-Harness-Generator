@@ -384,6 +384,28 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("export_pilot_pack.py", command)
 
+    if args.command == "pilot-campaign":
+        command = []
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.out:
+            command.extend(["--out", args.out])
+        if args.max_pilots is not None:
+            command.extend(["--max-pilots", str(args.max_pilots)])
+        if args.min_records is not None:
+            command.extend(["--min-records", str(args.min_records)])
+        if args.min_external_or_multi_project is not None:
+            command.extend(["--min-external-or-multi-project", str(args.min_external_or_multi_project)])
+        if args.min_domains is not None:
+            command.extend(["--min-domains", str(args.min_domains)])
+        if args.min_installed_init_brief is not None:
+            command.extend(["--min-installed-init-brief", str(args.min_installed_init_brief)])
+        if args.no_write:
+            command.append("--no-write")
+        if args.json:
+            command.append("--json")
+        return python_script("export_pilot_campaign.py", command)
+
     if args.command == "usage-from-issue":
         command = [
             args.issue_body,
@@ -720,6 +742,17 @@ def make_parser() -> argparse.ArgumentParser:
     pilot_pack.add_argument("--prefill-from-trials", action="store_true", help="Prefill the issue draft from the latest complete task-trial record")
     pilot_pack.add_argument("--generated", help="UTC timestamp override")
     pilot_pack.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    pilot_campaign = subparsers.add_parser("pilot-campaign", help="Write a pilot campaign plan from usage evidence gaps")
+    pilot_campaign.add_argument("--record-dir", help="Directory where usage record JSON files are read")
+    pilot_campaign.add_argument("--out", help="Pilot campaign Markdown path")
+    pilot_campaign.add_argument("--max-pilots", type=int, help="Maximum suggested pilot slots to include")
+    pilot_campaign.add_argument("--min-records", type=int, help="Target valid usage records")
+    pilot_campaign.add_argument("--min-external-or-multi-project", type=int, help="Target external or multi-project records")
+    pilot_campaign.add_argument("--min-domains", type=int, help="Target distinct domains")
+    pilot_campaign.add_argument("--min-installed-init-brief", type=int, help="Target records generated via installed init --brief")
+    pilot_campaign.add_argument("--no-write", action="store_true", help="Do not write the Markdown campaign")
+    pilot_campaign.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     usage_from_issue = subparsers.add_parser("usage-from-issue", help="Create usage evidence from a GitHub issue-form body")
     usage_from_issue.add_argument("issue_body", help="Markdown issue body path, or '-' for stdin")

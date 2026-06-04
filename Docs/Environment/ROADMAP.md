@@ -41,8 +41,9 @@ Already proven:
 - Privacy-checked usage-record validation.
 - Copied-harness evidence conversion into privacy-checked usage records.
 - External usage-report intake and issue-body conversion.
-- Beta-exit usage-gap reporting and suggested pilot targets through
-  `codex-harness usage-gaps`.
+- Beta-exit usage-gap reporting, suggested pilot targets, and a shareable
+  campaign packet through `codex-harness usage-gaps` and
+  `codex-harness pilot-campaign`.
 - Short deterministic demo capture through `codex-harness demo-capture`.
 
 Still unproven:
@@ -78,7 +79,8 @@ The project can stop calling itself a beta only when all of these are true:
    use `codex-harness usage-from-issue` to convert the issue body into the
    checked-in usage record. Run `codex-harness usage-gaps` after each record to
    pick the next pilot profile, source type, and generation path by the largest
-   remaining beta-exit gap.
+   remaining beta-exit gap, then run `codex-harness pilot-campaign` when a
+   shareable outreach packet is useful.
 
 2. Add more public-safe live examples.
    Prioritize domains where the generated harness has high-risk boundaries:

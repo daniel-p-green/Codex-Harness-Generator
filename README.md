@@ -113,6 +113,9 @@ replacement. What is proven today:
   `Docs/Environment/USAGE_GAPS.md`, a concrete list of the remaining beta-exit
   evidence gaps plus suggested external pilot targets from the supported Codex
   profile catalog.
+- `scripts/export_pilot_campaign.py` and `codex-harness pilot-campaign` write
+  `Docs/Environment/PILOT_CAMPAIGN.md`, a shareable external-pilot campaign
+  plan derived from the current usage gaps.
 - `scripts/usage_from_harness.py` and `codex-harness usage-from-harness`
   convert a generated harness's local eval report and task trials into a
   privacy-checked usage record.
@@ -462,6 +465,12 @@ The report includes suggested pilot targets with starter `init` and `pilot-pack`
 commands so maintainers can collect the next records by profile, source type,
 and generation path instead of guessing.
 
+Write a shareable campaign packet from those gaps:
+
+```bash
+python scripts/codex_harness.py pilot-campaign
+```
+
 To collect privacy-safe evidence from outside this repository, use the
 **External usage report** GitHub issue template and
 `Docs/Environment/EXTERNAL_USAGE_EVIDENCE.md`.
@@ -561,6 +570,7 @@ Common subcommands:
 | `usage-from-harness` | `usage_from_harness.py` | Converts copied-harness task trials and eval reports into a privacy-checked usage record. |
 | `evidence-packet <path>` | `export_evidence_packet.py` | Exports a public-safe Markdown evidence packet from copied-harness local eval and task trials. |
 | `pilot-pack <path>` | `export_pilot_pack.py` | Writes an external pilot guide and optional GitHub issue-body draft for one privacy-safe generated-harness trial. |
+| `pilot-campaign` | `export_pilot_campaign.py` | Writes a shareable external-pilot campaign plan from current usage evidence gaps. |
 | `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record. |
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
 | `usage-gaps` | `usage_gaps.py` | Reports remaining beta-exit usage evidence gaps and writes `Docs/Environment/USAGE_GAPS.md`. |

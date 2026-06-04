@@ -839,6 +839,53 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_pilot_campaign_delegates_to_campaign_script(self):
+        command, _ = self.run_cli(
+            [
+                "pilot-campaign",
+                "--record-dir",
+                "/tmp/records",
+                "--out",
+                "/tmp/PILOT_CAMPAIGN.md",
+                "--max-pilots",
+                "2",
+                "--min-records",
+                "5",
+                "--min-external-or-multi-project",
+                "3",
+                "--min-domains",
+                "4",
+                "--min-installed-init-brief",
+                "2",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/export_pilot_campaign.py",
+                "--record-dir",
+                "/tmp/records",
+                "--out",
+                "/tmp/PILOT_CAMPAIGN.md",
+                "--max-pilots",
+                "2",
+                "--min-records",
+                "5",
+                "--min-external-or-multi-project",
+                "3",
+                "--min-domains",
+                "4",
+                "--min-installed-init-brief",
+                "2",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
     def test_usage_validate_delegates_to_validator(self):
         command, _ = self.run_cli(
             [
