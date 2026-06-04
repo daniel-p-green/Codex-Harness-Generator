@@ -7,7 +7,14 @@ import argparse
 import json
 from pathlib import Path
 
-from record_usage_case import DEFAULT_RECORD_DIR, UsageRecord, safe_slug, validate_record
+from record_usage_case import (
+    DEFAULT_RECORD_DIR,
+    NON_SYNTHETIC_EVIDENCE_TYPES,
+    UsageRecord,
+    safe_slug,
+    summarize_records,
+    validate_record,
+)
 
 
 REQUIRED_FIELDS = {
@@ -77,14 +84,34 @@ def validate_record_file(path: Path) -> dict:
     return {"path": path.as_posix(), "status": "pass", "error": None}
 
 
-def validate_record_dir(record_dir: Path) -> dict:
+def validate_record_dir(
+    record_dir: Path,
+    min_records: int = 0,
+    require_non_synthetic: bool = False,
+    require_success: bool = False,
+) -> dict:
     paths = sorted(record_dir.glob("*.json")) if record_dir.exists() else []
     results = [validate_record_file(path) for path in paths]
-    status = "pass" if all(result["status"] == "pass" for result in results) else "fail"
+    valid_records = []
+    for path, result in zip(paths, results):
+        if result["status"] == "pass":
+            valid_records.append(json.loads(path.read_text(encoding="utf-8")))
+    summary = summarize_records(valid_records)
+    requirement_errors = []
+    if summary["total"] < min_records:
+        requirement_errors.append(f"requires at least {min_records} usage record(s); found {summary['total']}")
+    if require_non_synthetic and summary["non_synthetic"] == 0:
+        allowed = ", ".join(sorted(NON_SYNTHETIC_EVIDENCE_TYPES))
+        requirement_errors.append(f"requires at least one non-synthetic usage record ({allowed})")
+    if require_success and summary["success"] == 0:
+        requirement_errors.append("requires at least one successful usage record")
+    status = "pass" if all(result["status"] == "pass" for result in results) and not requirement_errors else "fail"
     return {
         "status": status,
         "record_dir": record_dir.as_posix(),
         "record_count": len(results),
+        "summary": summary,
+        "requirement_errors": requirement_errors,
         "results": results,
     }
 
@@ -92,16 +119,32 @@ def validate_record_dir(record_dir: Path) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--record-dir", default=DEFAULT_RECORD_DIR.as_posix())
+    parser.add_argument("--min-records", type=int, default=0, help="Fail unless at least this many valid records exist")
+    parser.add_argument("--require-non-synthetic", action="store_true", help="Fail unless sanitized or private-summary evidence exists")
+    parser.add_argument("--require-success", action="store_true", help="Fail unless at least one successful usage record exists")
     parser.add_argument("--json", action="store_true", help="Emit JSON")
     args = parser.parse_args()
 
-    payload = validate_record_dir(Path(args.record_dir))
+    payload = validate_record_dir(
+        Path(args.record_dir),
+        min_records=args.min_records,
+        require_non_synthetic=args.require_non_synthetic,
+        require_success=args.require_success,
+    )
     if args.json:
         print(json.dumps(payload, indent=2))
     else:
         print(f"Usage records validation: {payload['status'].upper()}")
         print(f"- record_dir: {payload['record_dir']}")
         print(f"- records: {payload['record_count']}")
+        summary = payload["summary"]
+        print(
+            "- summary: total={total} synthetic={synthetic} sanitized={sanitized} private-summary={private_summary} non-synthetic={non_synthetic} success={success}".format(
+                **summary
+            )
+        )
+        for error in payload["requirement_errors"]:
+            print(f"- requirement: FAIL - {error}")
         for result in payload["results"]:
             print(f"- {result['path']}: {result['status'].upper()}")
             if result["error"]:

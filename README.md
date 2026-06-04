@@ -65,14 +65,16 @@ replacement. What is proven today:
   `Docs/Environment/SEMANTIC_ALIGNMENT.md`.
 - `scripts/record_usage_case.py` provides a privacy-checked path for recording
   sanitized real-world or private-summary usage evidence under
-  `Docs/Environment/usage-records/`.
+  `Docs/Environment/usage-records/`, and `scripts/validate_usage_records.py`
+  can enforce stricter non-synthetic proof thresholds when making real-world
+  usage claims.
 
 What still needs product proof:
 
-- Real use of generated harnesses on real Codex tasks over time.
-- More live examples for specialized or higher-risk domains beyond the current
-  public-safe security-audit, legal-research, financial-modeling,
-  hiring-pipeline, and customer-support fixtures.
+- Real use of generated harnesses on real Codex tasks over time, recorded as
+  sanitized or private-summary usage evidence.
+- More live examples for specialized domains as new public-safe briefs become
+  available.
 
 Until those real-world usage records exist, treat the eval suite, golden
 fixtures, deterministic examples, and synthetic live examples as strong product
@@ -249,14 +251,27 @@ python scripts/codex_harness.py usage-record \
   --outcome success \
   --evidence-type private-summary \
   --evidence "Generated harness guided implementation and verification." \
+  --evidence "Sanitized artifact checklist completed; raw evidence retained privately." \
   --verification "Tests passed; raw logs retained privately." \
-  --privacy-review "No secrets, personal data, proprietary source, or local paths included."
+  --verification "Expected task artifact was produced and reviewed." \
+  --privacy-review "No secrets, personal data, proprietary source, or local paths included." \
+  --limitation "Raw project files are private."
 ```
 
 Validate checked-in usage records before release:
 
 ```bash
 python scripts/codex_harness.py usage-validate
+```
+
+Require actual non-synthetic success evidence before making real-world usage
+claims:
+
+```bash
+python scripts/codex_harness.py usage-validate \
+  --min-records 1 \
+  --require-non-synthetic \
+  --require-success
 ```
 
 The wrapper is intentionally thin. It delegates to the underlying scripts so
@@ -295,7 +310,7 @@ Common subcommands:
 | `source-freshness` | `check_source_freshness.py` | Confirms official OpenAI source URLs are reachable. |
 | `semantic-alignment` | `check_semantic_alignment.py` | Checks local guidance against official Codex doc concepts. |
 | `usage-record` | `record_usage_case.py` | Records sanitized generated-harness usage evidence. |
-| `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema and privacy checks. |
+| `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
 | `snapshot` | `record_eval_snapshot.py` | Records an eval trend snapshot. |
 
 ## Presets

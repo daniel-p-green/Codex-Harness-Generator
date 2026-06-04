@@ -5,6 +5,16 @@ This report indexes sanitized generated-harness usage evidence recorded by
 records may summarize private work, but public artifacts must not include
 secrets, personal data, proprietary source, or local machine paths.
 
+## Summary
+
+| Total | Synthetic | Sanitized | Private Summary | Non-Synthetic | Success | Partial | Failed | Inconclusive |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+Product-proof status: no non-synthetic usage records yet
+
+## Records
+
 | Generated | Slug | Domain | Outcome | Evidence Type | Verification Count |
 |---|---|---|---|---|---:|
 |  |  |  |  |  | 0 |

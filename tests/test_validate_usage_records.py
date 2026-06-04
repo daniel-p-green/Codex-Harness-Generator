@@ -47,6 +47,14 @@ class ValidateUsageRecordsTests(unittest.TestCase):
 
         self.assertEqual("pass", payload["status"])
         self.assertEqual(0, payload["record_count"])
+        self.assertEqual(0, payload["summary"]["total"])
+
+    def test_validate_record_dir_can_require_records(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            payload = validate_usage_records.validate_record_dir(Path(temp_dir) / "missing", min_records=1)
+
+        self.assertEqual("fail", payload["status"])
+        self.assertIn("at least 1", payload["requirement_errors"][0])
 
     def test_validate_record_file_accepts_valid_record(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -55,6 +63,38 @@ class ValidateUsageRecordsTests(unittest.TestCase):
             result = validate_usage_records.validate_record_file(path)
 
         self.assertEqual("pass", result["status"], result)
+
+    def test_validate_record_dir_can_require_non_synthetic_success(self):
+        payload = self.valid_payload()
+        payload["slug"] = "private-task"
+        payload["evidence_type"] = "private-summary"
+        payload["evidence"] = ["private summary reviewed", "sanitized artifact checklist completed"]
+        payload["verification"] = ["expected artifact exists", "privacy scan passed"]
+        payload["limitations"] = ["Raw project files are private."]
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_payload(root, "private-task", payload)
+
+            result = validate_usage_records.validate_record_dir(
+                root,
+                min_records=1,
+                require_non_synthetic=True,
+                require_success=True,
+            )
+
+        self.assertEqual("pass", result["status"], result)
+        self.assertEqual(1, result["summary"]["non_synthetic"])
+
+    def test_validate_record_dir_fails_non_synthetic_requirement_for_synthetic_only(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_payload(root, "synthetic-task", self.valid_payload())
+
+            result = validate_usage_records.validate_record_dir(root, require_non_synthetic=True)
+
+        self.assertEqual("fail", result["status"])
+        self.assertIn("non-synthetic", result["requirement_errors"][0])
 
     def test_validate_record_file_rejects_slug_filename_mismatch(self):
         with tempfile.TemporaryDirectory() as temp_dir:

@@ -15,7 +15,9 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_RECORD_DIR = REPO_ROOT / "Docs" / "Environment" / "usage-records"
 DEFAULT_REPORT = REPO_ROOT / "Docs" / "Environment" / "USAGE_RECORDS.md"
 ALLOWED_EVIDENCE_TYPES = {"synthetic", "sanitized", "private-summary"}
+NON_SYNTHETIC_EVIDENCE_TYPES = {"sanitized", "private-summary"}
 ALLOWED_OUTCOMES = {"success", "partial", "failed", "inconclusive"}
+GENERATED_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 
 SENSITIVE_PATTERNS = [
     (re.compile(r"sk-[A-Za-z0-9_-]{12,}"), "possible OpenAI API key"),
@@ -74,16 +76,36 @@ def find_sensitive_text(text: str) -> list[str]:
 
 
 def validate_record(record: UsageRecord) -> None:
+    required_text = {
+        "title": record.title,
+        "generated": record.generated,
+        "domain": record.domain,
+        "harness_path": record.harness_path,
+        "task_summary": record.task_summary,
+        "privacy_review": record.privacy_review,
+    }
+    empty = [key for key, value in required_text.items() if not value.strip()]
+    if empty:
+        raise SystemExit("Required field(s) must not be empty: " + ", ".join(sorted(empty)))
+    if not GENERATED_RE.match(record.generated):
+        raise SystemExit("generated must use UTC timestamp format YYYY-MM-DDTHH:MM:SSZ.")
     if record.evidence_type not in ALLOWED_EVIDENCE_TYPES:
         raise SystemExit(f"Unsupported evidence_type: {record.evidence_type}")
     if record.outcome not in ALLOWED_OUTCOMES:
         raise SystemExit(f"Unsupported outcome: {record.outcome}")
-    if not record.privacy_review.strip():
-        raise SystemExit("A privacy review note is required.")
-    if not record.evidence:
+    if not record.evidence or any(not item.strip() for item in record.evidence):
         raise SystemExit("At least one evidence item is required.")
-    if not record.verification:
+    if not record.verification or any(not item.strip() for item in record.verification):
         raise SystemExit("At least one verification item is required.")
+    if any(not item.strip() for item in record.limitations):
+        raise SystemExit("Limitations must not include empty items.")
+    if record.evidence_type in NON_SYNTHETIC_EVIDENCE_TYPES:
+        if len(record.evidence) < 2:
+            raise SystemExit("Non-synthetic usage records require at least two evidence items.")
+        if len(record.verification) < 2:
+            raise SystemExit("Non-synthetic usage records require at least two verification items.")
+        if not record.limitations:
+            raise SystemExit("Non-synthetic usage records require at least one limitation.")
     scan_text = json.dumps(record.to_dict(), sort_keys=True)
     findings = find_sensitive_text(scan_text)
     if findings:
@@ -130,7 +152,28 @@ def load_records(record_dir: Path) -> list[dict]:
     return records
 
 
+def summarize_records(records: list[dict]) -> dict:
+    by_type = {evidence_type: 0 for evidence_type in sorted(ALLOWED_EVIDENCE_TYPES)}
+    by_outcome = {outcome: 0 for outcome in sorted(ALLOWED_OUTCOMES)}
+    for record in records:
+        by_type[record["evidence_type"]] = by_type.get(record["evidence_type"], 0) + 1
+        by_outcome[record["outcome"]] = by_outcome.get(record["outcome"], 0) + 1
+    non_synthetic = sum(by_type.get(evidence_type, 0) for evidence_type in NON_SYNTHETIC_EVIDENCE_TYPES)
+    return {
+        "total": len(records),
+        "synthetic": by_type.get("synthetic", 0),
+        "sanitized": by_type.get("sanitized", 0),
+        "private_summary": by_type.get("private-summary", 0),
+        "non_synthetic": non_synthetic,
+        "success": by_outcome.get("success", 0),
+        "partial": by_outcome.get("partial", 0),
+        "failed": by_outcome.get("failed", 0),
+        "inconclusive": by_outcome.get("inconclusive", 0),
+    }
+
+
 def write_report(report_path: Path, records: list[dict]) -> None:
+    summary = summarize_records(records)
     lines = [
         "# Usage Records",
         "",
@@ -138,6 +181,24 @@ def write_report(report_path: Path, records: list[dict]) -> None:
         "`python scripts/record_usage_case.py`. It is intentionally conservative:",
         "records may summarize private work, but public artifacts must not include",
         "secrets, personal data, proprietary source, or local machine paths.",
+        "",
+        "## Summary",
+        "",
+        "| Total | Synthetic | Sanitized | Private Summary | Non-Synthetic | Success | Partial | Failed | Inconclusive |",
+        "|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| {total} | {synthetic} | {sanitized} | {private_summary} | {non_synthetic} | {success} | {partial} | {failed} | {inconclusive} |".format(
+            **summary
+        ),
+        "",
+        "Product-proof status: {status}".format(
+            status=(
+                "non-synthetic usage evidence present"
+                if summary["non_synthetic"]
+                else "no non-synthetic usage records yet"
+            )
+        ),
+        "",
+        "## Records",
         "",
         "| Generated | Slug | Domain | Outcome | Evidence Type | Verification Count |",
         "|---|---|---|---|---|---:|",

@@ -133,6 +133,12 @@ def build_command(args: argparse.Namespace) -> list[str]:
         command = []
         if args.record_dir:
             command.extend(["--record-dir", args.record_dir])
+        if args.min_records is not None:
+            command.extend(["--min-records", str(args.min_records)])
+        if args.require_non_synthetic:
+            command.append("--require-non-synthetic")
+        if args.require_success:
+            command.append("--require-success")
         if args.json:
             command.append("--json")
         return python_script("validate_usage_records.py", command)
@@ -204,6 +210,9 @@ def make_parser() -> argparse.ArgumentParser:
 
     usage_validate = subparsers.add_parser("usage-validate", help="Validate checked-in generated-harness usage evidence")
     usage_validate.add_argument("--record-dir", help="Directory where usage record JSON files are read")
+    usage_validate.add_argument("--min-records", type=int, help="Fail unless at least this many valid records exist")
+    usage_validate.add_argument("--require-non-synthetic", action="store_true", help="Fail unless sanitized or private-summary evidence exists")
+    usage_validate.add_argument("--require-success", action="store_true", help="Fail unless at least one successful usage record exists")
     usage_validate.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     subparsers.add_parser("snapshot", help="Record an eval trend snapshot")

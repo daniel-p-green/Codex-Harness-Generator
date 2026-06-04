@@ -217,7 +217,18 @@ class CodexHarnessCliTests(unittest.TestCase):
         )
 
     def test_usage_validate_delegates_to_validator(self):
-        command, _ = self.run_cli(["usage-validate", "--record-dir", "/tmp/records", "--json"])
+        command, _ = self.run_cli(
+            [
+                "usage-validate",
+                "--record-dir",
+                "/tmp/records",
+                "--min-records",
+                "1",
+                "--require-non-synthetic",
+                "--require-success",
+                "--json",
+            ]
+        )
 
         self.assertEqual(
             [
@@ -225,6 +236,10 @@ class CodexHarnessCliTests(unittest.TestCase):
                 "scripts/validate_usage_records.py",
                 "--record-dir",
                 "/tmp/records",
+                "--min-records",
+                "1",
+                "--require-non-synthetic",
+                "--require-success",
                 "--json",
             ],
             command,

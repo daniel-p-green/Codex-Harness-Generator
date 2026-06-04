@@ -44,6 +44,26 @@ class RecordUsageCaseTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             record_usage_case.validate_record(record)
 
+    def test_validate_record_rejects_non_synthetic_without_enough_verification(self):
+        record = self.make_record(
+            evidence_type="private-summary",
+            evidence=("private summary reviewed",),
+            verification=("expected artifact exists",),
+        )
+
+        with self.assertRaises(SystemExit):
+            record_usage_case.validate_record(record)
+
+    def test_validate_record_accepts_stronger_non_synthetic_record(self):
+        record = self.make_record(
+            evidence_type="private-summary",
+            evidence=("private summary reviewed", "sanitized artifact checklist completed"),
+            verification=("expected artifact exists", "privacy scan passed"),
+            limitations=("Raw project files are private.",),
+        )
+
+        record_usage_case.validate_record(record)
+
     def test_write_record_and_report(self):
         record = self.make_record()
 
@@ -59,6 +79,25 @@ class RecordUsageCaseTests(unittest.TestCase):
             text = report.read_text(encoding="utf-8")
             self.assertIn("synthetic-task", text)
             self.assertIn("software development", text)
+            self.assertIn("Product-proof status: no non-synthetic usage records yet", text)
+
+    def test_summarize_records_counts_non_synthetic_evidence(self):
+        records = [
+            self.make_record().to_dict(),
+            self.make_record(
+                slug="private-task",
+                evidence_type="private-summary",
+                evidence=("private summary reviewed", "sanitized artifact checklist completed"),
+                verification=("expected artifact exists", "privacy scan passed"),
+            ).to_dict(),
+        ]
+
+        summary = record_usage_case.summarize_records(records)
+
+        self.assertEqual(2, summary["total"])
+        self.assertEqual(1, summary["synthetic"])
+        self.assertEqual(1, summary["private_summary"])
+        self.assertEqual(1, summary["non_synthetic"])
 
     def test_write_record_requires_force_for_existing_slug(self):
         record = self.make_record()
