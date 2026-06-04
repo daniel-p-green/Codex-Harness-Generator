@@ -896,6 +896,7 @@ class CodexHarnessCliTests(unittest.TestCase):
                 "--report",
                 "/tmp/USAGE_RECORDS.md",
                 "--force",
+                "--no-write",
                 "--json",
             ]
         )
@@ -922,6 +923,7 @@ class CodexHarnessCliTests(unittest.TestCase):
                 "--report",
                 "/tmp/USAGE_RECORDS.md",
                 "--force",
+                "--no-write",
                 "--json",
             ],
             command,

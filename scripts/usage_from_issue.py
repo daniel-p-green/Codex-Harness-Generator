@@ -20,6 +20,7 @@ from record_usage_case import (
     UsageRecord,
     display_path,
     load_records,
+    validate_record,
     safe_slug,
     write_record,
     write_report,
@@ -143,18 +144,32 @@ def main() -> int:
     parser.add_argument("--record-dir", default=DEFAULT_RECORD_DIR.as_posix())
     parser.add_argument("--report", default=DEFAULT_REPORT.as_posix())
     parser.add_argument("--force", action="store_true", help="Replace existing record with same slug")
+    parser.add_argument("--no-write", action="store_true", help="Validate and preview the record without writing files")
     parser.add_argument("--json", action="store_true", help="Emit JSON payload")
     args = parser.parse_args()
 
     record = build_record(args)
-    record_dir = Path(args.record_dir)
-    path = write_record(record_dir, record, force=args.force)
-    records = load_records(record_dir)
-    write_report(Path(args.report), records)
-    if args.json:
-        print(json.dumps({"status": "pass", "path": display_path(path), "record": record.to_dict()}, indent=2))
+    path = None
+    if args.no_write:
+        validate_record(record)
     else:
-        print(f"Recorded usage evidence from issue: {display_path(path)}")
+        record_dir = Path(args.record_dir)
+        path = write_record(record_dir, record, force=args.force)
+        records = load_records(record_dir)
+        write_report(Path(args.report), records)
+    if args.json:
+        payload = {
+            "status": "pass",
+            "written": not args.no_write,
+            "path": display_path(path) if path is not None else None,
+            "record": record.to_dict(),
+        }
+        print(json.dumps(payload, indent=2))
+    else:
+        if args.no_write:
+            print(f"Validated usage evidence from issue without writing: {record.slug}")
+        else:
+            print(f"Recorded usage evidence from issue: {display_path(path)}")
     return 0
 
 

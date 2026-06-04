@@ -464,6 +464,8 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.extend(["--report", args.report])
         if args.force:
             command.append("--force")
+        if args.no_write:
+            command.append("--no-write")
         if args.json:
             command.append("--json")
         return python_script("usage_from_issue.py", command)
@@ -843,6 +845,7 @@ def make_parser() -> argparse.ArgumentParser:
     usage_from_issue.add_argument("--record-dir", help="Directory where usage record JSON files are written")
     usage_from_issue.add_argument("--report", help="Usage-record Markdown report path")
     usage_from_issue.add_argument("--force", action="store_true", help="Replace existing record with same slug")
+    usage_from_issue.add_argument("--no-write", action="store_true", help="Validate and preview without writing files")
     usage_from_issue.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     usage_validate = subparsers.add_parser("usage-validate", help="Validate checked-in generated-harness usage evidence")

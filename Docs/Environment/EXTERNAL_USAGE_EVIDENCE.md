@@ -75,18 +75,21 @@ Review the packet for concrete evidence, verification, privacy boundaries, and
 limitations before turning it into a checked-in usage record.
 
 Maintainers can convert a usable public issue into a checked-in usage record by
-saving the issue body to a local Markdown file and running:
+saving the issue body to a local Markdown file. Preview and privacy-check the
+normalized record before writing files:
 
 ```bash
 python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
   --slug external-example \
   --title "External example" \
+  --no-write \
   --json
 ```
 
-The importer reads the GitHub issue-form headings, writes a usage-record JSON
-file, updates `Docs/Environment/USAGE_RECORDS.md`, and applies the same
-required-field and sensitive-text checks as `usage-record`.
+If the preview is complete and public-safe, rerun without `--no-write` to write
+the usage-record JSON file and update `Docs/Environment/USAGE_RECORDS.md`.
+The importer reads the GitHub issue-form headings and applies the same
+required-field and sensitive-text checks as `usage-record` in both modes.
 
 For manual conversion or cleanup, use:
 

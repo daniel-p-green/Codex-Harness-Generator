@@ -321,6 +321,28 @@ def build_payload() -> dict:
                 ],
             ),
             (
+                "usage_from_issue_preview",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "usage-from-issue",
+                    issue_body.as_posix(),
+                    "--slug",
+                    "install-smoke-issue-preview",
+                    "--title",
+                    "Install smoke issue preview",
+                    "--source-type",
+                    "self-dogfood",
+                    "--generation-path",
+                    "installed-quickstart",
+                    "--record-dir",
+                    usage_records.as_posix(),
+                    "--report",
+                    usage_report.as_posix(),
+                    "--no-write",
+                    "--json",
+                ],
+            ),
+            (
                 "usage_from_issue",
                 [
                     (venv / "bin" / "codex-harness").as_posix(),
