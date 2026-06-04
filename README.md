@@ -175,7 +175,8 @@ replacement. What is proven today:
 - `scripts/sync_pilot_github_issues.py` and `codex-harness
   pilot-github-sync` fetch live pilot issue bodies and comments, lint them
   through the usage importer, and report which issues are conversion-ready
-  without counting live issues or passing lint as proof.
+  without counting live issues or passing lint as proof. Waiting issues include
+  copyable reporter follow-up text for the exact missing public-safe fields.
 - `scripts/usage_from_github_issue.py` and `codex-harness
   usage-from-github-issue <issue-number-or-url>` fetch a completed public issue
   with `gh`, optionally include reporter comments, then reuse the same lint,
@@ -755,7 +756,7 @@ Common subcommands:
 | `pilot-handoff` | `export_pilot_handoff.py` | Writes shareable per-pilot handoff folders with a single reporter handoff, pilot pack, copied issue draft, prefilled usage-report draft, and maintainer commands. |
 | `pilot-handoff-audit` | `audit_pilot_handoffs.py` | Checks handoff folders for required reporter files, claim boundaries, and importer-shaped usage-report drafts before sending. |
 | `pilot-github-issues` | `export_pilot_github_issues.py` | Writes GitHub-ready issue bodies and `gh issue create` commands from active pilot-board records without treating opened issues as usage proof. |
-| `pilot-github-sync` | `sync_pilot_github_issues.py` | Fetches live pilot GitHub issues with comments, lints them through the same importer, and reports conversion readiness without writing usage records. |
+| `pilot-github-sync` | `sync_pilot_github_issues.py` | Fetches live pilot GitHub issues with comments, lints them through the same importer, writes reporter follow-up text for missing fields, and reports conversion readiness without writing usage records. |
 | `usage-from-github-issue` | `usage_from_github_issue.py` | Fetches a completed public GitHub issue with `gh`, optionally includes reporter comments, then lints, previews, or converts it through the same privacy-checked usage-record importer. |
 | `beta-exit-audit` | `beta_exit_audit.py` | Writes a non-gating audit of beta-exit readiness and remaining evidence gaps. |
 | `proof-next` | `proof_next.py` | Writes the next beta-exit proof actions and candidate coverage projection from current usage gaps without counting the plan as evidence. |

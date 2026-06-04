@@ -168,6 +168,9 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertEqual("waiting-for-reporter", record["readiness"])
         self.assertIn("outcome", record["missing_fields"])
         self.assertIn("usage-from-github-issue https://github.com/example/repo/issues/42", record["commands"]["convert"])
+        self.assertIn("Please reply with the missing public-safe sections", record["reporter_followup"])
+        self.assertIn("### Evidence", record["reporter_followup"])
+        self.assertIn("at least two public-safe bullets", record["reporter_followup"])
 
     def test_comment_completed_issue_reports_conversion_ready(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -186,6 +189,7 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertEqual("conversion-ready", record["readiness"])
         self.assertEqual([], record["missing_fields"])
         self.assertEqual(1, record["github_issue"]["comment_count"])
+        self.assertIn("No reporter follow-up needed", record["reporter_followup"])
 
     def test_write_report_includes_claim_boundary_and_commands(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -205,6 +209,8 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertIn("Conversion-ready issues: 1", report)
         self.assertIn("Do not count live issues", report)
         self.assertIn("usage-from-github-issue https://github.com/example/repo/issues/42", report)
+        self.assertIn("Reporter follow-up:", report)
+        self.assertIn("No reporter follow-up needed", report)
 
 
 if __name__ == "__main__":
