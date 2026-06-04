@@ -42,6 +42,8 @@ replacement. What is proven today:
   bundled domain preset.
 - Generated harnesses are required to include architecture, assumptions, source
   mapping, manifests, and validation reports.
+- Generated harnesses include `scripts/check-harness.py`, a local smoke check
+  that can run without this generator repo.
 - `scripts/capture_live_create_example.py` provides a repeatable packaging path
   for sanitized live `/create` outputs.
 - `examples/live-create/` contains sanitized live model-mediated `/create`
@@ -385,7 +387,7 @@ Common subcommands:
 | `brief-acceptance <target>` | `run_brief_acceptance.py` | Recommends a profile from a brief, runs deterministic acceptance, and records `PROFILE_SELECTION.md`. |
 | `eval <paths...>` | `eval_generated_harness.py` | Checks generated harness contract quality. |
 | `smoke <paths...>` | `smoke_generated_harness.py` | Parses config, resolves agents and skills, optionally runs Codex live smoke. |
-| `validate <paths...>` | `validate_generated_harness.py` | Runs eval and smoke together for generated harnesses. |
+| `validate <paths...>` | `validate_generated_harness.py` | Runs eval, offline smoke, and the generated local self-check together. |
 | `migration-audit <paths...>` | `migration_audit.py` | Audits legacy harness artifacts and lists the Codex-native migration work. |
 | `gate` | `run_evals.py` | Runs the repo release gate. |
 | `live-trials` | `run_live_example_task_trials.py` | Runs authenticated Codex tasks against checked-in live examples. |

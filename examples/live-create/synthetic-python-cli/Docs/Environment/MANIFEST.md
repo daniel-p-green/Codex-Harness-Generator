@@ -36,3 +36,4 @@ Generated harness inventory.
 - Docs/Environment/GENERATION_PROGRESS.md
 - Docs/Environment/VALIDATION_REPORT.md
 - Docs/Environment/LIVE_CREATE_CAPTURE.md
+- scripts/check-harness.py

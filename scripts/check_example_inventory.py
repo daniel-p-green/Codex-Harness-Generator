@@ -25,6 +25,7 @@ REQUIRED_HARNESS_PATHS = (
     ".codex/agents/reviewer.toml",
     ".codex/rules/core.md",
     ".agents/skills/health-check/SKILL.md",
+    "scripts/check-harness.py",
     "Docs/GETTING_STARTED.md",
     "Docs/Environment/GENESIS.md",
     "Docs/Environment/ARCHITECTURE.md",

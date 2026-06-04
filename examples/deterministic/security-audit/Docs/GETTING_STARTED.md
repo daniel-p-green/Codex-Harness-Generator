@@ -14,4 +14,10 @@ verify work with the narrowest meaningful check.
 The permission profile allows workspace edits while denying secrets, tokens,
 credentials, private keys, and `.env` files.
 
+You can also run the local smoke check without the generator repo:
+
+```bash
+python scripts/check-harness.py
+```
+
 Generated: 2026-06-04

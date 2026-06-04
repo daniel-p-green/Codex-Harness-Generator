@@ -131,6 +131,19 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
         self.assertIn('"status": "pass"', completed.stdout)
 
+    def test_local_harness_check_script_accepts_all_fixtures(self):
+        for fixture in self.fixture_paths():
+            with self.subTest(fixture=fixture.name):
+                completed = subprocess.run(
+                    [sys.executable, "scripts/check-harness.py"],
+                    cwd=fixture,
+                    text=True,
+                    capture_output=True,
+                    check=False,
+                )
+                self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+                self.assertIn('"status": "pass"', completed.stdout)
+
     def test_codex_live_smoke_uses_non_interactive_exec(self):
         completed = subprocess.CompletedProcess(args=[], returncode=0, stdout="OK\n", stderr="")
         with patch.object(smoke_generated_harness.shutil, "which", return_value="/usr/local/bin/codex"):
@@ -309,6 +322,15 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         temp_dir, target = self.copy_fixture()
         self.addCleanup(temp_dir.cleanup)
         (target / "Docs/Environment/VALIDATION_REPORT.md").unlink()
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"])
+        self.assert_has_check(result, "required_path")
+
+    def test_missing_local_check_script_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        (target / "scripts/check-harness.py").unlink()
 
         result = eval_generated_harness.evaluate(target)
         self.assertEqual("fail", result["status"])

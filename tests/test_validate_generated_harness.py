@@ -33,6 +33,7 @@ class ValidateGeneratedHarnessTests(unittest.TestCase):
         self.assertEqual([], result["failures"])
         self.assertEqual("pass", result["eval"]["status"])
         self.assertEqual("pass", result["smoke"]["offline"]["status"])
+        self.assertEqual("pass", result["smoke"]["local_check"]["status"])
 
     def test_build_payload_fails_when_eval_score_below_minimum(self):
         payload = validate_generated_harness.build_payload([FIXTURE.as_posix()], min_score=101)
@@ -50,6 +51,17 @@ class ValidateGeneratedHarnessTests(unittest.TestCase):
 
         self.assertEqual("fail", payload["status"])
         self.assertIn("offline_smoke_failed", payload["results"][0]["failures"])
+
+    def test_build_payload_fails_when_local_check_is_missing(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            target = Path(temp_dir) / "broken"
+            shutil.copytree(FIXTURE, target)
+            (target / "scripts" / "check-harness.py").unlink()
+
+            payload = validate_generated_harness.build_payload([target.as_posix()])
+
+        self.assertEqual("fail", payload["status"])
+        self.assertIn("local_check_failed", payload["results"][0]["failures"])
 
     def test_main_json_outputs_payload(self):
         output = io.StringIO()
@@ -71,6 +83,7 @@ class ValidateGeneratedHarnessTests(unittest.TestCase):
         self.assertEqual(0, status)
         self.assertIn("Generated harness validate: PASS", text)
         self.assertIn("offline=PASS", text)
+        self.assertIn("local=PASS", text)
 
 
 if __name__ == "__main__":

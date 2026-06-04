@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -14,10 +15,37 @@ from eval_generated_harness import evaluate
 from smoke_generated_harness import smoke_codex_live, smoke_offline
 
 
+def run_local_check(root: Path) -> dict:
+    script = root / "scripts" / "check-harness.py"
+    if not script.is_file():
+        return {
+            "path": script.as_posix(),
+            "status": "fail",
+            "returncode": 1,
+            "stdout": "",
+            "stderr": "scripts/check-harness.py is missing.",
+        }
+    completed = subprocess.run(
+        [sys.executable, script.as_posix()],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    return {
+        "path": script.as_posix(),
+        "status": "pass" if completed.returncode == 0 else "fail",
+        "returncode": completed.returncode,
+        "stdout": completed.stdout,
+        "stderr": completed.stderr,
+    }
+
+
 def validate_path(root: Path, min_score: int, codex_live: bool = False, prompt: str | None = None) -> dict:
     root = root.resolve()
     eval_result = evaluate(root)
     offline_smoke = smoke_offline(root)
+    local_check = run_local_check(root)
     live_smoke = smoke_codex_live(root, prompt or "Summarize the current project instructions in one sentence.") if codex_live else None
     failures = []
     if eval_result["status"] != "pass":
@@ -26,6 +54,8 @@ def validate_path(root: Path, min_score: int, codex_live: bool = False, prompt: 
         failures.append("eval_score_below_minimum")
     if offline_smoke["status"] != "pass":
         failures.append("offline_smoke_failed")
+    if local_check["status"] != "pass":
+        failures.append("local_check_failed")
     if live_smoke and live_smoke["status"] == "fail":
         failures.append("codex_live_smoke_failed")
     return {
@@ -35,6 +65,7 @@ def validate_path(root: Path, min_score: int, codex_live: bool = False, prompt: 
         "eval": eval_result,
         "smoke": {
             "offline": offline_smoke,
+            "local_check": local_check,
             **({"codex_live": live_smoke} if live_smoke is not None else {}),
         },
     }
@@ -55,14 +86,16 @@ def print_text(payload: dict) -> None:
     for result in payload["results"]:
         eval_result = result["eval"]
         offline = result["smoke"]["offline"]
+        local_check = result["smoke"]["local_check"]
         print(
-            "- {path}: {status} score={score} failures={failures} warnings={warnings} offline={offline_status}".format(
+            "- {path}: {status} score={score} failures={failures} warnings={warnings} offline={offline_status} local={local_status}".format(
                 path=result["path"],
                 status=result["status"].upper(),
                 score=eval_result["score"],
                 failures=eval_result["failure_count"],
                 warnings=eval_result["warning_count"],
                 offline_status=offline["status"].upper(),
+                local_status=local_check["status"].upper(),
             )
         )
         for failure in result["failures"]:
@@ -71,6 +104,11 @@ def print_text(payload: dict) -> None:
             print(f"  - [{finding['severity']}/{finding['check']}] {finding['path']}: {finding['message']}")
         for issue in offline["issues"]:
             print(f"  - [smoke] {issue}")
+        if local_check["status"] != "pass":
+            if local_check["stdout"]:
+                print(local_check["stdout"].rstrip())
+            if local_check["stderr"]:
+                print(local_check["stderr"].rstrip())
         live = result["smoke"].get("codex_live")
         if live:
             print(f"  codex-live={live['status'].upper()}")

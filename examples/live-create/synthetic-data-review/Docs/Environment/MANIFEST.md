@@ -36,3 +36,4 @@
 - Docs/Environment/VALIDATION_REPORT.md
 - Docs/Environment/VERSION.md
 - Docs/Environment/LIVE_CREATE_CAPTURE.md
+- scripts/check-harness.py

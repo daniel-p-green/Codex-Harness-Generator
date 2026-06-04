@@ -232,6 +232,7 @@ def check_required_paths(root: Path, findings: list[Finding]) -> None:
         ".codex/config.toml",
         ".codex/rules",
         ".agents/skills",
+        "scripts/check-harness.py",
         "Docs/GETTING_STARTED.md",
         "Docs/Environment/MANIFEST.md",
         "Docs/Environment/GENESIS.md",

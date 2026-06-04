@@ -5,4 +5,5 @@
 - .codex/agents/reviewer.toml
 - .codex/rules/core.md
 - .agents/skills/health-check/SKILL.md
+- scripts/check-harness.py
 - Docs/Environment/ASSUMPTIONS.md
