@@ -13,6 +13,10 @@ Good reports include:
 
 - The domain or project type.
 - The generated harness profile or public-safe label, if known.
+- The source type: `external`, `multi-project`, or `self-dogfood`.
+- The generation path, such as `installed-init-brief`,
+  `installed-init-from-project`, `adoption-plan`, `manual-migration`,
+  `live-create`, `repo-dogfood`, or `unknown`.
 - A public-safe task summary.
 - At least two evidence bullets.
 - At least two verification bullets.
@@ -74,6 +78,8 @@ python scripts/codex_harness.py usage-record \
   --task-summary "Public-safe summary from issue." \
   --outcome success \
   --evidence-type private-summary \
+  --source-type external \
+  --generation-path installed-init-brief \
   --evidence "Evidence bullet from issue." \
   --evidence "Second evidence bullet from issue." \
   --verification "Verification bullet from issue." \
@@ -88,8 +94,23 @@ Then verify:
 python scripts/codex_harness.py usage-validate \
   --min-records 3 \
   --require-non-synthetic \
-  --require-success
-python scripts/codex_harness.py proof-status --min-usage-records 3
+  --require-success \
+  --min-external-or-multi-project 1
+python scripts/codex_harness.py proof-status \
+  --min-usage-records 3 \
+  --min-external-or-multi-project 1
+```
+
+To test the full beta-exit usage threshold, use:
+
+```bash
+python scripts/codex_harness.py usage-validate \
+  --min-records 5 \
+  --require-non-synthetic \
+  --require-success \
+  --min-external-or-multi-project 3 \
+  --min-domains 4 \
+  --min-installed-init-brief 2
 ```
 
 ## Claim Discipline

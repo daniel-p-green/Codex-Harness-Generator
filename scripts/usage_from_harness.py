@@ -12,6 +12,8 @@ from pathlib import Path
 
 from record_usage_case import (
     ALLOWED_EVIDENCE_TYPES,
+    ALLOWED_GENERATION_PATHS,
+    ALLOWED_SOURCE_TYPES,
     DEFAULT_RECORD_DIR,
     DEFAULT_REPORT,
     UsageRecord,
@@ -146,6 +148,8 @@ def build_record(args: argparse.Namespace) -> UsageRecord:
         task_summary=task_summary,
         outcome=outcome,
         evidence_type=args.evidence_type,
+        source_type=args.source_type,
+        generation_path=args.generation_path,
         evidence=tuple(evidence),
         verification=tuple(verification),
         privacy_review=args.privacy_review,
@@ -163,6 +167,8 @@ def main() -> int:
     parser.add_argument("--task-summary", help="Public-safe task summary; defaults to the first complete task trial")
     parser.add_argument("--outcome", choices=sorted(VALID_OUTCOMES), help="Override derived outcome")
     parser.add_argument("--evidence-type", choices=sorted(ALLOWED_EVIDENCE_TYPES), required=True)
+    parser.add_argument("--source-type", choices=sorted(ALLOWED_SOURCE_TYPES), default="self-dogfood")
+    parser.add_argument("--generation-path", choices=sorted(ALLOWED_GENERATION_PATHS), default="unknown")
     parser.add_argument("--evidence", action="append", default=[], help="Additional public-safe evidence item; repeatable")
     parser.add_argument("--verification", action="append", default=[], help="Additional verification item; repeatable")
     parser.add_argument("--privacy-review", required=True, help="Public-safe privacy review note")

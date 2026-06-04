@@ -37,6 +37,32 @@ body:
     validations:
       required: true
   - type: dropdown
+    id: source_type
+    attributes:
+      label: Source type
+      description: Choose the most honest source category for this report.
+      options:
+        - external
+        - multi-project
+        - self-dogfood
+    validations:
+      required: true
+  - type: dropdown
+    id: generation_path
+    attributes:
+      label: Generation path
+      description: How did this harness enter the workflow?
+      options:
+        - installed-init-brief
+        - installed-init-from-project
+        - adoption-plan
+        - manual-migration
+        - live-create
+        - repo-dogfood
+        - unknown
+    validations:
+      required: true
+  - type: dropdown
     id: outcome
     attributes:
       label: Outcome

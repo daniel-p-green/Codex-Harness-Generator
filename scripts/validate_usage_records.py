@@ -9,6 +9,7 @@ from pathlib import Path
 
 from record_usage_case import (
     DEFAULT_RECORD_DIR,
+    EXTERNAL_OR_MULTI_PROJECT_SOURCE_TYPES,
     NON_SYNTHETIC_EVIDENCE_TYPES,
     UsageRecord,
     safe_slug,
@@ -26,6 +27,8 @@ REQUIRED_FIELDS = {
     "task_summary",
     "outcome",
     "evidence_type",
+    "source_type",
+    "generation_path",
     "evidence",
     "verification",
     "privacy_review",
@@ -63,6 +66,8 @@ def coerce_record(payload: dict, path: Path) -> UsageRecord:
         task_summary=payload["task_summary"],
         outcome=payload["outcome"],
         evidence_type=payload["evidence_type"],
+        source_type=payload["source_type"],
+        generation_path=payload["generation_path"],
         evidence=tuple(payload["evidence"]),
         verification=tuple(payload["verification"]),
         privacy_review=payload["privacy_review"],
@@ -89,6 +94,9 @@ def validate_record_dir(
     min_records: int = 0,
     require_non_synthetic: bool = False,
     require_success: bool = False,
+    min_external_or_multi_project: int = 0,
+    min_domains: int = 0,
+    min_installed_init_brief: int = 0,
 ) -> dict:
     paths = sorted(record_dir.glob("*.json")) if record_dir.exists() else []
     results = [validate_record_file(path) for path in paths]
@@ -105,6 +113,26 @@ def validate_record_dir(
         requirement_errors.append(f"requires at least one non-synthetic usage record ({allowed})")
     if require_success and summary["success"] == 0:
         requirement_errors.append("requires at least one successful usage record")
+    if summary["external_or_multi_project"] < min_external_or_multi_project:
+        allowed = ", ".join(sorted(EXTERNAL_OR_MULTI_PROJECT_SOURCE_TYPES))
+        requirement_errors.append(
+            "requires at least {required} external or multi-project usage record(s) ({allowed}); found {found}".format(
+                required=min_external_or_multi_project,
+                allowed=allowed,
+                found=summary["external_or_multi_project"],
+            )
+        )
+    if summary["distinct_domains"] < min_domains:
+        requirement_errors.append(
+            f"requires at least {min_domains} distinct usage domain(s); found {summary['distinct_domains']}"
+        )
+    if summary["installed_init_brief"] < min_installed_init_brief:
+        requirement_errors.append(
+            "requires at least {required} installed init --brief usage record(s); found {found}".format(
+                required=min_installed_init_brief,
+                found=summary["installed_init_brief"],
+            )
+        )
     status = "pass" if all(result["status"] == "pass" for result in results) and not requirement_errors else "fail"
     return {
         "status": status,
@@ -122,6 +150,9 @@ def main() -> int:
     parser.add_argument("--min-records", type=int, default=0, help="Fail unless at least this many valid records exist")
     parser.add_argument("--require-non-synthetic", action="store_true", help="Fail unless sanitized or private-summary evidence exists")
     parser.add_argument("--require-success", action="store_true", help="Fail unless at least one successful usage record exists")
+    parser.add_argument("--min-external-or-multi-project", type=int, default=0, help="Minimum external or multi-project usage records")
+    parser.add_argument("--min-domains", type=int, default=0, help="Minimum distinct usage domains")
+    parser.add_argument("--min-installed-init-brief", type=int, default=0, help="Minimum usage records generated via installed init --brief")
     parser.add_argument("--json", action="store_true", help="Emit JSON")
     args = parser.parse_args()
 
@@ -130,6 +161,9 @@ def main() -> int:
         min_records=args.min_records,
         require_non_synthetic=args.require_non_synthetic,
         require_success=args.require_success,
+        min_external_or_multi_project=args.min_external_or_multi_project,
+        min_domains=args.min_domains,
+        min_installed_init_brief=args.min_installed_init_brief,
     )
     if args.json:
         print(json.dumps(payload, indent=2))
@@ -139,7 +173,7 @@ def main() -> int:
         print(f"- records: {payload['record_count']}")
         summary = payload["summary"]
         print(
-            "- summary: total={total} synthetic={synthetic} sanitized={sanitized} private-summary={private_summary} non-synthetic={non_synthetic} success={success}".format(
+            "- summary: total={total} synthetic={synthetic} sanitized={sanitized} private-summary={private_summary} non-synthetic={non_synthetic} success={success} external-or-multi-project={external_or_multi_project} domains={distinct_domains} installed-init-brief={installed_init_brief}".format(
                 **summary
             )
         )

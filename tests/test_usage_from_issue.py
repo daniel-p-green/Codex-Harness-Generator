@@ -32,6 +32,14 @@ llm-app profile
 
 private-summary
 
+### Source type
+
+external
+
+### Generation path
+
+installed-init-brief
+
 ### Outcome
 
 success
@@ -67,6 +75,8 @@ class UsageFromIssueTests(unittest.TestCase):
         self.assertEqual("LLM app", sections["domain"])
         self.assertEqual("llm-app profile", sections["harness_label"])
         self.assertEqual("private-summary", sections["evidence_type"])
+        self.assertEqual("external", sections["source_type"])
+        self.assertEqual("installed-init-brief", sections["generation_path"])
         self.assertEqual("success", sections["outcome"])
         self.assertEqual(
             (
@@ -111,6 +121,8 @@ class UsageFromIssueTests(unittest.TestCase):
             self.assertEqual("pass", payload["status"])
             self.assertEqual("external-llm-app", record["slug"])
             self.assertEqual("private-summary", record["evidence_type"])
+            self.assertEqual("external", record["source_type"])
+            self.assertEqual("installed-init-brief", record["generation_path"])
             self.assertEqual("llm-app profile", record["harness_path"])
             self.assertEqual(2, len(record["evidence"]))
             self.assertEqual(2, len(record["verification"]))

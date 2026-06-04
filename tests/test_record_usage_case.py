@@ -27,6 +27,8 @@ class RecordUsageCaseTests(unittest.TestCase):
             "task_summary": "Used a generated harness to summarize public-safe TODO notes.",
             "outcome": "success",
             "evidence_type": "synthetic",
+            "source_type": "self-dogfood",
+            "generation_path": "installed-init-brief",
             "evidence": ("reports/todo-audit.md produced",),
             "verification": ("expected terms found",),
             "privacy_review": "Synthetic inputs only; no personal data or secrets.",
@@ -50,6 +52,12 @@ class RecordUsageCaseTests(unittest.TestCase):
             evidence=("private summary reviewed",),
             verification=("expected artifact exists",),
         )
+
+        with self.assertRaises(SystemExit):
+            record_usage_case.validate_record(record)
+
+    def test_validate_record_rejects_invalid_beta_metadata(self):
+        record = self.make_record(source_type="customer")
 
         with self.assertRaises(SystemExit):
             record_usage_case.validate_record(record)
@@ -98,6 +106,8 @@ class RecordUsageCaseTests(unittest.TestCase):
         self.assertEqual(1, summary["synthetic"])
         self.assertEqual(1, summary["private_summary"])
         self.assertEqual(1, summary["non_synthetic"])
+        self.assertEqual(2, summary["installed_init_brief"])
+        self.assertEqual(1, summary["distinct_domains"])
 
     def test_write_record_requires_force_for_existing_slug(self):
         record = self.make_record()

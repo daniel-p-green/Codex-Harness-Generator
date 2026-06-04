@@ -17,6 +17,17 @@ DEFAULT_REPORT = REPO_ROOT / "Docs" / "Environment" / "USAGE_RECORDS.md"
 ALLOWED_EVIDENCE_TYPES = {"synthetic", "sanitized", "private-summary"}
 NON_SYNTHETIC_EVIDENCE_TYPES = {"sanitized", "private-summary"}
 ALLOWED_OUTCOMES = {"success", "partial", "failed", "inconclusive"}
+ALLOWED_SOURCE_TYPES = {"self-dogfood", "external", "multi-project"}
+EXTERNAL_OR_MULTI_PROJECT_SOURCE_TYPES = {"external", "multi-project"}
+ALLOWED_GENERATION_PATHS = {
+    "installed-init-brief",
+    "installed-init-from-project",
+    "adoption-plan",
+    "manual-migration",
+    "live-create",
+    "repo-dogfood",
+    "unknown",
+}
 GENERATED_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 
 SENSITIVE_PATTERNS = [
@@ -38,6 +49,8 @@ class UsageRecord:
     task_summary: str
     outcome: str
     evidence_type: str
+    source_type: str
+    generation_path: str
     evidence: tuple[str, ...]
     verification: tuple[str, ...]
     privacy_review: str
@@ -53,6 +66,8 @@ class UsageRecord:
             "task_summary": self.task_summary,
             "outcome": self.outcome,
             "evidence_type": self.evidence_type,
+            "source_type": self.source_type,
+            "generation_path": self.generation_path,
             "evidence": list(self.evidence),
             "verification": list(self.verification),
             "privacy_review": self.privacy_review,
@@ -93,6 +108,10 @@ def validate_record(record: UsageRecord) -> None:
         raise SystemExit(f"Unsupported evidence_type: {record.evidence_type}")
     if record.outcome not in ALLOWED_OUTCOMES:
         raise SystemExit(f"Unsupported outcome: {record.outcome}")
+    if record.source_type not in ALLOWED_SOURCE_TYPES:
+        raise SystemExit(f"Unsupported source_type: {record.source_type}")
+    if record.generation_path not in ALLOWED_GENERATION_PATHS:
+        raise SystemExit(f"Unsupported generation_path: {record.generation_path}")
     if not record.evidence or any(not item.strip() for item in record.evidence):
         raise SystemExit("At least one evidence item is required.")
     if not record.verification or any(not item.strip() for item in record.verification):
@@ -122,6 +141,8 @@ def record_from_args(args: argparse.Namespace) -> UsageRecord:
         task_summary=args.task_summary,
         outcome=args.outcome,
         evidence_type=args.evidence_type,
+        source_type=args.source_type,
+        generation_path=args.generation_path,
         evidence=tuple(args.evidence),
         verification=tuple(args.verification),
         privacy_review=args.privacy_review,
@@ -162,10 +183,21 @@ def load_records(record_dir: Path) -> list[dict]:
 def summarize_records(records: list[dict]) -> dict:
     by_type = {evidence_type: 0 for evidence_type in sorted(ALLOWED_EVIDENCE_TYPES)}
     by_outcome = {outcome: 0 for outcome in sorted(ALLOWED_OUTCOMES)}
+    by_source_type = {source_type: 0 for source_type in sorted(ALLOWED_SOURCE_TYPES)}
+    by_generation_path = {generation_path: 0 for generation_path in sorted(ALLOWED_GENERATION_PATHS)}
+    domains = set()
     for record in records:
         by_type[record["evidence_type"]] = by_type.get(record["evidence_type"], 0) + 1
         by_outcome[record["outcome"]] = by_outcome.get(record["outcome"], 0) + 1
+        by_source_type[record["source_type"]] = by_source_type.get(record["source_type"], 0) + 1
+        by_generation_path[record["generation_path"]] = by_generation_path.get(record["generation_path"], 0) + 1
+        domain = record.get("domain", "").strip().lower()
+        if domain:
+            domains.add(domain)
     non_synthetic = sum(by_type.get(evidence_type, 0) for evidence_type in NON_SYNTHETIC_EVIDENCE_TYPES)
+    external_or_multi_project = sum(
+        by_source_type.get(source_type, 0) for source_type in EXTERNAL_OR_MULTI_PROJECT_SOURCE_TYPES
+    )
     return {
         "total": len(records),
         "synthetic": by_type.get("synthetic", 0),
@@ -176,6 +208,14 @@ def summarize_records(records: list[dict]) -> dict:
         "partial": by_outcome.get("partial", 0),
         "failed": by_outcome.get("failed", 0),
         "inconclusive": by_outcome.get("inconclusive", 0),
+        "self_dogfood": by_source_type.get("self-dogfood", 0),
+        "external": by_source_type.get("external", 0),
+        "multi_project": by_source_type.get("multi-project", 0),
+        "external_or_multi_project": external_or_multi_project,
+        "distinct_domains": len(domains),
+        "installed_init_brief": by_generation_path.get("installed-init-brief", 0),
+        "source_types": by_source_type,
+        "generation_paths": by_generation_path,
     }
 
 
@@ -191,9 +231,9 @@ def write_report(report_path: Path, records: list[dict]) -> None:
         "",
         "## Summary",
         "",
-        "| Total | Synthetic | Sanitized | Private Summary | Non-Synthetic | Success | Partial | Failed | Inconclusive |",
-        "|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
-        "| {total} | {synthetic} | {sanitized} | {private_summary} | {non_synthetic} | {success} | {partial} | {failed} | {inconclusive} |".format(
+        "| Total | Non-Synthetic | Success | External/Multi-Project | Distinct Domains | Installed Init Brief |",
+        "|---:|---:|---:|---:|---:|---:|",
+        "| {total} | {non_synthetic} | {success} | {external_or_multi_project} | {distinct_domains} | {installed_init_brief} |".format(
             **summary
         ),
         "",
@@ -207,22 +247,24 @@ def write_report(report_path: Path, records: list[dict]) -> None:
         "",
         "## Records",
         "",
-        "| Generated | Slug | Domain | Outcome | Evidence Type | Verification Count |",
-        "|---|---|---|---|---|---:|",
+        "| Generated | Slug | Domain | Source | Generation Path | Outcome | Evidence Type | Verification Count |",
+        "|---|---|---|---|---|---|---|---:|",
     ]
     for record in sorted(records, key=lambda item: item["generated"], reverse=True):
         lines.append(
-            "| {generated} | `{slug}` | {domain} | {outcome} | {evidence_type} | {verification_count} |".format(
+            "| {generated} | `{slug}` | {domain} | {source_type} | {generation_path} | {outcome} | {evidence_type} | {verification_count} |".format(
                 generated=record["generated"],
                 slug=record["slug"],
                 domain=record["domain"],
+                source_type=record["source_type"],
+                generation_path=record["generation_path"],
                 outcome=record["outcome"],
                 evidence_type=record["evidence_type"],
                 verification_count=len(record.get("verification", [])),
             )
         )
     if not records:
-        lines.append("|  |  |  |  |  | 0 |")
+        lines.append("|  |  |  |  |  |  |  | 0 |")
     lines.extend(
         [
             "",
@@ -233,6 +275,9 @@ def write_report(report_path: Path, records: list[dict]) -> None:
             "  proprietary source, and local machine paths.",
             "- `private-summary`: public-safe summary of private work where raw evidence",
             "  cannot be published.",
+            "- `source_type`: whether the record is repo self-dogfood, external usage,",
+            "  or multi-project usage.",
+            "- `generation_path`: how the harness entered the workflow.",
             "- A record is evidence of one harness use, not proof that every generated",
             "  harness will perform well.",
         ]
@@ -250,6 +295,8 @@ def main() -> int:
     parser.add_argument("--task-summary", required=True, help="Public-safe task summary")
     parser.add_argument("--outcome", choices=sorted(ALLOWED_OUTCOMES), required=True)
     parser.add_argument("--evidence-type", choices=sorted(ALLOWED_EVIDENCE_TYPES), required=True)
+    parser.add_argument("--source-type", choices=sorted(ALLOWED_SOURCE_TYPES), default="self-dogfood")
+    parser.add_argument("--generation-path", choices=sorted(ALLOWED_GENERATION_PATHS), default="unknown")
     parser.add_argument("--evidence", action="append", required=True, help="Public-safe evidence item; repeatable")
     parser.add_argument("--verification", action="append", required=True, help="Verification item; repeatable")
     parser.add_argument("--privacy-review", required=True, help="Public-safe privacy review note")

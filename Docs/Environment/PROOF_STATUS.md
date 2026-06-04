@@ -1,6 +1,6 @@
 # Proof Status
 
-Generated: 2026-06-04T10:30:13Z
+Generated: 2026-06-04T10:38:14Z
 Status: PASS
 Readiness: Codex-equivalent beta with checked-in self-dogfood proof
 
@@ -17,13 +17,16 @@ conservative and should be read with `PROOF_MATRIX.md`.
 | `checked_in_example_inventory` | PASS | profiles=20 brief_examples=4 failures=0 |
 | `installable_cli` | PASS | profiles=20 doctor=pass init=pass init_from_project=pass demo_capture=pass validate=pass inspect=pass adoption_plan=pass local_eval=pass evidence_packet=pass usage_from_harness=pass usage_from_issue=pass migration_audit=pass eval=pass |
 | `live_task_trials` | PASS | 8/8 pass; required >= 8 |
-| `non_synthetic_usage` | PASS | records=2 non_synthetic=2 success=2 |
+| `non_synthetic_usage` | PASS | records=2 non_synthetic=2 success=2 external_or_multi_project=0 domains=1 installed_init_brief=0 |
 
 ## Usage Evidence
 
 - Total records: 2
 - Non-synthetic records: 2
 - Successful records: 2
+- External or multi-project records: 0
+- Distinct domains: 1
+- Installed init --brief records: 0
 
 ## What This Does Not Prove
 

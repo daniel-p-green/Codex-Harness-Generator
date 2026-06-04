@@ -30,6 +30,8 @@ class ValidateUsageRecordsTests(unittest.TestCase):
             "task_summary": "Used a generated harness on public-safe TODO notes.",
             "outcome": "success",
             "evidence_type": "synthetic",
+            "source_type": "self-dogfood",
+            "generation_path": "installed-init-brief",
             "evidence": ["reports/todo-audit.md produced"],
             "verification": ["expected terms found"],
             "privacy_review": "Synthetic inputs only; no personal data or secrets.",
@@ -85,6 +87,53 @@ class ValidateUsageRecordsTests(unittest.TestCase):
 
         self.assertEqual("pass", result["status"], result)
         self.assertEqual(1, result["summary"]["non_synthetic"])
+
+    def test_validate_record_dir_can_enforce_beta_evidence_thresholds(self):
+        first = self.valid_payload()
+        first["slug"] = "external-llm-app"
+        first["domain"] = "LLM app"
+        first["source_type"] = "external"
+        first["evidence_type"] = "private-summary"
+        first["evidence"] = ["private summary reviewed", "sanitized artifact checklist completed"]
+        first["verification"] = ["expected artifact exists", "privacy scan passed"]
+        first["limitations"] = ["Raw project files are private."]
+        second = self.valid_payload()
+        second["slug"] = "multi-project-docs"
+        second["domain"] = "Documentation"
+        second["source_type"] = "multi-project"
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_payload(root, "external-llm-app", first)
+            self.write_payload(root, "multi-project-docs", second)
+
+            result = validate_usage_records.validate_record_dir(
+                root,
+                min_records=2,
+                min_external_or_multi_project=2,
+                min_domains=2,
+                min_installed_init_brief=2,
+            )
+
+        self.assertEqual("pass", result["status"], result)
+        self.assertEqual(2, result["summary"]["external_or_multi_project"])
+        self.assertEqual(2, result["summary"]["distinct_domains"])
+
+    def test_validate_record_dir_fails_beta_evidence_thresholds_for_self_dogfood(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_payload(root, "synthetic-task", self.valid_payload())
+
+            result = validate_usage_records.validate_record_dir(
+                root,
+                min_external_or_multi_project=1,
+                min_domains=2,
+                min_installed_init_brief=2,
+            )
+
+        self.assertEqual("fail", result["status"])
+        self.assertEqual(3, len(result["requirement_errors"]))
+        self.assertIn("external or multi-project", result["requirement_errors"][0])
 
     def test_validate_record_dir_fails_non_synthetic_requirement_for_synthetic_only(self):
         with tempfile.TemporaryDirectory() as temp_dir:

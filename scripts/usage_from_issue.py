@@ -11,10 +11,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from record_usage_case import (
+    ALLOWED_EVIDENCE_TYPES,
+    ALLOWED_GENERATION_PATHS,
+    ALLOWED_OUTCOMES,
+    ALLOWED_SOURCE_TYPES,
     DEFAULT_RECORD_DIR,
     DEFAULT_REPORT,
-    ALLOWED_EVIDENCE_TYPES,
-    ALLOWED_OUTCOMES,
     UsageRecord,
     display_path,
     load_records,
@@ -28,6 +30,8 @@ LABEL_MAP = {
     "domain or project type": "domain",
     "generated harness profile or label": "harness_label",
     "evidence type": "evidence_type",
+    "source type": "source_type",
+    "generation path": "generation_path",
     "outcome": "outcome",
     "public-safe task summary": "task_summary",
     "evidence": "evidence",
@@ -99,6 +103,12 @@ def build_record(args: argparse.Namespace) -> UsageRecord:
         raise SystemExit(f"Unsupported evidence type in issue body: {evidence_type}")
     if outcome not in ALLOWED_OUTCOMES:
         raise SystemExit(f"Unsupported outcome in issue body: {outcome}")
+    source_type = clean_value(sections.get("source_type", "")) or args.source_type
+    generation_path = clean_value(sections.get("generation_path", "")) or args.generation_path
+    if source_type not in ALLOWED_SOURCE_TYPES:
+        raise SystemExit(f"Unsupported source type in issue body: {source_type}")
+    if generation_path not in ALLOWED_GENERATION_PATHS:
+        raise SystemExit(f"Unsupported generation path in issue body: {generation_path}")
 
     harness_label = args.harness_label or clean_value(sections.get("harness_label", "")) or "external usage report"
     return UsageRecord(
@@ -110,6 +120,8 @@ def build_record(args: argparse.Namespace) -> UsageRecord:
         task_summary=require_field(sections, "task_summary"),
         outcome=outcome,
         evidence_type=evidence_type,
+        source_type=source_type,
+        generation_path=generation_path,
         evidence=parse_items(require_field(sections, "evidence")),
         verification=parse_items(require_field(sections, "verification")),
         privacy_review=require_field(sections, "privacy_review"),
@@ -123,6 +135,8 @@ def main() -> int:
     parser.add_argument("--slug", required=True, help="Stable usage-record slug")
     parser.add_argument("--title", required=True, help="Short usage-record title")
     parser.add_argument("--harness-label", help="Public-safe harness label override")
+    parser.add_argument("--source-type", choices=sorted(ALLOWED_SOURCE_TYPES), default="external")
+    parser.add_argument("--generation-path", choices=sorted(ALLOWED_GENERATION_PATHS), default="unknown")
     parser.add_argument("--generated", default=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
     parser.add_argument("--record-dir", default=DEFAULT_RECORD_DIR.as_posix())
     parser.add_argument("--report", default=DEFAULT_REPORT.as_posix())

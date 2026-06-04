@@ -111,7 +111,14 @@ def check_installable_cli() -> tuple[dict, dict]:
     )
 
 
-def build_payload(min_live_trials: int, min_usage_records: int, record_dir: Path) -> dict:
+def build_payload(
+    min_live_trials: int,
+    min_usage_records: int,
+    record_dir: Path,
+    min_external_or_multi_project: int = 0,
+    min_domains: int = 0,
+    min_installed_init_brief: int = 0,
+) -> dict:
     task_trials = parse_task_trials(TASK_TRIALS_REPORT)
     inventory = check_inventory()
     install_check, install_payload = check_installable_cli()
@@ -120,6 +127,9 @@ def build_payload(min_live_trials: int, min_usage_records: int, record_dir: Path
         min_records=min_usage_records,
         require_non_synthetic=True,
         require_success=True,
+        min_external_or_multi_project=min_external_or_multi_project,
+        min_domains=min_domains,
+        min_installed_init_brief=min_installed_init_brief,
     )
     checks = [
         check_file_exists("proof_matrix", PROOF_MATRIX),
@@ -146,7 +156,10 @@ def build_payload(min_live_trials: int, min_usage_records: int, record_dir: Path
         {
             "name": "non_synthetic_usage",
             "status": usage["status"],
-            "detail": "records={total} non_synthetic={non_synthetic} success={success}".format(**usage["summary"]),
+            "detail": "records={total} non_synthetic={non_synthetic} success={success} external_or_multi_project={external_or_multi_project} domains={distinct_domains} installed_init_brief={installed_init_brief}".format(
+                **usage["summary"]
+            ),
+            "requirement_errors": usage["requirement_errors"],
         },
     ]
     status = "pass" if all(check["status"] == "pass" for check in checks) else "fail"
@@ -199,6 +212,9 @@ def write_report(path: Path, payload: dict) -> None:
             f"- Total records: {usage['total']}",
             f"- Non-synthetic records: {usage['non_synthetic']}",
             f"- Successful records: {usage['success']}",
+            f"- External or multi-project records: {usage['external_or_multi_project']}",
+            f"- Distinct domains: {usage['distinct_domains']}",
+            f"- Installed init --brief records: {usage['installed_init_brief']}",
             "",
             "## What This Does Not Prove",
             "",
@@ -214,6 +230,9 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--min-live-trials", type=int, default=8, help="Minimum passing live task trials required")
     parser.add_argument("--min-usage-records", type=int, default=2, help="Minimum valid usage records required")
+    parser.add_argument("--min-external-or-multi-project", type=int, default=0, help="Minimum external or multi-project usage records")
+    parser.add_argument("--min-domains", type=int, default=0, help="Minimum distinct usage domains")
+    parser.add_argument("--min-installed-init-brief", type=int, default=0, help="Minimum usage records generated via installed init --brief")
     parser.add_argument("--record-dir", default=DEFAULT_RECORD_DIR.as_posix())
     parser.add_argument("--report", default=DEFAULT_REPORT.as_posix())
     parser.add_argument("--no-write", action="store_true", help="Do not write PROOF_STATUS.md")
@@ -224,6 +243,9 @@ def main(argv: list[str] | None = None) -> int:
         min_live_trials=args.min_live_trials,
         min_usage_records=args.min_usage_records,
         record_dir=Path(args.record_dir),
+        min_external_or_multi_project=args.min_external_or_multi_project,
+        min_domains=args.min_domains,
+        min_installed_init_brief=args.min_installed_init_brief,
     )
     if not args.no_write:
         write_report(Path(args.report), payload)
@@ -234,6 +256,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"- readiness: {payload['readiness']}")
         for check in payload["checks"]:
             print(f"- {check['name']}: {check['status'].upper()} - {check['detail']}")
+            for error in check.get("requirement_errors", []):
+                print(f"  requirement: {error}")
     return 0 if payload["status"] == "pass" else 1
 
 

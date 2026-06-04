@@ -99,6 +99,22 @@ Status: PASS
         self.assertEqual("fail", payload["status"])
         self.assertIn("required >= 99", next(check["detail"] for check in payload["checks"] if check["name"] == "live_task_trials"))
 
+    def test_build_payload_fails_beta_exit_usage_thresholds_for_current_self_dogfood(self):
+        with patch.object(proof_status, "build_cli_install_payload", return_value=self.fake_install_payload()):
+            payload = proof_status.build_payload(
+                min_live_trials=8,
+                min_usage_records=5,
+                record_dir=REPO_ROOT / "Docs" / "Environment" / "usage-records",
+                min_external_or_multi_project=3,
+                min_domains=4,
+                min_installed_init_brief=2,
+            )
+
+        self.assertEqual("fail", payload["status"])
+        usage_check = next(check for check in payload["checks"] if check["name"] == "non_synthetic_usage")
+        self.assertEqual("fail", usage_check["status"])
+        self.assertTrue(usage_check["requirement_errors"])
+
     def test_write_report_outputs_readiness(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             report = Path(temp_dir) / "PROOF_STATUS.md"

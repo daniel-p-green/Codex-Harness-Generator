@@ -7,6 +7,8 @@
   "task_summary": "Used this repo's Codex harness on public repository work to expand high-risk live task-trial fixtures and strengthen usage-proof validation.",
   "outcome": "success",
   "evidence_type": "sanitized",
+  "source_type": "self-dogfood",
+  "generation_path": "repo-dogfood",
   "evidence": [
     "Public commits ae785d3, 5267958, and de4e540 added financial-modeling, hiring-pipeline, customer-support, and usage-proof validation improvements.",
     "TASK_TRIALS.md records eight authenticated Codex task trials passing against checked-in public-safe examples."

@@ -7,18 +7,18 @@ secrets, personal data, proprietary source, or local machine paths.
 
 ## Summary
 
-| Total | Synthetic | Sanitized | Private Summary | Non-Synthetic | Success | Partial | Failed | Inconclusive |
-|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 2 | 0 | 2 | 0 | 2 | 2 | 0 | 0 | 0 |
+| Total | Non-Synthetic | Success | External/Multi-Project | Distinct Domains | Installed Init Brief |
+|---:|---:|---:|---:|---:|---:|
+| 2 | 2 | 2 | 0 | 1 | 0 |
 
 Product-proof status: non-synthetic usage evidence present
 
 ## Records
 
-| Generated | Slug | Domain | Outcome | Evidence Type | Verification Count |
-|---|---|---|---|---|---:|
-| 2026-06-04T07:00:16Z | `dogfood-brief-fast-path` | Codex harness generation | success | sanitized | 2 |
-| 2026-06-04T06:12:20Z | `dogfood-high-risk-proof-suite` | Codex harness generation | success | sanitized | 2 |
+| Generated | Slug | Domain | Source | Generation Path | Outcome | Evidence Type | Verification Count |
+|---|---|---|---|---|---|---|---:|
+| 2026-06-04T07:00:16Z | `dogfood-brief-fast-path` | Codex harness generation | self-dogfood | repo-dogfood | success | sanitized | 2 |
+| 2026-06-04T06:12:20Z | `dogfood-high-risk-proof-suite` | Codex harness generation | self-dogfood | repo-dogfood | success | sanitized | 2 |
 
 ## Scope
 
@@ -27,5 +27,8 @@ Product-proof status: non-synthetic usage evidence present
   proprietary source, and local machine paths.
 - `private-summary`: public-safe summary of private work where raw evidence
   cannot be published.
+- `source_type`: whether the record is repo self-dogfood, external usage,
+  or multi-project usage.
+- `generation_path`: how the harness entered the workflow.
 - A record is evidence of one harness use, not proof that every generated
   harness will perform well.

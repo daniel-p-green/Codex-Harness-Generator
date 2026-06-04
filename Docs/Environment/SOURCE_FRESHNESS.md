@@ -1,6 +1,6 @@
 # Source Freshness
 
-Generated: 2026-06-04T04:24:25Z
+Generated: 2026-06-04T10:40:03Z
 Status: PASS
 
 This report verifies that official OpenAI documentation URLs cited by

@@ -80,6 +80,10 @@ class UsageFromHarnessTests(unittest.TestCase):
                 "synthetic copied harness",
                 "--evidence-type",
                 "synthetic",
+                "--source-type",
+                "self-dogfood",
+                "--generation-path",
+                "installed-init-brief",
                 "--privacy-review",
                 "Synthetic public-safe test only.",
                 "--record-dir",
@@ -101,6 +105,8 @@ class UsageFromHarnessTests(unittest.TestCase):
         self.assertEqual("usage-proof-smoke", record["slug"])
         self.assertEqual("success", record["outcome"])
         self.assertEqual("synthetic copied harness", record["harness_path"])
+        self.assertEqual("self-dogfood", record["source_type"])
+        self.assertEqual("installed-init-brief", record["generation_path"])
         self.assertTrue(any("local eval report status" in item for item in record["evidence"]))
         self.assertTrue(any("Complete task-trial records reviewed: 1" in item for item in record["verification"]))
         self.assertTrue((record_dir / "usage-proof-smoke.json").is_file())

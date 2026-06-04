@@ -107,8 +107,8 @@ replacement. What is proven today:
 - `scripts/record_usage_case.py` provides a privacy-checked path for recording
   sanitized real-world or private-summary usage evidence under
   `Docs/Environment/usage-records/`, and `scripts/validate_usage_records.py`
-  can enforce stricter non-synthetic proof thresholds when making real-world
-  usage claims.
+  can enforce stricter non-synthetic, external/multi-project, domain-coverage,
+  and installed-generation proof thresholds when making real-world usage claims.
 - `scripts/usage_from_harness.py` and `codex-harness usage-from-harness`
   convert a generated harness's local eval report and task trials into a
   privacy-checked usage record.
@@ -385,6 +385,8 @@ python scripts/codex_harness.py usage-record \
   --task-summary "Public-safe summary of the task." \
   --outcome success \
   --evidence-type private-summary \
+  --source-type external \
+  --generation-path installed-init-brief \
   --evidence "Generated harness guided implementation and verification." \
   --evidence "Sanitized artifact checklist completed; raw evidence retained privately." \
   --verification "Tests passed; raw logs retained privately." \
@@ -408,6 +410,8 @@ python scripts/codex_harness.py usage-from-harness /tmp/codex-rag-harness \
   --domain "LLM app" \
   --harness-label "RAG harness private repo" \
   --evidence-type private-summary \
+  --source-type external \
+  --generation-path installed-init-brief \
   --privacy-review "Private-summary evidence only; no secrets, personal data, private repository names, or raw logs." \
   --limitation "Single private task trial, not longitudinal proof" \
   --json
@@ -443,11 +447,28 @@ python scripts/codex_harness.py usage-validate \
   --require-success
 ```
 
+Require beta-exit usage coverage before dropping the beta label:
+
+```bash
+python scripts/codex_harness.py usage-validate \
+  --min-records 5 \
+  --require-non-synthetic \
+  --require-success \
+  --min-external-or-multi-project 3 \
+  --min-domains 4 \
+  --min-installed-init-brief 2
+```
+
 Summarize the checked-in product-proof package:
 
 ```bash
 python scripts/codex_harness.py doctor
 python scripts/codex_harness.py proof-status
+python scripts/codex_harness.py proof-status \
+  --min-usage-records 5 \
+  --min-external-or-multi-project 3 \
+  --min-domains 4 \
+  --min-installed-init-brief 2
 ```
 
 `doctor` is the fast first check for a local checkout. It verifies Python,

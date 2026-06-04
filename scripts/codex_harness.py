@@ -277,6 +277,10 @@ def build_command(args: argparse.Namespace) -> list[str]:
             args.outcome,
             "--evidence-type",
             args.evidence_type,
+            "--source-type",
+            args.source_type,
+            "--generation-path",
+            args.generation_path,
             "--privacy-review",
             args.privacy_review,
         ]
@@ -307,6 +311,10 @@ def build_command(args: argparse.Namespace) -> list[str]:
             args.domain,
             "--evidence-type",
             args.evidence_type,
+            "--source-type",
+            args.source_type,
+            "--generation-path",
+            args.generation_path,
             "--privacy-review",
             args.privacy_review,
         ]
@@ -356,6 +364,10 @@ def build_command(args: argparse.Namespace) -> list[str]:
         ]
         if args.harness_label:
             command.extend(["--harness-label", args.harness_label])
+        if args.source_type:
+            command.extend(["--source-type", args.source_type])
+        if args.generation_path:
+            command.extend(["--generation-path", args.generation_path])
         if args.generated:
             command.extend(["--generated", args.generated])
         if args.record_dir:
@@ -378,6 +390,12 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--require-non-synthetic")
         if args.require_success:
             command.append("--require-success")
+        if args.min_external_or_multi_project is not None:
+            command.extend(["--min-external-or-multi-project", str(args.min_external_or_multi_project)])
+        if args.min_domains is not None:
+            command.extend(["--min-domains", str(args.min_domains)])
+        if args.min_installed_init_brief is not None:
+            command.extend(["--min-installed-init-brief", str(args.min_installed_init_brief)])
         if args.json:
             command.append("--json")
         return python_script("validate_usage_records.py", command)
@@ -388,6 +406,12 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.extend(["--min-live-trials", str(args.min_live_trials)])
         if args.min_usage_records is not None:
             command.extend(["--min-usage-records", str(args.min_usage_records)])
+        if args.min_external_or_multi_project is not None:
+            command.extend(["--min-external-or-multi-project", str(args.min_external_or_multi_project)])
+        if args.min_domains is not None:
+            command.extend(["--min-domains", str(args.min_domains)])
+        if args.min_installed_init_brief is not None:
+            command.extend(["--min-installed-init-brief", str(args.min_installed_init_brief)])
         if args.record_dir:
             command.extend(["--record-dir", args.record_dir])
         if args.report:
@@ -557,6 +581,20 @@ def make_parser() -> argparse.ArgumentParser:
     usage.add_argument("--task-summary", required=True, help="Public-safe task summary")
     usage.add_argument("--outcome", choices=["failed", "inconclusive", "partial", "success"], required=True)
     usage.add_argument("--evidence-type", choices=["private-summary", "sanitized", "synthetic"], required=True)
+    usage.add_argument("--source-type", choices=["external", "multi-project", "self-dogfood"], default="self-dogfood")
+    usage.add_argument(
+        "--generation-path",
+        choices=[
+            "adoption-plan",
+            "installed-init-brief",
+            "installed-init-from-project",
+            "live-create",
+            "manual-migration",
+            "repo-dogfood",
+            "unknown",
+        ],
+        default="unknown",
+    )
     usage.add_argument("--evidence", action="append", required=True, help="Public-safe evidence item; repeatable")
     usage.add_argument("--verification", action="append", required=True, help="Verification item; repeatable")
     usage.add_argument("--privacy-review", required=True, help="Public-safe privacy review note")
@@ -575,6 +613,20 @@ def make_parser() -> argparse.ArgumentParser:
     usage_from_harness.add_argument("--task-summary", help="Public-safe task summary")
     usage_from_harness.add_argument("--outcome", choices=["failed", "inconclusive", "partial", "success"], help="Override derived outcome")
     usage_from_harness.add_argument("--evidence-type", choices=["private-summary", "sanitized", "synthetic"], required=True)
+    usage_from_harness.add_argument("--source-type", choices=["external", "multi-project", "self-dogfood"], default="self-dogfood")
+    usage_from_harness.add_argument(
+        "--generation-path",
+        choices=[
+            "adoption-plan",
+            "installed-init-brief",
+            "installed-init-from-project",
+            "live-create",
+            "manual-migration",
+            "repo-dogfood",
+            "unknown",
+        ],
+        default="unknown",
+    )
     usage_from_harness.add_argument("--evidence", action="append", default=[], help="Additional public-safe evidence item; repeatable")
     usage_from_harness.add_argument("--verification", action="append", default=[], help="Additional verification item; repeatable")
     usage_from_harness.add_argument("--privacy-review", required=True, help="Public-safe privacy review note")
@@ -597,6 +649,20 @@ def make_parser() -> argparse.ArgumentParser:
     usage_from_issue.add_argument("--slug", required=True, help="Stable record slug")
     usage_from_issue.add_argument("--title", required=True, help="Short usage-record title")
     usage_from_issue.add_argument("--harness-label", help="Public-safe harness label override")
+    usage_from_issue.add_argument("--source-type", choices=["external", "multi-project", "self-dogfood"], default="external")
+    usage_from_issue.add_argument(
+        "--generation-path",
+        choices=[
+            "adoption-plan",
+            "installed-init-brief",
+            "installed-init-from-project",
+            "live-create",
+            "manual-migration",
+            "repo-dogfood",
+            "unknown",
+        ],
+        default="unknown",
+    )
     usage_from_issue.add_argument("--generated", help="UTC timestamp override")
     usage_from_issue.add_argument("--record-dir", help="Directory where usage record JSON files are written")
     usage_from_issue.add_argument("--report", help="Usage-record Markdown report path")
@@ -608,11 +674,17 @@ def make_parser() -> argparse.ArgumentParser:
     usage_validate.add_argument("--min-records", type=int, help="Fail unless at least this many valid records exist")
     usage_validate.add_argument("--require-non-synthetic", action="store_true", help="Fail unless sanitized or private-summary evidence exists")
     usage_validate.add_argument("--require-success", action="store_true", help="Fail unless at least one successful usage record exists")
+    usage_validate.add_argument("--min-external-or-multi-project", type=int, help="Minimum external or multi-project usage records")
+    usage_validate.add_argument("--min-domains", type=int, help="Minimum distinct usage domains")
+    usage_validate.add_argument("--min-installed-init-brief", type=int, help="Minimum usage records generated via installed init --brief")
     usage_validate.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     proof_status = subparsers.add_parser("proof-status", help="Summarize checked-in product-proof readiness")
     proof_status.add_argument("--min-live-trials", type=int, help="Minimum passing live task trials required")
     proof_status.add_argument("--min-usage-records", type=int, help="Minimum valid usage records required")
+    proof_status.add_argument("--min-external-or-multi-project", type=int, help="Minimum external or multi-project usage records")
+    proof_status.add_argument("--min-domains", type=int, help="Minimum distinct usage domains")
+    proof_status.add_argument("--min-installed-init-brief", type=int, help="Minimum usage records generated via installed init --brief")
     proof_status.add_argument("--record-dir", help="Directory where usage record JSON files are read")
     proof_status.add_argument("--report", help="Proof-status Markdown report path")
     proof_status.add_argument("--no-write", action="store_true", help="Do not rewrite PROOF_STATUS.md")
