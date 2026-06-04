@@ -12,6 +12,12 @@ Append entries manually or with:
 python scripts/record-task-trial.py --task "short task" --outcome success --evidence "artifact or file inspected" --verification "command or review completed" --privacy-review "public-safe summary only"
 ```
 
+Summarize recorded trials with:
+
+```bash
+python scripts/summarize-task-trials.py
+```
+
 ## Outcome Labels
 
 - `success`: Codex completed the task and verification passed.

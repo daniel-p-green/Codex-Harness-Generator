@@ -58,6 +58,8 @@ replacement. What is proven today:
 - Generated harnesses include `Docs/Environment/TASK_TRIALS.md` and
   `scripts/record-task-trial.py`, a copied-harness-local lane for recording
   task outcome, evidence, verification, privacy review, and limitations.
+- Generated harnesses include `scripts/summarize-task-trials.py`, a local
+  summary/check over recorded task-trial outcomes.
 - Generated harnesses include `scripts/check-harness.py`, a local smoke check
   that can run without this generator repo and catches missing paths, stale
   manifest references, broken agent/skill config, and weak eval/improvement

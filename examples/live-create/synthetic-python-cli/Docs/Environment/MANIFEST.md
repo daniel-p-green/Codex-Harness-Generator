@@ -39,6 +39,7 @@ Generated harness inventory.
 - scripts/check-harness.py
 - scripts/record-improvement.py
 - scripts/record-task-trial.py
+- scripts/summarize-task-trials.py
 - Docs/Environment/EVAL_PLAN.md
 - Docs/Environment/IMPROVEMENT_LOG.md
 - Docs/Environment/TASK_TRIALS.md

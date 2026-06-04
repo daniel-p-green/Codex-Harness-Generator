@@ -7,3 +7,4 @@ Single-project harness with one reviewer agent, one health-check skill, scoped p
 - Docs/Environment/TASK_TRIALS.md
 - scripts/record-improvement.py
 - scripts/record-task-trial.py
+- scripts/summarize-task-trials.py

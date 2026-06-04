@@ -331,6 +331,70 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertNotEqual(0, completed.returncode)
         self.assertIn("Unsupported outcome", completed.stderr + completed.stdout)
 
+    def test_summarize_task_trials_reports_outcome_counts(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+
+        record = subprocess.run(
+            [
+                sys.executable,
+                "scripts/record-task-trial.py",
+                "--date",
+                "2026-06-04",
+                "--task",
+                "TODO audit",
+                "--outcome",
+                "success",
+                "--evidence",
+                "Generated TODO report was inspected.",
+                "--verification",
+                "python scripts/check-harness.py",
+                "--privacy-review",
+                "Public-safe synthetic task only.",
+                "--harness-helped",
+                "AGENTS.md required verification.",
+                "--limitations",
+                "One local task trial.",
+            ],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(0, record.returncode, record.stdout + record.stderr)
+
+        completed = subprocess.run(
+            [sys.executable, "scripts/summarize-task-trials.py", "--min-successes", "1", "--json"],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+        payload = json.loads(completed.stdout)
+        self.assertEqual("pass", payload["status"])
+        self.assertEqual(1, payload["total"])
+        self.assertEqual(1, payload["outcomes"]["success"])
+        self.assertEqual(1, payload["complete_records"])
+
+    def test_summarize_task_trials_fails_when_success_threshold_not_met(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+
+        completed = subprocess.run(
+            [sys.executable, "scripts/summarize-task-trials.py", "--min-successes", "1", "--json"],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertNotEqual(0, completed.returncode)
+        payload = json.loads(completed.stdout)
+        self.assertEqual("fail", payload["status"])
+        self.assertTrue(any("below required minimum" in issue for issue in payload["issues"]), payload)
+
     def test_codex_live_smoke_uses_non_interactive_exec(self):
         completed = subprocess.CompletedProcess(args=[], returncode=0, stdout="OK\n", stderr="")
         with patch.object(smoke_generated_harness.shutil, "which", return_value="/usr/local/bin/codex"):
@@ -536,6 +600,15 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         temp_dir, target = self.copy_fixture()
         self.addCleanup(temp_dir.cleanup)
         (target / "scripts/record-task-trial.py").unlink()
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"])
+        self.assert_has_check(result, "required_path")
+
+    def test_missing_summarize_task_trials_script_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        (target / "scripts/summarize-task-trials.py").unlink()
 
         result = eval_generated_harness.evaluate(target)
         self.assertEqual("fail", result["status"])

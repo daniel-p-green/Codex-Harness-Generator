@@ -55,3 +55,4 @@
 - Docs/Environment/TASK_TRIALS.md
 - scripts/record-improvement.py
 - scripts/record-task-trial.py
+- scripts/summarize-task-trials.py

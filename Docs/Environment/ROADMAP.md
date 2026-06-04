@@ -19,8 +19,8 @@ Already proven:
   checks.
 - Generated harness improvement logs that convert repeated friction and user
   corrections into evidence-backed harness updates.
-- Generated harness task-trial logs that capture task outcomes, verification,
-  privacy review, and limitations after copied-harness use.
+- Generated harness task-trial logs and summaries that capture task outcomes,
+  verification, privacy review, and limitations after copied-harness use.
 - Checked-in deterministic, create-acceptance, brief-acceptance, and live-create
   examples.
 - Privacy-checked usage-record validation.

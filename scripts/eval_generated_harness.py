@@ -235,6 +235,7 @@ def check_required_paths(root: Path, findings: list[Finding]) -> None:
         "scripts/check-harness.py",
         "scripts/record-improvement.py",
         "scripts/record-task-trial.py",
+        "scripts/summarize-task-trials.py",
         "Docs/GETTING_STARTED.md",
         "Docs/Environment/MANIFEST.md",
         "Docs/Environment/GENESIS.md",
@@ -525,7 +526,7 @@ def check_docs(root: Path, findings: list[Finding]) -> None:
         for phrase in ["outcome labels", "entry template", "review rule"]:
             if phrase not in text:
                 add(findings, "task_trials", "maintainability", "warn", "Docs/Environment/TASK_TRIALS.md", f"Task trials should include {phrase}.")
-        for phrase in ["evidence", "verification", "privacy review", "limitations", "record-task-trial.py"]:
+        for phrase in ["evidence", "verification", "privacy review", "limitations", "record-task-trial.py", "summarize-task-trials.py"]:
             if phrase not in text:
                 add(findings, "task_trials", "maintainability", "warn", "Docs/Environment/TASK_TRIALS.md", f"Task trials should mention {phrase}.")
 
