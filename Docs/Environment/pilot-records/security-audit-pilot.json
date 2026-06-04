@@ -1,0 +1,18 @@
+{
+  "claim_boundary": "Preparing a pilot batch is not usage proof until reporters complete real task trials and evidence is converted into checked usage records.",
+  "domain": "security audit",
+  "generated": "2026-06-04T17:53:11Z",
+  "generation_path": "installed-quickstart",
+  "harness_label": "Security Audit Workspace Pilot",
+  "issue_draft": "Docs/Environment/beta-exit-pilot-materials/security-audit-pilot-usage-issue.md",
+  "notes": "",
+  "pilot_pack": "Docs/Environment/beta-exit-pilot-materials/security-audit-pilot-pilot-pack.md",
+  "profile": "security-audit",
+  "selected_index": 2,
+  "slug": "security-audit-pilot",
+  "source_type": "external",
+  "status": "prepared",
+  "target": "generated pilot harness: security-audit-pilot",
+  "title": "security audit pilot",
+  "usage_record": ""
+}

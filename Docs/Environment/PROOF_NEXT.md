@@ -1,6 +1,6 @@
 # Proof Next Actions
 
-Generated: 2026-06-04T17:44:39Z
+Generated: 2026-06-04T17:55:16Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 
@@ -44,8 +44,8 @@ Projected remaining gaps after suggested pilots:
 
 - Slug: `llm-app-pilot`
 - Status: `prepared`
-- Pilot pack: `Docs/Environment/LLM_APP_PILOT_PACK.md`
-- Issue draft: `Docs/Environment/LLM_APP_USAGE_ISSUE_DRAFT.md`
+- Pilot pack: `Docs/Environment/beta-exit-pilot-materials/llm-app-pilot-pilot-pack.md`
+- Issue draft: `Docs/Environment/beta-exit-pilot-materials/llm-app-pilot-usage-issue.md`
 
 Continue this pilot instead of preparing a duplicate.
 

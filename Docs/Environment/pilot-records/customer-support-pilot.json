@@ -1,0 +1,18 @@
+{
+  "claim_boundary": "Preparing a pilot batch is not usage proof until reporters complete real task trials and evidence is converted into checked usage records.",
+  "domain": "customer support",
+  "generated": "2026-06-04T17:53:11Z",
+  "generation_path": "installed-quickstart",
+  "harness_label": "Customer Support Workspace Pilot",
+  "issue_draft": "Docs/Environment/beta-exit-pilot-materials/customer-support-pilot-usage-issue.md",
+  "notes": "",
+  "pilot_pack": "Docs/Environment/beta-exit-pilot-materials/customer-support-pilot-pilot-pack.md",
+  "profile": "customer-support",
+  "selected_index": 3,
+  "slug": "customer-support-pilot",
+  "source_type": "external",
+  "status": "prepared",
+  "target": "generated pilot harness: customer-support-pilot",
+  "title": "customer support pilot",
+  "usage_record": ""
+}

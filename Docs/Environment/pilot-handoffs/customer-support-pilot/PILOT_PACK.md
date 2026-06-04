@@ -1,11 +1,11 @@
 # External Pilot Pack
 
 Generated: 2026-06-04T17:53:11Z
-Harness label: LLM App Workspace Pilot
-Domain: LLM app
+Harness label: Customer Support Workspace Pilot
+Domain: customer support
 Source type: external
 Generation path: installed-quickstart
-Detected profile: llm-app
+Detected profile: customer-support
 
 This pack helps a reporter try one real Codex task with a generated harness and
 produce public-safe evidence. It is a pilot workflow, not a production-readiness
@@ -48,13 +48,13 @@ python scripts/run-harness-evals.py --min-successes 1
 From this generator repo, export a public-safe packet:
 
 ```bash
-python scripts/codex_harness.py evidence-packet <generated-harness> --harness-label "LLM App Workspace Pilot" --min-successes 1
+python scripts/codex_harness.py evidence-packet <generated-harness> --harness-label "Customer Support Workspace Pilot" --min-successes 1
 ```
 
 If the packet is public-safe and complete, preview the copied-harness evidence:
 
 ```bash
-python scripts/codex_harness.py usage-from-harness <generated-harness> --slug "llm-app-pilot" --evidence-type private-summary --privacy-review "Reporter confirmed public-safe private-summary evidence only." --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
+python scripts/codex_harness.py usage-from-harness <generated-harness> --slug "customer-support-pilot" --evidence-type private-summary --privacy-review "Reporter confirmed public-safe private-summary evidence only." --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
 ```
 
 After review, rerun without `--no-write` to write the usage record and convert
@@ -69,7 +69,7 @@ python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md --
 
 ## Issue Draft
 
-- Fill out `llm-app-pilot-usage-issue.md`, then paste it into the GitHub External usage report issue.
+- Fill out `customer-support-pilot-usage-issue.md`, then paste it into the GitHub External usage report issue.
 - Keep raw evidence private unless it is already safe for public release.
 - This issue draft is blank until the reporter fills it in.
 - Include at least two evidence bullets, two verification bullets, one privacy

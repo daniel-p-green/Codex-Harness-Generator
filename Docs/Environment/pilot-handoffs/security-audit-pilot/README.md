@@ -1,9 +1,9 @@
-# LLM app pilot Handoff
+# security audit pilot Handoff
 
 Generated: 2026-06-04T17:53:48Z
-Pilot slug: `llm-app-pilot`
+Pilot slug: `security-audit-pilot`
 Status: `prepared`
-Domain: LLM app
+Domain: security audit
 Source type: `external`
 Generation path: `installed-quickstart`
 

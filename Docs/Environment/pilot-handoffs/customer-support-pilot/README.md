@@ -1,9 +1,9 @@
-# LLM app pilot Handoff
+# customer support pilot Handoff
 
 Generated: 2026-06-04T17:53:48Z
-Pilot slug: `llm-app-pilot`
+Pilot slug: `customer-support-pilot`
 Status: `prepared`
-Domain: LLM app
+Domain: customer support
 Source type: `external`
 Generation path: `installed-quickstart`
 

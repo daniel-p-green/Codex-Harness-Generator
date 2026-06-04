@@ -1,6 +1,6 @@
 # External Pilot Pack
 
-Generated: 2026-06-04T15:21:55Z
+Generated: 2026-06-04T17:53:11Z
 Harness label: LLM App Workspace Pilot
 Domain: LLM app
 Source type: external
@@ -69,7 +69,7 @@ python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md --
 
 ## Issue Draft
 
-- Fill out `LLM_APP_USAGE_ISSUE_DRAFT.md`, then paste it into the GitHub External usage report issue.
+- Fill out `llm-app-pilot-usage-issue.md`, then paste it into the GitHub External usage report issue.
 - Keep raw evidence private unless it is already safe for public release.
 - This issue draft is blank until the reporter fills it in.
 - Include at least two evidence bullets, two verification bullets, one privacy

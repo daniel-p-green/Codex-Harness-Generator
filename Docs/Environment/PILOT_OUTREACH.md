@@ -1,6 +1,6 @@
 # Pilot Outreach Packet
 
-Generated: 2026-06-04T16:40:14Z
+Generated: 2026-06-04T17:53:47Z
 Status: PASS
 Readiness: outreach-ready
 
@@ -8,7 +8,7 @@ Outreach packets help request and track pilots; they are not usage proof until a
 
 ## Summary
 
-- Outreach-ready pilots: 1
+- Outreach-ready pilots: 3
 - Included statuses: prepared, invited, completed
 - Pilot board readiness: pilot-funnel-active
 
@@ -20,8 +20,8 @@ Outreach packets help request and track pilots; they are not usage proof until a
 - Domain: LLM app
 - Source type: `external`
 - Generation path: `installed-quickstart`
-- Pilot pack: `Docs/Environment/LLM_APP_PILOT_PACK.md`
-- Issue draft: `Docs/Environment/LLM_APP_USAGE_ISSUE_DRAFT.md`
+- Pilot pack: `Docs/Environment/beta-exit-pilot-materials/llm-app-pilot-pilot-pack.md`
+- Issue draft: `Docs/Environment/beta-exit-pilot-materials/llm-app-pilot-usage-issue.md`
 
 Reporter message:
 
@@ -29,8 +29,8 @@ Reporter message:
 Would you be willing to try one small real Codex task using LLM app pilot?
 
 - Domain: LLM app
-- Pilot pack: Docs/Environment/LLM_APP_PILOT_PACK.md
-- Issue draft: Docs/Environment/LLM_APP_USAGE_ISSUE_DRAFT.md
+- Pilot pack: Docs/Environment/beta-exit-pilot-materials/llm-app-pilot-pilot-pack.md
+- Issue draft: Docs/Environment/beta-exit-pilot-materials/llm-app-pilot-usage-issue.md
 
 Please pick one privacy-safe task, run the generated harness checks, record the task trial,
 and share either the completed issue draft or a private copied harness directory with public-safe evidence.
@@ -59,6 +59,100 @@ Copied-harness conversion:
 ```bash
 codex-harness usage-from-harness <generated-harness> --slug llm-app-pilot --evidence-type private-summary --privacy-review "Reporter confirmed public-safe private-summary evidence only." --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
 codex-harness usage-from-harness <generated-harness> --slug llm-app-pilot --evidence-type private-summary --privacy-review "Reporter confirmed public-safe private-summary evidence only." --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+```
+
+### 2. security audit pilot (`security-audit-pilot`)
+
+- Status: `prepared`
+- Domain: security audit
+- Source type: `external`
+- Generation path: `installed-quickstart`
+- Pilot pack: `Docs/Environment/beta-exit-pilot-materials/security-audit-pilot-pilot-pack.md`
+- Issue draft: `Docs/Environment/beta-exit-pilot-materials/security-audit-pilot-usage-issue.md`
+
+Reporter message:
+
+```text
+Would you be willing to try one small real Codex task using security audit pilot?
+
+- Domain: security audit
+- Pilot pack: Docs/Environment/beta-exit-pilot-materials/security-audit-pilot-pilot-pack.md
+- Issue draft: Docs/Environment/beta-exit-pilot-materials/security-audit-pilot-usage-issue.md
+
+Please pick one privacy-safe task, run the generated harness checks, record the task trial,
+and share either the completed issue draft or a private copied harness directory with public-safe evidence.
+
+Do not include secrets, personal data, proprietary source, private repository names, local machine paths, raw logs, or raw private transcripts.
+A private-summary report is fine if the raw evidence cannot be public.
+```
+
+Maintainer tracking:
+
+```bash
+codex-harness pilot-update security-audit-pilot --status invited --record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records --report Docs/Environment/PILOT_BOARD.md --notes "sent to reporter"
+codex-harness pilot-update security-audit-pilot --status completed --record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records --report Docs/Environment/PILOT_BOARD.md --notes "reporter completed task and shared public-safe evidence"
+```
+
+Issue-body conversion:
+
+```bash
+codex-harness usage-from-issue <completed-issue.md> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
+codex-harness usage-from-issue <completed-issue.md> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
+codex-harness usage-from-issue <completed-issue.md> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+```
+
+Copied-harness conversion:
+
+```bash
+codex-harness usage-from-harness <generated-harness> --slug security-audit-pilot --evidence-type private-summary --privacy-review "Reporter confirmed public-safe private-summary evidence only." --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
+codex-harness usage-from-harness <generated-harness> --slug security-audit-pilot --evidence-type private-summary --privacy-review "Reporter confirmed public-safe private-summary evidence only." --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+```
+
+### 3. customer support pilot (`customer-support-pilot`)
+
+- Status: `prepared`
+- Domain: customer support
+- Source type: `external`
+- Generation path: `installed-quickstart`
+- Pilot pack: `Docs/Environment/beta-exit-pilot-materials/customer-support-pilot-pilot-pack.md`
+- Issue draft: `Docs/Environment/beta-exit-pilot-materials/customer-support-pilot-usage-issue.md`
+
+Reporter message:
+
+```text
+Would you be willing to try one small real Codex task using customer support pilot?
+
+- Domain: customer support
+- Pilot pack: Docs/Environment/beta-exit-pilot-materials/customer-support-pilot-pilot-pack.md
+- Issue draft: Docs/Environment/beta-exit-pilot-materials/customer-support-pilot-usage-issue.md
+
+Please pick one privacy-safe task, run the generated harness checks, record the task trial,
+and share either the completed issue draft or a private copied harness directory with public-safe evidence.
+
+Do not include secrets, personal data, proprietary source, private repository names, local machine paths, raw logs, or raw private transcripts.
+A private-summary report is fine if the raw evidence cannot be public.
+```
+
+Maintainer tracking:
+
+```bash
+codex-harness pilot-update customer-support-pilot --status invited --record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records --report Docs/Environment/PILOT_BOARD.md --notes "sent to reporter"
+codex-harness pilot-update customer-support-pilot --status completed --record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records --report Docs/Environment/PILOT_BOARD.md --notes "reporter completed task and shared public-safe evidence"
+```
+
+Issue-body conversion:
+
+```bash
+codex-harness usage-from-issue <completed-issue.md> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
+codex-harness usage-from-issue <completed-issue.md> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
+codex-harness usage-from-issue <completed-issue.md> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+```
+
+Copied-harness conversion:
+
+```bash
+codex-harness usage-from-harness <generated-harness> --slug customer-support-pilot --evidence-type private-summary --privacy-review "Reporter confirmed public-safe private-summary evidence only." --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
+codex-harness usage-from-harness <generated-harness> --slug customer-support-pilot --evidence-type private-summary --privacy-review "Reporter confirmed public-safe private-summary evidence only." --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
 ```
 
 ## Claim Boundary

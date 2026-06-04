@@ -1,6 +1,6 @@
 # Pilot Board
 
-Generated: 2026-06-04T16:40:14Z
+Generated: 2026-06-04T17:53:34Z
 Status: PASS
 Readiness: pilot-funnel-active
 
@@ -8,13 +8,13 @@ Pilot-board records track outreach and completion state only; they are not usage
 
 ## Summary
 
-- Total pilot records: 1
-- Pending outreach or reporter work: 1
+- Total pilot records: 3
+- Pending outreach or reporter work: 3
 - Completed but not converted: 0
 - Converted with validated usage records: 0
-- External or multi-project pilots: 1
-- Installed brief-based generation pilots: 1
-- Distinct domains: 1
+- External or multi-project pilots: 3
+- Installed brief-based generation pilots: 3
+- Distinct domains: 3
 
 ## Status Counts
 
@@ -22,10 +22,12 @@ Pilot-board records track outreach and completion state only; they are not usage
 - converted: 0
 - dropped: 0
 - invited: 0
-- prepared: 1
+- prepared: 3
 
 ## Pilot Records
 
 | Pilot | Status | Domain | Source | Generation | Usage record |
 |---|---|---|---|---|---|
+| `customer-support-pilot` | prepared | customer support | `external` | `installed-quickstart` | not converted |
 | `llm-app-pilot` | prepared | LLM app | `external` | `installed-quickstart` | not converted |
+| `security-audit-pilot` | prepared | security audit | `external` | `installed-quickstart` | not converted |

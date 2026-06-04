@@ -1,6 +1,6 @@
 # Pilot Handoff Audit
 
-Generated: 2026-06-04T17:49:51Z
+Generated: 2026-06-04T17:53:48Z
 Status: PASS
 Readiness: handoff-audit-ready
 
@@ -8,7 +8,7 @@ This audit checks whether handoff folders are ready to send; it is not usage pro
 
 ## Summary
 
-- Handoff folders audited: 1
+- Handoff folders audited: 3
 - Handoff directory: `Docs/Environment/pilot-handoffs`
 - Included statuses: prepared, invited, completed
 
@@ -19,6 +19,26 @@ This audit checks whether handoff folders are ready to send; it is not usage pro
 - Status: PASS
 - Readiness: reporter-ready
 - Directory: `Docs/Environment/pilot-handoffs/llm-app-pilot`
+- Usage report draft readiness: needs-input
+
+Warnings:
+- USAGE_REPORT_DRAFT.md is importer-shaped but still needs reporter evidence before conversion.
+
+### security audit pilot (`security-audit-pilot`)
+
+- Status: PASS
+- Readiness: reporter-ready
+- Directory: `Docs/Environment/pilot-handoffs/security-audit-pilot`
+- Usage report draft readiness: needs-input
+
+Warnings:
+- USAGE_REPORT_DRAFT.md is importer-shaped but still needs reporter evidence before conversion.
+
+### customer support pilot (`customer-support-pilot`)
+
+- Status: PASS
+- Readiness: reporter-ready
+- Directory: `Docs/Environment/pilot-handoffs/customer-support-pilot`
 - Usage report draft readiness: needs-input
 
 Warnings:

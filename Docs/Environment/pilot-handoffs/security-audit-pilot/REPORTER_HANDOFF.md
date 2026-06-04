@@ -1,12 +1,12 @@
-# LLM app pilot Reporter Handoff
+# security audit pilot Reporter Handoff
 
 ## Message
 
-Would you be willing to try one small real Codex task using LLM app pilot?
+Would you be willing to try one small real Codex task using security audit pilot?
 
-- Domain: LLM app
-- Pilot pack: Docs/Environment/beta-exit-pilot-materials/llm-app-pilot-pilot-pack.md
-- Issue draft: Docs/Environment/beta-exit-pilot-materials/llm-app-pilot-usage-issue.md
+- Domain: security audit
+- Pilot pack: Docs/Environment/beta-exit-pilot-materials/security-audit-pilot-pilot-pack.md
+- Issue draft: Docs/Environment/beta-exit-pilot-materials/security-audit-pilot-usage-issue.md
 
 Please pick one privacy-safe task, run the generated harness checks, record the task trial,
 and share either the completed issue draft or a private copied harness directory with public-safe evidence.
@@ -19,11 +19,11 @@ A private-summary report is fine if the raw evidence cannot be public.
 # External Pilot Pack
 
 Generated: 2026-06-04T17:53:11Z
-Harness label: LLM App Workspace Pilot
-Domain: LLM app
+Harness label: Security Audit Workspace Pilot
+Domain: security audit
 Source type: external
 Generation path: installed-quickstart
-Detected profile: llm-app
+Detected profile: security-audit
 
 This pack helps a reporter try one real Codex task with a generated harness and
 produce public-safe evidence. It is a pilot workflow, not a production-readiness
@@ -66,13 +66,13 @@ python scripts/run-harness-evals.py --min-successes 1
 From this generator repo, export a public-safe packet:
 
 ```bash
-python scripts/codex_harness.py evidence-packet <generated-harness> --harness-label "LLM App Workspace Pilot" --min-successes 1
+python scripts/codex_harness.py evidence-packet <generated-harness> --harness-label "Security Audit Workspace Pilot" --min-successes 1
 ```
 
 If the packet is public-safe and complete, preview the copied-harness evidence:
 
 ```bash
-python scripts/codex_harness.py usage-from-harness <generated-harness> --slug "llm-app-pilot" --evidence-type private-summary --privacy-review "Reporter confirmed public-safe private-summary evidence only." --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
+python scripts/codex_harness.py usage-from-harness <generated-harness> --slug "security-audit-pilot" --evidence-type private-summary --privacy-review "Reporter confirmed public-safe private-summary evidence only." --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
 ```
 
 After review, rerun without `--no-write` to write the usage record and convert
@@ -87,7 +87,7 @@ python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md --
 
 ## Issue Draft
 
-- Fill out `llm-app-pilot-usage-issue.md`, then paste it into the GitHub External usage report issue.
+- Fill out `security-audit-pilot-usage-issue.md`, then paste it into the GitHub External usage report issue.
 - Keep raw evidence private unless it is already safe for public release.
 - This issue draft is blank until the reporter fills it in.
 - Include at least two evidence bullets, two verification bullets, one privacy
@@ -103,15 +103,15 @@ pack alone.
 
 ### Pilot or usage-record slug
 
-llm-app-pilot
+security-audit-pilot
 
 ### Domain or project type
 
-LLM app
+security audit
 
 ### Generated harness profile or label
 
-LLM App Workspace Pilot
+Security Audit Workspace Pilot
 
 ### Evidence type
 

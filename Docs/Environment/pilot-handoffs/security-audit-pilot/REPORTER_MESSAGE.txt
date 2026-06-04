@@ -1,8 +1,8 @@
-Would you be willing to try one small real Codex task using LLM app pilot?
+Would you be willing to try one small real Codex task using security audit pilot?
 
-- Domain: LLM app
-- Pilot pack: Docs/Environment/beta-exit-pilot-materials/llm-app-pilot-pilot-pack.md
-- Issue draft: Docs/Environment/beta-exit-pilot-materials/llm-app-pilot-usage-issue.md
+- Domain: security audit
+- Pilot pack: Docs/Environment/beta-exit-pilot-materials/security-audit-pilot-pilot-pack.md
+- Issue draft: Docs/Environment/beta-exit-pilot-materials/security-audit-pilot-usage-issue.md
 
 Please pick one privacy-safe task, run the generated harness checks, record the task trial,
 and share either the completed issue draft or a private copied harness directory with public-safe evidence.

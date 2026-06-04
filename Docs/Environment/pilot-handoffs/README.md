@@ -1,6 +1,6 @@
 # Pilot Handoffs
 
-Generated: 2026-06-04T17:49:42Z
+Generated: 2026-06-04T17:53:48Z
 Status: PASS
 Readiness: handoff-ready
 
@@ -9,3 +9,5 @@ Pilot handoff folders help send and track pilots; they are not usage proof until
 ## Handoffs
 
 - `llm-app-pilot`: `llm-app-pilot/`
+- `security-audit-pilot`: `security-audit-pilot/`
+- `customer-support-pilot`: `customer-support-pilot/`
