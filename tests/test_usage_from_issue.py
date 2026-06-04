@@ -123,6 +123,20 @@ class UsageFromIssueTests(unittest.TestCase):
             usage_from_issue.parse_items(sections["evidence"]),
         )
 
+    def test_parse_items_keeps_wrapped_markdown_bullets_together(self):
+        value = """- First evidence item wraps onto
+  a continuation line.
+- Second evidence item.
+"""
+
+        self.assertEqual(
+            (
+                "First evidence item wraps onto a continuation line.",
+                "Second evidence item.",
+            ),
+            usage_from_issue.parse_items(value),
+        )
+
     def test_usage_from_issue_writes_privacy_checked_record(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)

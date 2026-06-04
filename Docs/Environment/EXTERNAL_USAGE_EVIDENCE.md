@@ -25,6 +25,9 @@ Good reports include:
 - A privacy review.
 - At least one limitation.
 
+Wrapped Markdown bullets are fine. The importer keeps indented continuation
+lines with the bullet they belong to.
+
 For a parseable, public-safe example issue body, see
 `Docs/Environment/EXTERNAL_USAGE_ISSUE_EXAMPLE.md`. That file is synthetic and
 exists to test the intake shape; it is not usage proof.

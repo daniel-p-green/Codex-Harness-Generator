@@ -64,6 +64,7 @@ class ExternalUsageEvidenceTests(unittest.TestCase):
         self.assertIn("python scripts/codex_harness.py usage-from-harness", text)
         self.assertIn("python scripts/codex_harness.py usage-from-issue", text)
         self.assertIn("Docs/Environment/EXTERNAL_USAGE_ISSUE_EXAMPLE.md", text)
+        self.assertIn("Wrapped Markdown bullets are fine", text)
         self.assertIn("Pilot or usage-record slug", text)
         self.assertIn("python scripts/codex_harness.py usage-record", text)
         self.assertIn("--evidence-type private-summary", text)

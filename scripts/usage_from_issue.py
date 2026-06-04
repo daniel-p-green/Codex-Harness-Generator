@@ -108,14 +108,33 @@ def parse_items(value: str) -> tuple[str, ...]:
     if not value:
         return ()
     items = []
+    current: list[str] = []
+    saw_bullet = False
+
+    def flush_current() -> None:
+        if not current:
+            return
+        item = clean_value(" ".join(part.strip() for part in current if part.strip()))
+        if item:
+            items.append(item)
+        current.clear()
+
     for line in value.splitlines():
         stripped = line.strip()
         if not stripped:
+            if current and not saw_bullet:
+                flush_current()
             continue
         bullet = re.match(r"^(?:[-*+]|\d+[.)])\s+(.+)$", stripped)
-        item = clean_value((bullet.group(1) if bullet else stripped).strip())
-        if item:
-            items.append(item)
+        if bullet:
+            saw_bullet = True
+            flush_current()
+            current.append(bullet.group(1).strip())
+        elif current:
+            current.append(stripped)
+        else:
+            current.append(stripped)
+    flush_current()
     return tuple(item for item in items if item)
 
 

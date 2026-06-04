@@ -40,8 +40,10 @@ after trying a generated Codex harness for an LLM app workflow.
 
 ### Evidence
 
-- The generated harness gave the reporter a task-trial checklist with evidence, verification, privacy review, and limitation fields.
-- The generated local eval report gave the maintainer a concrete artifact to inspect before deciding whether a usage record would be justified.
+- The generated harness gave the reporter a task-trial checklist with evidence,
+  verification, privacy review, and limitation fields.
+- The generated local eval report gave the maintainer a concrete artifact to
+  inspect before deciding whether a usage record would be justified.
 
 ### Verification performed
 
@@ -57,4 +59,5 @@ transcripts are included.
 ### Limitations
 
 - This example proves issue-body parsing and privacy-safe shape only.
-- It does not prove external adoption, reporter completion, or beta-exit readiness.
+- It does not prove external adoption, reporter completion, or beta-exit
+  readiness.
