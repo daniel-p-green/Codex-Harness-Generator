@@ -80,6 +80,7 @@ def build_payload() -> dict:
         usage_gaps_report = temp_root / "USAGE_GAPS.md"
         pilot_campaign_report = temp_root / "PILOT_CAMPAIGN.md"
         issue_body = temp_root / "external-usage-issue.md"
+        linked_pilot_issue_body = temp_root / "linked-pilot-usage-issue.md"
         issue_body.write_text(
             "\n".join(
                 [
@@ -128,6 +129,59 @@ def build_payload() -> dict:
                     "### Limitations",
                     "",
                     "- Single synthetic install smoke.",
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        linked_pilot_issue_body.write_text(
+            "\n".join(
+                [
+                    "### Domain or project type",
+                    "",
+                    "LLM app",
+                    "",
+                    "### Generated harness profile or label",
+                    "",
+                    "LLM App Workspace Pilot",
+                    "",
+                    "### Evidence type",
+                    "",
+                    "private-summary",
+                    "",
+                    "### Source type",
+                    "",
+                    "external",
+                    "",
+                    "### Generation path",
+                    "",
+                    "installed-quickstart",
+                    "",
+                    "### Outcome",
+                    "",
+                    "success",
+                    "",
+                    "### Public-safe task summary",
+                    "",
+                    "A prepared pilot was converted through the installed CLI smoke workflow.",
+                    "",
+                    "### Evidence",
+                    "",
+                    "- Installed CLI prepared a matching external pilot record.",
+                    "- Installed CLI converted the reporter issue into checked usage evidence.",
+                    "",
+                    "### Verification performed",
+                    "",
+                    "- usage-from-issue returned a passing linked pilot update payload.",
+                    "- pilot-board validated the converted usage record reference.",
+                    "",
+                    "### Privacy review",
+                    "",
+                    "Public-safe install-smoke linked conversion only; no secrets, private paths, personal data, or raw logs.",
+                    "",
+                    "### Limitations",
+                    "",
+                    "- Single installed CLI linked-conversion smoke.",
                 ]
             )
             + "\n",
@@ -464,6 +518,27 @@ def build_payload() -> dict:
                 ],
             ),
             (
+                "usage_from_issue_pilot_conversion",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "usage-from-issue",
+                    linked_pilot_issue_body.as_posix(),
+                    "--slug",
+                    "llm-app-pilot",
+                    "--title",
+                    "LLM app pilot",
+                    "--record-dir",
+                    usage_records.as_posix(),
+                    "--report",
+                    usage_report.as_posix(),
+                    "--pilot-record-dir",
+                    pilot_records.as_posix(),
+                    "--pilot-board-report",
+                    pilot_board_report.as_posix(),
+                    "--json",
+                ],
+            ),
+            (
                 "usage_gaps",
                 [
                     (venv / "bin" / "codex-harness").as_posix(),
@@ -525,6 +600,19 @@ def build_payload() -> dict:
                         step["status"] = "fail"
                         step["returncode"] = 1
                         step["stderr"] += "\nExpected 20 profiles from installed CLI."
+                if name == "usage_from_issue_pilot_conversion" and completed.returncode == 0:
+                    conversion_payload = json.loads(completed.stdout)
+                    pilot_update = conversion_payload.get("pilot_update") or {}
+                    if (
+                        conversion_payload.get("status") != "pass"
+                        or pilot_update.get("status") != "pass"
+                        or pilot_update.get("board_status") != "pass"
+                        or (pilot_update.get("record") or {}).get("status") != "converted"
+                        or (pilot_update.get("record") or {}).get("usage_record") != "llm-app-pilot"
+                    ):
+                        step["status"] = "fail"
+                        step["returncode"] = 1
+                        step["stderr"] += "\nLinked pilot conversion payload did not prove a validated conversion."
                 steps.append(step)
                 if step["status"] == "fail":
                     break
