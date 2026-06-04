@@ -224,7 +224,8 @@ def reporter_handoff_markdown(record: dict, files: dict, payload: dict, director
             "",
             "## Usage Report Draft",
             "",
-            "After the pilot task, complete `USAGE_REPORT_DRAFT.md`. The maintainer can lint it with "
+            "Start in the generated harness with `NEXT_TASK.md`, then complete `USAGE_REPORT_DRAFT.md` "
+            "after the pilot task. The maintainer can lint it with "
             "`codex-harness usage-from-issue USAGE_REPORT_DRAFT.md --pilot-record-dir <pilot-records> --lint-only`.",
         ]
     )

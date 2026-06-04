@@ -54,6 +54,8 @@ class ExternalPilotPackTests(unittest.TestCase):
         self.assertIn("# External Pilot Pack", pack)
         self.assertIn("Detected profile: not recorded", pack)
         self.assertIn("python scripts/check-harness.py", pack)
+        self.assertIn("Open `NEXT_TASK.md` first", pack)
+        self.assertIn("Pick one small real task from `NEXT_TASK.md`", pack)
         self.assertIn("python scripts/record-task-trial.py", pack)
         self.assertIn("python scripts/run-harness-evals.py --min-successes 1", pack)
         self.assertIn("python scripts/codex_harness.py evidence-packet <generated-harness>", pack)
@@ -196,6 +198,19 @@ class ExternalPilotPackTests(unittest.TestCase):
                 export_pilot_pack.build_payload(args)
 
         self.assertIn("Missing generated getting started guide", str(raised.exception))
+
+    def test_requires_next_task_guide(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            harness = temp_path / "harness"
+            shutil.copytree(FIXTURE, harness)
+            (harness / "NEXT_TASK.md").unlink()
+            args = self.base_args(temp_path, harness=harness.as_posix())
+
+            with self.assertRaises(SystemExit) as raised:
+                export_pilot_pack.build_payload(args)
+
+        self.assertIn("Missing generated next task guide", str(raised.exception))
 
 
 if __name__ == "__main__":

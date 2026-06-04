@@ -1,6 +1,6 @@
 # security audit pilot Handoff
 
-Generated: 2026-06-04T17:53:48Z
+Generated: 2026-06-04T22:31:43Z
 Pilot slug: `security-audit-pilot`
 Status: `prepared`
 Domain: security audit

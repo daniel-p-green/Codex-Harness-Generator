@@ -187,7 +187,11 @@ Run these commands from the copied generated harness directory:
 python scripts/check-harness.py
 ```
 
-Pick one small real task from `Docs/GETTING_STARTED.md`, complete it with Codex,
+Open `NEXT_TASK.md` first. It gives the shortest reporter path for choosing a
+safe task, recording evidence, running local evals, and exporting a public-safe
+usage report.
+
+Pick one small real task from `NEXT_TASK.md`, complete it with Codex,
 then record the result:
 
 ```bash
@@ -245,6 +249,8 @@ def build_payload(args: argparse.Namespace) -> dict:
         raise SystemExit(f"Harness path must be an existing directory: {harness}")
     if not (harness / "Docs" / "GETTING_STARTED.md").is_file():
         raise SystemExit(f"Missing generated getting started guide: {harness / 'Docs' / 'GETTING_STARTED.md'}")
+    if not (harness / "NEXT_TASK.md").is_file():
+        raise SystemExit(f"Missing generated next task guide: {harness / 'NEXT_TASK.md'}")
     if not (harness / "scripts" / "record-task-trial.py").is_file():
         raise SystemExit(f"Missing task-trial recorder: {harness / 'scripts' / 'record-task-trial.py'}")
     if not (harness / "scripts" / "run-harness-evals.py").is_file():

@@ -119,7 +119,7 @@ def build_payload(args: argparse.Namespace) -> dict:
         "pilot_record": pilot_record,
         "next_steps": [
             f"Open the generated harness at {target.as_posix()}.",
-            "Ask the reporter to complete one small real Codex task using Docs/GETTING_STARTED.md.",
+            "Ask the reporter to complete one small real Codex task using NEXT_TASK.md.",
             "Record the result with scripts/record-task-trial.py, including evidence, verification, privacy review, and limitations.",
             "Run scripts/run-harness-evals.py from the generated harness.",
             "Convert public-safe evidence with codex-harness usage-from-harness or codex-harness usage-from-issue.",

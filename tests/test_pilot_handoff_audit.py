@@ -130,6 +130,23 @@ class PilotHandoffAuditTests(unittest.TestCase):
         self.assertEqual("handoff-audit-failed", payload["readiness"])
         self.assertIn("Missing required file: USAGE_REPORT_DRAFT.md", payload["errors"][0])
 
+    def test_fails_when_reporter_handoff_omits_next_task_guide(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_record(root)
+            args = self.write_handoff(root)
+            reporter_handoff = Path(args.handoff_dir) / "llm-app-pilot" / "REPORTER_HANDOFF.md"
+            reporter_handoff.write_text(
+                reporter_handoff.read_text(encoding="utf-8").replace("NEXT_TASK.md", "Docs/GETTING_STARTED.md"),
+                encoding="utf-8",
+            )
+
+            payload = audit_pilot_handoffs.build_payload(args)
+
+        self.assertEqual("fail", payload["status"])
+        self.assertEqual("handoff-audit-failed", payload["readiness"])
+        self.assertIn("REPORTER_HANDOFF.md must point reporters to NEXT_TASK.md.", payload["errors"][0])
+
     def test_no_active_pilots_is_pass_without_records(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)

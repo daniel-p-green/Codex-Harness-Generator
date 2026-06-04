@@ -68,6 +68,7 @@ class PreparePilotTests(unittest.TestCase):
         self.assertTrue(quickstart_report_exists)
         self.assertIn("# External Pilot Pack", pack)
         self.assertIn("external RAG pilot harness", pack)
+        self.assertTrue(any("NEXT_TASK.md" in step for step in payload["next_steps"]))
         self.assertIn("### Domain or project type", issue)
         self.assertIn("LLM app", issue)
         self.assertIsNone(payload["pilot_record"])

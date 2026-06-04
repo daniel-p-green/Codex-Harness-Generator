@@ -1,6 +1,6 @@
 # External Pilot Pack
 
-Generated: 2026-06-04T17:53:11Z
+Generated: 2026-06-04T22:31:00Z
 Harness label: LLM App Workspace Pilot
 Domain: LLM app
 Source type: external
@@ -30,7 +30,11 @@ Run these commands from the copied generated harness directory:
 python scripts/check-harness.py
 ```
 
-Pick one small real task from `Docs/GETTING_STARTED.md`, complete it with Codex,
+Open `NEXT_TASK.md` first. It gives the shortest reporter path for choosing a
+safe task, recording evidence, running local evals, and exporting a public-safe
+usage report.
+
+Pick one small real task from `NEXT_TASK.md`, complete it with Codex,
 then record the result:
 
 ```bash

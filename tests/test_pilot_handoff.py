@@ -105,6 +105,7 @@ class PilotHandoffTests(unittest.TestCase):
             self.assertIn("Would you be willing", reporter_handoff)
             self.assertIn("# Pilot Pack", reporter_handoff)
             self.assertIn("# Usage Issue Draft", reporter_handoff)
+            self.assertIn("NEXT_TASK.md", reporter_handoff)
             self.assertIn("USAGE_REPORT_DRAFT.md", reporter_handoff)
             self.assertIn("usage-from-issue", (handoff / "MAINTAINER_COMMANDS.md").read_text(encoding="utf-8"))
             self.assertIn("not usage proof", (Path(args.out) / "README.md").read_text(encoding="utf-8"))

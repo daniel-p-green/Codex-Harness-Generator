@@ -182,6 +182,8 @@ def audit_record(record: dict, args: argparse.Namespace) -> dict:
             errors.append("README.md must keep the handoff claim boundary explicit.")
         if reporter_handoff.exists():
             reporter_text = reporter_handoff.read_text(encoding="utf-8")
+            if "NEXT_TASK.md" not in reporter_text:
+                errors.append("REPORTER_HANDOFF.md must point reporters to NEXT_TASK.md.")
             if "USAGE_REPORT_DRAFT.md" not in reporter_text:
                 errors.append("REPORTER_HANDOFF.md must point reporters to USAGE_REPORT_DRAFT.md.")
             if "not usage proof" not in reporter_text:
