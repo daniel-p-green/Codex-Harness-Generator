@@ -75,6 +75,7 @@ class PilotBoardTests(unittest.TestCase):
         self.assertEqual("prepared", record["status"])
         self.assertEqual("LLM app", record["domain"])
         self.assertEqual("installed-quickstart", record["generation_path"])
+        self.assertEqual("generated pilot harness: llm-app-pilot", record["target"])
         self.assertIn("not usage proof", record["claim_boundary"])
 
     def test_build_payload_summarizes_pending_pilots(self):
@@ -103,6 +104,18 @@ class PilotBoardTests(unittest.TestCase):
 
         self.assertEqual("fail", payload["status"])
         self.assertTrue(any("usage_record" in error for error in payload["errors"]))
+
+    def test_build_payload_rejects_local_target_paths(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            record_dir = Path(temp_dir)
+            record = pilot_board.build_record(self.pilot_payload())
+            record["target"] = "/private/tmp/codex-llm-app-pilot"
+            (record_dir / "llm-app-pilot.json").write_text(json.dumps(record) + "\n", encoding="utf-8")
+
+            payload = pilot_board.build_payload(record_dir)
+
+        self.assertEqual("fail", payload["status"])
+        self.assertTrue(any("target must be public-safe" in error for error in payload["errors"]))
 
     def test_update_record_file_moves_pilot_through_funnel(self):
         with tempfile.TemporaryDirectory() as temp_dir:

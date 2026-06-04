@@ -8,6 +8,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from record_usage_case import find_sensitive_text
 from validate_usage_records import DEFAULT_RECORD_DIR as DEFAULT_USAGE_RECORD_DIR
 from validate_usage_records import validate_record_file
 
@@ -21,6 +22,12 @@ INSTALLED_BRIEF_GENERATION_PATHS = {
     "installed-init-brief",
     "installed-quickstart",
 }
+LOCAL_PATH_PREFIXES = (
+    "/Users/",
+    "/private/tmp/",
+    "/tmp/",
+    "/var/folders/",
+)
 
 
 def default_record_path(record_dir: Path, slug: str) -> Path:
@@ -31,10 +38,24 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def public_target_label(value: str, fallback: str) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return fallback
+    path = Path(text)
+    if path.is_absolute():
+        try:
+            return path.resolve().relative_to(REPO_ROOT).as_posix()
+        except (OSError, ValueError):
+            return fallback
+    return text
+
+
 def build_record(payload: dict, status: str = "prepared", notes: str = "") -> dict:
     selected = payload["selected_pilot"]
     prepared = payload["prepared_pilot"]
     pilot_pack = prepared.get("pilot_pack") or {}
+    fallback_target = f"generated pilot harness: {selected['slug']}"
     return {
         "slug": selected["slug"],
         "title": selected["title"],
@@ -44,7 +65,7 @@ def build_record(payload: dict, status: str = "prepared", notes: str = "") -> di
         "profile": selected["profile"],
         "source_type": selected["source_type"],
         "generation_path": selected["generation_path"],
-        "target": prepared["target"],
+        "target": public_target_label(prepared["target"], fallback_target),
         "harness_label": pilot_pack.get("harness_label") or selected["project_name"],
         "pilot_pack": pilot_pack.get("pack", ""),
         "issue_draft": pilot_pack.get("issue_draft", ""),
@@ -61,6 +82,13 @@ def write_record(path: Path, record: dict, force: bool = False) -> dict:
             "status": "fail",
             "path": path.as_posix(),
             "error": "record already exists; pass --force to replace it",
+        }
+    errors = validate_record(record, path)
+    if errors:
+        return {
+            "status": "fail",
+            "path": path.as_posix(),
+            "error": "invalid pilot record: " + "; ".join(errors),
         }
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -233,6 +261,12 @@ def validate_record(record: dict, path: Path) -> list[str]:
         errors.append(f"{path.name}: converted pilot must include usage_record")
     if "proof" not in str(record.get("claim_boundary", "")).casefold():
         errors.append(f"{path.name}: claim_boundary must say the pilot is not usage proof")
+    target = str(record.get("target", "")).strip()
+    if any(target.startswith(prefix) for prefix in LOCAL_PATH_PREFIXES):
+        errors.append(f"{path.name}: target must be public-safe; local machine paths are not allowed")
+    findings = find_sensitive_text(json.dumps(record, sort_keys=True))
+    if findings:
+        errors.append(f"{path.name}: sensitive text detected: {', '.join(findings)}")
     return errors
 
 
@@ -247,10 +281,10 @@ def load_records(record_dir: Path, usage_record_dir: Path = DEFAULT_USAGE_RECORD
         except json.JSONDecodeError as exc:
             errors.append(f"{path.name}: invalid JSON: {exc}")
             continue
-        record["_path"] = path.as_posix()
         errors.extend(validate_record(record, path))
         conversion_errors, usage_record_path = validate_converted_usage_record(record, path, usage_record_dir)
         errors.extend(conversion_errors)
+        record["_path"] = path.as_posix()
         if usage_record_path:
             record["_validated_usage_record"] = usage_record_path
         records.append(record)

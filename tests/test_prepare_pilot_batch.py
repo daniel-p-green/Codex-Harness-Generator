@@ -122,6 +122,7 @@ class PreparePilotBatchTests(unittest.TestCase):
         self.assertEqual(1, payload["selected_count"])
         self.assertEqual("llm-app-pilot", record["slug"])
         self.assertEqual("prepared", record["status"])
+        self.assertEqual("generated pilot harness: llm-app-pilot", record["target"])
         self.assertEqual("external", record["source_type"])
 
     def test_negative_max_pilots_is_rejected(self):

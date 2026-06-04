@@ -76,7 +76,7 @@ class ProofNextTests(unittest.TestCase):
             "slug": "llm-app-pilot",
             "source_type": "external",
             "status": status,
-            "target": "/private/tmp/codex-llm-app-pilot",
+            "target": "generated pilot harness: llm-app-pilot",
             "title": "LLM app pilot",
             "usage_record": "",
         }

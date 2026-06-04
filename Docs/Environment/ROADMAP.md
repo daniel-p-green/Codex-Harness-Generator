@@ -49,7 +49,8 @@ Already proven:
   can see pending, completed, converted, and dropped pilots without counting
   outreach state as usage proof; `codex-harness pilot-update` moves pilots
   through that funnel without hand-editing JSON, and converted pilots are
-  cross-checked against matching usage-record metadata.
+  cross-checked against matching usage-record metadata. Checked-in pilot records
+  keep public target labels instead of local machine paths.
 - Checked-in deterministic, create-acceptance, brief-acceptance, and live-create
   examples.
 - Privacy-checked usage-record validation.

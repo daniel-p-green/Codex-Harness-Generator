@@ -125,6 +125,7 @@ class PrepareNextPilotTests(unittest.TestCase):
         self.assertEqual("pass", payload["pilot_record"]["status"])
         self.assertEqual("llm-app-pilot", record["slug"])
         self.assertEqual("prepared", record["status"])
+        self.assertEqual("generated pilot harness: llm-app-pilot", record["target"])
         self.assertEqual("prepared for external reporter", record["notes"])
 
     def test_select_pilot_rejects_out_of_range_index(self):

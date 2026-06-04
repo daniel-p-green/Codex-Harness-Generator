@@ -152,7 +152,9 @@ replacement. What is proven today:
   prepared, invited, completed, converted, and dropped pilots without treating
   outreach state as usage proof. Use `codex-harness pilot-update <slug>` to
   move a pilot through that funnel and refresh the board without hand-editing
-  JSON; converted pilots are cross-checked against the referenced usage record.
+  JSON; converted pilots are cross-checked against the referenced usage record,
+  and checked-in pilot records reject local machine paths in public target
+  metadata.
 - `scripts/export_pilot_outreach.py` and `codex-harness pilot-outreach` write
   `Docs/Environment/PILOT_OUTREACH.md`, a reporter-ready outreach packet from
   active pilot-board records with invite tracking and evidence-conversion
