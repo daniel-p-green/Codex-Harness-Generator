@@ -110,6 +110,9 @@ replacement. What is proven today:
   workflows.
 - `pyproject.toml` exposes that wrapper as an installable `codex-harness`
   console command, and the release gate smokes the non-editable install path.
+- GitHub Actions runs the release gate on Python 3.10, 3.11, and 3.12, matching
+  the advertised package classifiers, and uploads the JSON gate payload for
+  each version.
 - `scripts/record_eval_snapshot.py` records eval-gate snapshots under
   `Docs/Environment/eval-history/` and updates `Docs/Environment/EVAL_TRENDS.md`.
 - `scripts/check_source_freshness.py` verifies official OpenAI documentation
@@ -877,6 +880,11 @@ Run the full local gate before publishing changes:
 ```bash
 python scripts/run_evals.py
 ```
+
+The public GitHub Actions workflow runs this same gate on Python 3.10, 3.11,
+and 3.12. Each run also uploads an `eval-gate-python-*` JSON artifact so
+maintainers can inspect the full step payload instead of relying only on log
+scrollback.
 
 This runs:
 

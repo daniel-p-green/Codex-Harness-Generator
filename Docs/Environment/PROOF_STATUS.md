@@ -1,6 +1,6 @@
 # Proof Status
 
-Generated: 2026-06-04T19:51:11Z
+Generated: 2026-06-04T20:03:46Z
 Status: PASS
 Mode: self-dogfood-proof
 Readiness: Codex-equivalent beta with checked-in self-dogfood proof
@@ -28,6 +28,7 @@ conservative and should be read with `PROOF_MATRIX.md`.
 | `proof_next_report` | PASS | Docs/Environment/PROOF_NEXT.md |
 | `beta_exit_audit_report` | PASS | Docs/Environment/BETA_EXIT_AUDIT.md |
 | `upstream_drift_report` | PASS | Docs/Environment/UPSTREAM_DRIFT.md |
+| `ci_eval_workflow` | PASS | .github/workflows/evals.yml python=3.10,3.11,3.12 uploads=eval-gate-python-* |
 | `source_freshness_report` | PASS | report=Docs/Environment/SOURCE_FRESHNESS.md status=pass json_status=pass generated=2026-06-04T11:50:18Z |
 | `semantic_alignment_report` | PASS | report=Docs/Environment/SEMANTIC_ALIGNMENT.md status=pass json_status=pass generated=2026-06-04T11:50:18Z |
 | `task_trials_report` | PASS | examples/live-create/TASK_TRIALS.md |

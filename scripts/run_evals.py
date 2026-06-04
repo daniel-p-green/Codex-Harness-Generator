@@ -319,6 +319,7 @@ def main() -> int:
                     "scripts/validate_generated_harness.py",
                     "scripts/validate_usage_records.py",
                     "tests/test_cli_install.py",
+                    "tests/test_ci_workflow.py",
                     "tests/test_codex_equivalence.py",
                     "tests/test_create_acceptance.py",
                     "tests/test_brief_acceptance.py",

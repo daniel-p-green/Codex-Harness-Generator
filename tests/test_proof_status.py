@@ -146,8 +146,60 @@ Status: PASS
         self.assertIn("proof_next_report", [check["name"] for check in payload["checks"]])
         self.assertIn("beta_exit_audit_report", [check["name"] for check in payload["checks"]])
         self.assertIn("upstream_drift_report", [check["name"] for check in payload["checks"]])
+        ci_check = next(check for check in payload["checks"] if check["name"] == "ci_eval_workflow")
+        self.assertEqual("pass", ci_check["status"])
+        self.assertIn("python=3.10,3.11,3.12", ci_check["detail"])
         self.assertEqual(4, payload["example_inventory"]["brief_example_count"])
         self.assertGreaterEqual(payload["usage_summary"]["non_synthetic"], 1)
+
+    def test_ci_workflow_check_matches_package_python_classifiers(self):
+        payload = proof_status.check_ci_workflow()
+
+        self.assertEqual("pass", payload["status"], payload)
+        self.assertIn("python=3.10,3.11,3.12", payload["detail"])
+        self.assertIn("eval-gate-python-*", payload["detail"])
+
+    def test_ci_workflow_check_fails_when_matrix_drifts_from_classifiers(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            pyproject = root / "pyproject.toml"
+            pyproject.write_text(
+                "\n".join(
+                    [
+                        "[project]",
+                        "classifiers = [",
+                        '  "Programming Language :: Python :: 3.10",',
+                        '  "Programming Language :: Python :: 3.11",',
+                        "]",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            workflow = root / "evals.yml"
+            workflow.write_text(
+                "\n".join(
+                    [
+                        "jobs:",
+                        "  evals:",
+                        "    strategy:",
+                        "      matrix:",
+                        "        python-version:",
+                        '          - "3.11"',
+                        "    steps:",
+                        "      - name: Run eval gate",
+                        "        run: |",
+                        "          set -o pipefail",
+                        "          python scripts/run_evals.py --json | tee eval-gate-${{ matrix.python-version }}.json",
+                        "      - uses: actions/upload-artifact@v4",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            payload = proof_status.check_ci_workflow(workflow, pyproject)
+
+        self.assertEqual("fail", payload["status"])
+        self.assertIn("does not match advertised classifiers", payload["detail"])
 
     def test_status_report_check_requires_markdown_and_json_pass(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -299,6 +351,7 @@ Status: PASS
         self.assertIn("pilot_next_action_report", text)
         self.assertIn("pilot_github_followups", text)
         self.assertIn("beta_exit_audit_report", text)
+        self.assertIn("ci_eval_workflow", text)
         self.assertIn("What This Does Not Prove", text)
 
     def test_main_writes_report_and_returns_success(self):

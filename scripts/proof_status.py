@@ -39,10 +39,14 @@ SOURCE_FRESHNESS_JSON = REPO_ROOT / "Docs" / "Environment" / "SOURCE_FRESHNESS.j
 SEMANTIC_ALIGNMENT_REPORT = REPO_ROOT / "Docs" / "Environment" / "SEMANTIC_ALIGNMENT.md"
 SEMANTIC_ALIGNMENT_JSON = REPO_ROOT / "Docs" / "Environment" / "SEMANTIC_ALIGNMENT.json"
 TASK_TRIALS_REPORT = REPO_ROOT / "examples" / "live-create" / "TASK_TRIALS.md"
+CI_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "evals.yml"
+PYPROJECT = REPO_ROOT / "pyproject.toml"
 DEFAULT_REPORT = REPO_ROOT / "Docs" / "Environment" / "PROOF_STATUS.md"
 TASK_TRIAL_ROW_RE = re.compile(r"^\| `(?P<trial>[^`]+)` \| `(?P<example>[^`]+)` \| (?P<status>[A-Z]+) \| `(?P<output>[^`]+)` \|$")
 FOLLOWUP_FILE_RE = re.compile(r"^- Follow-up file: `(?P<path>[^`]+)`$")
 FOLLOWUP_COMMAND_RE = re.compile(r"^gh issue comment .+ --body-file (?P<path>\S+)$")
+PYTHON_CLASSIFIER_RE = re.compile(r'"Programming Language :: Python :: (3\.\d+)"')
+WORKFLOW_PYTHON_VERSION_RE = re.compile(r'"(3\.\d+)"')
 DEFAULT_MIN_LIVE_TRIALS = 8
 DEFAULT_MIN_USAGE_RECORDS = 2
 BETA_EXIT_MIN_USAGE_RECORDS = 5
@@ -102,6 +106,54 @@ def check_file_exists(name: str, path: Path) -> dict:
         "name": name,
         "status": "pass" if path.exists() else "fail",
         "detail": display_path(path) if path.exists() else f"missing: {display_path(path)}",
+    }
+
+
+def advertised_python_versions(pyproject_path: Path = PYPROJECT) -> list[str]:
+    if not pyproject_path.exists():
+        return []
+    return sorted(PYTHON_CLASSIFIER_RE.findall(pyproject_path.read_text(encoding="utf-8")))
+
+
+def workflow_python_versions(workflow_path: Path = CI_WORKFLOW) -> list[str]:
+    if not workflow_path.exists():
+        return []
+    text = workflow_path.read_text(encoding="utf-8")
+    try:
+        matrix_block = text.split("python-version:", 1)[1].split("steps:", 1)[0]
+    except IndexError:
+        return []
+    return sorted(WORKFLOW_PYTHON_VERSION_RE.findall(matrix_block))
+
+
+def check_ci_workflow(workflow_path: Path = CI_WORKFLOW, pyproject_path: Path = PYPROJECT) -> dict:
+    if not workflow_path.exists():
+        return {
+            "name": "ci_eval_workflow",
+            "status": "fail",
+            "detail": f"missing: {display_path(workflow_path)}",
+        }
+    text = workflow_path.read_text(encoding="utf-8")
+    advertised = advertised_python_versions(pyproject_path)
+    matrix = workflow_python_versions(workflow_path)
+    errors = []
+    if advertised != matrix:
+        errors.append(f"python matrix {matrix} does not match advertised classifiers {advertised}")
+    if "python scripts/run_evals.py --json | tee eval-gate-${{ matrix.python-version }}.json" not in text:
+        errors.append("workflow does not capture JSON eval gate payload")
+    if "set -o pipefail" not in text:
+        errors.append("workflow may hide eval gate failures through tee")
+    if "actions/upload-artifact@v4" not in text:
+        errors.append("workflow does not upload eval gate payload")
+
+    return {
+        "name": "ci_eval_workflow",
+        "status": "pass" if not errors else "fail",
+        "detail": (
+            f"{display_path(workflow_path)} python={','.join(matrix)} uploads=eval-gate-python-*"
+            if not errors
+            else "; ".join(errors)
+        ),
     }
 
 
@@ -325,6 +377,7 @@ def build_payload(
         check_file_exists("proof_next_report", PROOF_NEXT_REPORT),
         check_file_exists("beta_exit_audit_report", BETA_EXIT_AUDIT_REPORT),
         check_file_exists("upstream_drift_report", UPSTREAM_DRIFT_REPORT),
+        check_ci_workflow(CI_WORKFLOW, PYPROJECT),
         check_status_report("source_freshness_report", SOURCE_FRESHNESS_REPORT, SOURCE_FRESHNESS_JSON),
         check_status_report("semantic_alignment_report", SEMANTIC_ALIGNMENT_REPORT, SEMANTIC_ALIGNMENT_JSON),
         check_file_exists("task_trials_report", TASK_TRIALS_REPORT),
