@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import shlex
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Callable
 
@@ -23,11 +23,25 @@ DEFAULT_RECORD_DIR = pilot_board.DEFAULT_RECORD_DIR
 DEFAULT_REPORT = REPO_ROOT / "Docs" / "Environment" / "PILOT_GITHUB_SYNC.md"
 DEFAULT_FOLLOWUP_DIR = REPO_ROOT / "Docs" / "Environment" / "pilot-github-followups"
 DEFAULT_PILOT_BOARD_REPORT = pilot_board.DEFAULT_REPORT
+DEFAULT_REMINDER_AFTER_HOURS = 72
 MAINTAINER_FOLLOWUP_MARKER = "<!-- codex-harness-maintainer-followup -->"
 
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def parse_utc_timestamp(value: str) -> datetime | None:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(timezone.utc)
+    except ValueError:
+        return None
+
+
+def format_utc_timestamp(value: datetime) -> str:
+    return value.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def display_path(path: Path) -> str:
@@ -39,6 +53,10 @@ def display_path(path: Path) -> str:
 
 def display_arg_path(path_text: str) -> str:
     return display_path(Path(path_text))
+
+
+def reminder_after_hours(args: argparse.Namespace) -> float:
+    return float(getattr(args, "reminder_after_hours", DEFAULT_REMINDER_AFTER_HOURS))
 
 
 def selected_records(records: list[dict], statuses: tuple[str, ...], slugs: tuple[str, ...]) -> list[dict]:
@@ -153,6 +171,28 @@ def reporter_reply_summary(github_payload: dict, maintainer_comment: dict) -> di
     }
 
 
+def followup_wait_state(generated: str, maintainer_comment: dict, reporter_replies: dict, reminder_after_hours: float) -> dict:
+    created_at = maintainer_comment.get("created_at", "")
+    created = parse_utc_timestamp(created_at)
+    now = parse_utc_timestamp(generated)
+    if not created or not now:
+        return {
+            "maintainer_followup_age_hours": None,
+            "reminder_after_hours": reminder_after_hours,
+            "reminder_due": False,
+            "next_reminder_at": "",
+        }
+    age_hours = max(0.0, (now - created).total_seconds() / 3600)
+    next_reminder_at = created + timedelta(hours=reminder_after_hours)
+    reporter_replied = reporter_replies.get("after_latest_maintainer_followup", False)
+    return {
+        "maintainer_followup_age_hours": round(age_hours, 2),
+        "reminder_after_hours": reminder_after_hours,
+        "reminder_due": bool(not reporter_replied and age_hours >= reminder_after_hours),
+        "next_reminder_at": format_utc_timestamp(next_reminder_at),
+    }
+
+
 FIELD_LABELS = {
     "outcome": "Outcome",
     "task_summary": "Public-safe task summary",
@@ -233,6 +273,10 @@ def issue_sync_record(
         "maintainer_followup_posted": False,
         "maintainer_followup_comment": {},
         "reporter_replies": {"count": 0, "latest": {}, "after_latest_maintainer_followup": False},
+        "maintainer_followup_age_hours": None,
+        "reminder_after_hours": reminder_after_hours(args),
+        "reminder_due": False,
+        "next_reminder_at": "",
     }
     if not issue_url:
         base["errors"] = ["Pilot record has no live GitHub issue URL in notes or status history."]
@@ -249,6 +293,14 @@ def issue_sync_record(
         base["maintainer_followup_comment"] = maintainer_followup_comment(github_payload)
         base["maintainer_followup_posted"] = bool(base["maintainer_followup_comment"])
         base["reporter_replies"] = reporter_reply_summary(github_payload, base["maintainer_followup_comment"])
+        base.update(
+            followup_wait_state(
+                args.generated,
+                base["maintainer_followup_comment"],
+                base["reporter_replies"],
+                reminder_after_hours(args),
+            )
+        )
         lint_payload = usage_from_github_issue.build_payload(
             lint_args(args, record, issue_url),
             github_payload=github_payload,
@@ -294,6 +346,7 @@ def summarize(records: list[dict]) -> dict:
         "reporter_replies_after_followup": sum(
             1 for record in records if record.get("reporter_replies", {}).get("after_latest_maintainer_followup")
         ),
+        "reminders_due": sum(1 for record in records if record.get("reminder_due")),
     }
 
 
@@ -325,6 +378,7 @@ def build_payload(args: argparse.Namespace, fetch_issue: Callable[..., dict] = u
         "record_dir": args.record_dir,
         "usage_record_dir": args.usage_record_dir,
         "followup_dir": args.followup_dir,
+        "reminder_after_hours": reminder_after_hours(args),
         "statuses": list(statuses),
         "slugs": list(slugs),
         "summary": summary,
@@ -376,6 +430,8 @@ def write_report(path: Path, payload: dict) -> None:
         f"- Maintainer follow-ups already posted: {summary['maintainer_followups_posted']}",
         f"- Reporter replies: {summary['reporter_reply_count']}",
         f"- Reporter replies after latest maintainer follow-up: {summary['reporter_replies_after_followup']}",
+        f"- Follow-up reminders due: {summary.get('reminders_due', 0)}",
+        f"- Reminder review threshold: {payload.get('reminder_after_hours', DEFAULT_REMINDER_AFTER_HOURS)} hours",
         f"- Needs attention: {summary['needs_attention']}",
         f"- Missing live issue URL: {summary['missing_issue_url']}",
         "",
@@ -397,6 +453,9 @@ def write_report(path: Path, payload: dict) -> None:
                 f"- Maintainer follow-up already posted: `{str(record.get('maintainer_followup_posted', False)).lower()}`",
                 f"- Maintainer follow-up URL: {record.get('maintainer_followup_comment', {}).get('url') or 'none'}",
                 f"- Maintainer follow-up posted at: `{record.get('maintainer_followup_comment', {}).get('created_at') or 'none'}`",
+                f"- Maintainer follow-up age: `{record.get('maintainer_followup_age_hours') if record.get('maintainer_followup_age_hours') is not None else 'unknown'}` hours",
+                f"- Reminder due: `{str(record.get('reminder_due', False)).lower()}`",
+                f"- Next reminder review at: `{record.get('next_reminder_at') or 'none'}`",
                 f"- Reporter replies: {record.get('reporter_replies', {}).get('count', 0)}",
                 f"- Latest reporter reply: {record.get('reporter_replies', {}).get('latest', {}).get('url') or 'none'}",
                 f"- Reporter replied after latest maintainer follow-up: `{str(record.get('reporter_replies', {}).get('after_latest_maintainer_followup', False)).lower()}`",
@@ -459,6 +518,7 @@ def main() -> int:
     parser.add_argument("--repo", help="Optional GitHub repository in owner/name form")
     parser.add_argument("--gh-bin", default="gh", help="GitHub CLI executable")
     parser.add_argument("--generated", default=utc_now(), help="UTC timestamp override for previewed records")
+    parser.add_argument("--reminder-after-hours", type=float, default=DEFAULT_REMINDER_AFTER_HOURS, help="Hours after a maintainer follow-up before the queue flags reminder review")
     parser.add_argument("--status", action="append", choices=sorted(pilot_board.ALLOWED_STATUSES), help="Pilot status to include; repeatable")
     parser.add_argument("--slug", action="append", help="Pilot slug to include; repeatable")
     parser.add_argument("--no-write", action="store_true", help="Do not write the Markdown report")

@@ -110,6 +110,7 @@ class PilotGithubSyncTests(unittest.TestCase):
             "repo": None,
             "gh_bin": "gh",
             "generated": "2026-06-04T00:00:00Z",
+            "reminder_after_hours": 72,
             "status": None,
             "slug": None,
             "no_write": False,
@@ -209,9 +210,37 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertEqual(0, record["github_issue"]["comment_count"])
         self.assertEqual(0, record["reporter_replies"]["count"])
         self.assertFalse(record["reporter_replies"]["after_latest_maintainer_followup"])
+        self.assertEqual(72, record["reminder_after_hours"])
+        self.assertFalse(record["reminder_due"])
+        self.assertEqual("2026-06-07T19:38:17Z", record["next_reminder_at"])
         self.assertEqual("", record["followup_file"])
         self.assertNotIn("comment_followup", record["commands"])
         self.assertIn("already posted", record["reporter_followup"])
+
+    def test_stale_maintainer_followup_flags_reminder_due_without_comment_command(self):
+        maintainer_comment = f"{sync_pilot_github_issues.MAINTAINER_FOLLOWUP_MARKER}\n\nPlease add the missing fields."
+        comment_payload = {
+            "author": {"login": "maintainer"},
+            "body": maintainer_comment,
+            "createdAt": "2026-06-04T19:38:17Z",
+            "url": "https://github.com/example/repo/issues/42#issuecomment-1",
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_pilot_record(root)
+
+            payload = sync_pilot_github_issues.build_payload(
+                self.args(root, generated="2026-06-08T00:00:00Z"),
+                fetch_issue=lambda *args, **kwargs: self.github_payload(comments=[comment_payload]),
+            )
+
+        record = payload["records"][0]
+        self.assertEqual(1, payload["summary"]["reminders_due"])
+        self.assertTrue(record["reminder_due"])
+        self.assertEqual(76.36, record["maintainer_followup_age_hours"])
+        self.assertEqual("2026-06-07T19:38:17Z", record["next_reminder_at"])
+        self.assertEqual("", record["followup_file"])
+        self.assertNotIn("comment_followup", record["commands"])
 
     def test_reporter_reply_after_followup_reenables_targeted_comment(self):
         maintainer_comment = f"{sync_pilot_github_issues.MAINTAINER_FOLLOWUP_MARKER}\n\nPlease add the missing fields."
@@ -244,6 +273,7 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertEqual(1, record["reporter_replies"]["count"])
         self.assertEqual("https://github.com/example/repo/issues/42#issuecomment-2", record["reporter_replies"]["latest"]["url"])
         self.assertTrue(record["reporter_replies"]["after_latest_maintainer_followup"])
+        self.assertFalse(record["reminder_due"])
         self.assertTrue(record["followup_file"].endswith("llm-app-pilot-followup.md"))
         self.assertIn("comment_followup", record["commands"])
 
