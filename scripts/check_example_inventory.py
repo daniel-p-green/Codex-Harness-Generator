@@ -28,6 +28,7 @@ REQUIRED_HARNESS_PATHS = (
     "scripts/check-harness.py",
     "scripts/record-improvement.py",
     "scripts/record-task-trial.py",
+    "scripts/summarize-improvements.py",
     "scripts/summarize-task-trials.py",
     "scripts/run-harness-evals.py",
     "Docs/GETTING_STARTED.md",

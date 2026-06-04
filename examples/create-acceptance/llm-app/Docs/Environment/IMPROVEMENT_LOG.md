@@ -10,6 +10,12 @@ Append entries manually or with:
 python scripts/record-improvement.py --category CHECK_GAP --task "short task" --friction "what went wrong" --evidence "file or command evidence"
 ```
 
+Summarize the improvement backlog with:
+
+```bash
+python scripts/summarize-improvements.py
+```
+
 ## Categories
 
 | Category | Use when | Candidate update |
@@ -51,6 +57,7 @@ directly addresses the friction. After an update, run:
 
 ```bash
 python scripts/check-harness.py
+python scripts/summarize-improvements.py
 ```
 
 Then run the relevant check from `Docs/Environment/EVAL_PLAN.md`.

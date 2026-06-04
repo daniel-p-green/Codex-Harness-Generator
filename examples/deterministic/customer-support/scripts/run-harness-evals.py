@@ -57,13 +57,21 @@ def build_payload(min_successes: int) -> dict:
                 "--json",
             ],
         ),
+        "improvements": run_command(
+            [sys.executable, "scripts/summarize-improvements.py", "--json"],
+            ["python", "scripts/summarize-improvements.py", "--json"],
+        ),
     }
     task_trial_payload = parse_json_stdout(checks["task_trials"])
+    improvement_payload = parse_json_stdout(checks["improvements"])
     issues: list[str] = []
     for name, result in checks.items():
         if result["status"] != "pass":
             issues.append(f"{name} failed")
     for issue in task_trial_payload.get("issues", []):
+        if issue not in issues:
+            issues.append(issue)
+    for issue in improvement_payload.get("issues", []):
         if issue not in issues:
             issues.append(issue)
     return {
@@ -72,6 +80,7 @@ def build_payload(min_successes: int) -> dict:
         "min_successes": min_successes,
         "checks": checks,
         "task_trials": task_trial_payload,
+        "improvements": improvement_payload,
         "issues": issues,
     }
 
@@ -103,6 +112,21 @@ def write_report(payload: dict) -> Path:
         outcomes = task_trials.get("outcomes", {})
         for outcome, count in outcomes.items():
             lines.append(f"- {outcome}: {count}")
+    improvements = payload.get("improvements") or {}
+    if improvements:
+        lines.extend(
+            [
+                "",
+                "## Improvements",
+                "",
+                f"- total: {improvements.get('total', 0)}",
+                f"- complete records: {improvements.get('complete_records', 0)}",
+                f"- actionable: {improvements.get('actionable', 0)}",
+                f"- applied: {improvements.get('applied', 0)}",
+            ]
+        )
+        for status, count in improvements.get("statuses", {}).items():
+            lines.append(f"- {status}: {count}")
     if payload["issues"]:
         lines.extend(["", "## Issues", ""])
         for issue in payload["issues"]:

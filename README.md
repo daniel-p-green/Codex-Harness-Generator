@@ -61,6 +61,9 @@ replacement. What is proven today:
   evidence-backed harness updates.
 - Generated harnesses include `scripts/record-improvement.py`, a local helper
   for appending structured, redacted improvement-log entries.
+- Generated harnesses include `scripts/summarize-improvements.py`, a local
+  summary/check over the improvement backlog, including proposed and applied
+  harness updates.
 - Generated harnesses include `Docs/Environment/TASK_TRIALS.md` and
   `scripts/record-task-trial.py`, a copied-harness-local lane for recording
   task outcome, evidence, verification, privacy review, and limitations.
@@ -68,7 +71,8 @@ replacement. What is proven today:
   summary/check over recorded task-trial outcomes.
 - Generated harnesses include `scripts/run-harness-evals.py` and
   `Docs/Environment/EVAL_REPORT.md`, a copied-harness-local eval report that
-  runs the local smoke check and task-trial summary without this generator repo.
+  runs the local smoke check, task-trial summary, and improvement-backlog
+  summary without this generator repo.
 - Generated harnesses include `scripts/check-harness.py`, a local smoke check
   that can run without this generator repo and catches missing paths, stale
   manifest references, broken agent/skill config, and weak eval/improvement
@@ -527,6 +531,7 @@ your-project/
 |   |-- run-harness-evals.py
 |   |-- record-improvement.py
 |   |-- record-task-trial.py
+|   |-- summarize-improvements.py
 |   |-- summarize-task-trials.py
 |-- Memory/
 |-- State/

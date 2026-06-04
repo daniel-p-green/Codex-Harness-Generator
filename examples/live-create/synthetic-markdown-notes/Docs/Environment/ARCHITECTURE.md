@@ -100,6 +100,7 @@ Use workspace write with sensitive recursive deny rules for `.env`, secrets, tok
 - Docs/Environment/TASK_TRIALS.md
 - scripts/record-improvement.py
 - scripts/record-task-trial.py
+- scripts/summarize-improvements.py
 - scripts/summarize-task-trials.py
 - scripts/run-harness-evals.py
 - Docs/Environment/EVAL_REPORT.md

@@ -643,6 +643,12 @@ Append entries manually or with:
 python scripts/record-improvement.py --category CHECK_GAP --task "short task" --friction "what went wrong" --evidence "file or command evidence"
 ```
 
+Summarize the improvement backlog with:
+
+```bash
+python scripts/summarize-improvements.py
+```
+
 ## Categories
 
 | Category | Use when | Candidate update |
@@ -684,6 +690,7 @@ directly addresses the friction. After an update, run:
 
 ```bash
 python scripts/check-harness.py
+python scripts/summarize-improvements.py
 ```
 
 Then run the relevant check from `Docs/Environment/EVAL_PLAN.md`.
@@ -1043,6 +1050,147 @@ if __name__ == "__main__":
 '''
 
 
+def summarize_improvements_script() -> str:
+    return r'''#!/usr/bin/env python3
+"""Summarize and validate improvement-log entries for a generated harness."""
+
+from __future__ import annotations
+
+import argparse
+import json
+from collections import Counter
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+LOG_PATH = ROOT / "Docs/Environment/IMPROVEMENT_LOG.md"
+VALID_CATEGORIES = {
+    "CHECK_GAP",
+    "ROUTING_CORRECTION",
+    "PERMISSION_FRICTION",
+    "SOURCE_FIDELITY",
+    "DOMAIN_RISK",
+}
+VALID_STATUSES = {"open", "proposed", "applied", "rejected"}
+EMPTY_VALUES = {"", "none", "none yet", "not run yet", "not stated"}
+
+
+def parse_entries(text: str) -> list[dict[str, str]]:
+    entries: list[dict[str, str]] = []
+    current: dict[str, str] | None = None
+    for raw_line in text.splitlines():
+        line = raw_line.rstrip()
+        if line.startswith("### "):
+            if current is not None:
+                entries.append(current)
+            title = line.removeprefix("### ").strip()
+            parts = title.split(" - ", 2)
+            current = {"title": title}
+            if len(parts) == 3:
+                current.update({"date": parts[0], "category": parts[1], "task": parts[2]})
+            continue
+        if current is None or not line.startswith("- ") or ":" not in line:
+            continue
+        key, value = line[2:].split(":", 1)
+        current[key.strip().lower().replace(" ", "_").replace("-", "_").replace(",", "")] = value.strip()
+    if current is not None:
+        entries.append(current)
+    return entries
+
+
+def is_empty(value: str | None) -> bool:
+    return (value or "").strip().lower() in EMPTY_VALUES
+
+
+def entry_issues(entry: dict[str, str], index: int) -> list[str]:
+    label = entry.get("task") or entry.get("title") or f"entry {index}"
+    issues: list[str] = []
+    category = entry.get("category", "")
+    status = entry.get("status", "")
+    if category not in VALID_CATEGORIES:
+        issues.append(f"{label}: invalid or missing category")
+    if status not in VALID_STATUSES:
+        issues.append(f"{label}: invalid or missing status")
+    for field in ["task", "observed_friction", "evidence"]:
+        if is_empty(entry.get(field)):
+            issues.append(f"{label}: missing useful {field.replace('_', ' ')}")
+    if status in {"proposed", "applied"} and is_empty(entry.get("candidate_harness_update")):
+        issues.append(f"{label}: proposed/applied entries need a candidate harness update")
+    if status == "applied" and is_empty(entry.get("verification_after_update")):
+        issues.append(f"{label}: applied entries need verification after update")
+    return issues
+
+
+def build_payload(path: Path) -> dict:
+    if not path.is_file():
+        return {
+            "status": "fail",
+            "path": path.as_posix(),
+            "total": 0,
+            "categories": {},
+            "statuses": {},
+            "actionable": 0,
+            "applied": 0,
+            "complete_records": 0,
+            "issues": [f"Missing improvement log file: {path.relative_to(ROOT).as_posix()}"],
+        }
+    entries = parse_entries(path.read_text(encoding="utf-8"))
+    categories = Counter(entry.get("category", "unknown") for entry in entries)
+    statuses = Counter(entry.get("status", "unknown") for entry in entries)
+    issues: list[str] = []
+    complete_records = 0
+    for index, entry in enumerate(entries, 1):
+        current_issues = entry_issues(entry, index)
+        if current_issues:
+            issues.extend(current_issues)
+        else:
+            complete_records += 1
+    actionable = statuses.get("open", 0) + statuses.get("proposed", 0)
+    return {
+        "status": "pass" if not issues else "fail",
+        "path": path.relative_to(ROOT).as_posix(),
+        "total": len(entries),
+        "categories": dict(sorted(categories.items())),
+        "statuses": dict(sorted(statuses.items())),
+        "actionable": actionable,
+        "applied": statuses.get("applied", 0),
+        "complete_records": complete_records,
+        "issues": issues,
+    }
+
+
+def print_text(payload: dict) -> None:
+    print(f"Improvements: {payload['status'].upper()}")
+    print(f"- total: {payload['total']}")
+    print(f"- complete records: {payload['complete_records']}")
+    print(f"- actionable: {payload['actionable']}")
+    print(f"- applied: {payload['applied']}")
+    for category, count in payload["categories"].items():
+        print(f"- category {category}: {count}")
+    for status, count in payload["statuses"].items():
+        print(f"- status {status}: {count}")
+    for issue in payload["issues"]:
+        print(f"- issue: {issue}")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--json", action="store_true", help="Emit JSON")
+    args = parser.parse_args()
+
+    payload = build_payload(LOG_PATH)
+    if args.json:
+        print(json.dumps(payload, indent=2))
+    else:
+        print_text(payload)
+    return 0 if payload["status"] == "pass" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+'''
+
+
 def run_harness_evals_script() -> str:
     return r'''#!/usr/bin/env python3
 """Run copied-harness-local eval checks and write an eval report."""
@@ -1103,13 +1251,21 @@ def build_payload(min_successes: int) -> dict:
                 "--json",
             ],
         ),
+        "improvements": run_command(
+            [sys.executable, "scripts/summarize-improvements.py", "--json"],
+            ["python", "scripts/summarize-improvements.py", "--json"],
+        ),
     }
     task_trial_payload = parse_json_stdout(checks["task_trials"])
+    improvement_payload = parse_json_stdout(checks["improvements"])
     issues: list[str] = []
     for name, result in checks.items():
         if result["status"] != "pass":
             issues.append(f"{name} failed")
     for issue in task_trial_payload.get("issues", []):
+        if issue not in issues:
+            issues.append(issue)
+    for issue in improvement_payload.get("issues", []):
         if issue not in issues:
             issues.append(issue)
     return {
@@ -1118,6 +1274,7 @@ def build_payload(min_successes: int) -> dict:
         "min_successes": min_successes,
         "checks": checks,
         "task_trials": task_trial_payload,
+        "improvements": improvement_payload,
         "issues": issues,
     }
 
@@ -1149,6 +1306,21 @@ def write_report(payload: dict) -> Path:
         outcomes = task_trials.get("outcomes", {})
         for outcome, count in outcomes.items():
             lines.append(f"- {outcome}: {count}")
+    improvements = payload.get("improvements") or {}
+    if improvements:
+        lines.extend(
+            [
+                "",
+                "## Improvements",
+                "",
+                f"- total: {improvements.get('total', 0)}",
+                f"- complete records: {improvements.get('complete_records', 0)}",
+                f"- actionable: {improvements.get('actionable', 0)}",
+                f"- applied: {improvements.get('applied', 0)}",
+            ]
+        )
+        for status, count in improvements.get("statuses", {}).items():
+            lines.append(f"- {status}: {count}")
     if payload["issues"]:
         lines.extend(["", "## Issues", ""])
         for issue in payload["issues"]:
@@ -1212,6 +1384,7 @@ REQUIRED_PATHS = [
     "scripts/check-harness.py",
     "scripts/record-improvement.py",
     "scripts/record-task-trial.py",
+    "scripts/summarize-improvements.py",
     "scripts/summarize-task-trials.py",
     "scripts/run-harness-evals.py",
     "Docs/GETTING_STARTED.md",
@@ -1321,7 +1494,7 @@ def main() -> int:
     require_terms(
         "Docs/Environment/IMPROVEMENT_LOG.md",
         "improvement log",
-        ["categories", "seed patterns", "entry template", "update rule", "friction", "evidence", "user correction", "verification after update", "record-improvement.py"],
+        ["categories", "seed patterns", "entry template", "update rule", "friction", "evidence", "user correction", "verification after update", "record-improvement.py", "summarize-improvements.py"],
         issues,
     )
     require_terms(
@@ -1333,7 +1506,7 @@ def main() -> int:
     require_terms(
         "Docs/Environment/EVAL_REPORT.md",
         "eval report",
-        ["status", "checks", "task trials", "issues"],
+        ["status", "checks", "task trials", "improvements", "issues"],
         issues,
     )
     require_terms(
@@ -1587,6 +1760,12 @@ Then summarize task-trial outcomes:
 python scripts/summarize-task-trials.py
 ```
 
+Summarize the improvement backlog:
+
+```bash
+python scripts/summarize-improvements.py
+```
+
 Run the copied-harness eval report:
 
 ```bash
@@ -1631,6 +1810,7 @@ scoped permissions, compact core rules, and environment records.
 - scripts/check-harness.py
 - scripts/record-improvement.py
 - scripts/record-task-trial.py
+- scripts/summarize-improvements.py
 - scripts/summarize-task-trials.py
 - scripts/run-harness-evals.py
 - Docs/GETTING_STARTED.md
@@ -1669,6 +1849,7 @@ scoped permissions, compact core rules, and environment records.
         "scripts/check-harness.py",
         "scripts/record-improvement.py",
         "scripts/record-task-trial.py",
+        "scripts/summarize-improvements.py",
         "scripts/summarize-task-trials.py",
         "scripts/run-harness-evals.py",
         "Docs/GETTING_STARTED.md",
@@ -1701,6 +1882,8 @@ scoped permissions, compact core rules, and environment records.
 
     write(target / "scripts/record-task-trial.py", record_task_trial_script())
 
+    write(target / "scripts/summarize-improvements.py", summarize_improvements_script())
+
     write(target / "scripts/summarize-task-trials.py", summarize_task_trials_script())
 
     write(target / "scripts/run-harness-evals.py", run_harness_evals_script())
@@ -1718,11 +1901,19 @@ Minimum success trials required: 0
 
 - local_check: PASS (`python scripts/check-harness.py`)
 - task_trials: PASS (`python scripts/summarize-task-trials.py --min-successes 0 --json`)
+- improvements: PASS (`python scripts/summarize-improvements.py --json`)
 
 ## Task Trials
 
 - total: 0
 - complete records: 0
+
+## Improvements
+
+- total: 0
+- complete records: 0
+- actionable: 0
+- applied: 0
 
 ## Issues
 

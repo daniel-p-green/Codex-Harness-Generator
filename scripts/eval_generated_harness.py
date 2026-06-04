@@ -235,6 +235,7 @@ def check_required_paths(root: Path, findings: list[Finding]) -> None:
         "scripts/check-harness.py",
         "scripts/record-improvement.py",
         "scripts/record-task-trial.py",
+        "scripts/summarize-improvements.py",
         "scripts/summarize-task-trials.py",
         "scripts/run-harness-evals.py",
         "Docs/GETTING_STARTED.md",
@@ -518,7 +519,7 @@ def check_docs(root: Path, findings: list[Finding]) -> None:
         for phrase in ["categories", "seed patterns", "entry template", "update rule"]:
             if phrase not in text:
                 add(findings, "improvement_log", "maintainability", "warn", "Docs/Environment/IMPROVEMENT_LOG.md", f"Improvement log should include {phrase}.")
-        for phrase in ["friction", "evidence", "user correction", "verification after update", "record-improvement.py"]:
+        for phrase in ["friction", "evidence", "user correction", "verification after update", "record-improvement.py", "summarize-improvements.py"]:
             if phrase not in text:
                 add(findings, "improvement_log", "maintainability", "warn", "Docs/Environment/IMPROVEMENT_LOG.md", f"Improvement log should mention {phrase}.")
 
@@ -535,7 +536,7 @@ def check_docs(root: Path, findings: list[Finding]) -> None:
     eval_report = root / "Docs/Environment/EVAL_REPORT.md"
     if eval_report.exists():
         text = read_text(eval_report).lower()
-        for phrase in ["status", "checks", "task trials", "issues"]:
+        for phrase in ["status", "checks", "task trials", "improvements", "issues"]:
             if phrase not in text:
                 add(findings, "eval_report", "maintainability", "warn", "Docs/Environment/EVAL_REPORT.md", f"Eval report should include {phrase}.")
 

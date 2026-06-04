@@ -38,6 +38,12 @@ Then summarize task-trial outcomes:
 python scripts/summarize-task-trials.py
 ```
 
+Summarize the improvement backlog:
+
+```bash
+python scripts/summarize-improvements.py
+```
+
 Run the copied-harness eval report:
 
 ```bash

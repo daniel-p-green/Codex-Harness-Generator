@@ -266,6 +266,97 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertNotEqual(0, completed.returncode)
         self.assertIn("Unsupported category", completed.stderr + completed.stdout)
 
+    def test_summarize_improvements_reports_backlog_counts(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+
+        record = subprocess.run(
+            [
+                sys.executable,
+                "scripts/record-improvement.py",
+                "--date",
+                "2026-06-04",
+                "--category",
+                "CHECK_GAP",
+                "--task",
+                "CLI smoke",
+                "--friction",
+                "Codex could not find the runnable command.",
+                "--evidence",
+                "Docs/Environment/EVAL_PLAN.md lacked the project command.",
+                "--candidate-update",
+                "Add the command to the eval plan.",
+                "--verification",
+                "python scripts/check-harness.py",
+                "--status",
+                "proposed",
+            ],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(0, record.returncode, record.stdout + record.stderr)
+
+        completed = subprocess.run(
+            [sys.executable, "scripts/summarize-improvements.py", "--json"],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+        payload = json.loads(completed.stdout)
+        self.assertEqual("pass", payload["status"])
+        self.assertEqual(1, payload["total"])
+        self.assertEqual(1, payload["statuses"]["proposed"])
+        self.assertEqual(1, payload["actionable"])
+        self.assertEqual(1, payload["complete_records"])
+
+    def test_summarize_improvements_fails_for_applied_entry_without_verification(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+
+        record = subprocess.run(
+            [
+                sys.executable,
+                "scripts/record-improvement.py",
+                "--date",
+                "2026-06-04",
+                "--category",
+                "CHECK_GAP",
+                "--task",
+                "CLI smoke",
+                "--friction",
+                "Codex could not find the runnable command.",
+                "--evidence",
+                "Docs/Environment/EVAL_PLAN.md lacked the project command.",
+                "--candidate-update",
+                "Add the command to the eval plan.",
+                "--status",
+                "applied",
+            ],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(0, record.returncode, record.stdout + record.stderr)
+
+        completed = subprocess.run(
+            [sys.executable, "scripts/summarize-improvements.py", "--json"],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertNotEqual(0, completed.returncode)
+        payload = json.loads(completed.stdout)
+        self.assertEqual("fail", payload["status"])
+        self.assertTrue(any("applied entries need verification" in issue for issue in payload["issues"]), payload)
+
     def test_record_task_trial_script_appends_structured_entry(self):
         temp_dir, target = self.copy_fixture()
         self.addCleanup(temp_dir.cleanup)
@@ -412,9 +503,11 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertEqual("pass", payload["status"])
         self.assertEqual("pass", payload["checks"]["local_check"]["status"])
         self.assertEqual("pass", payload["checks"]["task_trials"]["status"])
+        self.assertEqual("pass", payload["checks"]["improvements"]["status"])
         report = (target / "Docs/Environment/EVAL_REPORT.md").read_text(encoding="utf-8")
         self.assertIn("Status: PASS", report)
         self.assertIn("## Task Trials", report)
+        self.assertIn("## Improvements", report)
         self.assertIn("- none", report)
 
     def test_run_harness_evals_fails_when_success_threshold_not_met(self):
@@ -652,6 +745,15 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         temp_dir, target = self.copy_fixture()
         self.addCleanup(temp_dir.cleanup)
         (target / "scripts/record-task-trial.py").unlink()
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"])
+        self.assert_has_check(result, "required_path")
+
+    def test_missing_summarize_improvements_script_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        (target / "scripts/summarize-improvements.py").unlink()
 
         result = eval_generated_harness.evaluate(target)
         self.assertEqual("fail", result["status"])
