@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Added `scripts/simulate_create_trigger.py` and contract tests for the deterministic `/create` preflight handoff artifact.
 - Added `scripts/run_create_acceptance.py` for a deterministic preset `/create` acceptance flow that preserves trigger context, generates a harness, evaluates it, smokes it, and writes an acceptance report.
 - Added `scripts/refresh_create_acceptance_examples.py` and a checked-in deterministic preset `/create` acceptance example.
+- Added optional `python scripts/run_evals.py --codex-live` support for authenticated local Codex CLI live smoke checks.
 
 ### Changed
 

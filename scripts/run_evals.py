@@ -63,14 +63,27 @@ def create_acceptance_example_paths() -> list[str]:
     ]
 
 
+def create_acceptance_live_paths(profile: str) -> list[str]:
+    paths = create_acceptance_example_paths()
+    if profile == "all":
+        return paths
+    target = CREATE_ACCEPTANCE_EXAMPLE_ROOT / profile
+    return [target.as_posix()] if target.is_dir() else []
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--json", action="store_true", help="Emit JSON")
+    parser.add_argument("--codex-live", action="store_true", help="Also run authenticated Codex CLI live smoke against checked-in create-acceptance examples")
+    parser.add_argument("--codex-live-profile", default="software-development", help="Profile for --codex-live, or 'all'")
     args = parser.parse_args()
 
     python = sys.executable
     with tempfile.TemporaryDirectory() as temp_dir:
         create_acceptance_target = Path(temp_dir) / "create-acceptance"
+        live_paths = create_acceptance_live_paths(args.codex_live_profile)
+        if args.codex_live and not live_paths:
+            parser.error(f"No checked-in create-acceptance example found for --codex-live-profile {args.codex_live_profile!r}")
         steps = [
             run_step(
                 "static_codex_port_eval",
@@ -119,6 +132,24 @@ def main() -> int:
                 "create_acceptance_example_smoke",
                 [python, "scripts/smoke_generated_harness.py", "--json", *create_acceptance_example_paths()],
             ),
+            *(
+                [
+                    run_step(
+                        "create_acceptance_example_codex_live_smoke",
+                        [
+                            python,
+                            "scripts/smoke_generated_harness.py",
+                            "--json",
+                            "--codex-live",
+                            "--prompt",
+                            "Reply OK if you loaded this generated harness.",
+                            *live_paths,
+                        ],
+                    )
+                ]
+                if args.codex_live
+                else []
+            ),
             run_step(
                 "unit_and_mutation_tests",
                 [python, "-m", "unittest", "discover", "-s", "tests", "-q"],
@@ -143,6 +174,7 @@ def main() -> int:
                     "tests/test_create_trigger_contract.py",
                     "tests/test_eval_codex_port.py",
                     "tests/test_generated_harness_contract.py",
+                    "tests/test_run_evals.py",
                 ],
             ),
         ]

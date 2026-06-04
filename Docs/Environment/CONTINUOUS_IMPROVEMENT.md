@@ -28,11 +28,13 @@ The GitHub Actions workflow `.github/workflows/evals.yml` runs the same gate on 
 For a local live smoke check against the Codex CLI, run:
 
 ```bash
-python scripts/smoke_generated_harness.py --codex-live tests/fixtures/generated_harnesses/software-dev-basic
+python scripts/run_evals.py --codex-live
 ```
 
 Use this only on machines with authenticated Codex CLI access. The live mode is
-non-interactive and should not start the Codex TUI.
+non-interactive and should not start the Codex TUI. By default it adds one live
+smoke check against `examples/create-acceptance/software-development`; use
+`--codex-live-profile all` for the full checked-in create-acceptance matrix.
 
 ## Fixture Coverage
 

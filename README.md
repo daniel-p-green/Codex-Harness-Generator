@@ -259,9 +259,13 @@ still be reviewed against generated artifacts.
 For an authenticated local Codex CLI check against a generated harness, run:
 
 ```bash
-python scripts/smoke_generated_harness.py --codex-live \
-  examples/create-acceptance/software-development
+python scripts/run_evals.py --codex-live
 ```
+
+By default this adds one live smoke check against
+`examples/create-acceptance/software-development`. Use
+`--codex-live-profile all` to run live smoke against every checked-in
+create-acceptance profile.
 
 ## Project Structure
 
