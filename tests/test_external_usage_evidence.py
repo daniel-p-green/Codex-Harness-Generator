@@ -55,6 +55,7 @@ class ExternalUsageEvidenceTests(unittest.TestCase):
         text = EVIDENCE_DOC.read_text(encoding="utf-8")
 
         self.assertIn("# External Usage Evidence", text)
+        self.assertIn("python scripts/codex_harness.py pilot-pack", text)
         self.assertIn("python scripts/codex_harness.py usage-from-issue", text)
         self.assertIn("python scripts/codex_harness.py usage-record", text)
         self.assertIn("--evidence-type private-summary", text)

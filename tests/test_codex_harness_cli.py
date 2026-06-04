@@ -241,6 +241,65 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_pilot_pack_delegates_to_exporter(self):
+        command, _ = self.run_cli(
+            [
+                "pilot-pack",
+                "/tmp/harness",
+                "--out",
+                "/tmp/EXTERNAL_PILOT_PACK.md",
+                "--issue-out",
+                "/tmp/EXTERNAL_USAGE_ISSUE_DRAFT.md",
+                "--harness-label",
+                "public harness label",
+                "--domain",
+                "software development",
+                "--slug",
+                "external-pilot",
+                "--title",
+                "External pilot",
+                "--source-type",
+                "external",
+                "--generation-path",
+                "installed-init-brief",
+                "--min-successes",
+                "2",
+                "--generated",
+                "2026-06-04T12:00:00Z",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/export_pilot_pack.py",
+                "/tmp/harness",
+                "--domain",
+                "software development",
+                "--slug",
+                "external-pilot",
+                "--title",
+                "External pilot",
+                "--source-type",
+                "external",
+                "--generation-path",
+                "installed-init-brief",
+                "--out",
+                "/tmp/EXTERNAL_PILOT_PACK.md",
+                "--issue-out",
+                "/tmp/EXTERNAL_USAGE_ISSUE_DRAFT.md",
+                "--harness-label",
+                "public harness label",
+                "--min-successes",
+                "2",
+                "--generated",
+                "2026-06-04T12:00:00Z",
+                "--json",
+            ],
+            command,
+        )
+
     def test_profiles_details_delegates_to_profile_catalog(self):
         command, _ = self.run_cli(["profiles", "--details"])
 

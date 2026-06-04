@@ -84,7 +84,9 @@ def parse_items(value: str) -> tuple[str, ...]:
         if not stripped:
             continue
         bullet = re.match(r"^(?:[-*+]|\d+[.)])\s+(.+)$", stripped)
-        items.append((bullet.group(1) if bullet else stripped).strip())
+        item = clean_value((bullet.group(1) if bullet else stripped).strip())
+        if item:
+            items.append(item)
     return tuple(item for item in items if item)
 
 

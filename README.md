@@ -118,6 +118,9 @@ replacement. What is proven today:
 - `scripts/export_evidence_packet.py` and `codex-harness evidence-packet`
   write a public-safe Markdown packet from a copied harness's local eval report
   and task trials before maintainers decide whether a usage record is justified.
+- `scripts/export_pilot_pack.py` and `codex-harness pilot-pack` write an
+  external pilot guide and optional GitHub issue-body draft so outside testers
+  know which commands to run, what evidence to record, and what not to share.
 - `scripts/usage_from_issue.py` and `codex-harness usage-from-issue` convert a
   sanitized GitHub external-usage issue body into a privacy-checked usage
   record.
@@ -404,6 +407,14 @@ evidence:
 
 ```bash
 python scripts/codex_harness.py local-eval /tmp/codex-rag-harness
+python scripts/codex_harness.py pilot-pack /tmp/codex-rag-harness \
+  --domain "LLM app" \
+  --slug rag-harness-trial \
+  --title "RAG harness trial" \
+  --harness-label "RAG harness private repo" \
+  --source-type external \
+  --generation-path installed-init-brief \
+  --issue-out /tmp/EXTERNAL_USAGE_ISSUE_DRAFT.md
 python scripts/codex_harness.py evidence-packet /tmp/codex-rag-harness \
   --harness-label "RAG harness private repo" \
   --out /tmp/HARNESS_EVIDENCE_PACKET.md
@@ -534,6 +545,7 @@ Common subcommands:
 | `usage-record` | `record_usage_case.py` | Records sanitized generated-harness usage evidence. |
 | `usage-from-harness` | `usage_from_harness.py` | Converts copied-harness task trials and eval reports into a privacy-checked usage record. |
 | `evidence-packet <path>` | `export_evidence_packet.py` | Exports a public-safe Markdown evidence packet from copied-harness local eval and task trials. |
+| `pilot-pack <path>` | `export_pilot_pack.py` | Writes an external pilot guide and optional GitHub issue-body draft for one privacy-safe generated-harness trial. |
 | `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record. |
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
 | `proof-status` | `proof_status.py` | Summarizes checked-in proof readiness, live task-trial coverage, and usage evidence. |

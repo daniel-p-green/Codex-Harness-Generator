@@ -61,6 +61,8 @@ def build_payload() -> dict:
         adoption_blueprint = temp_root / "adoption-blueprint"
         adoption_copy_script = temp_root / "copy-adds.sh"
         evidence_packet = temp_root / "HARNESS_EVIDENCE_PACKET.md"
+        pilot_pack = temp_root / "EXTERNAL_PILOT_PACK.md"
+        pilot_issue = temp_root / "EXTERNAL_USAGE_ISSUE_DRAFT.md"
         usage_records = temp_root / "usage-records"
         usage_report = temp_root / "USAGE_RECORDS.md"
         issue_body = temp_root / "external-usage-issue.md"
@@ -231,6 +233,31 @@ def build_payload() -> dict:
                     evidence_packet.as_posix(),
                     "--harness-label",
                     "install-smoke generated harness",
+                    "--json",
+                ],
+            ),
+            (
+                "pilot_pack",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "pilot-pack",
+                    generated.as_posix(),
+                    "--out",
+                    pilot_pack.as_posix(),
+                    "--issue-out",
+                    pilot_issue.as_posix(),
+                    "--harness-label",
+                    "install-smoke generated harness",
+                    "--domain",
+                    "install smoke",
+                    "--slug",
+                    "install-smoke-pilot",
+                    "--title",
+                    "Install smoke pilot",
+                    "--source-type",
+                    "self-dogfood",
+                    "--generation-path",
+                    "installed-init-brief",
                     "--json",
                 ],
             ),

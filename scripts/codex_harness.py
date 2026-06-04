@@ -354,6 +354,34 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("export_evidence_packet.py", command)
 
+    if args.command == "pilot-pack":
+        command = [
+            args.harness,
+            "--domain",
+            args.domain,
+            "--slug",
+            args.slug,
+            "--title",
+            args.title,
+            "--source-type",
+            args.source_type,
+            "--generation-path",
+            args.generation_path,
+        ]
+        if args.out:
+            command.extend(["--out", args.out])
+        if args.issue_out:
+            command.extend(["--issue-out", args.issue_out])
+        if args.harness_label:
+            command.extend(["--harness-label", args.harness_label])
+        if args.min_successes is not None:
+            command.extend(["--min-successes", str(args.min_successes)])
+        if args.generated:
+            command.extend(["--generated", args.generated])
+        if args.json:
+            command.append("--json")
+        return python_script("export_pilot_pack.py", command)
+
     if args.command == "usage-from-issue":
         command = [
             args.issue_body,
@@ -643,6 +671,32 @@ def make_parser() -> argparse.ArgumentParser:
     evidence_packet.add_argument("--harness-label", help="Public-safe harness label; defaults to directory name")
     evidence_packet.add_argument("--min-successes", type=int, default=0, help="Minimum passing success task trials expected")
     evidence_packet.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    pilot_pack = subparsers.add_parser("pilot-pack", help="Write an external pilot guide and optional issue-body draft")
+    pilot_pack.add_argument("harness", help="Generated harness directory")
+    pilot_pack.add_argument("--out", help="Pilot pack path; defaults inside the harness Docs/Environment directory")
+    pilot_pack.add_argument("--issue-out", help="Optional GitHub issue-body draft path")
+    pilot_pack.add_argument("--harness-label", help="Public-safe harness label; defaults to directory name")
+    pilot_pack.add_argument("--domain", required=True, help="Public-safe usage domain")
+    pilot_pack.add_argument("--slug", required=True, help="Suggested usage-record slug")
+    pilot_pack.add_argument("--title", required=True, help="Suggested usage-record title")
+    pilot_pack.add_argument("--source-type", choices=["external", "multi-project", "self-dogfood"], default="external")
+    pilot_pack.add_argument(
+        "--generation-path",
+        choices=[
+            "adoption-plan",
+            "installed-init-brief",
+            "installed-init-from-project",
+            "live-create",
+            "manual-migration",
+            "repo-dogfood",
+            "unknown",
+        ],
+        default="unknown",
+    )
+    pilot_pack.add_argument("--min-successes", type=int, default=1, help="Minimum passing success task trials expected")
+    pilot_pack.add_argument("--generated", help="UTC timestamp override")
+    pilot_pack.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     usage_from_issue = subparsers.add_parser("usage-from-issue", help="Create usage evidence from a GitHub issue-form body")
     usage_from_issue.add_argument("issue_body", help="Markdown issue body path, or '-' for stdin")

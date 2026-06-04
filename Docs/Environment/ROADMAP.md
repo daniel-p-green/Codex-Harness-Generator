@@ -33,6 +33,9 @@ Already proven:
   verification menu, evidence commands, and privacy-safe reporting guidance.
 - Public-safe evidence packets that summarize copied-harness local eval and
   task-trial evidence before converting it into checked-in usage records.
+- External pilot packs that give prospective reporters a one-task checklist,
+  public-safe evidence boundary, maintainer commands, and optional issue-body
+  draft before external usage conversion.
 - Checked-in deterministic, create-acceptance, brief-acceptance, and live-create
   examples.
 - Privacy-checked usage-record validation.
@@ -66,10 +69,12 @@ The project can stop calling itself a beta only when all of these are true:
 1. Add external usage records.
    Use `.github/ISSUE_TEMPLATE/external-usage-report.yml` and
    `Docs/Environment/EXTERNAL_USAGE_EVIDENCE.md`. When a generated harness has
-   local task trials, use `codex-harness usage-from-harness` to draft the
-   privacy-checked record from copied-harness evidence. When an external report
-   arrives as a GitHub issue, use `codex-harness usage-from-issue` to convert the
-   issue body into the checked-in usage record.
+   local task trials, use `codex-harness pilot-pack` to give the reporter a
+   one-task checklist and optional issue-body draft, then use
+   `codex-harness usage-from-harness` to draft the privacy-checked record from
+   copied-harness evidence. When an external report arrives as a GitHub issue,
+   use `codex-harness usage-from-issue` to convert the issue body into the
+   checked-in usage record.
 
 2. Add more public-safe live examples.
    Prioritize domains where the generated harness has high-risk boundaries:

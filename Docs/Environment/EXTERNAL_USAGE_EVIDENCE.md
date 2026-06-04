@@ -40,6 +40,21 @@ and limits.
 
 ## Maintainer Conversion
 
+Before asking someone outside this repo to report a trial, create a pilot pack
+from the copied generated harness. The pack gives the reporter a one-task loop,
+safe evidence boundaries, maintainer commands, and an optional issue-body draft:
+
+```bash
+python scripts/codex_harness.py pilot-pack /path/to/generated-harness \
+  --domain "LLM app" \
+  --slug external-example \
+  --title "External example" \
+  --harness-label "private-summary: external reporter" \
+  --source-type external \
+  --generation-path installed-init-brief \
+  --issue-out /tmp/EXTERNAL_USAGE_ISSUE_DRAFT.md
+```
+
 When the reporter can share a copied generated harness directory privately, ask
 them to record task trials and export a public-safe packet first:
 

@@ -159,6 +159,38 @@ class UsageFromIssueTests(unittest.TestCase):
             self.assertNotEqual(0, completed.returncode)
             self.assertIn("sensitive text", completed.stderr + completed.stdout)
 
+    def test_usage_from_issue_rejects_unfilled_no_response_bullets(self):
+        body = ISSUE_BODY.replace("- Generated AGENTS.md matched the project shape.\n- The harness made verification steps explicit.", "- _No response_\n- _No response_")
+        body = body.replace("- Ran the generated smoke check successfully.\n- Completed one real task using the generated reviewer guidance.", "- _No response_\n- _No response_")
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            issue = temp_path / "issue.md"
+            issue.write_text(body, encoding="utf-8")
+
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    SCRIPT.as_posix(),
+                    issue.as_posix(),
+                    "--slug",
+                    "unfilled-external-report",
+                    "--title",
+                    "Unfilled external report",
+                    "--record-dir",
+                    (temp_path / "records").as_posix(),
+                    "--report",
+                    (temp_path / "USAGE_RECORDS.md").as_posix(),
+                    "--json",
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertNotEqual(0, completed.returncode)
+            self.assertIn("At least one evidence item is required", completed.stderr + completed.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
