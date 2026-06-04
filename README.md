@@ -646,6 +646,27 @@ To collect privacy-safe evidence from outside this repository, use the
 **External usage report** GitHub issue template and
 `Docs/Environment/EXTERNAL_USAGE_EVIDENCE.md`.
 
+For the public pilot queue, use the GitHub sync loop:
+
+```bash
+python scripts/codex_harness.py pilot-github-issues
+python scripts/codex_harness.py pilot-github-sync \
+  --followup-dir Docs/Environment/pilot-github-followups
+python scripts/codex_harness.py usage-from-github-issue <issue-number-or-url> \
+  --include-comments \
+  --pilot-record-dir Docs/Environment/pilot-records \
+  --pilot-board-report Docs/Environment/PILOT_BOARD.md \
+  --no-write \
+  --json
+```
+
+`pilot-github-sync` writes `Docs/Environment/PILOT_GITHUB_SYNC.md`, reporter
+follow-up files, and `gh issue comment --body-file ...` commands for waiting
+issues. Post those follow-ups only when the report is still missing public-safe
+evidence, verification, privacy, or limitation fields; after the reporter
+updates the issue, rerun sync and preview conversion before writing a usage
+record.
+
 Require actual non-synthetic success evidence before making real-world usage
 claims:
 

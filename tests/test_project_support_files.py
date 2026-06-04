@@ -61,6 +61,20 @@ class ProjectSupportFilesTests(unittest.TestCase):
         ):
             self.assertIn(phrase, text)
 
+    def test_roadmap_documents_public_pilot_github_followup_loop(self):
+        text = ROADMAP.read_text(encoding="utf-8")
+
+        for phrase in (
+            "codex-harness pilot-github-issues",
+            "codex-harness pilot-github-sync",
+            "Docs/Environment/PILOT_GITHUB_SYNC.md",
+            "Docs/Environment/pilot-github-followups",
+            "gh issue comment --body-file",
+            "pilot_github_followups",
+            "codex-harness usage-from-github-issue --include-comments",
+        ):
+            self.assertIn(phrase, text)
+
 
 if __name__ == "__main__":
     unittest.main()

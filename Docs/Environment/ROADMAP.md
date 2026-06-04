@@ -56,6 +56,17 @@ Already proven:
 - Privacy-checked usage-record validation.
 - Copied-harness evidence conversion into privacy-checked usage records.
 - External usage-report intake and issue-body conversion.
+- GitHub-ready external pilot issue export through
+  `codex-harness pilot-github-issues`, so active pilots can be opened as public
+  issues from the same privacy-safe issue-body shape without treating issue
+  creation as proof.
+- Live GitHub pilot readiness sync through `codex-harness pilot-github-sync`,
+  including checked-in `Docs/Environment/PILOT_GITHUB_SYNC.md`, reporter
+  follow-up files under `Docs/Environment/pilot-github-followups/`, and
+  copyable `gh issue comment --body-file` commands for missing evidence fields.
+- Proof-status coverage for `pilot_github_followups`, so the checked-in sync
+  report cannot reference missing follow-up files or omit the comment commands
+  maintainers need to move waiting issues forward.
 - Beta-exit usage-gap reporting, suggested pilot targets, and a shareable
   campaign packet through `codex-harness usage-gaps` and
   `codex-harness pilot-campaign`.
@@ -111,9 +122,18 @@ The project can stop calling itself a beta only when all of these are true:
    harness to produce a public-safe issue-body draft after a successful real
    task trial. When an external report arrives as a GitHub issue, use
    `codex-harness usage-from-issue` to convert the issue body into the
-   checked-in usage record. Run `codex-harness proof-next` after each record to
-   refresh the next pilot, board, conversion, audit, and final proof commands.
-   Use `codex-harness usage-gaps` for the raw gap report,
+   checked-in usage record. For public pilot intake, run
+   `codex-harness pilot-github-issues` to create the issue queue, run
+   `codex-harness pilot-github-sync --followup-dir
+   Docs/Environment/pilot-github-followups` to fetch live issue bodies and
+   comments, then post the generated `gh issue comment --body-file ...`
+   follow-up commands from `Docs/Environment/PILOT_GITHUB_SYNC.md` when a
+   reporter still owes public-safe evidence fields. After the reporter updates
+   the issue, rerun `codex-harness pilot-github-sync` and preview conversion
+   with `codex-harness usage-from-github-issue --include-comments` before
+   writing the checked-in usage record. Run `codex-harness proof-next` after
+   each record to refresh the next pilot, board, conversion, audit, and final
+   proof commands. Use `codex-harness usage-gaps` for the raw gap report,
    `codex-harness prepare-next-pilot` to prepare the next suggested pilot
    directly, `codex-harness pilot-board` to inspect in-flight pilots,
    `codex-harness pilot-handoff` plus `codex-harness pilot-handoff-audit`
