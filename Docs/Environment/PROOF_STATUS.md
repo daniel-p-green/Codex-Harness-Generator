@@ -1,6 +1,6 @@
 # Proof Status
 
-Generated: 2026-06-04T10:02:09Z
+Generated: 2026-06-04T10:14:44Z
 Status: PASS
 Readiness: Codex-equivalent beta with checked-in self-dogfood proof
 

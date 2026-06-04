@@ -43,6 +43,8 @@ class PlanProjectAdoptionTests(unittest.TestCase):
             profile=None,
             project_name=None,
             harness=None,
+            blueprint_out=None,
+            force_blueprint=False,
             max_files=100,
             limit=3,
             generated_date="2026-06-04",
@@ -66,6 +68,8 @@ class PlanProjectAdoptionTests(unittest.TestCase):
             profile="software-development",
             project_name="RAG App",
             harness=None,
+            blueprint_out=None,
+            force_blueprint=False,
             max_files=100,
             limit=3,
             generated_date="2026-06-04",
@@ -78,6 +82,77 @@ class PlanProjectAdoptionTests(unittest.TestCase):
         self.assertIn("# Harness Adoption Plan", text)
         self.assertIn("`AGENTS.md` | conflict", text)
         self.assertIn("It does not include source file contents", text)
+
+    def test_blueprint_out_and_copy_script_copy_only_add_rows(self):
+        temp_dir, root = self.make_project()
+        self.addCleanup(temp_dir.cleanup)
+        original_agents = (root / "AGENTS.md").read_text(encoding="utf-8")
+        blueprint = Path(temp_dir.name) / "blueprint"
+        copy_script = Path(temp_dir.name) / "copy-adds.sh"
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                SCRIPT.as_posix(),
+                root.as_posix(),
+                "--source-label",
+                "public rag app",
+                "--blueprint-out",
+                blueprint.as_posix(),
+                "--copy-script",
+                copy_script.as_posix(),
+                "--json",
+            ],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+        payload = json.loads(completed.stdout)
+        self.assertEqual("pass", payload["status"])
+        self.assertEqual(copy_script.as_posix(), payload["copy_script"])
+        self.assertTrue((blueprint / "AGENTS.md").exists())
+        self.assertTrue(copy_script.exists())
+        self.assertTrue(copy_script.stat().st_mode & 0o111)
+        script_text = copy_script.read_text(encoding="utf-8")
+        self.assertIn("Refusing to overwrite existing path", script_text)
+        self.assertNotIn("cp \"$BLUEPRINT_DIR\"/AGENTS.md", script_text)
+
+        copy_completed = subprocess.run(
+            [copy_script.as_posix()],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(0, copy_completed.returncode, copy_completed.stdout + copy_completed.stderr)
+        self.assertEqual(original_agents, (root / "AGENTS.md").read_text(encoding="utf-8"))
+        self.assertTrue((root / ".codex" / "config.toml").exists())
+        self.assertTrue((root / "scripts" / "check-harness.py").exists())
+
+    def test_copy_script_requires_persistent_blueprint(self):
+        temp_dir, root = self.make_project()
+        self.addCleanup(temp_dir.cleanup)
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                SCRIPT.as_posix(),
+                root.as_posix(),
+                "--copy-script",
+                str(Path(temp_dir.name) / "copy-adds.sh"),
+            ],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertNotEqual(0, completed.returncode)
+        self.assertIn("--copy-script requires --harness or --blueprint-out", completed.stderr + completed.stdout)
 
     def test_cli_emits_json(self):
         temp_dir, root = self.make_project()

@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import filecmp
 import json
+import shlex
 import tempfile
 from pathlib import Path
 
@@ -105,11 +106,69 @@ def write_report(path: Path, payload: dict) -> Path:
     return path
 
 
+def shell_quote(path: Path | str) -> str:
+    return shlex.quote(Path(path).as_posix() if isinstance(path, Path) else path)
+
+
+def shell_join_var(var_name: str, relative: str) -> str:
+    return f'"${var_name}"/{shell_quote(relative)}'
+
+
+def write_copy_script(path: Path, payload: dict, blueprint: Path, project: Path) -> Path:
+    add_items = [item for item in payload["files"] if item["status"] == "add"]
+    lines = [
+        "#!/usr/bin/env bash",
+        "set -euo pipefail",
+        "",
+        f"BLUEPRINT_DIR={shell_quote(blueprint.resolve())}",
+        f"PROJECT_DIR={shell_quote(project.resolve())}",
+        "",
+        'if [ ! -d "$BLUEPRINT_DIR" ]; then',
+        '  echo "Blueprint directory not found: $BLUEPRINT_DIR" >&2',
+        "  exit 1",
+        "fi",
+        'if [ ! -d "$PROJECT_DIR" ]; then',
+        '  echo "Project directory not found: $PROJECT_DIR" >&2',
+        "  exit 1",
+        "fi",
+        "",
+        f'echo "Copying {len(add_items)} add-only harness files..."',
+    ]
+    for item in add_items:
+        relative = item["path"]
+        parent = Path(relative).parent.as_posix()
+        target_expr = shell_join_var("PROJECT_DIR", relative)
+        source_expr = shell_join_var("BLUEPRINT_DIR", relative)
+        if parent != ".":
+            lines.append(f"mkdir -p {shell_join_var('PROJECT_DIR', parent)}")
+        lines.extend(
+            [
+                f"if [ -e {target_expr} ]; then",
+                f"  echo \"Refusing to overwrite existing path: {relative}\" >&2",
+                "  exit 1",
+                "fi",
+                f"cp {source_expr} {target_expr}",
+            ]
+        )
+    lines.extend(
+        [
+            'echo "Add-only copy complete. Review conflicts manually before merging them."',
+            "",
+        ]
+    )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines), encoding="utf-8")
+    path.chmod(0o755)
+    return path
+
+
 def build_payload(
     project: Path,
     profile: str | None,
     project_name: str | None,
     harness: Path | None,
+    blueprint_out: Path | None,
+    force_blueprint: bool,
     max_files: int,
     limit: int,
     generated_date: str,
@@ -131,11 +190,30 @@ def build_payload(
     project_label = source_label or project.name
     selection_source = "explicit --profile" if profile else "metadata inspection"
 
+    if harness is not None and blueprint_out is not None:
+        raise SystemExit("--harness and --blueprint-out cannot be used together")
+
     if harness is not None:
         if not harness.exists() or not harness.is_dir():
             raise SystemExit(f"Harness path must be an existing directory: {harness}")
         files = [classify_file(project, harness, relative) for relative in iter_blueprint_files(harness)]
         blueprint_label = harness.name
+        blueprint_path = harness
+    elif blueprint_out is not None:
+        if blueprint_out.exists() and not blueprint_out.is_dir():
+            raise SystemExit(f"Blueprint output exists and is not a directory: {blueprint_out}")
+        if blueprint_out.exists() and any(blueprint_out.iterdir()) and not force_blueprint:
+            raise SystemExit(f"Blueprint output is not empty. Re-run with --force-blueprint to replace it: {blueprint_out}")
+        generate(
+            blueprint_out,
+            project_name or inspection["project"],
+            selected_profile,
+            force=True,
+            generated_date=generated_date,
+        )
+        files = [classify_file(project, blueprint_out, relative) for relative in iter_blueprint_files(blueprint_out)]
+        blueprint_label = blueprint_out.name
+        blueprint_path = blueprint_out
     else:
         with tempfile.TemporaryDirectory() as temp_dir:
             blueprint = Path(temp_dir) / "generated-harness"
@@ -148,6 +226,7 @@ def build_payload(
             )
             files = [classify_file(project, blueprint, relative) for relative in iter_blueprint_files(blueprint)]
         blueprint_label = f"generated {selected_profile} blueprint"
+        blueprint_path = None
 
     summary = build_summary(files)
     return {
@@ -166,6 +245,7 @@ def build_payload(
         "summary": summary,
         "files": files,
         "conflicts": [item for item in files if item["status"] == "conflict"],
+        "_blueprint_path": blueprint_path,
     }
 
 
@@ -192,19 +272,26 @@ def main() -> int:
     parser.add_argument("--profile", help="Starter profile override; defaults to inspection recommendation")
     parser.add_argument("--project-name", help="Project name for generated blueprint docs")
     parser.add_argument("--harness", help="Existing generated harness blueprint to compare instead of creating one")
+    parser.add_argument("--blueprint-out", help="Persist the generated blueprint to this directory")
+    parser.add_argument("--force-blueprint", action="store_true", help="Replace --blueprint-out when it already contains files")
     parser.add_argument("--max-files", type=int, default=800, help="Maximum project files to inspect")
     parser.add_argument("--limit", type=int, default=3, help="Number of inspection recommendations to consider")
     parser.add_argument("--generated-date", default=DEFAULT_GENERATED_DATE, help="Stable generated date for temporary blueprint docs")
     parser.add_argument("--source-label", help="Public-safe label for the inspected project")
     parser.add_argument("--report", help="Write a Markdown adoption plan to this path")
+    parser.add_argument("--copy-script", help="Write an executable add-only copy script; requires --harness or --blueprint-out")
     parser.add_argument("--json", action="store_true", help="Emit JSON")
     args = parser.parse_args()
+    if args.copy_script and not (args.harness or args.blueprint_out):
+        parser.error("--copy-script requires --harness or --blueprint-out so the script can reference a persistent blueprint")
 
     payload = build_payload(
         project=Path(args.project),
         profile=args.profile,
         project_name=args.project_name,
         harness=Path(args.harness) if args.harness else None,
+        blueprint_out=Path(args.blueprint_out) if args.blueprint_out else None,
+        force_blueprint=args.force_blueprint,
         max_files=args.max_files,
         limit=args.limit,
         generated_date=args.generated_date,
@@ -213,12 +300,21 @@ def main() -> int:
     if args.report:
         report = write_report(Path(args.report), payload)
         payload["report"] = report.as_posix()
+    if args.copy_script:
+        blueprint_path = payload["_blueprint_path"]
+        if blueprint_path is None:
+            raise SystemExit("--copy-script requires a persistent blueprint")
+        copy_script = write_copy_script(Path(args.copy_script), payload, blueprint_path, Path(args.project))
+        payload["copy_script"] = copy_script.as_posix()
+    payload.pop("_blueprint_path", None)
     if args.json:
         print(json.dumps(payload, indent=2))
     else:
         print(format_payload(payload), end="")
         if args.report:
             print(f"- report: {payload['report']}")
+        if args.copy_script:
+            print(f"- copy script: {payload['copy_script']}")
     return 0
 
 

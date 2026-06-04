@@ -39,6 +39,8 @@ class CheckCliInstallTests(unittest.TestCase):
         self.assertTrue(any("codex-harness" in command[0] and "validate" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "inspect" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "adoption-plan" in command for command in calls))
+        self.assertTrue(any("codex-harness" in command[0] and "--blueprint-out" in command for command in calls))
+        self.assertTrue(any("codex-harness" in command[0] and "--copy-script" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "init" in command and "--from-project" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "local-eval" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "usage-from-harness" in command for command in calls))

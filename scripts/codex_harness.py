@@ -112,6 +112,10 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.extend(["--project-name", args.project_name])
         if args.harness:
             command.extend(["--harness", args.harness])
+        if args.blueprint_out:
+            command.extend(["--blueprint-out", args.blueprint_out])
+        if args.force_blueprint:
+            command.append("--force-blueprint")
         if args.max_files is not None:
             command.extend(["--max-files", str(args.max_files)])
         if args.limit is not None:
@@ -120,6 +124,8 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.extend(["--source-label", args.source_label])
         if args.report:
             command.extend(["--report", args.report])
+        if args.copy_script:
+            command.extend(["--copy-script", args.copy_script])
         if args.json:
             command.append("--json")
         return python_script("plan_project_adoption.py", command)
@@ -449,10 +455,13 @@ def make_parser() -> argparse.ArgumentParser:
     adoption_plan.add_argument("--profile", help="Starter profile override; defaults to inspection recommendation")
     adoption_plan.add_argument("--project-name", help="Project name for generated blueprint docs")
     adoption_plan.add_argument("--harness", help="Existing generated harness blueprint to compare")
+    adoption_plan.add_argument("--blueprint-out", help="Persist the generated blueprint to this directory")
+    adoption_plan.add_argument("--force-blueprint", action="store_true", help="Replace --blueprint-out when it already contains files")
     adoption_plan.add_argument("--max-files", type=int, default=800, help="Maximum files to inspect before truncating")
     adoption_plan.add_argument("--limit", type=int, default=3, help="Number of inspection recommendations to consider")
     adoption_plan.add_argument("--source-label", help="Public-safe project label")
     adoption_plan.add_argument("--report", help="Write a Markdown adoption plan to this path")
+    adoption_plan.add_argument("--copy-script", help="Write an executable add-only copy script; requires --harness or --blueprint-out")
     adoption_plan.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     generate = subparsers.add_parser("generate", help="Generate a minimal deterministic harness")

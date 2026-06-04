@@ -58,6 +58,8 @@ def build_payload() -> dict:
         inspected_generated = temp_root / "inspected-generated"
         demo_generated = temp_root / "demo-generated"
         adoption_report = temp_root / "ADOPTION_PLAN.md"
+        adoption_blueprint = temp_root / "adoption-blueprint"
+        adoption_copy_script = temp_root / "copy-adds.sh"
         usage_records = temp_root / "usage-records"
         usage_report = temp_root / "USAGE_RECORDS.md"
         issue_body = temp_root / "external-usage-issue.md"
@@ -165,6 +167,10 @@ def build_payload() -> dict:
                     "install-smoke generated harness",
                     "--report",
                     adoption_report.as_posix(),
+                    "--blueprint-out",
+                    adoption_blueprint.as_posix(),
+                    "--copy-script",
+                    adoption_copy_script.as_posix(),
                     "--json",
                 ],
             ),
