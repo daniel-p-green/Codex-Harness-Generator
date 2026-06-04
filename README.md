@@ -117,10 +117,10 @@ Before trying the full model-mediated `/create` flow, generate a minimal valid
 harness deterministically:
 
 ```bash
-python scripts/generate_minimal_harness.py --list-profiles
-python scripts/generate_minimal_harness.py /tmp/codex-harness-example --force
-python scripts/eval_generated_harness.py /tmp/codex-harness-example
-python scripts/smoke_generated_harness.py /tmp/codex-harness-example
+python scripts/codex_harness.py profiles
+python scripts/codex_harness.py generate /tmp/codex-harness-example --force
+python scripts/codex_harness.py eval /tmp/codex-harness-example
+python scripts/codex_harness.py smoke /tmp/codex-harness-example
 ```
 
 The deterministic generator currently supports:
@@ -139,7 +139,7 @@ with:
 
 ```bash
 python scripts/refresh_deterministic_examples.py
-python scripts/run_evals.py
+python scripts/codex_harness.py gate
 ```
 
 To test the `/create` trigger handoff without launching a full live generation:
@@ -157,7 +157,7 @@ uses before profile selection, architecture, generation, and validation.
 To run the deterministic preset `/create` acceptance flow end to end:
 
 ```bash
-python scripts/run_create_acceptance.py /tmp/codex-create-acceptance \
+python scripts/codex_harness.py acceptance /tmp/codex-create-acceptance \
   --profile software-development \
   --project-type "Python CLI" \
   --notes "release gate acceptance"
@@ -172,7 +172,7 @@ Checked-in create-acceptance examples are available under
 
 ```bash
 python scripts/refresh_create_acceptance_examples.py
-python scripts/run_evals.py
+python scripts/codex_harness.py gate
 ```
 
 To package a sanitized live `/create` output after it has passed eval and smoke:
@@ -193,7 +193,7 @@ live examples prove the `/create` handoff, not just a valid generated harness.
 To prove checked-in live examples can steer Codex through representative tasks:
 
 ```bash
-python scripts/run_live_example_task_trials.py
+python scripts/codex_harness.py live-trials
 ```
 
 This uses authenticated local Codex CLI access, copies each live example to a
@@ -203,14 +203,19 @@ temporary workspace, seeds synthetic inputs, runs `codex exec`, and writes
 To record an eval trend snapshot:
 
 ```bash
-python scripts/record_eval_snapshot.py
+python scripts/codex_harness.py snapshot
 ```
 
 To check official OpenAI source freshness:
 
 ```bash
-python scripts/check_source_freshness.py
+python scripts/codex_harness.py source-freshness
 ```
+
+The wrapper is intentionally thin. It delegates to the underlying scripts so
+advanced users can still call `scripts/generate_minimal_harness.py`,
+`scripts/run_create_acceptance.py`, `scripts/run_evals.py`, and the individual
+evaluators directly.
 
 ## Commands
 
@@ -220,6 +225,28 @@ python scripts/check_source_freshness.py
 | `/validate-environment` | Checks an existing harness for broken references, invalid config, missing metadata, weak skill triggers, and quality issues. |
 | `/upgrade-environment` | Audits an existing harness and proposes improvements before making approved changes. |
 | `/update` | Refreshes the generator's local knowledge base from web research or `Docs/ProvideKnowledge/` in local-only mode. |
+
+## Script Entry Point
+
+For local CLI use before or alongside Codex, start with:
+
+```bash
+python scripts/codex_harness.py --help
+```
+
+Common subcommands:
+
+| Subcommand | Delegates to | What it proves |
+|---|---|---|
+| `profiles` | `generate_minimal_harness.py --list-profiles` | Shows supported deterministic starters. |
+| `generate <target>` | `generate_minimal_harness.py` | Writes a minimal valid Codex harness. |
+| `acceptance <target>` | `run_create_acceptance.py` | Runs trigger handoff, generation, eval, smoke, and report writing. |
+| `eval <paths...>` | `eval_generated_harness.py` | Checks generated harness contract quality. |
+| `smoke <paths...>` | `smoke_generated_harness.py` | Parses config, resolves agents and skills, optionally runs Codex live smoke. |
+| `gate` | `run_evals.py` | Runs the repo release gate. |
+| `live-trials` | `run_live_example_task_trials.py` | Runs authenticated Codex tasks against checked-in live examples. |
+| `source-freshness` | `check_source_freshness.py` | Confirms official OpenAI source URLs are reachable. |
+| `snapshot` | `record_eval_snapshot.py` | Records an eval trend snapshot. |
 
 ## Presets
 

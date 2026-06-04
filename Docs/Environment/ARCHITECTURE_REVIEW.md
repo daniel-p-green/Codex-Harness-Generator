@@ -65,8 +65,9 @@ transcript.
   legal, finance, hiring, and support.
 - Add semantic-drift checks that compare local guidance against official docs,
   beyond the current official-source reachability check.
-- Add a minimal deterministic bootstrap script for users who expect a CLI entry
-  point before entering Codex.
+- Keep the thin `scripts/codex_harness.py` wrapper aligned with the underlying
+  scripts as workflows evolve, so users have one obvious first command without
+  duplicating generator logic.
 
 ## Utility Verdict
 
