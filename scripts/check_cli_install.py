@@ -244,18 +244,10 @@ def build_payload() -> dict:
         fake_gh.chmod(0o755)
 
         commands = [
-            ("create_venv", [sys.executable, "-m", "venv", "--system-site-packages", venv.as_posix()], None),
+            ("create_venv", [sys.executable, "-m", "venv", venv.as_posix()], None),
             (
                 "install_package",
-                [
-                    (venv / "bin" / "python").as_posix(),
-                    "-m",
-                    "pip",
-                    "install",
-                    "--no-build-isolation",
-                    "--no-deps",
-                    ".",
-                ],
+                [(venv / "bin" / "python").as_posix(), "-m", "pip", "install", "."],
                 install_source,
             ),
             ("profiles", [(venv / "bin" / "codex-harness").as_posix(), "profiles", "--json"], None),

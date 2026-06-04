@@ -1,6 +1,7 @@
 import importlib.util
 import json
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -93,6 +94,12 @@ class CheckCliInstallTests(unittest.TestCase):
         names = [step["name"] for step in payload["steps"]]
         self.assertEqual(["create_venv", "install_package", "profiles", "doctor", "init", "quickstart", "demo_capture", "prepare_pilot", "validate", "inspect", "adoption_plan", "equivalence", "upstream_drift", "init_from_project", "record_task_trial", "local_eval", "public_usage_report", "evidence_packet", "pilot_pack", "usage_from_harness", "usage_from_issue_lint", "usage_from_issue_preview", "usage_from_issue", "prepare_next_pilot", "prepare_pilot_batch_dry_run", "pilot_board", "pilot_update", "pilot_outreach", "pilot_handoff", "pilot_handoff_audit", "pilot_github_issues", "pilot_github_sync", "pilot_next_action", "usage_from_issue_pilot_conversion", "usage_from_github_issue_lint", "usage_gaps", "beta_exit_audit", "pilot_campaign", "proof_next", "migration_audit", "prepare_migration", "eval"], names)
         self.assertTrue(any("pip" in command and "install" in command for command in calls))
+        create_venv_call = next(command for command in calls if command[0:3] == [sys.executable, "-m", "venv"])
+        self.assertNotIn("--system-site-packages", create_venv_call)
+        install_call = next(command for command in calls if "pip" in command and "install" in command)
+        self.assertNotIn("--no-build-isolation", install_call)
+        self.assertNotIn("--no-deps", install_call)
+        self.assertEqual(".", install_call[-1])
         install_cwds = [cwd for command, cwd in run_cwds if "pip" in command and "install" in command]
         self.assertEqual(1, len(install_cwds))
         self.assertIsNotNone(install_cwds[0])

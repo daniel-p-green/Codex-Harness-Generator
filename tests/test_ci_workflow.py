@@ -6,6 +6,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = REPO_ROOT / ".github" / "workflows" / "evals.yml"
 PYPROJECT = REPO_ROOT / "pyproject.toml"
+SCRIPTS = REPO_ROOT / "scripts"
 
 
 class CiWorkflowTests(unittest.TestCase):
@@ -32,6 +33,13 @@ class CiWorkflowTests(unittest.TestCase):
         self.assertIn("python scripts/run_evals.py --json | tee eval-gate-${{ matrix.python-version }}.json", text)
         self.assertIn("actions/upload-artifact@v4", text)
         self.assertIn("eval-gate-python-${{ matrix.python-version }}", text)
+
+    def test_tomli_fallback_has_python_310_runtime_dependency(self):
+        script_text = "\n".join(path.read_text(encoding="utf-8") for path in SCRIPTS.glob("*.py"))
+        pyproject_text = PYPROJECT.read_text(encoding="utf-8")
+
+        self.assertIn("import tomli as tomllib", script_text)
+        self.assertIn('"tomli>=2.0.1; python_version < \'3.11\'"', pyproject_text)
 
 
 if __name__ == "__main__":
