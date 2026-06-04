@@ -80,6 +80,10 @@ replacement. What is proven today:
   `Docs/Environment/EVAL_REPORT.md`, a copied-harness-local eval report that
   runs the local smoke check, task-trial summary, and improvement-backlog
   summary without this generator repo.
+- Generated harnesses include `scripts/export-public-usage-report.py`, a
+  copied-harness-local exporter that turns the latest complete successful task
+  trial plus local eval status into the same public-safe issue-body format that
+  maintainers can convert with `codex-harness usage-from-issue`.
 - Generated harnesses include `scripts/check-harness.py`, a local smoke check
   that can run without this generator repo and catches missing paths, stale
   manifest references, broken agent/skill config, and weak eval/improvement
@@ -657,6 +661,7 @@ your-project/
 |   |-- record-task-trial.py
 |   |-- summarize-improvements.py
 |   |-- summarize-task-trials.py
+|   |-- export-public-usage-report.py
 |-- Memory/
 |-- State/
 |-- Retro/

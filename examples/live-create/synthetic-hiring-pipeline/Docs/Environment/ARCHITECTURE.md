@@ -30,3 +30,5 @@ health-check skill, scoped permissions, and structured decision-support rules.
 - README.md
 - scripts/run-harness-evals.py
 - Docs/Environment/EVAL_REPORT.md
+
+- scripts/export-public-usage-report.py

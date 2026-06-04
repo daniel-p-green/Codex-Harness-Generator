@@ -26,3 +26,5 @@
 - Docs/Environment/CREATE_ACCEPTANCE_REPORT.md
 - Docs/Environment/PROFILE_SELECTION.md
 - Docs/Environment/DEMO_CAPTURE.md
+
+- scripts/export-public-usage-report.py

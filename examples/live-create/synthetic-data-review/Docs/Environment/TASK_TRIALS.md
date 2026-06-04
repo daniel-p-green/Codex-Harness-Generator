@@ -23,6 +23,12 @@ Run the copied-harness eval summary with:
 python scripts/run-harness-evals.py
 ```
 
+Export a public-safe usage report draft after at least one successful real task:
+
+```bash
+python scripts/export-public-usage-report.py --out Docs/Environment/PUBLIC_USAGE_REPORT.md
+```
+
 ## Outcome Labels
 
 - `success`: Codex completed the task and verification passed.

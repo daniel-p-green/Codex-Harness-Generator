@@ -64,6 +64,7 @@ def build_payload() -> dict:
         adoption_copy_script = temp_root / "copy-adds.sh"
         equivalence_report = temp_root / "CODEX_EQUIVALENCE_MATRIX.md"
         evidence_packet = temp_root / "HARNESS_EVIDENCE_PACKET.md"
+        public_usage_report = temp_root / "PUBLIC_USAGE_REPORT.md"
         pilot_pack = temp_root / "EXTERNAL_PILOT_PACK.md"
         pilot_issue = temp_root / "EXTERNAL_USAGE_ISSUE_DRAFT.md"
         prepared_pilot_pack = temp_root / "PREPARED_EXTERNAL_PILOT_PACK.md"
@@ -278,6 +279,20 @@ def build_payload() -> dict:
                 ],
             ),
             ("local_eval", [(venv / "bin" / "codex-harness").as_posix(), "local-eval", generated.as_posix(), "--json"]),
+            (
+                "public_usage_report",
+                [
+                    (venv / "bin" / "python").as_posix(),
+                    (generated / "scripts" / "export-public-usage-report.py").as_posix(),
+                    "--out",
+                    public_usage_report.as_posix(),
+                    "--source-type",
+                    "self-dogfood",
+                    "--generation-path",
+                    "installed-init-brief",
+                    "--json",
+                ],
+            ),
             (
                 "evidence_packet",
                 [

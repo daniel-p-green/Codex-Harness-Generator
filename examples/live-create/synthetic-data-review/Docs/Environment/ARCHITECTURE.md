@@ -108,3 +108,5 @@ User inclination: lean simple. Status: Auto-confirmed (preset mode).
 - scripts/summarize-task-trials.py
 - scripts/run-harness-evals.py
 - Docs/Environment/EVAL_REPORT.md
+
+- scripts/export-public-usage-report.py

@@ -30,3 +30,5 @@ one health-check skill, scoped permissions, and scenario-analysis rules.
 - README.md
 - scripts/run-harness-evals.py
 - Docs/Environment/EVAL_REPORT.md
+
+- scripts/export-public-usage-report.py

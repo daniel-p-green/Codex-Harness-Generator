@@ -39,6 +39,7 @@ REQUIRED_HARNESS_PATHS = (
     "scripts/summarize-improvements.py",
     "scripts/summarize-task-trials.py",
     "scripts/run-harness-evals.py",
+    "scripts/export-public-usage-report.py",
     "Docs/GETTING_STARTED.md",
     "Docs/Environment/GENESIS.md",
     "Docs/Environment/ARCHITECTURE.md",
@@ -231,6 +232,15 @@ def check_generated_contract(root_label: str, target: Path) -> list[InventoryFai
                         check="generated_contract",
                         path=rel(doc_path),
                         message="Generated task-trial docs must show the required --limitations field.",
+                    )
+                )
+            if "export-public-usage-report.py" not in doc:
+                failures.append(
+                    InventoryFailure(
+                        root=root_label,
+                        check="generated_contract",
+                        path=rel(doc_path),
+                        message="Generated task-trial docs must show the public usage report exporter.",
                     )
                 )
 

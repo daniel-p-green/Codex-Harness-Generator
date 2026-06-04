@@ -50,4 +50,10 @@ Run the copied-harness eval report:
 python scripts/run-harness-evals.py
 ```
 
+After a successful real task trial, export a public-safe usage report draft with privacy review and limitations:
+
+```bash
+python scripts/export-public-usage-report.py --out Docs/Environment/PUBLIC_USAGE_REPORT.md
+```
+
 Generated: 2026-06-04

@@ -74,8 +74,12 @@ CAPABILITIES = [
     {
         "name": "Copied-harness autonomy",
         "original_need": "A copied harness should keep working away from the generator repo.",
-        "codex_surface": "Generated local check, local eval report, task-trial recorder, and improvement recorder.",
-        "evidence_paths": ["tests/test_generated_harness_contract.py", "examples/deterministic/software-development/scripts/run-harness-evals.py"],
+        "codex_surface": "Generated local check, local eval report, task-trial recorder, improvement recorder, and public usage report exporter.",
+        "evidence_paths": [
+            "tests/test_generated_harness_contract.py",
+            "examples/deterministic/software-development/scripts/run-harness-evals.py",
+            "examples/deterministic/software-development/scripts/export-public-usage-report.py",
+        ],
         "commands": ["codex-harness local-eval <generated-harness>"],
     },
     {

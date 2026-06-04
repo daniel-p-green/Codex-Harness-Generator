@@ -82,8 +82,15 @@ Run the copied-harness eval report:
 python scripts/run-harness-evals.py
 ```
 
+After a successful real task trial, export a public-safe usage report draft:
+
+```bash
+python scripts/export-public-usage-report.py --out Docs/Environment/PUBLIC_USAGE_REPORT.md
+```
+
 If this harness came from the public generator and the task is safe to describe,
-share only the local eval summary, task-trial summary, privacy review, and
-limitations. Keep raw private evidence out of public reports.
+share only the exported public usage report, local eval summary, task-trial
+summary, privacy review, and limitations. Keep raw private evidence out of
+public reports.
 
 Generated: 2026-06-04

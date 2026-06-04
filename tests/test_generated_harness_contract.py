@@ -619,10 +619,96 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertIn("Status: FAIL", report)
         self.assertIn("success count 0 is below required minimum 1", report)
 
+    def test_export_public_usage_report_writes_issue_body_from_success_trial(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+
+        record = subprocess.run(
+            [
+                sys.executable,
+                "scripts/record-task-trial.py",
+                "--date",
+                "2026-06-04",
+                "--task",
+                "TODO audit",
+                "--outcome",
+                "success",
+                "--evidence",
+                "Generated TODO report was inspected.",
+                "--verification",
+                "python scripts/check-harness.py",
+                "--privacy-review",
+                "Public-safe synthetic task only.",
+                "--harness-helped",
+                "AGENTS.md required verification.",
+                "--limitations",
+                "One local task trial.",
+            ],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(0, record.returncode, record.stdout + record.stderr)
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "scripts/export-public-usage-report.py",
+                "--out",
+                "Docs/Environment/PUBLIC_USAGE_REPORT.md",
+                "--json",
+            ],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+        payload = json.loads(completed.stdout)
+        self.assertEqual("pass", payload["status"], payload)
+        self.assertEqual("TODO audit", payload["task"])
+        self.assertEqual("Docs/Environment/PUBLIC_USAGE_REPORT.md", payload["path"])
+        report = (target / "Docs/Environment/PUBLIC_USAGE_REPORT.md").read_text(encoding="utf-8")
+        self.assertIn("### Domain or project type", report)
+        self.assertIn("### Generated harness profile or label", report)
+        self.assertIn("### Evidence type", report)
+        self.assertIn("private-summary", report)
+        self.assertIn("### Public-safe task summary", report)
+        self.assertIn("TODO audit", report)
+        self.assertIn("Copied-harness eval report status: PASS", report)
+        self.assertIn("not longitudinal proof", report)
+
+    def test_export_public_usage_report_fails_without_success_trial(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+
+        completed = subprocess.run(
+            [sys.executable, "scripts/export-public-usage-report.py", "--json"],
+            cwd=target,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertNotEqual(0, completed.returncode)
+        self.assertIn("success count 0 is below required minimum 1", completed.stderr + completed.stdout)
+
     def test_missing_run_harness_evals_script_fails(self):
         temp_dir, target = self.copy_fixture()
         self.addCleanup(temp_dir.cleanup)
         (target / "scripts/run-harness-evals.py").unlink()
+
+        result = eval_generated_harness.evaluate(target)
+
+        self.assertEqual("fail", result["status"])
+        self.assert_has_check(result, "required_path")
+
+    def test_missing_export_public_usage_report_script_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        (target / "scripts/export-public-usage-report.py").unlink()
 
         result = eval_generated_harness.evaluate(target)
 

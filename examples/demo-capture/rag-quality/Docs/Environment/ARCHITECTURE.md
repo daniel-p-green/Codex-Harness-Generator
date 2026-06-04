@@ -27,3 +27,5 @@ scoped permissions, compact core rules, and environment records.
 - Docs/Environment/TASK_TRIALS.md
 - Docs/Environment/SOURCE_MAP.md
 - Docs/Environment/VALIDATION_REPORT.md
+
+- scripts/export-public-usage-report.py

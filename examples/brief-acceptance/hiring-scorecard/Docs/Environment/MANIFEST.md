@@ -11,6 +11,7 @@
 - scripts/summarize-improvements.py
 - scripts/summarize-task-trials.py
 - scripts/run-harness-evals.py
+- scripts/export-public-usage-report.py
 - Docs/GETTING_STARTED.md
 - Docs/Environment/GENESIS.md
 - Docs/Environment/ARCHITECTURE.md

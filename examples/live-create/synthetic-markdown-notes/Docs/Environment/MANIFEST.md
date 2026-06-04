@@ -46,3 +46,5 @@ Every generated handoff file below was created for `temporary synthetic target`.
 - Docs/Environment/TASK_TRIALS.md
 - scripts/run-harness-evals.py
 - Docs/Environment/EVAL_REPORT.md
+
+- scripts/export-public-usage-report.py

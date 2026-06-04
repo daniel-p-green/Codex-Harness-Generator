@@ -25,6 +25,7 @@ REQUIRED_PATHS = [
     "scripts/summarize-improvements.py",
     "scripts/summarize-task-trials.py",
     "scripts/run-harness-evals.py",
+    "scripts/export-public-usage-report.py",
     "Docs/GETTING_STARTED.md",
     "Docs/Environment/GENESIS.md",
     "Docs/Environment/ARCHITECTURE.md",
@@ -144,7 +145,7 @@ def main() -> int:
     require_terms(
         "Docs/Environment/TASK_TRIALS.md",
         "task trials",
-        ["outcome labels", "evidence", "verification", "privacy review", "limitations", "record-task-trial.py", "summarize-task-trials.py", "run-harness-evals.py"],
+        ["outcome labels", "evidence", "verification", "privacy review", "limitations", "record-task-trial.py", "summarize-task-trials.py", "run-harness-evals.py", "export-public-usage-report.py"],
         issues,
     )
     require_terms(

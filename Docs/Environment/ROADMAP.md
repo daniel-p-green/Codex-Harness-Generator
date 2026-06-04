@@ -30,6 +30,9 @@ Already proven:
 - Generated harness local eval reports that run copied-harness smoke checks and
   task-trial and improvement-backlog summaries without depending on this
   generator repo.
+- Generated harness public-usage report drafts that turn a copied-harness
+  successful task trial plus local eval status into a public-safe issue-body
+  format without depending on this generator repo.
 - Generated harness onboarding guides with a first useful task loop,
   verification menu, evidence commands, and privacy-safe reporting guidance.
 - Checked-in Codex equivalence matrix covering command, artifact, and proof
@@ -82,8 +85,11 @@ The project can stop calling itself a beta only when all of these are true:
    `codex-harness pilot-pack` to give the reporter a one-task checklist and
    optional issue-body draft, then use
    `codex-harness usage-from-harness` to draft the privacy-checked record from
-   copied-harness evidence. When an external report arrives as a GitHub issue,
-   use `codex-harness usage-from-issue` to convert the issue body into the
+   copied-harness evidence. Reporters can also run
+   `python scripts/export-public-usage-report.py` from the copied generated
+   harness to produce a public-safe issue-body draft after a successful real
+   task trial. When an external report arrives as a GitHub issue, use
+   `codex-harness usage-from-issue` to convert the issue body into the
    checked-in usage record. Run `codex-harness usage-gaps` after each record to
    pick the next pilot profile, source type, and generation path by the largest
    remaining beta-exit gap, then run `codex-harness pilot-campaign` when a
