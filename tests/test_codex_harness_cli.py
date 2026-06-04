@@ -1275,6 +1275,43 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_usage_from_harness_allows_pilot_metadata_defaults(self):
+        command, _ = self.run_cli(
+            [
+                "usage-from-harness",
+                "/tmp/harness",
+                "--slug",
+                "demo",
+                "--evidence-type",
+                "private-summary",
+                "--privacy-review",
+                "Public-safe copied-harness evidence only.",
+                "--pilot-record-dir",
+                "/tmp/pilot-records",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/usage_from_harness.py",
+                "/tmp/harness",
+                "--slug",
+                "demo",
+                "--evidence-type",
+                "private-summary",
+                "--privacy-review",
+                "Public-safe copied-harness evidence only.",
+                "--pilot-record-dir",
+                "/tmp/pilot-records",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
     def test_usage_from_issue_delegates_to_issue_importer_script(self):
         command, _ = self.run_cli(
             [

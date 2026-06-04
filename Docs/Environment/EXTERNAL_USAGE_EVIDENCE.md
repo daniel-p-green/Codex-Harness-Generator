@@ -93,17 +93,14 @@ limitations before turning it into a checked-in usage record.
 When the generated harness directory is available to the maintainer, prefer the
 copied-harness converter. It reads the local eval report and task-trial records,
 previews the normalized usage record, and can link the record back to a prepared
-pilot without writing anything during review:
+pilot without writing anything during review. With a matching pilot record, the
+converter infers title, domain, harness label, source type, and generation path
+from `Docs/Environment/pilot-records/<slug>.json`:
 
 ```bash
 python scripts/codex_harness.py usage-from-harness /path/to/generated-harness \
   --slug external-example \
-  --title "External example" \
-  --domain "LLM app" \
-  --harness-label "private-summary: external reporter" \
   --evidence-type private-summary \
-  --source-type external \
-  --generation-path installed-quickstart \
   --privacy-review "Reporter confirmed public-safe private-summary evidence only." \
   --pilot-record-dir Docs/Environment/pilot-records \
   --pilot-board-report Docs/Environment/PILOT_BOARD.md \

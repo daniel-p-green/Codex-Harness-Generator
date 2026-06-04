@@ -1,6 +1,6 @@
 # Proof Next Actions
 
-Generated: 2026-06-04T14:50:59Z
+Generated: 2026-06-04T15:01:40Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 
@@ -62,7 +62,7 @@ codex-harness pilot-update llm-app-pilot --status invited --record-dir Docs/Envi
 Purpose: validate the generated harness's local eval and task-trial evidence without writing a usage record or mutating the pilot board
 
 ```bash
-codex-harness usage-from-harness <generated-harness> --slug llm-app-pilot --title "LLM app pilot" --domain "LLM app" --harness-label "LLM App Workspace Pilot" --evidence-type private-summary --source-type external --generation-path installed-quickstart --privacy-review "Reporter confirmed public-safe private-summary evidence only." --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
+codex-harness usage-from-harness <generated-harness> --slug llm-app-pilot --evidence-type private-summary --privacy-review "Reporter confirmed public-safe private-summary evidence only." --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
 ```
 
 5. convert copied-harness evidence
@@ -70,7 +70,7 @@ codex-harness usage-from-harness <generated-harness> --slug llm-app-pilot --titl
 Purpose: write the checked usage record and convert the matching pilot after preview output is reviewed
 
 ```bash
-codex-harness usage-from-harness <generated-harness> --slug llm-app-pilot --title "LLM app pilot" --domain "LLM app" --harness-label "LLM App Workspace Pilot" --evidence-type private-summary --source-type external --generation-path installed-quickstart --privacy-review "Reporter confirmed public-safe private-summary evidence only." --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+codex-harness usage-from-harness <generated-harness> --slug llm-app-pilot --evidence-type private-summary --privacy-review "Reporter confirmed public-safe private-summary evidence only." --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
 ```
 
 6. preview issue evidence

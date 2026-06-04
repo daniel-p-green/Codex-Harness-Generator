@@ -28,6 +28,13 @@ from record_usage_case import (
 
 
 VALID_OUTCOMES = {"success", "partial", "failed", "inconclusive"}
+PILOT_DEFAULT_FIELDS = {
+    "title": "title",
+    "domain": "domain",
+    "harness_label": "harness_label",
+    "source_type": "source_type",
+    "generation_path": "generation_path",
+}
 
 
 def read_text(path: Path) -> str:
@@ -81,6 +88,40 @@ def derive_outcome(eval_status: str, outcomes: dict[str, int]) -> str:
     if outcomes.get("failed", 0):
         return "failed"
     return "inconclusive"
+
+
+def apply_pilot_defaults(args: argparse.Namespace) -> dict | None:
+    if not args.pilot_record_dir:
+        return None
+    slug = safe_slug(args.slug)
+    path = pilot_board.default_record_path(Path(args.pilot_record_dir), slug)
+    record = pilot_board.read_record(path)
+    errors = pilot_board.validate_record(record, path)
+    if errors:
+        raise SystemExit("Pilot record is invalid: " + "; ".join(errors))
+    for arg_name, pilot_field in PILOT_DEFAULT_FIELDS.items():
+        if getattr(args, arg_name, None) is None:
+            setattr(args, arg_name, record.get(pilot_field))
+    return record
+
+
+def require_metadata(args: argparse.Namespace) -> None:
+    required = {
+        "title": "--title",
+        "domain": "--domain",
+        "evidence_type": "--evidence-type",
+        "source_type": "--source-type",
+        "generation_path": "--generation-path",
+        "privacy_review": "--privacy-review",
+    }
+    missing = [flag for attr, flag in required.items() if not getattr(args, attr, None)]
+    if missing:
+        raise SystemExit(
+            "Missing required metadata: "
+            + ", ".join(missing)
+            + ". Provide the flags directly or use --pilot-record-dir with a matching prepared pilot for title, "
+            "domain, source type, generation path, and harness label."
+        )
 
 
 def build_record(args: argparse.Namespace) -> UsageRecord:
@@ -163,17 +204,17 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("harness", help="Generated harness directory with Docs/Environment/TASK_TRIALS.md and EVAL_REPORT.md")
     parser.add_argument("--slug", required=True, help="Stable usage-record slug")
-    parser.add_argument("--title", required=True, help="Short usage-record title")
-    parser.add_argument("--domain", required=True, help="Usage domain")
-    parser.add_argument("--harness-label", help="Public-safe harness path label; defaults to directory name")
+    parser.add_argument("--title", help="Short usage-record title; inferred from matching pilot record when available")
+    parser.add_argument("--domain", help="Usage domain; inferred from matching pilot record when available")
+    parser.add_argument("--harness-label", help="Public-safe harness path label; inferred from matching pilot record or defaults to directory name")
     parser.add_argument("--task-summary", help="Public-safe task summary; defaults to the first complete task trial")
     parser.add_argument("--outcome", choices=sorted(VALID_OUTCOMES), help="Override derived outcome")
-    parser.add_argument("--evidence-type", choices=sorted(ALLOWED_EVIDENCE_TYPES), required=True)
-    parser.add_argument("--source-type", choices=sorted(ALLOWED_SOURCE_TYPES), default="self-dogfood")
-    parser.add_argument("--generation-path", choices=sorted(ALLOWED_GENERATION_PATHS), default="unknown")
+    parser.add_argument("--evidence-type", choices=sorted(ALLOWED_EVIDENCE_TYPES))
+    parser.add_argument("--source-type", choices=sorted(ALLOWED_SOURCE_TYPES), help="Source type; inferred from matching pilot record when available")
+    parser.add_argument("--generation-path", choices=sorted(ALLOWED_GENERATION_PATHS), help="Generation path; inferred from matching pilot record when available")
     parser.add_argument("--evidence", action="append", default=[], help="Additional public-safe evidence item; repeatable")
     parser.add_argument("--verification", action="append", default=[], help="Additional verification item; repeatable")
-    parser.add_argument("--privacy-review", required=True, help="Public-safe privacy review note")
+    parser.add_argument("--privacy-review", help="Public-safe privacy review note")
     parser.add_argument("--limitation", action="append", default=[], help="Additional limitation; repeatable")
     parser.add_argument("--generated", default=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
     parser.add_argument("--record-dir", default=DEFAULT_RECORD_DIR.as_posix())
@@ -189,6 +230,8 @@ def main() -> int:
     parser.add_argument("--json", action="store_true", help="Emit the record JSON")
     args = parser.parse_args()
 
+    apply_pilot_defaults(args)
+    require_metadata(args)
     record = build_record(args)
     validate_record(record)
     if args.pilot_record_dir:

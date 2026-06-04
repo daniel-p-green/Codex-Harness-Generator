@@ -456,19 +456,19 @@ def build_command(args: argparse.Namespace) -> list[str]:
             args.harness,
             "--slug",
             args.slug,
-            "--title",
-            args.title,
-            "--domain",
-            args.domain,
-            "--evidence-type",
-            args.evidence_type,
-            "--source-type",
-            args.source_type,
-            "--generation-path",
-            args.generation_path,
-            "--privacy-review",
-            args.privacy_review,
         ]
+        if args.title:
+            command.extend(["--title", args.title])
+        if args.domain:
+            command.extend(["--domain", args.domain])
+        if args.evidence_type:
+            command.extend(["--evidence-type", args.evidence_type])
+        if args.source_type:
+            command.extend(["--source-type", args.source_type])
+        if args.generation_path:
+            command.extend(["--generation-path", args.generation_path])
+        if args.privacy_review:
+            command.extend(["--privacy-review", args.privacy_review])
         if args.harness_label:
             command.extend(["--harness-label", args.harness_label])
         if args.task_summary:
@@ -1065,13 +1065,13 @@ def make_parser() -> argparse.ArgumentParser:
     usage_from_harness = subparsers.add_parser("usage-from-harness", help="Create usage evidence from a generated harness's local reports")
     usage_from_harness.add_argument("harness", help="Generated harness directory")
     usage_from_harness.add_argument("--slug", required=True, help="Stable record slug")
-    usage_from_harness.add_argument("--title", required=True, help="Short record title")
-    usage_from_harness.add_argument("--domain", required=True, help="Usage domain")
+    usage_from_harness.add_argument("--title", help="Short record title; inferred from matching pilot record when available")
+    usage_from_harness.add_argument("--domain", help="Usage domain; inferred from matching pilot record when available")
     usage_from_harness.add_argument("--harness-label", help="Public-safe harness path label")
     usage_from_harness.add_argument("--task-summary", help="Public-safe task summary")
     usage_from_harness.add_argument("--outcome", choices=["failed", "inconclusive", "partial", "success"], help="Override derived outcome")
-    usage_from_harness.add_argument("--evidence-type", choices=["private-summary", "sanitized", "synthetic"], required=True)
-    usage_from_harness.add_argument("--source-type", choices=["external", "multi-project", "self-dogfood"], default="self-dogfood")
+    usage_from_harness.add_argument("--evidence-type", choices=["private-summary", "sanitized", "synthetic"])
+    usage_from_harness.add_argument("--source-type", choices=["external", "multi-project", "self-dogfood"], help="Source type; inferred from matching pilot record when available")
     usage_from_harness.add_argument(
         "--generation-path",
         choices=[
@@ -1084,11 +1084,11 @@ def make_parser() -> argparse.ArgumentParser:
             "repo-dogfood",
             "unknown",
         ],
-        default="unknown",
+        help="Generation path; inferred from matching pilot record when available",
     )
     usage_from_harness.add_argument("--evidence", action="append", default=[], help="Additional public-safe evidence item; repeatable")
     usage_from_harness.add_argument("--verification", action="append", default=[], help="Additional verification item; repeatable")
-    usage_from_harness.add_argument("--privacy-review", required=True, help="Public-safe privacy review note")
+    usage_from_harness.add_argument("--privacy-review", help="Public-safe privacy review note")
     usage_from_harness.add_argument("--limitation", action="append", default=[], help="Additional limitation; repeatable")
     usage_from_harness.add_argument("--generated", help="UTC timestamp override")
     usage_from_harness.add_argument("--record-dir", help="Directory where usage record JSON files are written")

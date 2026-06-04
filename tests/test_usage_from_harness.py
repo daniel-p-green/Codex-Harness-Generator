@@ -201,6 +201,52 @@ class UsageFromHarnessTests(unittest.TestCase):
         self.assertTrue(pilot_record["validated_usage_record"].endswith("usage-proof-smoke.json"))
         self.assertIn("Converted with validated usage records: 1", board_report.read_text(encoding="utf-8"))
 
+    def test_usage_from_harness_infers_metadata_from_pilot_record(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        self.record_trial(target)
+        temp_path = Path(temp_dir.name)
+        record_dir = temp_path / "records"
+        report = temp_path / "USAGE_RECORDS.md"
+        pilot_record_dir = temp_path / "pilot-records"
+        self.write_matching_pilot_record(pilot_record_dir)
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                SCRIPT.as_posix(),
+                target.as_posix(),
+                "--slug",
+                "usage-proof-smoke",
+                "--evidence-type",
+                "private-summary",
+                "--privacy-review",
+                "Public-safe copied-harness evidence only.",
+                "--record-dir",
+                record_dir.as_posix(),
+                "--report",
+                report.as_posix(),
+                "--pilot-record-dir",
+                pilot_record_dir.as_posix(),
+                "--no-write",
+                "--json",
+            ],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+        payload = json.loads(completed.stdout)
+        record = payload["record"]
+        self.assertFalse(payload["written"])
+        self.assertEqual("Usage proof smoke", record["title"])
+        self.assertEqual("software development", record["domain"])
+        self.assertEqual("synthetic copied harness", record["harness_path"])
+        self.assertEqual("external", record["source_type"])
+        self.assertEqual("installed-init-brief", record["generation_path"])
+
     def test_usage_from_harness_no_write_validates_without_writing_record(self):
         temp_dir, target = self.copy_fixture()
         self.addCleanup(temp_dir.cleanup)
@@ -329,6 +375,10 @@ class UsageFromHarnessTests(unittest.TestCase):
                 "software development",
                 "--evidence-type",
                 "synthetic",
+                "--source-type",
+                "self-dogfood",
+                "--generation-path",
+                "repo-dogfood",
                 "--privacy-review",
                 "Synthetic public-safe test only.",
             ],
@@ -340,6 +390,34 @@ class UsageFromHarnessTests(unittest.TestCase):
 
         self.assertNotEqual(0, completed.returncode)
         self.assertIn("No complete task-trial entries", completed.stderr + completed.stdout)
+
+    def test_usage_from_harness_requires_metadata_without_pilot_record(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        self.record_trial(target)
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                SCRIPT.as_posix(),
+                target.as_posix(),
+                "--slug",
+                "missing-metadata",
+                "--evidence-type",
+                "synthetic",
+                "--privacy-review",
+                "Synthetic public-safe test only.",
+            ],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertNotEqual(0, completed.returncode)
+        self.assertIn("Missing required metadata", completed.stderr + completed.stdout)
+        self.assertIn("--title", completed.stderr + completed.stdout)
+        self.assertIn("--domain", completed.stderr + completed.stdout)
 
     def test_derive_outcome_uses_eval_and_task_trial_state(self):
         self.assertEqual("failed", usage_from_harness.derive_outcome("fail", {"success": 1}))

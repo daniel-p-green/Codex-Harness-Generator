@@ -51,10 +51,6 @@ def pilot_value(pilot: dict, key: str, fallback: str = "") -> str:
     return str(value)
 
 
-def pilot_harness_label(pilot: dict) -> str:
-    return pilot_value(pilot, "harness_label", pilot_value(pilot, "project_name", pilot_value(pilot, "title")))
-
-
 def build_usage_from_harness_command(pilot: dict, args: argparse.Namespace, *, no_write: bool) -> str:
     parts = [
         "codex-harness",
@@ -62,18 +58,8 @@ def build_usage_from_harness_command(pilot: dict, args: argparse.Namespace, *, n
         "<generated-harness>",
         "--slug",
         pilot_value(pilot, "slug"),
-        "--title",
-        quoted(pilot_value(pilot, "title")),
-        "--domain",
-        quoted(pilot_value(pilot, "domain")),
-        "--harness-label",
-        quoted(pilot_harness_label(pilot)),
         "--evidence-type",
         "private-summary",
-        "--source-type",
-        pilot_value(pilot, "source_type", "external"),
-        "--generation-path",
-        pilot_value(pilot, "generation_path", "installed-quickstart"),
         "--privacy-review",
         quoted("Reporter confirmed public-safe private-summary evidence only."),
         "--record-dir",
