@@ -159,6 +159,8 @@ Reporter confirmed the public summary excludes secrets, personal data, proprieta
 
 Start in the generated harness with `NEXT_TASK.md`, then complete `USAGE_REPORT_DRAFT.md` after the pilot task. The maintainer can lint it with `codex-harness usage-from-issue USAGE_REPORT_DRAFT.md --pilot-record-dir <pilot-records> --lint-only`.
 
+Use `RETURN_PACKET.md` as the final checklist before sending evidence back.
+
 ## Claim Boundary
 
 Pilot handoff folders help send and track pilots; they are not usage proof until a real task is completed and converted into a validated usage record.

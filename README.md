@@ -171,8 +171,8 @@ replacement. What is proven today:
 - `scripts/export_pilot_handoff.py` and `codex-harness pilot-handoff` write
   shareable per-pilot folders with a single `REPORTER_HANDOFF.md`, reporter
   message, pilot pack, copied issue draft, prefilled `USAGE_REPORT_DRAFT.md`,
-  and maintainer commands so active pilots are easier to send without counting
-  the handoff as usage proof.
+  `RETURN_PACKET.md` checklist, and maintainer commands so active pilots are
+  easier to send without counting the handoff as usage proof.
 - `scripts/audit_pilot_handoffs.py` and `codex-harness pilot-handoff-audit`
   verify those folders before sending: required reporter files exist, claim
   boundaries stay visible, and `USAGE_REPORT_DRAFT.md` is importer-shaped while
@@ -808,8 +808,8 @@ Common subcommands:
 | `pilot-board` | `pilot_board.py` | Summarizes prepared pilot records and cross-checks converted pilots against usage records without counting outreach as proof. |
 | `pilot-update <slug>` | `pilot_board.py` | Updates one prepared pilot's status, validates converted usage-record references, and refreshes the pilot board. |
 | `pilot-outreach` | `export_pilot_outreach.py` | Writes reporter-ready outreach copy, tracking commands, and conversion commands from active pilot-board records. |
-| `pilot-handoff` | `export_pilot_handoff.py` | Writes shareable per-pilot handoff folders with a single reporter handoff, pilot pack, copied issue draft, prefilled usage-report draft, and maintainer commands. |
-| `pilot-handoff-audit` | `audit_pilot_handoffs.py` | Checks handoff folders for required reporter files, claim boundaries, and importer-shaped usage-report drafts before sending. |
+| `pilot-handoff` | `export_pilot_handoff.py` | Writes shareable per-pilot handoff folders with a single reporter handoff, pilot pack, copied issue draft, prefilled usage-report draft, reporter return packet, and maintainer commands. |
+| `pilot-handoff-audit` | `audit_pilot_handoffs.py` | Checks handoff folders for required reporter files, return packets, claim boundaries, and importer-shaped usage-report drafts before sending. |
 | `pilot-github-issues` | `export_pilot_github_issues.py` | Writes GitHub-ready issue bodies and `gh issue create` commands from active pilot-board records without treating opened issues as usage proof. |
 | `pilot-github-sync` | `sync_pilot_github_issues.py` | Fetches live pilot GitHub issues with comments, lints them through the same importer, writes reporter follow-up files and `gh issue comment` commands for missing fields, and reports conversion readiness without writing usage records. |
 | `pilot-next-action` | `pilot_next_action.py` | Summarizes live pilot GitHub issue readiness into the single next maintainer command without counting the action as usage proof. |

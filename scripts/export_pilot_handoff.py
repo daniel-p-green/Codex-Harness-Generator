@@ -153,6 +153,61 @@ def usage_report_draft_markdown(record: dict) -> str:
     )
 
 
+def return_packet_markdown(record: dict, payload: dict) -> str:
+    return "\n".join(
+        [
+            f"# {record['title']} Return Packet",
+            "",
+            "Use this after the pilot task is complete. This packet is for returning",
+            "public-safe evidence; it is not usage proof until the maintainer converts it",
+            "into a validated usage record.",
+            "",
+            "## Reporter Checklist",
+            "",
+            "1. In the generated harness, start with `NEXT_TASK.md` and complete one small real task.",
+            "2. Run `python scripts/check-harness.py` from the generated harness.",
+            "3. Run `python scripts/run-harness-evals.py` from the generated harness.",
+            "4. Fill every `_no response_` field in `USAGE_REPORT_DRAFT.md`.",
+            "5. Return the completed `USAGE_REPORT_DRAFT.md` to the maintainer.",
+            "",
+            "## Optional Reporter Lint",
+            "",
+            "If `codex-harness` is installed, run this before sending the report back:",
+            "",
+            "```bash",
+            "codex-harness usage-from-issue USAGE_REPORT_DRAFT.md --lint-only --json",
+            "```",
+            "",
+            "## Required Evidence Shape",
+            "",
+            "- Outcome: success, partial, failed, or inconclusive.",
+            "- Public-safe task summary: what you asked Codex to do and what changed.",
+            "- Evidence: at least two public-safe bullets, with no secrets or private paths.",
+            "- Verification performed: at least two concrete checks or inspections.",
+            "- Privacy review: what you removed, sanitized, or kept private.",
+            "- Limitations: at least one honest caveat about scope or confidence.",
+            "",
+            "## Maintainer Use",
+            "",
+            "The maintainer should preview conversion before writing a usage record:",
+            "",
+            "```bash",
+            (
+                "codex-harness usage-from-issue USAGE_REPORT_DRAFT.md "
+                "--pilot-record-dir Docs/Environment/pilot-records "
+                "--pilot-board-report Docs/Environment/PILOT_BOARD.md "
+                "--no-write --json"
+            ),
+            "```",
+            "",
+            "## Claim Boundary",
+            "",
+            payload["claim_boundary"],
+            "",
+        ]
+    )
+
+
 def readme_markdown(record: dict, files: dict, payload: dict) -> str:
     missing = [name for name, item in files.items() if item["status"] != "copied"]
     lines = [
@@ -171,6 +226,7 @@ def readme_markdown(record: dict, files: dict, payload: dict) -> str:
         "- `PILOT_PACK.md`: one-task pilot guide, copied when available.",
         "- `USAGE_ISSUE_DRAFT.md`: issue-body evidence template, copied when available.",
         "- `USAGE_REPORT_DRAFT.md`: prefilled issue-body draft to complete after the pilot task.",
+        "- `RETURN_PACKET.md`: reporter checklist for sending back convertible evidence.",
         "",
         "## Maintainer Files",
         "",
@@ -227,6 +283,8 @@ def reporter_handoff_markdown(record: dict, files: dict, payload: dict, director
             "Start in the generated harness with `NEXT_TASK.md`, then complete `USAGE_REPORT_DRAFT.md` "
             "after the pilot task. The maintainer can lint it with "
             "`codex-harness usage-from-issue USAGE_REPORT_DRAFT.md --pilot-record-dir <pilot-records> --lint-only`.",
+            "",
+            "Use `RETURN_PACKET.md` as the final checklist before sending evidence back.",
         ]
     )
     lines.extend(
@@ -316,6 +374,7 @@ def write_handoff(output_root: Path, payload: dict, force: bool) -> None:
         }
         safe_write(directory / "REPORTER_MESSAGE.txt", record["reporter_message"] + "\n")
         safe_write(directory / "USAGE_REPORT_DRAFT.md", usage_report_draft_markdown(record))
+        safe_write(directory / "RETURN_PACKET.md", return_packet_markdown(record, payload))
         safe_write(directory / "MAINTAINER_COMMANDS.md", command_markdown(record["commands"]))
         safe_write(directory / "README.md", readme_markdown(record, files, payload))
         safe_write(directory / "REPORTER_HANDOFF.md", reporter_handoff_markdown(record, files, payload, directory))
@@ -325,6 +384,7 @@ def write_handoff(output_root: Path, payload: dict, force: bool) -> None:
             "REPORTER_HANDOFF.md": (directory / "REPORTER_HANDOFF.md").as_posix(),
             "REPORTER_MESSAGE.txt": (directory / "REPORTER_MESSAGE.txt").as_posix(),
             "USAGE_REPORT_DRAFT.md": (directory / "USAGE_REPORT_DRAFT.md").as_posix(),
+            "RETURN_PACKET.md": (directory / "RETURN_PACKET.md").as_posix(),
             "MAINTAINER_COMMANDS.md": (directory / "MAINTAINER_COMMANDS.md").as_posix(),
             "PILOT_PACK.md": files["pilot_pack"],
             "USAGE_ISSUE_DRAFT.md": files["issue_draft"],

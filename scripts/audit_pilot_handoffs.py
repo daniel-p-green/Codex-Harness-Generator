@@ -25,6 +25,7 @@ REQUIRED_FILES = (
     "PILOT_PACK.md",
     "USAGE_ISSUE_DRAFT.md",
     "USAGE_REPORT_DRAFT.md",
+    "RETURN_PACKET.md",
 )
 ACCEPTABLE_DRAFT_ERRORS = (
     "Missing required issue field(s):",
@@ -177,6 +178,7 @@ def audit_record(record: dict, args: argparse.Namespace) -> dict:
     else:
         readme = directory / "README.md"
         reporter_handoff = directory / "REPORTER_HANDOFF.md"
+        return_packet = directory / "RETURN_PACKET.md"
         maintainer_commands = directory / "MAINTAINER_COMMANDS.md"
         if readme.exists() and "not usage proof" not in readme.read_text(encoding="utf-8"):
             errors.append("README.md must keep the handoff claim boundary explicit.")
@@ -188,6 +190,18 @@ def audit_record(record: dict, args: argparse.Namespace) -> dict:
                 errors.append("REPORTER_HANDOFF.md must point reporters to USAGE_REPORT_DRAFT.md.")
             if "not usage proof" not in reporter_text:
                 errors.append("REPORTER_HANDOFF.md must keep the handoff claim boundary explicit.")
+            if "RETURN_PACKET.md" not in reporter_text:
+                errors.append("REPORTER_HANDOFF.md must point reporters to RETURN_PACKET.md.")
+        if return_packet.exists():
+            return_text = return_packet.read_text(encoding="utf-8")
+            if "NEXT_TASK.md" not in return_text:
+                errors.append("RETURN_PACKET.md must point reporters to NEXT_TASK.md.")
+            if "USAGE_REPORT_DRAFT.md" not in return_text:
+                errors.append("RETURN_PACKET.md must point reporters to USAGE_REPORT_DRAFT.md.")
+            if "usage-from-issue" not in return_text:
+                errors.append("RETURN_PACKET.md must include the issue lint or preview command.")
+            if "not usage proof" not in return_text:
+                errors.append("RETURN_PACKET.md must keep the handoff claim boundary explicit.")
         if maintainer_commands.exists():
             command_text = maintainer_commands.read_text(encoding="utf-8")
             if "usage-from-issue" not in command_text or "usage-from-harness" not in command_text:

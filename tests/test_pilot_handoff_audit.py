@@ -147,6 +147,36 @@ class PilotHandoffAuditTests(unittest.TestCase):
         self.assertEqual("handoff-audit-failed", payload["readiness"])
         self.assertIn("REPORTER_HANDOFF.md must point reporters to NEXT_TASK.md.", payload["errors"][0])
 
+    def test_fails_when_return_packet_is_missing(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_record(root)
+            args = self.write_handoff(root)
+            (Path(args.handoff_dir) / "llm-app-pilot" / "RETURN_PACKET.md").unlink()
+
+            payload = audit_pilot_handoffs.build_payload(args)
+
+        self.assertEqual("fail", payload["status"])
+        self.assertEqual("handoff-audit-failed", payload["readiness"])
+        self.assertIn("Missing required file: RETURN_PACKET.md", payload["errors"][0])
+
+    def test_fails_when_return_packet_omits_issue_lint_path(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_record(root)
+            args = self.write_handoff(root)
+            return_packet = Path(args.handoff_dir) / "llm-app-pilot" / "RETURN_PACKET.md"
+            return_packet.write_text(
+                return_packet.read_text(encoding="utf-8").replace("usage-from-issue", "manual review"),
+                encoding="utf-8",
+            )
+
+            payload = audit_pilot_handoffs.build_payload(args)
+
+        self.assertEqual("fail", payload["status"])
+        self.assertEqual("handoff-audit-failed", payload["readiness"])
+        self.assertIn("RETURN_PACKET.md must include the issue lint or preview command.", payload["errors"][0])
+
     def test_no_active_pilots_is_pass_without_records(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)

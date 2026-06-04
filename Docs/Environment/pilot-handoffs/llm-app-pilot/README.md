@@ -1,8 +1,8 @@
 # LLM app pilot Handoff
 
-Generated: 2026-06-04T22:31:43Z
+Generated: 2026-06-04T22:37:10Z
 Pilot slug: `llm-app-pilot`
-Status: `prepared`
+Status: `invited`
 Domain: LLM app
 Source type: `external`
 Generation path: `installed-quickstart`
@@ -13,6 +13,7 @@ Generation path: `installed-quickstart`
 - `PILOT_PACK.md`: one-task pilot guide, copied when available.
 - `USAGE_ISSUE_DRAFT.md`: issue-body evidence template, copied when available.
 - `USAGE_REPORT_DRAFT.md`: prefilled issue-body draft to complete after the pilot task.
+- `RETURN_PACKET.md`: reporter checklist for sending back convertible evidence.
 
 ## Maintainer Files
 
