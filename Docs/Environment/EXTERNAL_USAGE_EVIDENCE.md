@@ -12,7 +12,7 @@ harness on a real or public-safe task.
 Good reports include:
 
 - The domain or project type.
-- The generated harness profile, if known.
+- The generated harness profile or public-safe label, if known.
 - A public-safe task summary.
 - At least two evidence bullets.
 - At least two verification bullets.
@@ -36,8 +36,21 @@ and limits.
 
 ## Maintainer Conversion
 
-Maintainers can convert a usable public issue into a checked-in usage record
-with:
+Maintainers can convert a usable public issue into a checked-in usage record by
+saving the issue body to a local Markdown file and running:
+
+```bash
+python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
+  --slug external-example \
+  --title "External example" \
+  --json
+```
+
+The importer reads the GitHub issue-form headings, writes a usage-record JSON
+file, updates `Docs/Environment/USAGE_RECORDS.md`, and applies the same
+required-field and sensitive-text checks as `usage-record`.
+
+For manual conversion or cleanup, use:
 
 ```bash
 python scripts/codex_harness.py usage-record \

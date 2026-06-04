@@ -27,7 +27,7 @@ Already proven:
   examples.
 - Privacy-checked usage-record validation.
 - Copied-harness evidence conversion into privacy-checked usage records.
-- External usage-report intake.
+- External usage-report intake and issue-body conversion.
 - Short deterministic demo capture through `codex-harness demo-capture`.
 
 Still unproven:
@@ -57,7 +57,9 @@ The project can stop calling itself a beta only when all of these are true:
    Use `.github/ISSUE_TEMPLATE/external-usage-report.yml` and
    `Docs/Environment/EXTERNAL_USAGE_EVIDENCE.md`. When a generated harness has
    local task trials, use `codex-harness usage-from-harness` to draft the
-   privacy-checked record from copied-harness evidence.
+   privacy-checked record from copied-harness evidence. When an external report
+   arrives as a GitHub issue, use `codex-harness usage-from-issue` to convert the
+   issue body into the checked-in usage record.
 
 2. Add more public-safe live examples.
    Prioritize domains where the generated harness has high-risk boundaries:

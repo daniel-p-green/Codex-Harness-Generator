@@ -276,6 +276,28 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("usage_from_harness.py", command)
 
+    if args.command == "usage-from-issue":
+        command = [
+            args.issue_body,
+            "--slug",
+            args.slug,
+            "--title",
+            args.title,
+        ]
+        if args.harness_label:
+            command.extend(["--harness-label", args.harness_label])
+        if args.generated:
+            command.extend(["--generated", args.generated])
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.report:
+            command.extend(["--report", args.report])
+        if args.force:
+            command.append("--force")
+        if args.json:
+            command.append("--json")
+        return python_script("usage_from_issue.py", command)
+
     if args.command == "usage-validate":
         command = []
         if args.record_dir:
@@ -469,6 +491,17 @@ def make_parser() -> argparse.ArgumentParser:
     usage_from_harness.add_argument("--report", help="Usage-record Markdown report path")
     usage_from_harness.add_argument("--force", action="store_true", help="Replace existing record with same slug")
     usage_from_harness.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    usage_from_issue = subparsers.add_parser("usage-from-issue", help="Create usage evidence from a GitHub issue-form body")
+    usage_from_issue.add_argument("issue_body", help="Markdown issue body path, or '-' for stdin")
+    usage_from_issue.add_argument("--slug", required=True, help="Stable record slug")
+    usage_from_issue.add_argument("--title", required=True, help="Short usage-record title")
+    usage_from_issue.add_argument("--harness-label", help="Public-safe harness label override")
+    usage_from_issue.add_argument("--generated", help="UTC timestamp override")
+    usage_from_issue.add_argument("--record-dir", help="Directory where usage record JSON files are written")
+    usage_from_issue.add_argument("--report", help="Usage-record Markdown report path")
+    usage_from_issue.add_argument("--force", action="store_true", help="Replace existing record with same slug")
+    usage_from_issue.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     usage_validate = subparsers.add_parser("usage-validate", help="Validate checked-in generated-harness usage evidence")
     usage_validate.add_argument("--record-dir", help="Directory where usage record JSON files are read")

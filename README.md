@@ -101,6 +101,9 @@ replacement. What is proven today:
 - `scripts/usage_from_harness.py` and `codex-harness usage-from-harness`
   convert a generated harness's local eval report and task trials into a
   privacy-checked usage record.
+- `scripts/usage_from_issue.py` and `codex-harness usage-from-issue` convert a
+  sanitized GitHub external-usage issue body into a privacy-checked usage
+  record.
 - `Docs/Environment/usage-records/` includes sanitized self-dogfood usage
   records from this public repo's Codex work. They are useful evidence, but not
   yet external or longitudinal adoption proof.
@@ -362,6 +365,16 @@ python scripts/codex_harness.py usage-from-harness /tmp/codex-rag-harness \
   --json
 ```
 
+When an external usage report arrives through the GitHub issue template, save
+the issue body and convert it directly:
+
+```bash
+python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
+  --slug external-rag-trial \
+  --title "External RAG harness trial" \
+  --json
+```
+
 Validate checked-in usage records before release:
 
 ```bash
@@ -445,6 +458,7 @@ Common subcommands:
 | `semantic-alignment` | `check_semantic_alignment.py` | Checks local guidance against official Codex doc concepts. |
 | `usage-record` | `record_usage_case.py` | Records sanitized generated-harness usage evidence. |
 | `usage-from-harness` | `usage_from_harness.py` | Converts copied-harness task trials and eval reports into a privacy-checked usage record. |
+| `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record. |
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
 | `proof-status` | `proof_status.py` | Summarizes checked-in proof readiness, live task-trial coverage, and usage evidence. |
 | `doctor` | `doctor.py` | Runs a fast local readiness check and prints the next useful commands. |

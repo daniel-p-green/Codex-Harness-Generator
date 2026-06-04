@@ -557,6 +557,51 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_usage_from_issue_delegates_to_issue_importer_script(self):
+        command, _ = self.run_cli(
+            [
+                "usage-from-issue",
+                "/tmp/issue.md",
+                "--slug",
+                "external-demo",
+                "--title",
+                "External demo",
+                "--harness-label",
+                "public harness label",
+                "--generated",
+                "2026-06-04T00:00:00Z",
+                "--record-dir",
+                "/tmp/records",
+                "--report",
+                "/tmp/USAGE_RECORDS.md",
+                "--force",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/usage_from_issue.py",
+                "/tmp/issue.md",
+                "--slug",
+                "external-demo",
+                "--title",
+                "External demo",
+                "--harness-label",
+                "public harness label",
+                "--generated",
+                "2026-06-04T00:00:00Z",
+                "--record-dir",
+                "/tmp/records",
+                "--report",
+                "/tmp/USAGE_RECORDS.md",
+                "--force",
+                "--json",
+            ],
+            command,
+        )
+
     def test_usage_validate_delegates_to_validator(self):
         command, _ = self.run_cli(
             [

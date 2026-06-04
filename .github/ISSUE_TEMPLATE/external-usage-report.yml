@@ -17,6 +17,14 @@ body:
       placeholder: LLM app
     validations:
       required: true
+  - type: input
+    id: harness_label
+    attributes:
+      label: Generated harness profile or label
+      description: Optional public-safe label; do not include private repository names or local paths.
+      placeholder: llm-app profile, private-summary harness
+    validations:
+      required: false
   - type: dropdown
     id: evidence_type
     attributes:

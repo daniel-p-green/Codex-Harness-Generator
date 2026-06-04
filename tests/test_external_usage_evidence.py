@@ -14,6 +14,7 @@ class ExternalUsageEvidenceTests(unittest.TestCase):
         self.assertIn("name: External usage report", text)
         for field_id in (
             "domain",
+            "harness_label",
             "evidence_type",
             "outcome",
             "task_summary",
@@ -48,6 +49,7 @@ class ExternalUsageEvidenceTests(unittest.TestCase):
         text = EVIDENCE_DOC.read_text(encoding="utf-8")
 
         self.assertIn("# External Usage Evidence", text)
+        self.assertIn("python scripts/codex_harness.py usage-from-issue", text)
         self.assertIn("python scripts/codex_harness.py usage-record", text)
         self.assertIn("--evidence-type private-summary", text)
         self.assertIn("python scripts/codex_harness.py usage-validate", text)

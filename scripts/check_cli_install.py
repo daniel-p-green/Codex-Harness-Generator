@@ -58,6 +58,52 @@ def build_payload() -> dict:
         demo_generated = temp_root / "demo-generated"
         usage_records = temp_root / "usage-records"
         usage_report = temp_root / "USAGE_RECORDS.md"
+        issue_body = temp_root / "external-usage-issue.md"
+        issue_body.write_text(
+            "\n".join(
+                [
+                    "### Domain or project type",
+                    "",
+                    "install smoke",
+                    "",
+                    "### Generated harness profile or label",
+                    "",
+                    "install-smoke issue report",
+                    "",
+                    "### Evidence type",
+                    "",
+                    "private-summary",
+                    "",
+                    "### Outcome",
+                    "",
+                    "success",
+                    "",
+                    "### Public-safe task summary",
+                    "",
+                    "A generated harness was exercised through the install smoke.",
+                    "",
+                    "### Evidence",
+                    "",
+                    "- Installed CLI generated and validated a harness.",
+                    "- Installed CLI converted a copied-harness eval into usage evidence.",
+                    "",
+                    "### Verification performed",
+                    "",
+                    "- codex-harness validate passed.",
+                    "- codex-harness local-eval passed.",
+                    "",
+                    "### Privacy review",
+                    "",
+                    "Public-safe install-smoke issue body only; no secrets, personal data, private paths, or raw logs.",
+                    "",
+                    "### Limitations",
+                    "",
+                    "- Single synthetic install smoke.",
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
 
         commands = [
             ("create_venv", [sys.executable, "-m", "venv", "--system-site-packages", venv.as_posix()]),
@@ -144,6 +190,24 @@ def build_payload() -> dict:
                     "synthetic",
                     "--privacy-review",
                     "synthetic install-smoke evidence only",
+                    "--record-dir",
+                    usage_records.as_posix(),
+                    "--report",
+                    usage_report.as_posix(),
+                    "--force",
+                    "--json",
+                ],
+            ),
+            (
+                "usage_from_issue",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "usage-from-issue",
+                    issue_body.as_posix(),
+                    "--slug",
+                    "install-smoke-issue",
+                    "--title",
+                    "Install smoke issue report",
                     "--record-dir",
                     usage_records.as_posix(),
                     "--report",
