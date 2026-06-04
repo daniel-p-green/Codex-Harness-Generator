@@ -143,6 +143,22 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("validate_usage_records.py", command)
 
+    if args.command == "proof-status":
+        command = []
+        if args.min_live_trials is not None:
+            command.extend(["--min-live-trials", str(args.min_live_trials)])
+        if args.min_usage_records is not None:
+            command.extend(["--min-usage-records", str(args.min_usage_records)])
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.report:
+            command.extend(["--report", args.report])
+        if args.no_write:
+            command.append("--no-write")
+        if args.json:
+            command.append("--json")
+        return python_script("proof_status.py", command)
+
     if args.command == "snapshot":
         return python_script("record_eval_snapshot.py", [])
 
@@ -214,6 +230,14 @@ def make_parser() -> argparse.ArgumentParser:
     usage_validate.add_argument("--require-non-synthetic", action="store_true", help="Fail unless sanitized or private-summary evidence exists")
     usage_validate.add_argument("--require-success", action="store_true", help="Fail unless at least one successful usage record exists")
     usage_validate.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    proof_status = subparsers.add_parser("proof-status", help="Summarize checked-in product-proof readiness")
+    proof_status.add_argument("--min-live-trials", type=int, help="Minimum passing live task trials required")
+    proof_status.add_argument("--min-usage-records", type=int, help="Minimum valid usage records required")
+    proof_status.add_argument("--record-dir", help="Directory where usage record JSON files are read")
+    proof_status.add_argument("--report", help="Proof-status Markdown report path")
+    proof_status.add_argument("--no-write", action="store_true", help="Do not rewrite PROOF_STATUS.md")
+    proof_status.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     subparsers.add_parser("snapshot", help="Record an eval trend snapshot")
 

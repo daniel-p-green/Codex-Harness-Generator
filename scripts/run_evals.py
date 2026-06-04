@@ -181,6 +181,10 @@ def main() -> int:
                 [python, "scripts/validate_usage_records.py", "--json"],
             ),
             run_step(
+                "proof_status",
+                [python, "scripts/proof_status.py", "--no-write", "--json"],
+            ),
+            run_step(
                 "unit_and_mutation_tests",
                 [python, "-m", "unittest", "discover", "-s", "tests", "-q"],
             ),
@@ -198,6 +202,7 @@ def main() -> int:
                     "scripts/eval_deterministic_profiles.py",
                     "scripts/eval_generated_harness.py",
                     "scripts/generate_minimal_harness.py",
+                    "scripts/proof_status.py",
                     "scripts/refresh_create_acceptance_examples.py",
                     "scripts/refresh_deterministic_examples.py",
                     "scripts/record_eval_snapshot.py",
@@ -214,6 +219,7 @@ def main() -> int:
                     "tests/test_eval_codex_port.py",
                     "tests/test_generated_harness_contract.py",
                     "tests/test_live_example_task_trials.py",
+                    "tests/test_proof_status.py",
                     "tests/test_record_eval_snapshot.py",
                     "tests/test_record_usage_case.py",
                     "tests/test_run_evals.py",

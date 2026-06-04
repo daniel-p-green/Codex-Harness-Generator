@@ -245,6 +245,41 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_proof_status_delegates_to_status_script(self):
+        command, _ = self.run_cli(
+            [
+                "proof-status",
+                "--min-live-trials",
+                "8",
+                "--min-usage-records",
+                "1",
+                "--record-dir",
+                "/tmp/records",
+                "--report",
+                "/tmp/PROOF_STATUS.md",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/proof_status.py",
+                "--min-live-trials",
+                "8",
+                "--min-usage-records",
+                "1",
+                "--record-dir",
+                "/tmp/records",
+                "--report",
+                "/tmp/PROOF_STATUS.md",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

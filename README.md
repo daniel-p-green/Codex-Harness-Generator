@@ -71,6 +71,9 @@ replacement. What is proven today:
 - `Docs/Environment/usage-records/` includes a first sanitized self-dogfood
   usage record from this public repo's Codex work. It is useful evidence, but
   not yet external or longitudinal adoption proof.
+- `scripts/proof_status.py` writes `Docs/Environment/PROOF_STATUS.md`, a
+  one-command readiness summary tying the proof matrix, live task trials, and
+  usage records together without overclaiming.
 
 What still needs product proof:
 
@@ -279,6 +282,12 @@ python scripts/codex_harness.py usage-validate \
   --require-success
 ```
 
+Summarize the checked-in product-proof package:
+
+```bash
+python scripts/codex_harness.py proof-status
+```
+
 The wrapper is intentionally thin. It delegates to the underlying scripts so
 advanced users can still call `scripts/generate_minimal_harness.py`,
 `scripts/run_create_acceptance.py`, `scripts/run_evals.py`, and the individual
@@ -316,6 +325,7 @@ Common subcommands:
 | `semantic-alignment` | `check_semantic_alignment.py` | Checks local guidance against official Codex doc concepts. |
 | `usage-record` | `record_usage_case.py` | Records sanitized generated-harness usage evidence. |
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
+| `proof-status` | `proof_status.py` | Summarizes checked-in proof readiness, live task-trial coverage, and usage evidence. |
 | `snapshot` | `record_eval_snapshot.py` | Records an eval trend snapshot. |
 
 ## Presets
