@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from record_usage_case import ALLOWED_GENERATION_PATHS, find_sensitive_text
+from usage_from_harness import VALID_OUTCOMES, parse_eval_report, parse_task_entries
 
 
 DEFAULT_PACK_NAME = "EXTERNAL_PILOT_PACK.md"
@@ -36,7 +37,53 @@ def infer_profile(harness: Path) -> str:
     return "not recorded"
 
 
+def complete_task_entries(entries: list[dict[str, str]]) -> list[dict[str, str]]:
+    return [
+        entry
+        for entry in entries
+        if entry.get("task")
+        and entry.get("outcome") in VALID_OUTCOMES
+        and entry.get("evidence")
+        and entry.get("verification")
+        and entry.get("privacy_review")
+        and entry.get("limitations")
+        and entry.get("limitations", "").lower() not in {"none", "none stated", "not stated"}
+    ]
+
+
+def task_trial_prefill(harness: Path) -> dict:
+    task_trials_path = harness / "Docs" / "Environment" / "TASK_TRIALS.md"
+    eval_report_path = harness / "Docs" / "Environment" / "EVAL_REPORT.md"
+    if not task_trials_path.is_file():
+        raise SystemExit(f"Missing task trials file for prefill: {task_trials_path}")
+    if not eval_report_path.is_file():
+        raise SystemExit(f"Missing eval report file for prefill: {eval_report_path}")
+    entries = complete_task_entries(parse_task_entries(read_optional(task_trials_path)))
+    if not entries:
+        raise SystemExit("No complete task-trial entries found for prefill. Record a task trial before using --prefill-from-trials.")
+    entry = entries[-1]
+    eval_report = parse_eval_report(read_optional(eval_report_path))
+    return {
+        "outcome": entry["outcome"],
+        "task_summary": entry["task"],
+        "evidence": [
+            entry["evidence"],
+            f"Generated harness local eval report status: {eval_report.get('status', 'unknown').upper()}.",
+        ],
+        "verification": [
+            entry["verification"],
+            "Copied-harness eval report was reviewed before public reporting.",
+        ],
+        "privacy_review": entry["privacy_review"],
+        "limitations": [entry["limitations"]],
+    }
+
+
 def build_issue_draft(payload: dict) -> str:
+    prefill = payload.get("prefill") or {}
+    evidence = prefill.get("evidence") or ["_No response_", "_No response_"]
+    verification = prefill.get("verification") or ["_No response_", "_No response_"]
+    limitations = prefill.get("limitations") or ["One task in one generated harness; not longitudinal proof."]
     return "\n".join(
         [
             "### Domain or project type",
@@ -61,29 +108,30 @@ def build_issue_draft(payload: dict) -> str:
             "",
             "### Outcome",
             "",
-            "_No response_",
+            prefill.get("outcome", "_No response_"),
             "",
             "### Public-safe task summary",
             "",
-            "_No response_",
+            prefill.get("task_summary", "_No response_"),
             "",
             "### Evidence",
             "",
-            "- _No response_",
-            "- _No response_",
+            *[f"- {item}" for item in evidence],
             "",
             "### Verification performed",
             "",
-            "- _No response_",
-            "- _No response_",
+            *[f"- {item}" for item in verification],
             "",
             "### Privacy review",
             "",
-            "Reporter confirmed the public summary excludes secrets, personal data, proprietary source, private repository names, local machine paths, email addresses, and raw private logs.",
+            prefill.get(
+                "privacy_review",
+                "Reporter confirmed the public summary excludes secrets, personal data, proprietary source, private repository names, local machine paths, email addresses, and raw private logs.",
+            ),
             "",
             "### Limitations",
             "",
-            "- One task in one generated harness; not longitudinal proof.",
+            *[f"- {item}" for item in limitations],
         ]
     ).rstrip() + "\n"
 
@@ -92,6 +140,9 @@ def build_pack(payload: dict, include_issue_draft: bool) -> str:
     issue_line = ""
     if include_issue_draft:
         issue_line = "- Fill out `EXTERNAL_USAGE_ISSUE_DRAFT.md`, then paste it into the GitHub External usage report issue.\n"
+    prefill_note = "This issue draft is blank until the reporter fills it in."
+    if payload.get("prefill"):
+        prefill_note = "This issue draft is prefilled from the latest complete task-trial record; review and redact it before sharing."
     return f"""
 # External Pilot Pack
 
@@ -161,6 +212,7 @@ python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md --
 ## Issue Draft
 
 {issue_line}- Keep raw evidence private unless it is already safe for public release.
+- {prefill_note}
 - Include at least two evidence bullets, two verification bullets, one privacy
   review, and one limitation.
 
@@ -184,7 +236,7 @@ def build_payload(args: argparse.Namespace) -> dict:
         raise SystemExit(f"Missing copied-harness eval script: {harness / 'scripts' / 'run-harness-evals.py'}")
     if args.generation_path not in ALLOWED_GENERATION_PATHS:
         raise SystemExit(f"Unsupported generation path: {args.generation_path}")
-    return {
+    payload = {
         "generated_at": args.generated,
         "harness_label": args.harness_label or harness.name,
         "domain": args.domain,
@@ -195,6 +247,9 @@ def build_payload(args: argparse.Namespace) -> dict:
         "slug": args.slug,
         "title": args.title,
     }
+    if args.prefill_from_trials:
+        payload["prefill"] = task_trial_prefill(harness)
+    return payload
 
 
 def write_outputs(args: argparse.Namespace, payload: dict) -> dict:
@@ -202,7 +257,7 @@ def write_outputs(args: argparse.Namespace, payload: dict) -> dict:
     issue_out = Path(args.issue_out) if args.issue_out else None
     pack = build_pack(payload, include_issue_draft=issue_out is not None)
     issue = build_issue_draft(payload) if issue_out else ""
-    findings = find_sensitive_text(pack + "\n" + issue)
+    findings = find_sensitive_text(pack + "\n" + issue + "\n" + json.dumps(payload, sort_keys=True))
     if findings:
         raise SystemExit("Refusing to write pilot pack with sensitive text: " + ", ".join(findings))
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -227,6 +282,7 @@ def main() -> int:
     parser.add_argument("--source-type", choices=["external", "multi-project", "self-dogfood"], default="external")
     parser.add_argument("--generation-path", choices=sorted(ALLOWED_GENERATION_PATHS), default="unknown")
     parser.add_argument("--min-successes", type=int, default=1)
+    parser.add_argument("--prefill-from-trials", action="store_true", help="Prefill the issue draft from the latest complete task-trial record")
     parser.add_argument("--generated", default=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
     parser.add_argument("--json", action="store_true", help="Emit JSON payload")
     args = parser.parse_args()

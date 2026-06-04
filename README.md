@@ -414,6 +414,7 @@ python scripts/codex_harness.py pilot-pack /tmp/codex-rag-harness \
   --harness-label "RAG harness private repo" \
   --source-type external \
   --generation-path installed-init-brief \
+  --prefill-from-trials \
   --issue-out /tmp/EXTERNAL_USAGE_ISSUE_DRAFT.md
 python scripts/codex_harness.py evidence-packet /tmp/codex-rag-harness \
   --harness-label "RAG harness private repo" \

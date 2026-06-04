@@ -52,8 +52,14 @@ python scripts/codex_harness.py pilot-pack /path/to/generated-harness \
   --harness-label "private-summary: external reporter" \
   --source-type external \
   --generation-path installed-init-brief \
+  --prefill-from-trials \
   --issue-out /tmp/EXTERNAL_USAGE_ISSUE_DRAFT.md
 ```
+
+Use `--prefill-from-trials` after the copied harness has at least one complete
+task-trial entry. It fills the issue draft from the latest trial and local eval
+status, but the reporter or maintainer must still review and redact it before
+sharing.
 
 When the reporter can share a copied generated harness directory privately, ask
 them to record task trials and export a public-safe packet first:

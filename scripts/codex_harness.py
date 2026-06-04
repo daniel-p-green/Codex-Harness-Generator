@@ -376,6 +376,8 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.extend(["--harness-label", args.harness_label])
         if args.min_successes is not None:
             command.extend(["--min-successes", str(args.min_successes)])
+        if args.prefill_from_trials:
+            command.append("--prefill-from-trials")
         if args.generated:
             command.extend(["--generated", args.generated])
         if args.json:
@@ -695,6 +697,7 @@ def make_parser() -> argparse.ArgumentParser:
         default="unknown",
     )
     pilot_pack.add_argument("--min-successes", type=int, default=1, help="Minimum passing success task trials expected")
+    pilot_pack.add_argument("--prefill-from-trials", action="store_true", help="Prefill the issue draft from the latest complete task-trial record")
     pilot_pack.add_argument("--generated", help="UTC timestamp override")
     pilot_pack.add_argument("--json", action="store_true", help="Emit JSON payload")
 

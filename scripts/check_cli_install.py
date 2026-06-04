@@ -258,6 +258,7 @@ def build_payload() -> dict:
                     "self-dogfood",
                     "--generation-path",
                     "installed-init-brief",
+                    "--prefill-from-trials",
                     "--json",
                 ],
             ),

@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import shutil
 import sys
 import tempfile
 import unittest
@@ -34,6 +35,7 @@ class ExternalPilotPackTests(unittest.TestCase):
             "source_type": "external",
             "generation_path": "installed-init-brief",
             "min_successes": 1,
+            "prefill_from_trials": False,
             "generated": "2026-06-04T12:00:00Z",
         }
         values.update(overrides)
@@ -61,7 +63,44 @@ class ExternalPilotPackTests(unittest.TestCase):
         self.assertIn("### Domain or project type", issue)
         self.assertIn("software development", issue)
         self.assertIn("private-summary", issue)
+        self.assertIn("_No response_", issue)
         self.assertIn("One task in one generated harness", issue)
+
+    def test_prefills_issue_draft_from_latest_complete_task_trial(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            harness = temp_path / "harness"
+            shutil.copytree(FIXTURE, harness)
+            task_trials = harness / "Docs" / "Environment" / "TASK_TRIALS.md"
+            task_trials.write_text(
+                task_trials.read_text(encoding="utf-8")
+                + """
+### 2026-06-04 - SUCCESS - summarize retry behavior
+
+- Evidence: public-safe retry summary artifact
+- Verification: python scripts/run-harness-evals.py
+- Privacy review: public-safe summary only
+- Harness helped: reviewer caught a missing verification note
+- Limitations: one private-summary task, not longitudinal proof
+""",
+                encoding="utf-8",
+            )
+            args = self.base_args(temp_path, harness=harness.as_posix(), prefill_from_trials=True)
+            payload = export_pilot_pack.build_payload(args)
+            result = export_pilot_pack.write_outputs(args, payload)
+
+            pack = Path(result["pack"]).read_text(encoding="utf-8")
+            issue = Path(result["issue_draft"]).read_text(encoding="utf-8")
+
+        self.assertIn("prefilled from the latest complete task-trial record", pack)
+        self.assertIn("success", issue)
+        self.assertIn("summarize retry behavior", issue)
+        self.assertIn("public-safe retry summary artifact", issue)
+        self.assertIn("Generated harness local eval report status: PASS.", issue)
+        self.assertIn("python scripts/run-harness-evals.py", issue)
+        self.assertIn("Copied-harness eval report was reviewed", issue)
+        self.assertIn("one private-summary task, not longitudinal proof", issue)
+        self.assertNotIn("_No response_", issue)
 
     def test_json_result_is_serializable(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -77,6 +116,33 @@ class ExternalPilotPackTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             args = self.base_args(Path(temp_dir), harness_label="owner@example.com")
             payload = export_pilot_pack.build_payload(args)
+            with self.assertRaises(SystemExit) as raised:
+                export_pilot_pack.write_outputs(args, payload)
+
+        self.assertIn("sensitive text", str(raised.exception))
+
+    def test_refuses_sensitive_prefill_payload(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            harness = temp_path / "harness"
+            shutil.copytree(FIXTURE, harness)
+            task_trials = harness / "Docs" / "Environment" / "TASK_TRIALS.md"
+            task_trials.write_text(
+                task_trials.read_text(encoding="utf-8")
+                + """
+### 2026-06-04 - SUCCESS - summarize retry behavior
+
+- Evidence: inspected /Users/example/private/retry.log
+- Verification: python scripts/run-harness-evals.py
+- Privacy review: public-safe summary only
+- Harness helped: reviewer caught a missing verification note
+- Limitations: one private-summary task, not longitudinal proof
+""",
+                encoding="utf-8",
+            )
+            args = self.base_args(temp_path, harness=harness.as_posix(), prefill_from_trials=True, issue_out=None)
+            payload = export_pilot_pack.build_payload(args)
+
             with self.assertRaises(SystemExit) as raised:
                 export_pilot_pack.write_outputs(args, payload)
 
