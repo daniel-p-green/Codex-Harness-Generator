@@ -143,6 +143,14 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.extend(["--created", args.created])
         if args.generated:
             command.extend(["--generated", args.generated])
+        if args.pilot_record_dir:
+            command.extend(["--pilot-record-dir", args.pilot_record_dir])
+        if args.pilot_record_out:
+            command.extend(["--pilot-record-out", args.pilot_record_out])
+        if args.pilot_status:
+            command.extend(["--pilot-status", args.pilot_status])
+        if args.pilot_notes:
+            command.extend(["--pilot-notes", args.pilot_notes])
         if args.force:
             command.append("--force")
         if args.json:
@@ -960,6 +968,10 @@ def make_parser() -> argparse.ArgumentParser:
     prepare_pilot.add_argument("--generated-date", help="Stable generated date for generated docs")
     prepare_pilot.add_argument("--created", help="Stable created timestamp for CREATION_CONTEXT.md")
     prepare_pilot.add_argument("--generated", help="UTC timestamp for pilot pack metadata")
+    prepare_pilot.add_argument("--pilot-record-dir", help="Optional directory where a prepared-pilot tracking record is written")
+    prepare_pilot.add_argument("--pilot-record-out", help="Optional explicit prepared-pilot tracking record path")
+    prepare_pilot.add_argument("--pilot-status", choices=["completed", "converted", "dropped", "invited", "prepared"], help="Status for optional pilot-board record")
+    prepare_pilot.add_argument("--pilot-notes", help="Optional public-safe note for the pilot-board record")
     prepare_pilot.add_argument("--force", action="store_true", help="Replace target if it already contains files")
     prepare_pilot.add_argument("--json", action="store_true", help="Emit JSON payload")
 

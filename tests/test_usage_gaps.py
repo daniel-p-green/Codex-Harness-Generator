@@ -69,6 +69,7 @@ class UsageGapsTests(unittest.TestCase):
         self.assertEqual("LLM app pilot", result["suggested_pilots"][0]["title"])
         self.assertIn("codex-harness prepare-pilot", result["suggested_pilots"][0]["commands"][0])
         self.assertIn("--domain \"LLM app\"", result["suggested_pilots"][0]["commands"][0])
+        self.assertIn("--pilot-record-dir Docs/Environment/pilot-records", result["suggested_pilots"][0]["commands"][0])
         self.assertEqual(4, result["coverage_projection"]["candidate_pilot_count"])
         self.assertTrue(result["coverage_projection"]["would_satisfy_beta_exit_usage_thresholds"])
         self.assertEqual(5, result["coverage_projection"]["projected_summary"]["total"])
@@ -130,6 +131,7 @@ class UsageGapsTests(unittest.TestCase):
         self.assertIn("- External or multi-project records: 3", text)
         self.assertIn("## Suggested Pilot Targets", text)
         self.assertIn("codex-harness prepare-pilot", text)
+        self.assertIn("--pilot-record-dir Docs/Environment/pilot-records", text)
         self.assertIn("## Recommended Next Moves", text)
 
     def test_build_payload_fails_when_records_are_only_synthetic(self):

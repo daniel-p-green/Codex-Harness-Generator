@@ -24,6 +24,11 @@ class CheckCliInstallTests(unittest.TestCase):
             stdout = ""
             if command[-2:] == ["profiles", "--json"]:
                 stdout = json.dumps({"status": "pass", "profile_count": 20})
+            if "prepare-pilot" in command:
+                pilot_record_out = command[command.index("--pilot-record-out") + 1]
+                Path(pilot_record_out).parent.mkdir(parents=True, exist_ok=True)
+                Path(pilot_record_out).write_text('{"status": "prepared"}\n', encoding="utf-8")
+                stdout = json.dumps({"status": "pass", "pilot_record": {"status": "pass", "path": pilot_record_out}})
             if "usage-from-issue" in command and "--lint-only" in command:
                 stdout = json.dumps({"status": "pass", "readiness": "conversion-ready"})
             elif "prepare-pilot-batch" in command:
@@ -57,6 +62,7 @@ class CheckCliInstallTests(unittest.TestCase):
         self.assertTrue(any("codex-harness" in command[0] and "quickstart" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "demo-capture" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "prepare-pilot" in command for command in calls))
+        self.assertTrue(any("codex-harness" in command[0] and "prepare-pilot" in command and "--pilot-record-out" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "validate" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "inspect" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "adoption-plan" in command for command in calls))

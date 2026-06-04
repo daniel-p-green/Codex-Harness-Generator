@@ -70,6 +70,7 @@ def build_payload() -> dict:
         pilot_issue = temp_root / "EXTERNAL_USAGE_ISSUE_DRAFT.md"
         prepared_pilot_pack = temp_root / "PREPARED_EXTERNAL_PILOT_PACK.md"
         prepared_pilot_issue = temp_root / "PREPARED_EXTERNAL_USAGE_ISSUE_DRAFT.md"
+        prepared_pilot_record = temp_root / "PREPARED_EXTERNAL_PILOT_RECORD.json"
         next_pilot_pack = temp_root / "NEXT_EXTERNAL_PILOT_PACK.md"
         next_pilot_issue = temp_root / "NEXT_EXTERNAL_USAGE_ISSUE_DRAFT.md"
         pilot_batch_root = temp_root / "pilot-batch"
@@ -281,6 +282,10 @@ def build_payload() -> dict:
                     prepared_pilot_pack.as_posix(),
                     "--issue-out",
                     prepared_pilot_issue.as_posix(),
+                    "--pilot-record-out",
+                    prepared_pilot_record.as_posix(),
+                    "--pilot-notes",
+                    "install smoke direct pilot record",
                     "--force",
                     "--json",
                 ],
@@ -716,6 +721,17 @@ def build_payload() -> dict:
                         step["status"] = "fail"
                         step["returncode"] = 1
                         step["stderr"] += "\nIssue lint payload did not prove a conversion-ready issue body."
+                if name == "prepare_pilot" and completed.returncode == 0:
+                    prepare_payload = json.loads(completed.stdout)
+                    pilot_record = prepare_payload.get("pilot_record") or {}
+                    if (
+                        prepare_payload.get("status") != "pass"
+                        or pilot_record.get("status") != "pass"
+                        or not prepared_pilot_record.exists()
+                    ):
+                        step["status"] = "fail"
+                        step["returncode"] = 1
+                        step["stderr"] += "\nPrepare-pilot did not write a passing direct pilot-board record."
                 if name == "upstream_drift" and completed.returncode == 0:
                     drift_payload = json.loads(completed.stdout)
                     if drift_payload.get("status") != "pass" or drift_payload.get("ahead_behind", {}).get("upstream_only") != 0:

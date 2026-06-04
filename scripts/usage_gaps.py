@@ -75,7 +75,7 @@ def build_recommendations(gaps: dict) -> list[str]:
     if gaps["records"]:
         recommendations.append(f"Add {gaps['records']} more valid non-synthetic usage record(s).")
     recommendations.append(
-        "For the next suggested pilot, run `codex-harness prepare-next-pilot <target> --pilot-record-dir Docs/Environment/pilot-records` or copy the `codex-harness prepare-pilot <target>` command, review the generated pack, track it with `codex-harness pilot-board`, update status with `codex-harness pilot-update`, then convert completed evidence with `usage-from-harness` or `usage-from-issue`."
+        "For the next suggested pilot, run `codex-harness prepare-next-pilot <target> --pilot-record-dir Docs/Environment/pilot-records` or copy the suggested `codex-harness prepare-pilot <target> --pilot-record-dir Docs/Environment/pilot-records` command, review the generated pack, track it with `codex-harness pilot-board`, update status with `codex-harness pilot-update`, then convert completed evidence with `usage-from-harness` or `usage-from-issue`."
     )
     return recommendations
 
@@ -132,6 +132,8 @@ def build_suggested_pilots(domains: list[str], gaps: dict) -> list[dict]:
             source_type,
             "--generation-path",
             generation_path,
+            "--pilot-record-dir",
+            "Docs/Environment/pilot-records",
             "--force",
         ]
         pilots.append(

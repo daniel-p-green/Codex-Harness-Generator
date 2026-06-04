@@ -162,7 +162,9 @@ replacement. What is proven today:
 - `scripts/prepare_pilot.py` and `codex-harness prepare-pilot` combine
   brief-based quickstart generation with an external pilot pack and issue-body
   draft, so the next beta-exit pilot can be prepared with one command before a
-  reporter runs a real task.
+  reporter runs a real task. Add `--pilot-record-dir
+  Docs/Environment/pilot-records` to write the prepared pilot directly onto the
+  tracking board.
 - `scripts/prepare_next_pilot.py` and `codex-harness prepare-next-pilot`
   select the next recommended pilot from current usage gaps and prepare that
   generated harness, pack, and issue draft without copy-pasting a long command;
@@ -572,7 +574,9 @@ The report includes suggested pilot targets with starter `quickstart` or `init`
 commands plus `pilot-pack` follow-up so maintainers can collect the next records
 by profile, source type, and generation path instead of guessing. It also shows
 whether the suggested candidates would satisfy beta-exit usage thresholds if
-they become real converted evidence.
+they become real converted evidence. Suggested `prepare-pilot` commands include
+`--pilot-record-dir Docs/Environment/pilot-records` so prepared pilots are
+tracked immediately.
 
 Write a shareable campaign packet from those gaps:
 

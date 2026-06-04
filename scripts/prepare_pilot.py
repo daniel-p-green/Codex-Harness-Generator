@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import export_pilot_pack
+import pilot_board
 import run_quickstart
 from record_usage_case import ALLOWED_GENERATION_PATHS
 from run_brief_acceptance import DEFAULT_CREATED, DEFAULT_GENERATED_DATE
@@ -71,6 +72,39 @@ def build_payload(args: argparse.Namespace) -> dict:
         pilot_pack = export_pilot_pack.write_outputs(pack_args, pack_payload)
 
     status = "pass" if quickstart["status"] == "pass" and pilot_pack and pilot_pack["status"] == "pass" else "fail"
+    pilot_record = None
+    if status == "pass" and (getattr(args, "pilot_record_dir", None) or getattr(args, "pilot_record_out", None)):
+        provisional_payload = {
+            "generated": args.generated,
+            "selected_index": 1,
+            "selected_pilot": {
+                "slug": args.slug,
+                "title": args.title,
+                "domain": args.domain,
+                "profile": quickstart.get("profile") or "unknown",
+                "source_type": args.source_type,
+                "generation_path": args.generation_path,
+                "project_name": args.project_name,
+            },
+            "prepared_pilot": {
+                "target": target.as_posix(),
+                "pilot_pack": pilot_pack,
+            },
+            "claim_boundary": "Preparing a pilot is not usage proof until the reporter completes a real task trial and the evidence is converted into a checked usage record.",
+        }
+        record = pilot_board.build_record(
+            provisional_payload,
+            status=getattr(args, "pilot_status", "prepared"),
+            notes=getattr(args, "pilot_notes", ""),
+        )
+        record_path = (
+            Path(args.pilot_record_out)
+            if getattr(args, "pilot_record_out", None)
+            else pilot_board.default_record_path(Path(args.pilot_record_dir), record["slug"])
+        )
+        pilot_record = pilot_board.write_record(record_path, record, force=args.force)
+        if pilot_record["status"] != "pass":
+            status = "fail"
     return {
         "generated": args.generated,
         "status": status,
@@ -82,6 +116,7 @@ def build_payload(args: argparse.Namespace) -> dict:
         "generation_path": args.generation_path,
         "quickstart": quickstart,
         "pilot_pack": pilot_pack,
+        "pilot_record": pilot_record,
         "next_steps": [
             f"Open the generated harness at {target.as_posix()}.",
             "Ask the reporter to complete one small real Codex task using Docs/GETTING_STARTED.md.",
@@ -115,6 +150,10 @@ def main() -> int:
     parser.add_argument("--generated-date", default=DEFAULT_GENERATED_DATE, help="Stable generated date for generated docs")
     parser.add_argument("--created", default=DEFAULT_CREATED, help="Stable created timestamp for CREATION_CONTEXT.md")
     parser.add_argument("--generated", default=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), help="UTC timestamp for pilot pack metadata")
+    parser.add_argument("--pilot-record-dir", help="Optional directory where a prepared-pilot tracking record is written")
+    parser.add_argument("--pilot-record-out", help="Optional explicit prepared-pilot tracking record path")
+    parser.add_argument("--pilot-status", choices=sorted(pilot_board.ALLOWED_STATUSES), default="prepared", help="Status for optional pilot-board record")
+    parser.add_argument("--pilot-notes", default="", help="Optional public-safe note for the pilot-board record")
     parser.add_argument("--force", action="store_true", help="Replace target if it already contains files")
     parser.add_argument("--json", action="store_true", help="Emit JSON payload")
     args = parser.parse_args()
@@ -130,6 +169,8 @@ def main() -> int:
             print(f"- pilot pack: {payload['pilot_pack']['pack']}")
             if "issue_draft" in payload["pilot_pack"]:
                 print(f"- issue draft: {payload['pilot_pack']['issue_draft']}")
+        if payload["pilot_record"]:
+            print(f"- pilot record: {payload['pilot_record'].get('path')}")
         print(f"- boundary: {payload['claim_boundary']}")
     return 0 if payload["status"] == "pass" else 1
 
