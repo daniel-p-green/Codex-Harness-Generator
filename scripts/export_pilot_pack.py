@@ -207,7 +207,7 @@ python scripts/codex_harness.py evidence-packet <generated-harness> --harness-la
 If the packet is public-safe and complete, preview the copied-harness evidence:
 
 ```bash
-python scripts/codex_harness.py usage-from-harness <generated-harness> --slug "{payload["slug"]}" --title "{payload["title"]}" --domain "{payload["domain"]}" --harness-label "{payload["harness_label"]}" --evidence-type private-summary --source-type {payload["source_type"]} --generation-path {payload["generation_path"]} --privacy-review "Reporter confirmed public-safe private-summary evidence only." --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
+python scripts/codex_harness.py usage-from-harness <generated-harness> --slug "{payload["slug"]}" --evidence-type private-summary --privacy-review "Reporter confirmed public-safe private-summary evidence only." --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
 ```
 
 After review, rerun without `--no-write` to write the usage record and convert
@@ -216,7 +216,7 @@ the matching pilot-board record.
 Or convert the GitHub issue body after review:
 
 ```bash
-python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md --slug "{payload["slug"]}" --title "{payload["title"]}" --source-type {payload["source_type"]} --generation-path {payload["generation_path"]} --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md
+python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md --slug "{payload["slug"]}" --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md
 ```
 
 ## Issue Draft

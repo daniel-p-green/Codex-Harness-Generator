@@ -213,6 +213,44 @@ class UsageFromIssueTests(unittest.TestCase):
                 board_report.read_text(encoding="utf-8"),
             )
 
+    def test_usage_from_issue_infers_title_from_pilot_record(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            issue = temp_path / "issue.md"
+            issue.write_text(ISSUE_BODY, encoding="utf-8")
+            record_dir = temp_path / "records"
+            pilot_record_dir = temp_path / "pilot-records"
+            self.write_matching_pilot_record(pilot_record_dir)
+
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    SCRIPT.as_posix(),
+                    issue.as_posix(),
+                    "--slug",
+                    "external-llm-app",
+                    "--record-dir",
+                    record_dir.as_posix(),
+                    "--pilot-record-dir",
+                    pilot_record_dir.as_posix(),
+                    "--no-write",
+                    "--json",
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+            payload = json.loads(completed.stdout)
+            record = payload["record"]
+            self.assertFalse(payload["written"])
+            self.assertEqual("External LLM app report", record["title"])
+            self.assertEqual("llm-app profile", record["harness_path"])
+            self.assertEqual("external", record["source_type"])
+            self.assertEqual("installed-init-brief", record["generation_path"])
+
     def test_usage_from_issue_no_write_validates_without_writing_record(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
@@ -330,6 +368,34 @@ class UsageFromIssueTests(unittest.TestCase):
 
             self.assertNotEqual(0, completed.returncode)
             self.assertIn("sensitive text", completed.stderr + completed.stdout)
+
+    def test_usage_from_issue_requires_title_without_pilot_record(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            issue = temp_path / "issue.md"
+            issue.write_text(ISSUE_BODY, encoding="utf-8")
+
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    SCRIPT.as_posix(),
+                    issue.as_posix(),
+                    "--slug",
+                    "missing-title",
+                    "--record-dir",
+                    (temp_path / "records").as_posix(),
+                    "--no-write",
+                    "--json",
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertNotEqual(0, completed.returncode)
+            self.assertIn("Missing required metadata", completed.stderr + completed.stdout)
+            self.assertIn("--title", completed.stderr + completed.stdout)
 
     def test_usage_from_issue_rejects_unfilled_no_response_bullets(self):
         body = ISSUE_BODY.replace("- Generated AGENTS.md matched the project shape.\n- The harness made verification steps explicit.", "- _No response_\n- _No response_")

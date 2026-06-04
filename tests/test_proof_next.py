@@ -124,6 +124,7 @@ class ProofNextTests(unittest.TestCase):
         self.assertTrue(any("usage-from-harness <generated-harness> --slug llm-app-pilot" in command for command in commands))
         self.assertTrue(any("usage-from-issue <completed-issue.md>" in command and "--no-write --json" in command for command in commands))
         self.assertTrue(any("usage-from-harness <generated-harness>" in command and "--no-write --json" in command for command in commands))
+        self.assertFalse(any("usage-from-issue <completed-issue.md>" in command and "--title" in command for command in commands))
 
     def test_build_payload_marks_invited_pilot_completed_before_conversion(self):
         with tempfile.TemporaryDirectory() as temp_dir:

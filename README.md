@@ -505,8 +505,9 @@ python scripts/codex_harness.py usage-from-harness /tmp/codex-rag-harness \
 Use `--no-write --json` to preview copied-harness evidence before committing it.
 When `--pilot-record-dir` points at a matching prepared pilot, copied-harness
 conversion can infer title, domain, harness label, source type, and generation
-path from the pilot record; provide those flags directly for standalone
-conversions.
+path from the pilot record. Issue-body conversion can infer title plus fallback
+harness label, source type, and generation path from the same pilot record.
+Provide those flags directly for standalone conversions.
 When an external usage report arrives through the GitHub issue template, save
 the issue body and preview the normalized record the same way before writing
 files:

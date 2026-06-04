@@ -620,9 +620,9 @@ def build_command(args: argparse.Namespace) -> list[str]:
             args.issue_body,
             "--slug",
             args.slug,
-            "--title",
-            args.title,
         ]
+        if args.title:
+            command.extend(["--title", args.title])
         if args.harness_label:
             command.extend(["--harness-label", args.harness_label])
         if args.source_type:
@@ -1179,9 +1179,9 @@ def make_parser() -> argparse.ArgumentParser:
     usage_from_issue = subparsers.add_parser("usage-from-issue", help="Create usage evidence from a GitHub issue-form body")
     usage_from_issue.add_argument("issue_body", help="Markdown issue body path, or '-' for stdin")
     usage_from_issue.add_argument("--slug", required=True, help="Stable record slug")
-    usage_from_issue.add_argument("--title", required=True, help="Short usage-record title")
-    usage_from_issue.add_argument("--harness-label", help="Public-safe harness label override")
-    usage_from_issue.add_argument("--source-type", choices=["external", "multi-project", "self-dogfood"], default="external")
+    usage_from_issue.add_argument("--title", help="Short usage-record title; inferred from matching pilot record when available")
+    usage_from_issue.add_argument("--harness-label", help="Public-safe harness label override; inferred from matching pilot record when available")
+    usage_from_issue.add_argument("--source-type", choices=["external", "multi-project", "self-dogfood"], help="Fallback source type; inferred from matching pilot record when available")
     usage_from_issue.add_argument(
         "--generation-path",
         choices=[
@@ -1194,7 +1194,7 @@ def make_parser() -> argparse.ArgumentParser:
             "repo-dogfood",
             "unknown",
         ],
-        default="unknown",
+        help="Fallback generation path; inferred from matching pilot record when available",
     )
     usage_from_issue.add_argument("--generated", help="UTC timestamp override")
     usage_from_issue.add_argument("--record-dir", help="Directory where usage record JSON files are written")

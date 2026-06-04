@@ -1,6 +1,6 @@
 # External Pilot Pack
 
-Generated: 2026-06-04T14:42:23Z
+Generated: 2026-06-04T15:13:30Z
 Harness label: LLM App Workspace Pilot
 Domain: LLM app
 Source type: external
@@ -54,7 +54,7 @@ python scripts/codex_harness.py evidence-packet <generated-harness> --harness-la
 If the packet is public-safe and complete, preview the copied-harness evidence:
 
 ```bash
-python scripts/codex_harness.py usage-from-harness <generated-harness> --slug "llm-app-pilot" --title "LLM app pilot" --domain "LLM app" --harness-label "LLM App Workspace Pilot" --evidence-type private-summary --source-type external --generation-path installed-quickstart --privacy-review "Reporter confirmed public-safe private-summary evidence only." --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
+python scripts/codex_harness.py usage-from-harness <generated-harness> --slug "llm-app-pilot" --evidence-type private-summary --privacy-review "Reporter confirmed public-safe private-summary evidence only." --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
 ```
 
 After review, rerun without `--no-write` to write the usage record and convert
@@ -63,7 +63,7 @@ the matching pilot-board record.
 Or convert the GitHub issue body after review:
 
 ```bash
-python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md --slug "llm-app-pilot" --title "LLM app pilot" --source-type external --generation-path installed-quickstart --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md
+python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md --slug "llm-app-pilot" --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md
 ```
 
 ## Issue Draft

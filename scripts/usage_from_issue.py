@@ -43,6 +43,11 @@ LABEL_MAP = {
 }
 
 NO_RESPONSE_VALUES = {"", "_no response_", "no response"}
+PILOT_DEFAULT_FIELDS = {
+    "title": "title",
+    "source_type": "source_type",
+    "generation_path": "generation_path",
+}
 
 
 def normalize_label(value: str) -> str:
@@ -99,6 +104,36 @@ def require_field(sections: dict[str, str], key: str) -> str:
     return value
 
 
+def apply_pilot_defaults(args: argparse.Namespace) -> dict | None:
+    if not args.pilot_record_dir:
+        return None
+    slug = safe_slug(args.slug)
+    path = pilot_board.default_record_path(Path(args.pilot_record_dir), slug)
+    record = pilot_board.read_record(path)
+    errors = pilot_board.validate_record(record, path)
+    if errors:
+        raise SystemExit("Pilot record is invalid: " + "; ".join(errors))
+    for arg_name, pilot_field in PILOT_DEFAULT_FIELDS.items():
+        if getattr(args, arg_name, None) is None:
+            setattr(args, arg_name, record.get(pilot_field))
+    args.pilot_harness_label = record.get("harness_label")
+    return record
+
+
+def apply_standalone_defaults(args: argparse.Namespace) -> None:
+    if args.source_type is None:
+        args.source_type = "external"
+    if args.generation_path is None:
+        args.generation_path = "unknown"
+
+
+def require_metadata(args: argparse.Namespace) -> None:
+    if not args.title:
+        raise SystemExit(
+            "Missing required metadata: --title. Provide it directly or use --pilot-record-dir with a matching prepared pilot."
+        )
+
+
 def build_record(args: argparse.Namespace) -> UsageRecord:
     sections = parse_issue_sections(read_issue_body(args.issue_body))
     evidence_type = require_field(sections, "evidence_type")
@@ -114,7 +149,12 @@ def build_record(args: argparse.Namespace) -> UsageRecord:
     if generation_path not in ALLOWED_GENERATION_PATHS:
         raise SystemExit(f"Unsupported generation path in issue body: {generation_path}")
 
-    harness_label = args.harness_label or clean_value(sections.get("harness_label", "")) or "external usage report"
+    harness_label = (
+        args.harness_label
+        or clean_value(sections.get("harness_label", ""))
+        or getattr(args, "pilot_harness_label", "")
+        or "external usage report"
+    )
     return UsageRecord(
         slug=safe_slug(args.slug),
         title=args.title,
@@ -137,10 +177,10 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("issue_body", help="Markdown issue body path, or '-' for stdin")
     parser.add_argument("--slug", required=True, help="Stable usage-record slug")
-    parser.add_argument("--title", required=True, help="Short usage-record title")
-    parser.add_argument("--harness-label", help="Public-safe harness label override")
-    parser.add_argument("--source-type", choices=sorted(ALLOWED_SOURCE_TYPES), default="external")
-    parser.add_argument("--generation-path", choices=sorted(ALLOWED_GENERATION_PATHS), default="unknown")
+    parser.add_argument("--title", help="Short usage-record title; inferred from matching pilot record when available")
+    parser.add_argument("--harness-label", help="Public-safe harness label override; inferred from matching pilot record when available")
+    parser.add_argument("--source-type", choices=sorted(ALLOWED_SOURCE_TYPES), help="Fallback source type; inferred from matching pilot record when available")
+    parser.add_argument("--generation-path", choices=sorted(ALLOWED_GENERATION_PATHS), help="Fallback generation path; inferred from matching pilot record when available")
     parser.add_argument("--generated", default=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
     parser.add_argument("--record-dir", default=DEFAULT_RECORD_DIR.as_posix())
     parser.add_argument("--report", default=DEFAULT_REPORT.as_posix())
@@ -155,6 +195,9 @@ def main() -> int:
     parser.add_argument("--json", action="store_true", help="Emit JSON payload")
     args = parser.parse_args()
 
+    apply_pilot_defaults(args)
+    apply_standalone_defaults(args)
+    require_metadata(args)
     record = build_record(args)
     validate_record(record)
     if args.pilot_record_dir:

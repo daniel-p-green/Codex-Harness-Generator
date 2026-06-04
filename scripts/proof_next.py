@@ -84,8 +84,6 @@ def build_usage_from_issue_command(pilot: dict, args: argparse.Namespace, *, no_
         "<completed-issue.md>",
         "--slug",
         pilot_value(pilot, "slug"),
-        "--title",
-        quoted(pilot_value(pilot, "title")),
         "--record-dir",
         args.record_dir,
         "--report",

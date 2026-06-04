@@ -114,7 +114,8 @@ matching pilot `converted`, and refresh `Docs/Environment/PILOT_BOARD.md`.
 
 Maintainers can convert a usable public issue into a checked-in usage record by
 saving the issue body to a local Markdown file. Preview and privacy-check the
-normalized record before writing files:
+normalized record before writing files. For standalone issue conversion, provide
+`--title` directly:
 
 ```bash
 python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
@@ -127,13 +128,14 @@ python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
 If the preview is complete and public-safe, rerun without `--no-write` to write
 the usage-record JSON file and update `Docs/Environment/USAGE_RECORDS.md`.
 When the issue corresponds to a prepared pilot with the same slug, add the
-pilot-board directory so the importer also marks that pilot `converted`,
-validates the usage-record reference, and refreshes the pilot board:
+pilot-board directory so the importer can infer the title plus fallback harness
+label, source type, and generation path from the pilot record. It also marks
+that pilot `converted`, validates the usage-record reference, and refreshes the
+pilot board:
 
 ```bash
 python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
   --slug external-example \
-  --title "External example" \
   --pilot-record-dir Docs/Environment/pilot-records \
   --pilot-board-report Docs/Environment/PILOT_BOARD.md \
   --json

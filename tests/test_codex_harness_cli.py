@@ -1382,6 +1382,39 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_usage_from_issue_allows_pilot_metadata_defaults(self):
+        command, _ = self.run_cli(
+            [
+                "usage-from-issue",
+                "/tmp/issue.md",
+                "--slug",
+                "external-demo",
+                "--record-dir",
+                "/tmp/records",
+                "--pilot-record-dir",
+                "/tmp/pilot-records",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/usage_from_issue.py",
+                "/tmp/issue.md",
+                "--slug",
+                "external-demo",
+                "--record-dir",
+                "/tmp/records",
+                "--pilot-record-dir",
+                "/tmp/pilot-records",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
     def test_pilot_campaign_delegates_to_campaign_script(self):
         command, _ = self.run_cli(
             [
