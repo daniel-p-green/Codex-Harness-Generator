@@ -786,6 +786,61 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_pilot_github_issues_delegates_to_issue_exporter(self):
+        command, _ = self.run_cli(
+            [
+                "pilot-github-issues",
+                "--record-dir",
+                "/tmp/pilot-records",
+                "--usage-record-dir",
+                "/tmp/usage-records",
+                "--usage-report",
+                "/tmp/USAGE_RECORDS.md",
+                "--pilot-board-report",
+                "/tmp/PILOT_BOARD.md",
+                "--out-dir",
+                "/tmp/pilot-github-issues",
+                "--report",
+                "/tmp/PILOT_GITHUB_ISSUES.md",
+                "--status",
+                "prepared",
+                "--slug",
+                "llm-app-pilot",
+                "--label",
+                "external-usage",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/export_pilot_github_issues.py",
+                "--record-dir",
+                "/tmp/pilot-records",
+                "--usage-record-dir",
+                "/tmp/usage-records",
+                "--usage-report",
+                "/tmp/USAGE_RECORDS.md",
+                "--pilot-board-report",
+                "/tmp/PILOT_BOARD.md",
+                "--out-dir",
+                "/tmp/pilot-github-issues",
+                "--report",
+                "/tmp/PILOT_GITHUB_ISSUES.md",
+                "--status",
+                "prepared",
+                "--slug",
+                "llm-app-pilot",
+                "--label",
+                "external-usage",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
     def test_beta_exit_audit_delegates_to_auditor(self):
         command, _ = self.run_cli(
             [

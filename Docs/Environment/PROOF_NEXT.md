@@ -1,6 +1,6 @@
 # Proof Next Actions
 
-Generated: 2026-06-04T17:55:16Z
+Generated: 2026-06-04T18:06:18Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 
@@ -99,7 +99,15 @@ Purpose: verify each handoff folder has reporter materials and an importer-shape
 codex-harness pilot-handoff-audit --handoff-dir Docs/Environment/pilot-handoffs --record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records --usage-report Docs/Environment/USAGE_RECORDS.md --pilot-board-report Docs/Environment/PILOT_BOARD.md
 ```
 
-7. mark pilot invited
+7. export pilot GitHub issue queue
+
+Purpose: write public GitHub issue bodies and gh issue create commands for active pilots
+
+```bash
+codex-harness pilot-github-issues --record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records --usage-report Docs/Environment/USAGE_RECORDS.md --pilot-board-report Docs/Environment/PILOT_BOARD.md --out-dir Docs/Environment/pilot-github-issues --report Docs/Environment/PILOT_GITHUB_ISSUES.md
+```
+
+8. mark pilot invited
 
 Purpose: record outreach after the pilot pack is sent to a reporter
 
@@ -107,7 +115,7 @@ Purpose: record outreach after the pilot pack is sent to a reporter
 codex-harness pilot-update llm-app-pilot --status invited --record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records --report Docs/Environment/PILOT_BOARD.md --notes "sent to reporter"
 ```
 
-8. mark pilot completed
+9. mark pilot completed
 
 Purpose: record reporter completion before converting the evidence into a usage record
 
@@ -115,7 +123,7 @@ Purpose: record reporter completion before converting the evidence into a usage 
 codex-harness pilot-update llm-app-pilot --status completed --record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records --report Docs/Environment/PILOT_BOARD.md --notes "reporter completed task and shared public-safe evidence"
 ```
 
-9. preview copied-harness evidence
+10. preview copied-harness evidence
 
 Purpose: validate the generated harness's local eval and task-trial evidence without writing a usage record or mutating the pilot board
 
@@ -123,7 +131,7 @@ Purpose: validate the generated harness's local eval and task-trial evidence wit
 codex-harness usage-from-harness <generated-harness> --slug llm-app-pilot --evidence-type private-summary --privacy-review "Reporter confirmed public-safe private-summary evidence only." --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
 ```
 
-10. convert copied-harness evidence
+11. convert copied-harness evidence
 
 Purpose: write the checked usage record and convert the matching pilot after preview output is reviewed
 
@@ -131,7 +139,7 @@ Purpose: write the checked usage record and convert the matching pilot after pre
 codex-harness usage-from-harness <generated-harness> --slug llm-app-pilot --evidence-type private-summary --privacy-review "Reporter confirmed public-safe private-summary evidence only." --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
 ```
 
-11. lint issue evidence
+12. lint issue evidence
 
 Purpose: show missing fields, weak evidence counts, and privacy problems before attempting conversion
 
@@ -139,7 +147,7 @@ Purpose: show missing fields, weak evidence counts, and privacy problems before 
 codex-harness usage-from-issue <completed-issue.md> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
 ```
 
-12. preview issue evidence
+13. preview issue evidence
 
 Purpose: validate a completed reporter issue body without writing a usage record or mutating the pilot board
 
@@ -147,7 +155,7 @@ Purpose: validate a completed reporter issue body without writing a usage record
 codex-harness usage-from-issue <completed-issue.md> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
 ```
 
-13. convert issue evidence
+14. convert issue evidence
 
 Purpose: write the checked usage record and convert the matching pilot after preview output is reviewed
 
@@ -155,7 +163,7 @@ Purpose: write the checked usage record and convert the matching pilot after pre
 codex-harness usage-from-issue <completed-issue.md> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
 ```
 
-14. audit beta exit
+15. audit beta exit
 
 Purpose: refresh the non-gating readiness audit after each converted usage record
 
@@ -163,7 +171,7 @@ Purpose: refresh the non-gating readiness audit after each converted usage recor
 codex-harness beta-exit-audit --record-dir Docs/Environment/usage-records --pilot-record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records
 ```
 
-15. run final proof status
+16. run final proof status
 
 Purpose: only use this as a beta-exit gate after usage thresholds are satisfied
 

@@ -168,6 +168,10 @@ replacement. What is proven today:
   verify those folders before sending: required reporter files exist, claim
   boundaries stay visible, and `USAGE_REPORT_DRAFT.md` is importer-shaped while
   still requiring real reporter evidence before conversion.
+- `scripts/export_pilot_github_issues.py` and `codex-harness
+  pilot-github-issues` write GitHub-ready issue bodies plus `gh issue create`
+  commands for active pilots, so public intake can start from the same
+  privacy-safe reporter fields without counting opened issues as usage proof.
 - `scripts/prepare_pilot.py` and `codex-harness prepare-pilot` combine
   brief-based quickstart generation with an external pilot pack and issue-body
   draft, so the next beta-exit pilot can be prepared with one command before a
@@ -614,7 +618,7 @@ python scripts/codex_harness.py proof-next
 `proof-next` writes `Docs/Environment/PROOF_NEXT.md`. It packages the next
 pilot target, candidate coverage projection, `prepare-next-pilot`,
 `prepare-pilot-batch`, `pilot-board`, `pilot-outreach`, `pilot-handoff`,
-`pilot-handoff-audit`, preview-first `usage-from-harness` and `usage-from-issue` conversion commands,
+`pilot-handoff-audit`, `pilot-github-issues`, preview-first `usage-from-harness` and `usage-from-issue` conversion commands,
 `beta-exit-audit`, and final `proof-status --beta-exit` commands while keeping
 the claim boundary explicit: the packet is a plan, not usage proof. Use the
 copied-harness route when the generated harness directory is available; use the
@@ -734,6 +738,7 @@ Common subcommands:
 | `pilot-outreach` | `export_pilot_outreach.py` | Writes reporter-ready outreach copy, tracking commands, and conversion commands from active pilot-board records. |
 | `pilot-handoff` | `export_pilot_handoff.py` | Writes shareable per-pilot handoff folders with a single reporter handoff, pilot pack, copied issue draft, prefilled usage-report draft, and maintainer commands. |
 | `pilot-handoff-audit` | `audit_pilot_handoffs.py` | Checks handoff folders for required reporter files, claim boundaries, and importer-shaped usage-report drafts before sending. |
+| `pilot-github-issues` | `export_pilot_github_issues.py` | Writes GitHub-ready issue bodies and `gh issue create` commands from active pilot-board records without treating opened issues as usage proof. |
 | `beta-exit-audit` | `beta_exit_audit.py` | Writes a non-gating audit of beta-exit readiness and remaining evidence gaps. |
 | `proof-next` | `proof_next.py` | Writes the next beta-exit proof actions and candidate coverage projection from current usage gaps without counting the plan as evidence. |
 | `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record; infers the slug from the issue body when present, and supports `--lint-only`, `--no-write`, or `--pilot-record-dir` for linked pilot conversion. |

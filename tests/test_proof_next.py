@@ -47,6 +47,8 @@ class ProofNextTests(unittest.TestCase):
             pilot_board_report="Docs/Environment/PILOT_BOARD.md",
             usage_report="Docs/Environment/USAGE_RECORDS.md",
             pilot_handoff_out="Docs/Environment/pilot-handoffs",
+            pilot_github_issues_out="Docs/Environment/pilot-github-issues",
+            pilot_github_issues_report="Docs/Environment/PILOT_GITHUB_ISSUES.md",
             pilot_pack_out="/tmp/NEXT_EXTERNAL_PILOT_PACK.md",
             issue_out="/tmp/NEXT_EXTERNAL_USAGE_ISSUE_DRAFT.md",
             report=(report or record_dir / "PROOF_NEXT.md").as_posix(),
@@ -100,6 +102,7 @@ class ProofNextTests(unittest.TestCase):
         self.assertTrue(any("codex-harness prepare-next-pilot /tmp/next-pilot" in command for command in commands))
         self.assertTrue(any("codex-harness pilot-board" in command for command in commands))
         self.assertTrue(any("codex-harness pilot-handoff" in command and "--out Docs/Environment/pilot-handoffs" in command for command in commands))
+        self.assertTrue(any("codex-harness pilot-github-issues" in command for command in commands))
         self.assertTrue(any("codex-harness usage-from-issue" in command for command in commands))
         self.assertTrue(any("codex-harness usage-from-harness <generated-harness>" in command for command in commands))
         self.assertTrue(any("usage-from-issue <completed-issue.md>" in command and "--lint-only --json" in command for command in commands))
@@ -126,6 +129,7 @@ class ProofNextTests(unittest.TestCase):
         self.assertFalse(any("prepare-next-pilot" in command for command in commands))
         self.assertTrue(any("codex-harness pilot-outreach" in command for command in commands))
         self.assertTrue(any("codex-harness pilot-handoff" in command for command in commands))
+        self.assertTrue(any("codex-harness pilot-github-issues" in command for command in commands))
         self.assertTrue(any("pilot-update llm-app-pilot --status invited" in command for command in commands))
         self.assertTrue(any("pilot-update llm-app-pilot --status completed" in command for command in commands))
         self.assertTrue(any("usage-from-harness <generated-harness> --slug llm-app-pilot" in command for command in commands))

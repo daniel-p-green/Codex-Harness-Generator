@@ -20,6 +20,8 @@ DEFAULT_PILOT_RECORD_DIR_TEXT = "Docs/Environment/pilot-records"
 DEFAULT_PILOT_BOARD_REPORT_TEXT = "Docs/Environment/PILOT_BOARD.md"
 DEFAULT_USAGE_REPORT_TEXT = "Docs/Environment/USAGE_RECORDS.md"
 DEFAULT_PILOT_HANDOFF_OUT_TEXT = "Docs/Environment/pilot-handoffs"
+DEFAULT_PILOT_GITHUB_ISSUES_OUT_TEXT = "Docs/Environment/pilot-github-issues"
+DEFAULT_PILOT_GITHUB_ISSUES_REPORT_TEXT = "Docs/Environment/PILOT_GITHUB_ISSUES.md"
 
 
 def build_prepare_next_command(pilot: dict, args: argparse.Namespace) -> str:
@@ -158,6 +160,18 @@ def build_pilot_handoff_audit_command(args: argparse.Namespace) -> str:
     )
 
 
+def build_pilot_github_issues_command(args: argparse.Namespace) -> str:
+    return (
+        "codex-harness pilot-github-issues "
+        f"--record-dir {args.pilot_record_dir} "
+        f"--usage-record-dir {args.record_dir} "
+        f"--usage-report {args.usage_report} "
+        f"--pilot-board-report {args.pilot_board_report} "
+        f"--out-dir {args.pilot_github_issues_out} "
+        f"--report {args.pilot_github_issues_report}"
+    )
+
+
 def active_pilot_for_next(gaps_payload: dict, board_payload: dict) -> dict | None:
     next_pilot = (gaps_payload.get("suggested_pilots") or [None])[0]
     if not next_pilot:
@@ -233,6 +247,13 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
                 "purpose": "verify each handoff folder has reporter materials and an importer-shaped usage draft",
             }
         )
+        commands.append(
+            {
+                "name": "export pilot GitHub issue queue",
+                "command": build_pilot_github_issues_command(args),
+                "purpose": "write public GitHub issue bodies and gh issue create commands for active pilots",
+            }
+        )
         if active_pilot["status"] == "prepared":
             commands.append(
                 {
@@ -292,6 +313,11 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
                     "name": "audit pilot handoff",
                     "command": build_pilot_handoff_audit_command(args),
                     "purpose": "verify each handoff folder has reporter materials and an importer-shaped usage draft",
+                },
+                {
+                    "name": "export pilot GitHub issue queue",
+                    "command": build_pilot_github_issues_command(args),
+                    "purpose": "write public GitHub issue bodies and gh issue create commands for active pilots",
                 },
             ]
         )
@@ -460,6 +486,8 @@ def main() -> int:
     parser.add_argument("--pilot-board-report", default=DEFAULT_PILOT_BOARD_REPORT_TEXT, help="Pilot board Markdown path")
     parser.add_argument("--usage-report", default=DEFAULT_USAGE_REPORT_TEXT, help="Usage records Markdown path")
     parser.add_argument("--pilot-handoff-out", default=DEFAULT_PILOT_HANDOFF_OUT_TEXT, help="Pilot handoff output directory")
+    parser.add_argument("--pilot-github-issues-out", default=DEFAULT_PILOT_GITHUB_ISSUES_OUT_TEXT, help="Pilot GitHub issue body output directory")
+    parser.add_argument("--pilot-github-issues-report", default=DEFAULT_PILOT_GITHUB_ISSUES_REPORT_TEXT, help="Pilot GitHub issue queue report path")
     parser.add_argument("--pilot-pack-out", default="/tmp/NEXT_EXTERNAL_PILOT_PACK.md", help="Pilot pack output path for the next prepare command")
     parser.add_argument("--issue-out", default="/tmp/NEXT_EXTERNAL_USAGE_ISSUE_DRAFT.md", help="Issue draft output path for the next prepare command")
     parser.add_argument("--report", default=DEFAULT_REPORT.as_posix(), help="Proof-next Markdown path")
