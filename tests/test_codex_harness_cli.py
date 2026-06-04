@@ -1220,6 +1220,7 @@ class CodexHarnessCliTests(unittest.TestCase):
                 "--pilot-notes",
                 "converted from harness report",
                 "--force",
+                "--no-write",
                 "--json",
             ]
         )
@@ -1268,6 +1269,7 @@ class CodexHarnessCliTests(unittest.TestCase):
                 "--pilot-notes",
                 "converted from harness report",
                 "--force",
+                "--no-write",
                 "--json",
             ],
             command,

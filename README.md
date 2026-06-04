@@ -497,11 +497,14 @@ python scripts/codex_harness.py usage-from-harness /tmp/codex-rag-harness \
   --limitation "Single private task trial, not longitudinal proof" \
   --pilot-record-dir Docs/Environment/pilot-records \
   --pilot-board-report Docs/Environment/PILOT_BOARD.md \
+  --no-write \
   --json
 ```
 
+Use `--no-write --json` to preview copied-harness evidence before committing it.
 When an external usage report arrives through the GitHub issue template, save
-the issue body and preview the normalized record before writing files:
+the issue body and preview the normalized record the same way before writing
+files:
 
 ```bash
 python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \

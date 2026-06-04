@@ -185,6 +185,7 @@ def main() -> int:
     parser.add_argument("--pilot-board-report", default=pilot_board.DEFAULT_REPORT.as_posix())
     parser.add_argument("--pilot-notes", default="converted from generated harness evidence")
     parser.add_argument("--force", action="store_true", help="Replace existing record with same slug")
+    parser.add_argument("--no-write", action="store_true", help="Validate and preview the record without writing files")
     parser.add_argument("--json", action="store_true", help="Emit the record JSON")
     args = parser.parse_args()
 
@@ -199,35 +200,46 @@ def main() -> int:
             record.generation_path,
         )
     record_dir = Path(args.record_dir)
-    path = write_record(record_dir, record, force=args.force)
-    records = load_records(record_dir)
-    write_report(Path(args.report), records)
+    path = None
     pilot_update = None
-    if args.pilot_record_dir:
-        pilot_update = pilot_board.update_record_file(
-            Path(args.pilot_record_dir),
-            record.slug,
-            "converted",
-            notes=args.pilot_notes,
-            usage_record=record.slug,
-            usage_record_dir=record_dir,
-        )
-        board_payload = pilot_board.build_payload(Path(args.pilot_record_dir), usage_record_dir=record_dir)
-        pilot_board.write_report(Path(args.pilot_board_report), board_payload)
-        pilot_update["board_report"] = display_path(Path(args.pilot_board_report))
-        pilot_update["board_status"] = board_payload["status"]
-        pilot_update["board_readiness"] = board_payload["readiness"]
-        if board_payload["status"] != "pass":
-            raise SystemExit("Pilot board validation failed: " + "; ".join(board_payload["errors"]))
+    if not args.no_write:
+        path = write_record(record_dir, record, force=args.force)
+        records = load_records(record_dir)
+        write_report(Path(args.report), records)
+        if args.pilot_record_dir:
+            pilot_update = pilot_board.update_record_file(
+                Path(args.pilot_record_dir),
+                record.slug,
+                "converted",
+                notes=args.pilot_notes,
+                usage_record=record.slug,
+                usage_record_dir=record_dir,
+            )
+            board_payload = pilot_board.build_payload(Path(args.pilot_record_dir), usage_record_dir=record_dir)
+            pilot_board.write_report(Path(args.pilot_board_report), board_payload)
+            pilot_update["board_report"] = display_path(Path(args.pilot_board_report))
+            pilot_update["board_status"] = board_payload["status"]
+            pilot_update["board_readiness"] = board_payload["readiness"]
+            if board_payload["status"] != "pass":
+                raise SystemExit("Pilot board validation failed: " + "; ".join(board_payload["errors"]))
     if args.json:
         print(
             json.dumps(
-                {"status": "pass", "path": display_path(path), "record": record.to_dict(), "pilot_update": pilot_update},
+                {
+                    "status": "pass",
+                    "written": not args.no_write,
+                    "path": display_path(path) if path is not None else None,
+                    "record": record.to_dict(),
+                    "pilot_update": pilot_update,
+                },
                 indent=2,
             )
         )
     else:
-        print(f"Recorded usage evidence from harness: {display_path(path)}")
+        if args.no_write:
+            print(f"Validated usage evidence from harness without writing: {record.slug}")
+        else:
+            print(f"Recorded usage evidence from harness: {display_path(path)}")
         if pilot_update:
             print(f"Converted pilot board record: {display_path(Path(pilot_update['path']))}")
     return 0

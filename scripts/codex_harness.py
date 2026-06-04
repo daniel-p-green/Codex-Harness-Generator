@@ -495,6 +495,8 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.extend(["--pilot-notes", args.pilot_notes])
         if args.force:
             command.append("--force")
+        if args.no_write:
+            command.append("--no-write")
         if args.json:
             command.append("--json")
         return python_script("usage_from_harness.py", command)
@@ -1098,6 +1100,7 @@ def make_parser() -> argparse.ArgumentParser:
     usage_from_harness.add_argument("--pilot-board-report", help="Pilot-board Markdown report path for linked conversion")
     usage_from_harness.add_argument("--pilot-notes", help="Public-safe note for linked pilot-board conversion")
     usage_from_harness.add_argument("--force", action="store_true", help="Replace existing record with same slug")
+    usage_from_harness.add_argument("--no-write", action="store_true", help="Validate and preview without writing files")
     usage_from_harness.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     evidence_packet = subparsers.add_parser("evidence-packet", help="Export a public-safe evidence packet from a generated harness")
