@@ -137,6 +137,7 @@ python scripts/codex_harness.py brief-acceptance /tmp/codex-brief-check \
   --brief "RAG app with prompts, evals, and retrieval checks" \
   --force
 python scripts/codex_harness.py validate /tmp/codex-brief-check
+python scripts/codex_harness.py migration-audit /tmp/codex-brief-check
 python scripts/codex_harness.py gate
 ```
 

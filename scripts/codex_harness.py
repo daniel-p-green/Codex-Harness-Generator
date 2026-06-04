@@ -133,6 +133,12 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("validate_generated_harness.py", command)
 
+    if args.command == "migration-audit":
+        command = list(args.paths)
+        if args.json:
+            command.append("--json")
+        return python_script("migration_audit.py", command)
+
     if args.command == "gate":
         command: list[str] = []
         if args.codex_live:
@@ -322,6 +328,10 @@ def make_parser() -> argparse.ArgumentParser:
     validate.add_argument("--codex-live", action="store_true", help="Also run authenticated Codex CLI smoke")
     validate.add_argument("--prompt", help="Prompt to use with --codex-live")
     validate.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    migration_audit = subparsers.add_parser("migration-audit", help="Audit legacy harness directories for Codex migration work")
+    migration_audit.add_argument("paths", nargs="+", help="Harness directories to audit")
+    migration_audit.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     gate = subparsers.add_parser("gate", help="Run the repo eval gate")
     gate.add_argument("--codex-live", action="store_true", help="Include authenticated Codex CLI live smoke")

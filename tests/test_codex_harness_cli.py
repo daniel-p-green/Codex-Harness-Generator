@@ -299,6 +299,19 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_migration_audit_delegates_to_migration_audit_script(self):
+        command, _ = self.run_cli(["migration-audit", "/tmp/example", "--json"])
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/migration_audit.py",
+                "/tmp/example",
+                "--json",
+            ],
+            command,
+        )
+
     def test_semantic_alignment_delegates_to_checker(self):
         command, _ = self.run_cli(["semantic-alignment", "--timeout", "5", "--no-write", "--json"])
 

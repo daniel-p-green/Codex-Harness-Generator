@@ -46,8 +46,10 @@ SKIP_DIRS = {".git", "__pycache__", ".pytest_cache", ".eggs", "build", "dist"}
 SKIP_FORBIDDEN_TEXT_PATHS = {
     "scripts/eval_codex_port.py",
     "scripts/eval_generated_harness.py",
+    "scripts/migration_audit.py",
     "tests/test_eval_codex_port.py",
     "tests/test_generated_harness_contract.py",
+    "tests/test_migration_audit.py",
 }
 REASONING_EFFORT_VALUES = {"minimal", "low", "medium", "high", "xhigh"}
 MODEL_VERBOSITY_VALUES = {"low", "medium", "high"}

@@ -57,7 +57,7 @@ replacement. What is proven today:
   support scenarios.
 - `scripts/codex_harness.py` gives users one thin local entry point for
   profile listing, profile descriptions, generation, acceptance, eval, smoke,
-  gate, live-trial, source-freshness, and snapshot workflows.
+  migration audit, gate, live-trial, source-freshness, and snapshot workflows.
 - `pyproject.toml` exposes that wrapper as an installable `codex-harness`
   console command, and the release gate smokes the non-editable install path.
 - `scripts/record_eval_snapshot.py` records eval-gate snapshots under
@@ -179,6 +179,12 @@ python scripts/codex_harness.py generate /tmp/codex-harness-example --force
 python scripts/codex_harness.py validate /tmp/codex-harness-example
 python scripts/codex_harness.py eval /tmp/codex-harness-example
 python scripts/codex_harness.py smoke /tmp/codex-harness-example
+```
+
+To inspect an older harness before manually porting it to Codex-native files:
+
+```bash
+python scripts/codex_harness.py migration-audit /path/to/harness
 ```
 
 The deterministic generator currently supports the four base starter profiles
@@ -380,6 +386,7 @@ Common subcommands:
 | `eval <paths...>` | `eval_generated_harness.py` | Checks generated harness contract quality. |
 | `smoke <paths...>` | `smoke_generated_harness.py` | Parses config, resolves agents and skills, optionally runs Codex live smoke. |
 | `validate <paths...>` | `validate_generated_harness.py` | Runs eval and smoke together for generated harnesses. |
+| `migration-audit <paths...>` | `migration_audit.py` | Audits legacy harness artifacts and lists the Codex-native migration work. |
 | `gate` | `run_evals.py` | Runs the repo release gate. |
 | `live-trials` | `run_live_example_task_trials.py` | Runs authenticated Codex tasks against checked-in live examples. |
 | `source-freshness` | `check_source_freshness.py` | Confirms official OpenAI source URLs are reachable. |
