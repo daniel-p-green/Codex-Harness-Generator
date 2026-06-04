@@ -188,9 +188,11 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertIn("codex-harness-maintainer-followup", record["reporter_followup"])
         self.assertIn("### Evidence", record["reporter_followup"])
         self.assertIn("at least two public-safe bullets", record["reporter_followup"])
+        self.assertIn("_no response_", record["reporter_followup"])
         sections = usage_from_issue.parse_issue_sections(record["reporter_followup"])
         for field in ("outcome", "task_summary", "evidence", "verification", "privacy_review", "limitations"):
             self.assertIn(field, sections)
+            self.assertEqual("", sections[field])
         self.assertTrue(record["followup_file"].endswith("llm-app-pilot-followup.md"))
         self.assertIn("gh issue comment https://github.com/example/repo/issues/42", record["commands"]["comment_followup"])
         self.assertIn("--body-file", record["commands"]["comment_followup"])

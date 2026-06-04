@@ -97,9 +97,10 @@ class FormatUsageLintCommentTests(unittest.TestCase):
         self.assertIn("Reporter reply template", comment)
         self.assertIn("Copy this into a new issue comment", comment)
         self.assertIn("### Outcome", comment)
-        self.assertIn("Use `success`, `partial`, `failed`, or `inconclusive`.", comment)
+        self.assertIn("_no response_", comment)
+        self.assertIn("<!-- Use `success`, `partial`, `failed`, or `inconclusive`. -->", comment)
         self.assertIn("### Evidence", comment)
-        self.assertIn("Add at least two public-safe bullets", comment)
+        self.assertIn("<!-- Add at least two public-safe bullets", comment)
 
     def test_reporter_reply_template_matches_usage_issue_importer_headings(self):
         missing_fields = ["outcome", "task_summary", "evidence", "verification", "privacy_review", "limitations"]
@@ -109,7 +110,7 @@ class FormatUsageLintCommentTests(unittest.TestCase):
 
         for field in missing_fields:
             self.assertIn(field, sections)
-            self.assertTrue(sections[field].strip())
+            self.assertEqual("", sections[field])
 
 
 if __name__ == "__main__":

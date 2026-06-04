@@ -904,6 +904,57 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_pilot_reporter_replies_delegates_to_reply_exporter(self):
+        command, _ = self.run_cli(
+            [
+                "pilot-reporter-replies",
+                "--record-dir",
+                "/tmp/pilot-records",
+                "--usage-record-dir",
+                "/tmp/usage-records",
+                "--usage-report",
+                "/tmp/USAGE_RECORDS.md",
+                "--pilot-board-report",
+                "/tmp/PILOT_BOARD.md",
+                "--out-dir",
+                "/tmp/replies",
+                "--report",
+                "/tmp/PILOT_REPORTER_REPLIES.md",
+                "--status",
+                "invited",
+                "--slug",
+                "llm-app-pilot",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/export_pilot_reporter_replies.py",
+                "--record-dir",
+                "/tmp/pilot-records",
+                "--usage-record-dir",
+                "/tmp/usage-records",
+                "--usage-report",
+                "/tmp/USAGE_RECORDS.md",
+                "--pilot-board-report",
+                "/tmp/PILOT_BOARD.md",
+                "--out-dir",
+                "/tmp/replies",
+                "--report",
+                "/tmp/PILOT_REPORTER_REPLIES.md",
+                "--status",
+                "invited",
+                "--slug",
+                "llm-app-pilot",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
     def test_pilot_next_action_delegates_to_next_action_script(self):
         command, _ = self.run_cli(
             [
@@ -2231,6 +2282,14 @@ class CodexHarnessCliTests(unittest.TestCase):
                 "/tmp/USAGE_RECORDS.md",
                 "--pilot-handoff-out",
                 "/tmp/handoffs",
+                "--pilot-github-issues-out",
+                "/tmp/issues",
+                "--pilot-github-issues-report",
+                "/tmp/PILOT_GITHUB_ISSUES.md",
+                "--pilot-reporter-reply-out",
+                "/tmp/replies",
+                "--pilot-reporter-reply-report",
+                "/tmp/PILOT_REPORTER_REPLIES.md",
                 "--pilot-github-sync-report",
                 "/tmp/PILOT_GITHUB_SYNC.md",
                 "--pilot-github-followup-dir",
@@ -2269,6 +2328,14 @@ class CodexHarnessCliTests(unittest.TestCase):
                 "/tmp/USAGE_RECORDS.md",
                 "--pilot-handoff-out",
                 "/tmp/handoffs",
+                "--pilot-github-issues-out",
+                "/tmp/issues",
+                "--pilot-github-issues-report",
+                "/tmp/PILOT_GITHUB_ISSUES.md",
+                "--pilot-reporter-reply-out",
+                "/tmp/replies",
+                "--pilot-reporter-reply-report",
+                "/tmp/PILOT_REPORTER_REPLIES.md",
                 "--pilot-github-sync-report",
                 "/tmp/PILOT_GITHUB_SYNC.md",
                 "--pilot-github-followup-dir",

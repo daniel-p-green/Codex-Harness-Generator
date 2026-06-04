@@ -181,6 +181,10 @@ replacement. What is proven today:
   pilot-github-issues` write GitHub-ready issue bodies plus `gh issue create`
   commands for active pilots, so public intake can start from the same
   privacy-safe reporter fields without counting opened issues as usage proof.
+- `scripts/export_pilot_reporter_replies.py` and `codex-harness
+  pilot-reporter-replies` write copyable reporter completion reply templates
+  for active pilot issues, using the same headings the usage importer validates.
+  These templates reduce reporter friction but are not usage proof.
 - `scripts/sync_pilot_github_issues.py` and `codex-harness
   pilot-github-sync` fetch live pilot issue bodies and comments, lint them
   through the usage importer, and report which issues are conversion-ready
@@ -668,6 +672,7 @@ For the public pilot queue, use the GitHub sync loop:
 
 ```bash
 python scripts/codex_harness.py pilot-github-issues
+python scripts/codex_harness.py pilot-reporter-replies
 python scripts/codex_harness.py pilot-github-sync \
   --followup-dir Docs/Environment/pilot-github-followups
 python scripts/codex_harness.py pilot-next-action
@@ -679,10 +684,13 @@ python scripts/codex_harness.py usage-from-github-issue <issue-number-or-url> \
   --json
 ```
 
-`pilot-github-sync` writes `Docs/Environment/PILOT_GITHUB_SYNC.md`, reporter
-follow-up files, and `gh issue comment --body-file ...` commands for waiting
-issues. `pilot-next-action` writes `Docs/Environment/PILOT_NEXT_ACTION.md` and
-prints the single next maintainer command from that same live readiness check.
+`pilot-reporter-replies` writes `Docs/Environment/PILOT_REPORTER_REPLIES.md`
+and `Docs/Environment/pilot-reporter-replies/*.md`, which reporters can copy
+into issue comments after completing a task. `pilot-github-sync` writes
+`Docs/Environment/PILOT_GITHUB_SYNC.md`, reporter follow-up files, and
+`gh issue comment --body-file ...` commands for waiting issues.
+`pilot-next-action` writes `Docs/Environment/PILOT_NEXT_ACTION.md` and prints
+the single next maintainer command from that same live readiness check.
 The `Usage Evidence Lint` GitHub Action runs the same lint-only importer path on
 public usage issues and reporter comments, updating one marker-managed issue
 comment plus a `usage-evidence:needs-input` or
@@ -811,6 +819,7 @@ Common subcommands:
 | `pilot-handoff` | `export_pilot_handoff.py` | Writes shareable per-pilot handoff folders with a single reporter handoff, pilot pack, copied issue draft, prefilled usage-report draft, reporter return packet, and maintainer commands. |
 | `pilot-handoff-audit` | `audit_pilot_handoffs.py` | Checks handoff folders for required reporter files, return packets, claim boundaries, and importer-shaped usage-report drafts before sending. |
 | `pilot-github-issues` | `export_pilot_github_issues.py` | Writes GitHub-ready issue bodies and `gh issue create` commands from active pilot-board records without treating opened issues as usage proof. |
+| `pilot-reporter-replies` | `export_pilot_reporter_replies.py` | Writes reporter completion reply templates for active pilot issues, matching importer headings without counting templates as evidence. |
 | `pilot-github-sync` | `sync_pilot_github_issues.py` | Fetches live pilot GitHub issues with comments, lints them through the same importer, writes reporter follow-up files and `gh issue comment` commands for missing fields, and reports conversion readiness without writing usage records. |
 | `pilot-next-action` | `pilot_next_action.py` | Summarizes live pilot GitHub issue readiness into the single next maintainer command without counting the action as usage proof. |
 | `usage-from-github-issue` | `usage_from_github_issue.py` | Fetches a completed public GitHub issue with `gh`, optionally includes reporter comments, then lints, previews, or converts it through the same privacy-checked usage-record importer. |

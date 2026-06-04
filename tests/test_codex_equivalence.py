@@ -28,10 +28,12 @@ class CodexEquivalenceTests(unittest.TestCase):
         self.assertIn("Docs/Environment/EXTERNAL_USAGE_ISSUE_EXAMPLE.md", usage["evidence_paths"])
         self.assertIn("Docs/Environment/PILOT_HANDOFF_AUDIT.md", usage["evidence_paths"])
         self.assertIn("Docs/Environment/PILOT_GITHUB_ISSUES.md", usage["evidence_paths"])
+        self.assertIn("Docs/Environment/PILOT_REPORTER_REPLIES.md", usage["evidence_paths"])
         self.assertIn("codex-harness usage-from-issue <issue-body>", usage["commands"])
         self.assertIn("codex-harness usage-from-github-issue <issue-number-or-url>", usage["commands"])
         self.assertIn("codex-harness pilot-handoff-audit", usage["commands"])
         self.assertIn("codex-harness pilot-github-issues", usage["commands"])
+        self.assertIn("codex-harness pilot-reporter-replies", usage["commands"])
 
     def test_missing_evidence_path_fails_capability(self):
         original = check_codex_equivalence.CAPABILITIES

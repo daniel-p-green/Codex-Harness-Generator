@@ -60,6 +60,9 @@ Already proven:
   `codex-harness pilot-github-issues`, so active pilots can be opened as public
   issues from the same privacy-safe issue-body shape without treating issue
   creation as proof.
+- Reporter completion reply templates through `codex-harness
+  pilot-reporter-replies`, so reporters can paste importer-shaped evidence
+  comments after one real task without treating templates as proof.
 - Live GitHub pilot readiness sync through `codex-harness pilot-github-sync`,
   including checked-in `Docs/Environment/PILOT_GITHUB_SYNC.md`, reporter
   follow-up files under `Docs/Environment/pilot-github-followups/`, and
@@ -124,6 +127,8 @@ The project can stop calling itself a beta only when all of these are true:
    `codex-harness usage-from-issue` to convert the issue body into the
    checked-in usage record. For public pilot intake, run
    `codex-harness pilot-github-issues` to create the issue queue, run
+   `codex-harness pilot-reporter-replies` to write copyable completion reply
+   templates, run
    `codex-harness pilot-github-sync --followup-dir
    Docs/Environment/pilot-github-followups` to fetch live issue bodies and
    comments, then post the generated `gh issue comment --body-file ...`

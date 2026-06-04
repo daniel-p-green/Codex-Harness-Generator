@@ -244,12 +244,15 @@ def reporter_followup(record: dict) -> str:
             [
                 f"### {label}",
                 "",
-                f"{guidance}",
+                "_no response_",
+                f"<!-- {guidance} -->",
                 "",
             ]
         )
     lines.extend(
         [
+            "### Maintainer note",
+            "",
             "Once those sections are present, a maintainer can run `codex-harness pilot-github-sync` again and preview conversion.",
             "",
             "This follow-up does not count as usage proof; only a converted, validated usage record counts.",

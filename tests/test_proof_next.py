@@ -49,6 +49,8 @@ class ProofNextTests(unittest.TestCase):
             pilot_handoff_out="Docs/Environment/pilot-handoffs",
             pilot_github_issues_out="Docs/Environment/pilot-github-issues",
             pilot_github_issues_report="Docs/Environment/PILOT_GITHUB_ISSUES.md",
+            pilot_reporter_reply_out="Docs/Environment/pilot-reporter-replies",
+            pilot_reporter_reply_report="Docs/Environment/PILOT_REPORTER_REPLIES.md",
             pilot_github_sync_report="Docs/Environment/PILOT_GITHUB_SYNC.md",
             pilot_github_followup_dir="Docs/Environment/pilot-github-followups",
             pilot_pack_out="/tmp/NEXT_EXTERNAL_PILOT_PACK.md",
@@ -107,6 +109,7 @@ class ProofNextTests(unittest.TestCase):
         self.assertTrue(any("codex-harness pilot-board" in command for command in commands))
         self.assertTrue(any("codex-harness pilot-handoff" in command and "--out Docs/Environment/pilot-handoffs" in command for command in commands))
         self.assertTrue(any("codex-harness pilot-github-issues" in command for command in commands))
+        self.assertTrue(any("codex-harness pilot-reporter-replies" in command for command in commands))
         self.assertTrue(any("codex-harness pilot-github-sync" in command for command in commands))
         self.assertTrue(any("--followup-dir Docs/Environment/pilot-github-followups" in command for command in commands))
         self.assertTrue(any("codex-harness usage-from-issue" in command for command in commands))
@@ -137,6 +140,7 @@ class ProofNextTests(unittest.TestCase):
         self.assertTrue(any("codex-harness pilot-outreach" in command for command in commands))
         self.assertTrue(any("codex-harness pilot-handoff" in command for command in commands))
         self.assertTrue(any("codex-harness pilot-github-issues" in command for command in commands))
+        self.assertTrue(any("codex-harness pilot-reporter-replies" in command for command in commands))
         self.assertTrue(any("codex-harness pilot-github-sync" in command for command in commands))
         self.assertTrue(any("gh workflow run usage-evidence-lint.yml -f issue=all-open-pilots" in command for command in commands))
         self.assertTrue(any("pilot-update llm-app-pilot --status invited" in command for command in commands))

@@ -81,6 +81,7 @@ class ProjectSupportFilesTests(unittest.TestCase):
 
         for phrase in (
             "codex-harness pilot-github-issues",
+            "codex-harness pilot-reporter-replies",
             "codex-harness pilot-github-sync",
             "Docs/Environment/PILOT_GITHUB_SYNC.md",
             "Docs/Environment/pilot-github-followups",

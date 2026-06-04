@@ -101,7 +101,8 @@ def reply_template_lines(missing_fields: list[str]) -> list[str]:
             [
                 f"### {label}",
                 "",
-                guidance,
+                "_no response_",
+                f"<!-- {guidance} -->",
                 "",
             ]
         )

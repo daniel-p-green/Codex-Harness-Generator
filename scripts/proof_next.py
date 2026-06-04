@@ -23,6 +23,8 @@ DEFAULT_USAGE_REPORT_TEXT = "Docs/Environment/USAGE_RECORDS.md"
 DEFAULT_PILOT_HANDOFF_OUT_TEXT = "Docs/Environment/pilot-handoffs"
 DEFAULT_PILOT_GITHUB_ISSUES_OUT_TEXT = "Docs/Environment/pilot-github-issues"
 DEFAULT_PILOT_GITHUB_ISSUES_REPORT_TEXT = "Docs/Environment/PILOT_GITHUB_ISSUES.md"
+DEFAULT_PILOT_REPORTER_REPLY_OUT_TEXT = "Docs/Environment/pilot-reporter-replies"
+DEFAULT_PILOT_REPORTER_REPLY_REPORT_TEXT = "Docs/Environment/PILOT_REPORTER_REPLIES.md"
 DEFAULT_PILOT_GITHUB_SYNC_REPORT_TEXT = "Docs/Environment/PILOT_GITHUB_SYNC.md"
 DEFAULT_PILOT_GITHUB_FOLLOWUP_DIR_TEXT = "Docs/Environment/pilot-github-followups"
 GITHUB_ISSUE_RE = re.compile(r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/issues/\d+")
@@ -214,6 +216,18 @@ def build_pilot_github_issues_command(args: argparse.Namespace) -> str:
     )
 
 
+def build_pilot_reporter_replies_command(args: argparse.Namespace) -> str:
+    return (
+        "codex-harness pilot-reporter-replies "
+        f"--record-dir {args.pilot_record_dir} "
+        f"--usage-record-dir {args.record_dir} "
+        f"--usage-report {args.usage_report} "
+        f"--pilot-board-report {args.pilot_board_report} "
+        f"--out-dir {args.pilot_reporter_reply_out} "
+        f"--report {args.pilot_reporter_reply_report}"
+    )
+
+
 def build_pilot_github_sync_command(args: argparse.Namespace) -> str:
     return (
         "codex-harness pilot-github-sync "
@@ -318,6 +332,13 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
         )
         commands.append(
             {
+                "name": "export pilot reporter replies",
+                "command": build_pilot_reporter_replies_command(args),
+                "purpose": "write copyable reporter completion replies that match importer headings",
+            }
+        )
+        commands.append(
+            {
                 "name": "sync pilot GitHub issue readiness",
                 "command": build_pilot_github_sync_command(args),
                 "purpose": "fetch live pilot issues and identify which reporter updates are ready to convert",
@@ -388,6 +409,11 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
                     "name": "export pilot GitHub issue queue",
                     "command": build_pilot_github_issues_command(args),
                     "purpose": "write public GitHub issue bodies and gh issue create commands for active pilots",
+                },
+                {
+                    "name": "export pilot reporter replies",
+                    "command": build_pilot_reporter_replies_command(args),
+                    "purpose": "write copyable reporter completion replies that match importer headings",
                 },
                 {
                     "name": "sync pilot GitHub issue readiness",
@@ -564,6 +590,8 @@ def main() -> int:
     parser.add_argument("--pilot-handoff-out", default=DEFAULT_PILOT_HANDOFF_OUT_TEXT, help="Pilot handoff output directory")
     parser.add_argument("--pilot-github-issues-out", default=DEFAULT_PILOT_GITHUB_ISSUES_OUT_TEXT, help="Pilot GitHub issue body output directory")
     parser.add_argument("--pilot-github-issues-report", default=DEFAULT_PILOT_GITHUB_ISSUES_REPORT_TEXT, help="Pilot GitHub issue queue report path")
+    parser.add_argument("--pilot-reporter-reply-out", default=DEFAULT_PILOT_REPORTER_REPLY_OUT_TEXT, help="Pilot reporter reply template output directory")
+    parser.add_argument("--pilot-reporter-reply-report", default=DEFAULT_PILOT_REPORTER_REPLY_REPORT_TEXT, help="Pilot reporter reply queue report path")
     parser.add_argument("--pilot-github-sync-report", default=DEFAULT_PILOT_GITHUB_SYNC_REPORT_TEXT, help="Pilot GitHub issue sync report path")
     parser.add_argument("--pilot-github-followup-dir", default=DEFAULT_PILOT_GITHUB_FOLLOWUP_DIR_TEXT, help="Pilot GitHub issue follow-up output directory")
     parser.add_argument("--pilot-pack-out", default="/tmp/NEXT_EXTERNAL_PILOT_PACK.md", help="Pilot pack output path for the next prepare command")

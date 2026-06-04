@@ -99,6 +99,8 @@ def build_payload() -> dict:
         pilot_handoff_audit_report = temp_root / "PILOT_HANDOFF_AUDIT.md"
         pilot_github_issues_root = temp_root / "pilot-github-issues"
         pilot_github_issues_report = temp_root / "PILOT_GITHUB_ISSUES.md"
+        pilot_reporter_replies_root = temp_root / "pilot-reporter-replies"
+        pilot_reporter_replies_report = temp_root / "PILOT_REPORTER_REPLIES.md"
         pilot_github_sync_report = temp_root / "PILOT_GITHUB_SYNC.md"
         pilot_next_action_report = temp_root / "PILOT_NEXT_ACTION.md"
         beta_exit_audit_report = temp_root / "BETA_EXIT_AUDIT.md"
@@ -696,6 +698,26 @@ def build_payload() -> dict:
                 ],
             ),
             (
+                "pilot_reporter_replies",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "pilot-reporter-replies",
+                    "--record-dir",
+                    pilot_records.as_posix(),
+                    "--usage-record-dir",
+                    usage_records.as_posix(),
+                    "--usage-report",
+                    usage_report.as_posix(),
+                    "--pilot-board-report",
+                    pilot_board_report.as_posix(),
+                    "--out-dir",
+                    pilot_reporter_replies_root.as_posix(),
+                    "--report",
+                    pilot_reporter_replies_report.as_posix(),
+                    "--json",
+                ],
+            ),
+            (
                 "pilot_github_sync",
                 [
                     (venv / "bin" / "codex-harness").as_posix(),
@@ -971,6 +993,18 @@ def build_payload() -> dict:
                         step["status"] = "fail"
                         step["returncode"] = 1
                         step["stderr"] += "\nPilot handoff audit did not prove reporter-ready handoff folders."
+                if name == "pilot_reporter_replies" and completed.returncode == 0:
+                    reply_payload = json.loads(completed.stdout)
+                    if (
+                        reply_payload.get("status") != "pass"
+                        or reply_payload.get("readiness") != "reporter-replies-ready"
+                        or reply_payload.get("reply_count", 0) < 1
+                        or not pilot_reporter_replies_report.exists()
+                        or not (pilot_reporter_replies_root / "llm-app-pilot-reporter-reply.md").exists()
+                    ):
+                        step["status"] = "fail"
+                        step["returncode"] = 1
+                        step["stderr"] += "\nPilot reporter replies did not write a passing reporter reply packet."
                 if name == "usage_from_issue_pilot_conversion" and completed.returncode == 0:
                     conversion_payload = json.loads(completed.stdout)
                     pilot_update = conversion_payload.get("pilot_update") or {}

@@ -48,6 +48,7 @@ LABEL_MAP = {
 }
 
 NO_RESPONSE_VALUES = {"", "_no response_", "no response"}
+HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
 PILOT_DEFAULT_FIELDS = {
     "title": "title",
     "source_type": "source_type",
@@ -71,7 +72,7 @@ def normalize_label(value: str) -> str:
 
 
 def clean_value(value: str) -> str:
-    value = value.strip()
+    value = HTML_COMMENT_RE.sub("", value).strip()
     return "" if normalize_label(value) in NO_RESPONSE_VALUES else value
 
 

@@ -179,6 +179,25 @@ The report excludes secrets, personal data, private paths, proprietary source, r
         self.assertIn("private transcripts", sections["privacy_review"])
         self.assertEqual(("One reporter comment and one task.",), usage_from_issue.parse_items(sections["limitations"]))
 
+    def test_parse_issue_sections_ignores_html_guidance_comments(self):
+        body = """### Outcome
+
+_no response_
+<!-- Use `success`, `partial`, `failed`, or `inconclusive`. -->
+
+### Evidence
+
+_no response_
+<!-- Add at least two public-safe bullets. -->
+"""
+
+        sections = usage_from_issue.parse_issue_sections(body)
+
+        self.assertIn("outcome", sections)
+        self.assertIn("evidence", sections)
+        self.assertEqual("", sections["outcome"])
+        self.assertEqual("", sections["evidence"])
+
     def test_parse_items_keeps_wrapped_markdown_bullets_together(self):
         value = """- First evidence item wraps onto
   a continuation line.

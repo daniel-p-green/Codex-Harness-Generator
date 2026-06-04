@@ -52,6 +52,7 @@ class ProofStatusTests(unittest.TestCase):
                 {"name": "pilot_handoff", "status": "pass"},
                 {"name": "pilot_handoff_audit", "status": "pass"},
                 {"name": "pilot_github_issues", "status": "pass"},
+                {"name": "pilot_reporter_replies", "status": "pass"},
                 {"name": "pilot_github_sync", "status": "pass"},
                 {"name": "pilot_next_action", "status": "pass"},
                 {"name": "usage_from_issue_pilot_conversion", "status": "pass"},
@@ -125,6 +126,7 @@ Status: PASS
         self.assertIn("pilot_handoff=pass", install_check["detail"])
         self.assertIn("pilot_handoff_audit=pass", install_check["detail"])
         self.assertIn("pilot_github_issues=pass", install_check["detail"])
+        self.assertIn("pilot_reporter_replies=pass", install_check["detail"])
         self.assertIn("pilot_github_sync=pass", install_check["detail"])
         self.assertIn("pilot_next_action=pass", install_check["detail"])
         self.assertIn("usage_from_issue_pilot_conversion=pass", install_check["detail"])
@@ -141,6 +143,7 @@ Status: PASS
         self.assertIn("pilot_board_report", [check["name"] for check in payload["checks"]])
         self.assertIn("pilot_outreach_report", [check["name"] for check in payload["checks"]])
         self.assertIn("pilot_handoff_audit_report", [check["name"] for check in payload["checks"]])
+        self.assertIn("pilot_reporter_replies_report", [check["name"] for check in payload["checks"]])
         self.assertIn("pilot_next_action_report", [check["name"] for check in payload["checks"]])
         self.assertIn("pilot_github_followups", [check["name"] for check in payload["checks"]])
         self.assertIn("proof_next_report", [check["name"] for check in payload["checks"]])
@@ -375,6 +378,7 @@ Status: PASS
         self.assertIn("pilot_board_report", text)
         self.assertIn("pilot_outreach_report", text)
         self.assertIn("pilot_handoff_audit_report", text)
+        self.assertIn("pilot_reporter_replies_report", text)
         self.assertIn("pilot_next_action_report", text)
         self.assertIn("pilot_github_followups", text)
         self.assertIn("beta_exit_audit_report", text)

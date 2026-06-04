@@ -795,6 +795,30 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("export_pilot_github_issues.py", command)
 
+    if args.command == "pilot-reporter-replies":
+        command = []
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.usage_record_dir:
+            command.extend(["--usage-record-dir", args.usage_record_dir])
+        if args.usage_report:
+            command.extend(["--usage-report", args.usage_report])
+        if args.pilot_board_report:
+            command.extend(["--pilot-board-report", args.pilot_board_report])
+        if args.out_dir:
+            command.extend(["--out-dir", args.out_dir])
+        if args.report:
+            command.extend(["--report", args.report])
+        for status in args.status or []:
+            command.extend(["--status", status])
+        for slug in args.slug or []:
+            command.extend(["--slug", slug])
+        if args.no_write:
+            command.append("--no-write")
+        if args.json:
+            command.append("--json")
+        return python_script("export_pilot_reporter_replies.py", command)
+
     if args.command == "pilot-github-sync":
         command = []
         if args.record_dir:
@@ -1005,6 +1029,10 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.extend(["--pilot-github-issues-out", args.pilot_github_issues_out])
         if args.pilot_github_issues_report:
             command.extend(["--pilot-github-issues-report", args.pilot_github_issues_report])
+        if args.pilot_reporter_reply_out:
+            command.extend(["--pilot-reporter-reply-out", args.pilot_reporter_reply_out])
+        if args.pilot_reporter_reply_report:
+            command.extend(["--pilot-reporter-reply-report", args.pilot_reporter_reply_report])
         if args.pilot_github_sync_report:
             command.extend(["--pilot-github-sync-report", args.pilot_github_sync_report])
         if args.pilot_github_followup_dir:
@@ -1584,6 +1612,18 @@ def make_parser() -> argparse.ArgumentParser:
     pilot_github_issues.add_argument("--no-write", action="store_true", help="Do not write issue bodies or report")
     pilot_github_issues.add_argument("--json", action="store_true", help="Emit JSON payload")
 
+    pilot_reporter_replies = subparsers.add_parser("pilot-reporter-replies", help="Write reporter completion reply templates from active pilot records")
+    pilot_reporter_replies.add_argument("--record-dir", help="Directory where prepared pilot JSON records are read")
+    pilot_reporter_replies.add_argument("--usage-record-dir", help="Directory where usage record JSON files are read")
+    pilot_reporter_replies.add_argument("--usage-report", help="Usage-record Markdown report path for conversion commands")
+    pilot_reporter_replies.add_argument("--pilot-board-report", help="Pilot-board Markdown report path for conversion commands")
+    pilot_reporter_replies.add_argument("--out-dir", help="Directory for reporter reply template files")
+    pilot_reporter_replies.add_argument("--report", help="Markdown reporter reply queue report path")
+    pilot_reporter_replies.add_argument("--status", choices=["completed", "converted", "dropped", "invited", "prepared"], action="append", help="Pilot status to include; repeatable")
+    pilot_reporter_replies.add_argument("--slug", action="append", help="Pilot slug to include; repeatable")
+    pilot_reporter_replies.add_argument("--no-write", action="store_true", help="Do not write reply files or report")
+    pilot_reporter_replies.add_argument("--json", action="store_true", help="Emit JSON payload")
+
     pilot_github_sync = subparsers.add_parser("pilot-github-sync", help="Check live pilot GitHub issues for conversion readiness")
     pilot_github_sync.add_argument("--record-dir", help="Directory where prepared pilot JSON records are read")
     pilot_github_sync.add_argument("--usage-record-dir", help="Directory where usage record JSON files are read")
@@ -1723,6 +1763,8 @@ def make_parser() -> argparse.ArgumentParser:
     proof_next.add_argument("--pilot-handoff-out", help="Pilot handoff output directory")
     proof_next.add_argument("--pilot-github-issues-out", help="Pilot GitHub issue body output directory")
     proof_next.add_argument("--pilot-github-issues-report", help="Pilot GitHub issue queue report path")
+    proof_next.add_argument("--pilot-reporter-reply-out", help="Pilot reporter reply template output directory")
+    proof_next.add_argument("--pilot-reporter-reply-report", help="Pilot reporter reply queue report path")
     proof_next.add_argument("--pilot-github-sync-report", help="Pilot GitHub issue sync report path")
     proof_next.add_argument("--pilot-github-followup-dir", help="Pilot GitHub issue follow-up output directory")
     proof_next.add_argument("--pilot-pack-out", help="Pilot pack output path for the next prepare command")

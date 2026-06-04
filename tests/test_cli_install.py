@@ -50,6 +50,13 @@ class CheckCliInstallTests(unittest.TestCase):
                 report = Path(command[command.index("--report") + 1])
                 report.write_text("# Pilot Handoff Audit\n", encoding="utf-8")
                 stdout = json.dumps({"status": "pass", "readiness": "handoff-audit-ready", "handoff_count": 1})
+            elif "pilot-reporter-replies" in command:
+                output = Path(command[command.index("--out-dir") + 1])
+                report = Path(command[command.index("--report") + 1])
+                output.mkdir(parents=True, exist_ok=True)
+                (output / "llm-app-pilot-reporter-reply.md").write_text("# Reporter Completion Reply\n", encoding="utf-8")
+                report.write_text("# Pilot Reporter Replies\n", encoding="utf-8")
+                stdout = json.dumps({"status": "pass", "readiness": "reporter-replies-ready", "reply_count": 1})
             elif "pilot-github-sync" in command:
                 stdout = json.dumps(
                     {
@@ -92,7 +99,7 @@ class CheckCliInstallTests(unittest.TestCase):
 
         self.assertEqual("pass", payload["status"])
         names = [step["name"] for step in payload["steps"]]
-        self.assertEqual(["create_venv", "install_package", "profiles", "doctor", "init", "quickstart", "demo_capture", "prepare_pilot", "validate", "inspect", "adoption_plan", "equivalence", "upstream_drift", "init_from_project", "record_task_trial", "local_eval", "public_usage_report", "evidence_packet", "pilot_pack", "usage_from_harness", "usage_from_issue_lint", "usage_from_issue_preview", "usage_from_issue", "prepare_next_pilot", "prepare_pilot_batch_dry_run", "pilot_board", "pilot_update", "pilot_outreach", "pilot_handoff", "pilot_handoff_audit", "pilot_github_issues", "pilot_github_sync", "pilot_next_action", "usage_from_issue_pilot_conversion", "usage_from_github_issue_lint", "usage_gaps", "beta_exit_audit", "pilot_campaign", "proof_next", "migration_audit", "prepare_migration", "eval"], names)
+        self.assertEqual(["create_venv", "install_package", "profiles", "doctor", "init", "quickstart", "demo_capture", "prepare_pilot", "validate", "inspect", "adoption_plan", "equivalence", "upstream_drift", "init_from_project", "record_task_trial", "local_eval", "public_usage_report", "evidence_packet", "pilot_pack", "usage_from_harness", "usage_from_issue_lint", "usage_from_issue_preview", "usage_from_issue", "prepare_next_pilot", "prepare_pilot_batch_dry_run", "pilot_board", "pilot_update", "pilot_outreach", "pilot_handoff", "pilot_handoff_audit", "pilot_github_issues", "pilot_reporter_replies", "pilot_github_sync", "pilot_next_action", "usage_from_issue_pilot_conversion", "usage_from_github_issue_lint", "usage_gaps", "beta_exit_audit", "pilot_campaign", "proof_next", "migration_audit", "prepare_migration", "eval"], names)
         self.assertTrue(any("pip" in command and "install" in command for command in calls))
         create_venv_call = next(command for command in calls if command[0:3] == [sys.executable, "-m", "venv"])
         self.assertNotIn("--system-site-packages", create_venv_call)
@@ -123,6 +130,7 @@ class CheckCliInstallTests(unittest.TestCase):
         self.assertTrue(any("codex-harness" in command[0] and "local-eval" in command for command in calls))
         self.assertTrue(any("export-public-usage-report.py" in command[1] for command in calls if len(command) > 1))
         self.assertTrue(any("codex-harness" in command[0] and "evidence-packet" in command for command in calls))
+        self.assertTrue(any("codex-harness" in command[0] and "pilot-reporter-replies" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "pilot-pack" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "usage-from-harness" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "usage-from-issue" in command for command in calls))
