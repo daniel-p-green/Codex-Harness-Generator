@@ -30,6 +30,9 @@ replacement. What is proven today:
   profiles without waiting on a live model run.
 - `examples/deterministic/` contains checked-in generated harness snapshots for
   those profiles, and the release gate evaluates and smokes them.
+- `scripts/simulate_create_trigger.py` proves the deterministic `/create`
+  preflight handoff by writing `Docs/Environment/CREATION_CONTEXT.md` for fresh,
+  existing, hub, and resume scenarios.
 - Generated harnesses are required to include architecture, assumptions, source
   mapping, manifests, and validation reports.
 
@@ -121,6 +124,18 @@ python scripts/refresh_deterministic_examples.py
 python scripts/run_evals.py
 ```
 
+To test the `/create` trigger handoff without launching a full live generation:
+
+```bash
+python scripts/simulate_create_trigger.py /tmp/codex-create-trigger-example \
+  --project-type "Python CLI" \
+  --notes "solo developer" \
+  --json
+```
+
+This writes `Docs/Environment/CREATION_CONTEXT.md`, the artifact the orchestrator
+uses before profile selection, architecture, generation, and validation.
+
 ## Commands
 
 | Command | What it does |
@@ -204,6 +219,7 @@ This runs:
 - Offline smoke checks for generated harnesses.
 - Deterministic profile generation, evaluation, and smoke checks.
 - Checked-in deterministic example evaluation and smoke checks.
+- `/create` trigger contract tests for CREATION_CONTEXT.md handoff scenarios.
 - Contract and mutation tests.
 - Python compile checks.
 

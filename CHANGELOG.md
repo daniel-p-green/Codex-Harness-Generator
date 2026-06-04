@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Added `scripts/generate_minimal_harness.py` as a deterministic acceptance path that writes minimal valid Codex harnesses for software development, knowledge work, data analysis, and infrastructure profiles without requiring a live model run.
 - Added `scripts/eval_deterministic_profiles.py` so the release gate explicitly generates, evaluates, and smokes every deterministic profile.
 - Added `scripts/refresh_deterministic_examples.py` and checked-in deterministic example harnesses for each supported profile.
+- Added `scripts/simulate_create_trigger.py` and contract tests for the deterministic `/create` preflight handoff artifact.
 
 ### Changed
 
