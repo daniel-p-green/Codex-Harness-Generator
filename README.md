@@ -211,6 +211,9 @@ codex-harness init /tmp/codex-existing-project-harness \
   --from-project . \
   --project-name "Existing Project Harness" \
   --force
+codex-harness adoption-plan . \
+  --source-label "existing project" \
+  --report /tmp/HARNESS_ADOPTION_PLAN.md
 codex-harness init /tmp/codex-rag-harness \
   --brief "RAG app with prompts, evals, and retrieval checks" \
   --project-name "RAG Quality Harness" \
@@ -224,6 +227,9 @@ python scripts/codex_harness.py init /tmp/codex-existing-project-harness \
   --from-project . \
   --project-name "Existing Project Harness" \
   --force
+python scripts/codex_harness.py adoption-plan . \
+  --source-label "existing project" \
+  --report /tmp/HARNESS_ADOPTION_PLAN.md
 python scripts/codex_harness.py profile security-audit
 python scripts/codex_harness.py brief-acceptance /tmp/codex-rag-harness \
   --brief "RAG app with prompts, evals, and retrieval checks" \
@@ -239,6 +245,11 @@ python scripts/codex_harness.py local-eval /tmp/codex-harness-example
 python scripts/codex_harness.py eval /tmp/codex-harness-example
 python scripts/codex_harness.py smoke /tmp/codex-harness-example
 ```
+
+`adoption-plan` is non-destructive. It compares a generated harness blueprint to
+an existing project and labels files as `add`, `conflict`, or `identical` so
+project-local `AGENTS.md`, `.codex/config.toml`, and other existing guidance can
+be merged by hand.
 
 To inspect an older harness before manually porting it to Codex-native files:
 
@@ -467,6 +478,7 @@ Common subcommands:
 | `profile <slug>` | `profile_catalog.py` | Describes one deterministic starter, including first tasks and domain guardrails. |
 | `recommend <brief>` | `profile_catalog.py` | Recommends deterministic starters from a short project brief using explainable keyword matches, confidence labels, and low-confidence guidance. |
 | `inspect <path>` | `inspect_project.py` | Scans project metadata and recommends deterministic starters before generation. |
+| `adoption-plan <path>` | `plan_project_adoption.py` | Builds a non-destructive file-by-file plan for adopting a generated harness into an existing project. |
 | `generate <target>` | `generate_minimal_harness.py` | Writes a minimal valid Codex harness. |
 | `acceptance <target>` | `run_create_acceptance.py` | Runs trigger handoff, generation, eval, smoke, and report writing. |
 | `brief-acceptance <target>` | `run_brief_acceptance.py` | Recommends a profile from a brief, runs deterministic acceptance, and records `PROFILE_SELECTION.md`. |

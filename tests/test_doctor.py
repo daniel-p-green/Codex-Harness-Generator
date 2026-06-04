@@ -33,6 +33,7 @@ class DoctorTests(unittest.TestCase):
                 {"name": "init_from_project", "status": "pass"},
                 {"name": "validate", "status": "pass"},
                 {"name": "inspect", "status": "pass"},
+                {"name": "adoption_plan", "status": "pass"},
                 {"name": "local_eval", "status": "pass"},
                 {"name": "usage_from_harness", "status": "pass"},
                 {"name": "usage_from_issue", "status": "pass"},
@@ -71,6 +72,7 @@ class DoctorTests(unittest.TestCase):
         self.assertIn("validate=pass", install_check["detail"])
         self.assertIn("init_from_project=pass", install_check["detail"])
         self.assertIn("inspect=pass", install_check["detail"])
+        self.assertIn("adoption_plan=pass", install_check["detail"])
         self.assertIn("local_eval=pass", install_check["detail"])
         self.assertIn("usage_from_harness=pass", install_check["detail"])
         self.assertIn("usage_from_issue=pass", install_check["detail"])

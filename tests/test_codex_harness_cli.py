@@ -157,6 +157,53 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_adoption_plan_delegates_to_planner(self):
+        command, _ = self.run_cli(
+            [
+                "adoption-plan",
+                "/tmp/source",
+                "--profile",
+                "software-development",
+                "--project-name",
+                "Source Project",
+                "--harness",
+                "/tmp/harness",
+                "--max-files",
+                "25",
+                "--limit",
+                "2",
+                "--source-label",
+                "public source",
+                "--report",
+                "/tmp/ADOPTION_PLAN.md",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/plan_project_adoption.py",
+                "/tmp/source",
+                "--profile",
+                "software-development",
+                "--project-name",
+                "Source Project",
+                "--harness",
+                "/tmp/harness",
+                "--max-files",
+                "25",
+                "--limit",
+                "2",
+                "--source-label",
+                "public source",
+                "--report",
+                "/tmp/ADOPTION_PLAN.md",
+                "--json",
+            ],
+            command,
+        )
+
     def test_profiles_details_delegates_to_profile_catalog(self):
         command, _ = self.run_cli(["profiles", "--details"])
 

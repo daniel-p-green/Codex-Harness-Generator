@@ -75,6 +75,7 @@ def check_installable_cli() -> tuple[dict, dict]:
     demo_step = next((step for step in payload["steps"] if step["name"] == "demo_capture"), {})
     validate_step = next((step for step in payload["steps"] if step["name"] == "validate"), {})
     inspect_step = next((step for step in payload["steps"] if step["name"] == "inspect"), {})
+    adoption_step = next((step for step in payload["steps"] if step["name"] == "adoption_plan"), {})
     local_eval_step = next((step for step in payload["steps"] if step["name"] == "local_eval"), {})
     usage_from_harness_step = next((step for step in payload["steps"] if step["name"] == "usage_from_harness"), {})
     usage_from_issue_step = next((step for step in payload["steps"] if step["name"] == "usage_from_issue"), {})
@@ -83,7 +84,7 @@ def check_installable_cli() -> tuple[dict, dict]:
     if failed:
         detail = f"failed at {failed['name']}"
     else:
-        detail = "profiles={profiles} doctor={doctor_status} init={init_status} init_from_project={init_from_project_status} demo_capture={demo_status} validate={validate_status} inspect={inspect_status} local_eval={local_eval_status} usage_from_harness={usage_from_harness_status} usage_from_issue={usage_from_issue_status} migration_audit={migration_status} eval={eval_status}".format(
+        detail = "profiles={profiles} doctor={doctor_status} init={init_status} init_from_project={init_from_project_status} demo_capture={demo_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} local_eval={local_eval_status} usage_from_harness={usage_from_harness_status} usage_from_issue={usage_from_issue_status} migration_audit={migration_status} eval={eval_status}".format(
             profiles=profile_step.get("profile_count", "unknown"),
             doctor_status=doctor_step.get("status", "unknown"),
             init_status=init_step.get("status", "unknown"),
@@ -91,6 +92,7 @@ def check_installable_cli() -> tuple[dict, dict]:
             demo_status=demo_step.get("status", "unknown"),
             validate_status=validate_step.get("status", "unknown"),
             inspect_status=inspect_step.get("status", "unknown"),
+            adoption_status=adoption_step.get("status", "unknown"),
             local_eval_status=local_eval_step.get("status", "unknown"),
             usage_from_harness_status=usage_from_harness_step.get("status", "unknown"),
             usage_from_issue_status=usage_from_issue_step.get("status", "unknown"),

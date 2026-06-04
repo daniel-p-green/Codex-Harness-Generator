@@ -104,6 +104,26 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("inspect_project.py", command)
 
+    if args.command == "adoption-plan":
+        command = [args.project]
+        if args.profile:
+            command.extend(["--profile", args.profile])
+        if args.project_name:
+            command.extend(["--project-name", args.project_name])
+        if args.harness:
+            command.extend(["--harness", args.harness])
+        if args.max_files is not None:
+            command.extend(["--max-files", str(args.max_files)])
+        if args.limit is not None:
+            command.extend(["--limit", str(args.limit)])
+        if args.source_label:
+            command.extend(["--source-label", args.source_label])
+        if args.report:
+            command.extend(["--report", args.report])
+        if args.json:
+            command.append("--json")
+        return python_script("plan_project_adoption.py", command)
+
     if args.command == "generate":
         command = [args.target, "--profile", args.profile]
         if args.project_name:
@@ -423,6 +443,17 @@ def make_parser() -> argparse.ArgumentParser:
     inspect.add_argument("--max-files", type=int, default=800, help="Maximum files to scan before truncating")
     inspect.add_argument("--limit", type=int, default=3, help="Number of recommendations to show")
     inspect.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    adoption_plan = subparsers.add_parser("adoption-plan", help="Plan non-destructive harness adoption for an existing project")
+    adoption_plan.add_argument("project", help="Existing project directory")
+    adoption_plan.add_argument("--profile", help="Starter profile override; defaults to inspection recommendation")
+    adoption_plan.add_argument("--project-name", help="Project name for generated blueprint docs")
+    adoption_plan.add_argument("--harness", help="Existing generated harness blueprint to compare")
+    adoption_plan.add_argument("--max-files", type=int, default=800, help="Maximum files to inspect before truncating")
+    adoption_plan.add_argument("--limit", type=int, default=3, help="Number of inspection recommendations to consider")
+    adoption_plan.add_argument("--source-label", help="Public-safe project label")
+    adoption_plan.add_argument("--report", help="Write a Markdown adoption plan to this path")
+    adoption_plan.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     generate = subparsers.add_parser("generate", help="Generate a minimal deterministic harness")
     add_common_generation_args(generate)
