@@ -1,0 +1,310 @@
+#!/usr/bin/env python3
+"""Check live GitHub pilot issues for conversion readiness."""
+
+from __future__ import annotations
+
+import argparse
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Callable
+
+import export_pilot_github_issues
+import pilot_board
+import usage_from_github_issue
+from record_usage_case import DEFAULT_RECORD_DIR as DEFAULT_USAGE_RECORD_DIR
+from record_usage_case import DEFAULT_REPORT as DEFAULT_USAGE_REPORT
+from record_usage_case import find_sensitive_text
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_RECORD_DIR = pilot_board.DEFAULT_RECORD_DIR
+DEFAULT_REPORT = REPO_ROOT / "Docs" / "Environment" / "PILOT_GITHUB_SYNC.md"
+DEFAULT_PILOT_BOARD_REPORT = pilot_board.DEFAULT_REPORT
+
+
+def utc_now() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def display_path(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(REPO_ROOT).as_posix()
+    except (OSError, ValueError):
+        return path.as_posix()
+
+
+def selected_records(records: list[dict], statuses: tuple[str, ...], slugs: tuple[str, ...]) -> list[dict]:
+    status_set = set(statuses)
+    slug_set = set(slugs)
+    selected = []
+    for record in records:
+        if status_set and record.get("status") not in status_set:
+            continue
+        if slug_set and record.get("slug") not in slug_set:
+            continue
+        selected.append(record)
+    return sorted(selected, key=lambda item: (item.get("selected_index", 999), item.get("slug", "")))
+
+
+def lint_args(args: argparse.Namespace, record: dict, issue_url: str) -> argparse.Namespace:
+    return argparse.Namespace(
+        issue=issue_url,
+        repo=args.repo,
+        gh_bin=args.gh_bin,
+        include_comments=True,
+        slug=record["slug"],
+        title=None,
+        harness_label=None,
+        source_type=None,
+        generation_path=None,
+        generated=args.generated,
+        record_dir=args.usage_record_dir,
+        report=args.usage_report,
+        pilot_record_dir=args.record_dir,
+        pilot_board_report=args.pilot_board_report,
+        pilot_notes="converted from synced GitHub issue",
+        force=False,
+        lint_only=True,
+        no_write=False,
+        json=True,
+    )
+
+
+def conversion_command(issue_url: str, args: argparse.Namespace, *, lint_only: bool = False, no_write: bool = False) -> str:
+    parts = [
+        "codex-harness",
+        "usage-from-github-issue",
+        issue_url,
+        "--include-comments",
+        "--record-dir",
+        args.usage_record_dir,
+        "--report",
+        args.usage_report,
+        "--pilot-record-dir",
+        args.record_dir,
+        "--pilot-board-report",
+        args.pilot_board_report,
+    ]
+    if lint_only:
+        parts.append("--lint-only")
+    if no_write:
+        parts.append("--no-write")
+    parts.append("--json")
+    return " ".join(parts)
+
+
+def issue_sync_record(
+    args: argparse.Namespace,
+    record: dict,
+    fetch_issue: Callable[..., dict],
+) -> dict:
+    issue_url = export_pilot_github_issues.live_issue_url(record)
+    base = {
+        "slug": record["slug"],
+        "pilot_status": record["status"],
+        "domain": record["domain"],
+        "source_type": record["source_type"],
+        "generation_path": record["generation_path"],
+        "issue_url": issue_url,
+        "status": "missing-issue-url",
+        "readiness": "needs-live-issue",
+        "errors": [],
+        "warnings": [],
+        "missing_fields": [],
+        "counts": {},
+        "github_issue": {},
+        "commands": {},
+    }
+    if not issue_url:
+        base["errors"] = ["Pilot record has no live GitHub issue URL in notes or status history."]
+        return base
+
+    base["commands"] = {
+        "lint": conversion_command(issue_url, args, lint_only=True),
+        "preview": conversion_command(issue_url, args, no_write=True),
+        "convert": conversion_command(issue_url, args),
+    }
+    try:
+        github_payload = fetch_issue(issue_url, repo=args.repo or "", gh_bin=args.gh_bin, include_comments=True)
+        lint_payload = usage_from_github_issue.build_payload(
+            lint_args(args, record, issue_url),
+            github_payload=github_payload,
+        )
+    except SystemExit as exc:
+        base["status"] = "fetch-failed"
+        base["readiness"] = "needs-attention"
+        base["errors"] = [str(exc)]
+        return base
+
+    base["status"] = lint_payload["status"]
+    base["readiness"] = "conversion-ready" if lint_payload["status"] == "pass" else "waiting-for-reporter"
+    base["errors"] = lint_payload.get("errors", [])
+    base["warnings"] = lint_payload.get("warnings", [])
+    base["missing_fields"] = lint_payload.get("missing_fields", [])
+    base["counts"] = lint_payload.get("counts", {})
+    base["github_issue"] = lint_payload.get("github_issue", {})
+    return base
+
+
+def summarize(records: list[dict]) -> dict:
+    return {
+        "total": len(records),
+        "live_issue_count": sum(1 for record in records if record.get("issue_url")),
+        "conversion_ready": sum(1 for record in records if record.get("readiness") == "conversion-ready"),
+        "waiting_for_reporter": sum(1 for record in records if record.get("readiness") == "waiting-for-reporter"),
+        "needs_attention": sum(1 for record in records if record.get("readiness") == "needs-attention"),
+        "missing_issue_url": sum(1 for record in records if record.get("readiness") == "needs-live-issue"),
+    }
+
+
+def build_payload(args: argparse.Namespace, fetch_issue: Callable[..., dict] = usage_from_github_issue.fetch_github_issue) -> dict:
+    board = pilot_board.build_payload(Path(args.record_dir), usage_record_dir=Path(args.usage_record_dir))
+    statuses = tuple(args.status or ("invited", "completed"))
+    slugs = tuple(args.slug or ())
+    records = [
+        issue_sync_record(args, record, fetch_issue)
+        for record in selected_records(board["records"], statuses, slugs)
+    ]
+    summary = summarize(records)
+    if board["status"] != "pass" or summary["needs_attention"]:
+        status = "fail"
+    else:
+        status = "pass"
+    if not records:
+        readiness = "no-live-pilots"
+    elif summary["conversion_ready"]:
+        readiness = "conversion-ready"
+    elif summary["waiting_for_reporter"] or summary["missing_issue_url"]:
+        readiness = "waiting-for-reporters"
+    else:
+        readiness = "needs-attention"
+    return {
+        "generated": utc_now(),
+        "status": status,
+        "readiness": readiness,
+        "record_dir": args.record_dir,
+        "usage_record_dir": args.usage_record_dir,
+        "statuses": list(statuses),
+        "slugs": list(slugs),
+        "summary": summary,
+        "pilot_board": {
+            "status": board["status"],
+            "readiness": board["readiness"],
+            "summary": board["summary"],
+            "errors": board["errors"],
+        },
+        "records": records,
+        "claim_boundary": (
+            "Pilot GitHub issue sync checks public intake readiness only; it is not usage proof until "
+            "completed evidence is converted into a validated usage record."
+        ),
+    }
+
+
+def write_report(path: Path, payload: dict) -> None:
+    summary = payload["summary"]
+    lines = [
+        "# Pilot GitHub Issue Sync",
+        "",
+        f"Generated: {payload['generated']}",
+        f"Status: {payload['status'].upper()}",
+        f"Readiness: {payload['readiness']}",
+        "",
+        payload["claim_boundary"],
+        "",
+        "## Summary",
+        "",
+        f"- Tracked pilots: {summary['total']}",
+        f"- Live issue URLs: {summary['live_issue_count']}",
+        f"- Conversion-ready issues: {summary['conversion_ready']}",
+        f"- Waiting for reporter: {summary['waiting_for_reporter']}",
+        f"- Needs attention: {summary['needs_attention']}",
+        f"- Missing live issue URL: {summary['missing_issue_url']}",
+        "",
+        "## Issue Readiness",
+        "",
+    ]
+    if not payload["records"]:
+        lines.extend(["- none", ""])
+    for record in payload["records"]:
+        lines.extend(
+            [
+                f"### {record['slug']}",
+                "",
+                f"- Pilot status: `{record['pilot_status']}`",
+                f"- Readiness: `{record['readiness']}`",
+                f"- Issue: {record['issue_url'] or 'not recorded'}",
+                f"- GitHub state: `{record.get('github_issue', {}).get('state', 'unknown')}`",
+                f"- Comments included: {record.get('github_issue', {}).get('comment_count', 0)}",
+                f"- Missing fields: {', '.join(record['missing_fields']) if record['missing_fields'] else 'none'}",
+            ]
+        )
+        if record["errors"]:
+            lines.extend(["", "Errors:"])
+            lines.extend(f"- {error}" for error in record["errors"])
+        if record["warnings"]:
+            lines.extend(["", "Warnings:"])
+            lines.extend(f"- {warning}" for warning in record["warnings"])
+        if record["commands"]:
+            lines.extend(
+                [
+                    "",
+                    "Commands:",
+                    "",
+                    "```bash",
+                    record["commands"]["lint"],
+                    record["commands"]["preview"],
+                    record["commands"]["convert"],
+                    "```",
+                ]
+            )
+        lines.append("")
+    lines.extend(
+        [
+            "## Claim Boundary",
+            "",
+            "Do not count live issues, comments, or passing lint as adoption proof. Count only converted, validated usage records.",
+            "",
+        ]
+    )
+    text = "\n".join(lines).rstrip() + "\n"
+    findings = find_sensitive_text(text)
+    if findings:
+        raise SystemExit("Refusing to write GitHub issue sync report with sensitive text: " + ", ".join(findings))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--record-dir", default=DEFAULT_RECORD_DIR.as_posix(), help="Pilot-board record directory")
+    parser.add_argument("--usage-record-dir", default=DEFAULT_USAGE_RECORD_DIR.as_posix(), help="Usage-record JSON directory")
+    parser.add_argument("--usage-report", default=DEFAULT_USAGE_REPORT.as_posix(), help="Usage-record Markdown report path")
+    parser.add_argument("--pilot-board-report", default=DEFAULT_PILOT_BOARD_REPORT.as_posix(), help="Pilot-board Markdown report path")
+    parser.add_argument("--report", default=DEFAULT_REPORT.as_posix(), help="GitHub issue sync report path")
+    parser.add_argument("--repo", help="Optional GitHub repository in owner/name form")
+    parser.add_argument("--gh-bin", default="gh", help="GitHub CLI executable")
+    parser.add_argument("--generated", default=utc_now(), help="UTC timestamp override for previewed records")
+    parser.add_argument("--status", action="append", choices=sorted(pilot_board.ALLOWED_STATUSES), help="Pilot status to include; repeatable")
+    parser.add_argument("--slug", action="append", help="Pilot slug to include; repeatable")
+    parser.add_argument("--no-write", action="store_true", help="Do not write the Markdown report")
+    parser.add_argument("--json", action="store_true", help="Emit JSON payload")
+    args = parser.parse_args()
+
+    payload = build_payload(args)
+    if not args.no_write:
+        write_report(Path(args.report), payload)
+    if args.json:
+        print(json.dumps(payload, indent=2))
+    else:
+        print(f"Pilot GitHub sync: {payload['readiness']}")
+        print(f"- tracked pilots: {payload['summary']['total']}")
+        print(f"- conversion-ready: {payload['summary']['conversion_ready']}")
+        print(f"- waiting: {payload['summary']['waiting_for_reporter']}")
+        print(f"- boundary: {payload['claim_boundary']}")
+    return 0 if payload["status"] == "pass" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

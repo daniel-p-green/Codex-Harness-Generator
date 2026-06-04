@@ -23,6 +23,7 @@ DEFAULT_USAGE_REPORT_TEXT = "Docs/Environment/USAGE_RECORDS.md"
 DEFAULT_PILOT_HANDOFF_OUT_TEXT = "Docs/Environment/pilot-handoffs"
 DEFAULT_PILOT_GITHUB_ISSUES_OUT_TEXT = "Docs/Environment/pilot-github-issues"
 DEFAULT_PILOT_GITHUB_ISSUES_REPORT_TEXT = "Docs/Environment/PILOT_GITHUB_ISSUES.md"
+DEFAULT_PILOT_GITHUB_SYNC_REPORT_TEXT = "Docs/Environment/PILOT_GITHUB_SYNC.md"
 GITHUB_ISSUE_RE = re.compile(r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/issues/\d+")
 
 
@@ -212,6 +213,17 @@ def build_pilot_github_issues_command(args: argparse.Namespace) -> str:
     )
 
 
+def build_pilot_github_sync_command(args: argparse.Namespace) -> str:
+    return (
+        "codex-harness pilot-github-sync "
+        f"--record-dir {args.pilot_record_dir} "
+        f"--usage-record-dir {args.record_dir} "
+        f"--usage-report {args.usage_report} "
+        f"--pilot-board-report {args.pilot_board_report} "
+        f"--report {args.pilot_github_sync_report}"
+    )
+
+
 def active_pilot_for_next(gaps_payload: dict, board_payload: dict) -> dict | None:
     next_pilot = (gaps_payload.get("suggested_pilots") or [None])[0]
     if not next_pilot:
@@ -294,6 +306,13 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
                 "purpose": "write public GitHub issue bodies and gh issue create commands for active pilots",
             }
         )
+        commands.append(
+            {
+                "name": "sync pilot GitHub issue readiness",
+                "command": build_pilot_github_sync_command(args),
+                "purpose": "fetch live pilot issues and identify which reporter updates are ready to convert",
+            }
+        )
         if active_pilot["status"] == "prepared":
             commands.append(
                 {
@@ -358,6 +377,11 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
                     "name": "export pilot GitHub issue queue",
                     "command": build_pilot_github_issues_command(args),
                     "purpose": "write public GitHub issue bodies and gh issue create commands for active pilots",
+                },
+                {
+                    "name": "sync pilot GitHub issue readiness",
+                    "command": build_pilot_github_sync_command(args),
+                    "purpose": "fetch live pilot issues and identify which reporter updates are ready to convert",
                 },
             ]
         )
@@ -528,6 +552,7 @@ def main() -> int:
     parser.add_argument("--pilot-handoff-out", default=DEFAULT_PILOT_HANDOFF_OUT_TEXT, help="Pilot handoff output directory")
     parser.add_argument("--pilot-github-issues-out", default=DEFAULT_PILOT_GITHUB_ISSUES_OUT_TEXT, help="Pilot GitHub issue body output directory")
     parser.add_argument("--pilot-github-issues-report", default=DEFAULT_PILOT_GITHUB_ISSUES_REPORT_TEXT, help="Pilot GitHub issue queue report path")
+    parser.add_argument("--pilot-github-sync-report", default=DEFAULT_PILOT_GITHUB_SYNC_REPORT_TEXT, help="Pilot GitHub issue sync report path")
     parser.add_argument("--pilot-pack-out", default="/tmp/NEXT_EXTERNAL_PILOT_PACK.md", help="Pilot pack output path for the next prepare command")
     parser.add_argument("--issue-out", default="/tmp/NEXT_EXTERNAL_USAGE_ISSUE_DRAFT.md", help="Issue draft output path for the next prepare command")
     parser.add_argument("--report", default=DEFAULT_REPORT.as_posix(), help="Proof-next Markdown path")

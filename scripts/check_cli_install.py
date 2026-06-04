@@ -82,6 +82,7 @@ def build_payload() -> dict:
         pilot_handoff_audit_report = temp_root / "PILOT_HANDOFF_AUDIT.md"
         pilot_github_issues_root = temp_root / "pilot-github-issues"
         pilot_github_issues_report = temp_root / "PILOT_GITHUB_ISSUES.md"
+        pilot_github_sync_report = temp_root / "PILOT_GITHUB_SYNC.md"
         beta_exit_audit_report = temp_root / "BETA_EXIT_AUDIT.md"
         usage_records = temp_root / "usage-records"
         usage_report = temp_root / "USAGE_RECORDS.md"
@@ -601,7 +602,7 @@ def build_payload() -> dict:
                     "--report",
                     pilot_board_report.as_posix(),
                     "--notes",
-                    "install smoke update",
+                    "opened public pilot issue https://github.com/example/repo/issues/12",
                     "--json",
                 ],
             ),
@@ -678,6 +679,26 @@ def build_payload() -> dict:
                     pilot_github_issues_root.as_posix(),
                     "--report",
                     pilot_github_issues_report.as_posix(),
+                    "--json",
+                ],
+            ),
+            (
+                "pilot_github_sync",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "pilot-github-sync",
+                    "--record-dir",
+                    pilot_records.as_posix(),
+                    "--usage-record-dir",
+                    usage_records.as_posix(),
+                    "--usage-report",
+                    usage_report.as_posix(),
+                    "--pilot-board-report",
+                    pilot_board_report.as_posix(),
+                    "--report",
+                    pilot_github_sync_report.as_posix(),
+                    "--gh-bin",
+                    fake_gh.as_posix(),
                     "--json",
                 ],
             ),
