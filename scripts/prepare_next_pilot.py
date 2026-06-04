@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import prepare_pilot
+import pilot_board
 import usage_gaps
 from run_brief_acceptance import DEFAULT_CREATED, DEFAULT_GENERATED_DATE
 
@@ -61,7 +62,30 @@ def build_payload(args: argparse.Namespace) -> dict:
     pilot = select_pilot(gaps_payload, args.index)
     prepare_args = build_prepare_args(args, pilot)
     prepared = prepare_pilot.build_payload(prepare_args)
+    pilot_record = None
+    if prepared["status"] == "pass" and (args.pilot_record_out or args.pilot_record_dir):
+        provisional_payload = {
+            "generated": args.generated,
+            "selected_index": args.index,
+            "selected_pilot": pilot,
+            "prepared_pilot": prepared,
+            "claim_boundary": "Preparing the next pilot is not usage proof until the reporter completes a real task trial and the evidence is converted into a checked usage record.",
+        }
+        record = pilot_board.build_record(
+            provisional_payload,
+            status=args.pilot_status,
+            notes=args.pilot_notes,
+        )
+        record_path = (
+            Path(args.pilot_record_out)
+            if args.pilot_record_out
+            else pilot_board.default_record_path(Path(args.pilot_record_dir), record["slug"])
+        )
+        pilot_record = pilot_board.write_record(record_path, record, force=args.force)
+
     status = "pass" if gaps_payload["status"] == "pass" and prepared["status"] == "pass" else "fail"
+    if pilot_record and pilot_record["status"] != "pass":
+        status = "fail"
     return {
         "generated": args.generated,
         "status": status,
@@ -74,6 +98,7 @@ def build_payload(args: argparse.Namespace) -> dict:
             "summary": gaps_payload["summary"],
         },
         "prepared_pilot": prepared,
+        "pilot_record": pilot_record,
         "claim_boundary": "Preparing the next pilot is not usage proof until the reporter completes a real task trial and the evidence is converted into a checked usage record.",
     }
 
@@ -106,6 +131,10 @@ def main() -> int:
     parser.add_argument("--min-external-or-multi-project", type=int, default=usage_gaps.DEFAULT_TARGETS["min_external_or_multi_project"], help="Target external or multi-project records")
     parser.add_argument("--min-domains", type=int, default=usage_gaps.DEFAULT_TARGETS["min_domains"], help="Target distinct domains")
     parser.add_argument("--min-installed-init-brief", type=int, default=usage_gaps.DEFAULT_TARGETS["min_installed_init_brief"], help="Target records generated via installed brief-based generation")
+    parser.add_argument("--pilot-record-dir", help="Optional directory where a prepared-pilot tracking record is written")
+    parser.add_argument("--pilot-record-out", help="Optional explicit prepared-pilot tracking record path")
+    parser.add_argument("--pilot-status", choices=sorted(pilot_board.ALLOWED_STATUSES), default="prepared", help="Status for optional pilot-board record")
+    parser.add_argument("--pilot-notes", default="", help="Optional public-safe note for the pilot-board record")
     parser.add_argument("--force", action="store_true", help="Replace target if it already contains files")
     parser.add_argument("--json", action="store_true", help="Emit JSON payload")
     args = parser.parse_args()
@@ -120,6 +149,8 @@ def main() -> int:
         print(f"- selected: {selected['domain']} ({selected['profile']})")
         print(f"- target: {prepared['target']}")
         print(f"- pilot pack: {prepared.get('pilot_pack', {}).get('pack')}")
+        if payload["pilot_record"]:
+            print(f"- pilot record: {payload['pilot_record'].get('path')}")
         print(f"- boundary: {payload['claim_boundary']}")
     return 0 if payload["status"] == "pass" else 1
 

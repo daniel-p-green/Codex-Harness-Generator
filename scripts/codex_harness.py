@@ -203,6 +203,14 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.extend(["--min-domains", str(args.min_domains)])
         if args.min_installed_init_brief is not None:
             command.extend(["--min-installed-init-brief", str(args.min_installed_init_brief)])
+        if args.pilot_record_dir:
+            command.extend(["--pilot-record-dir", args.pilot_record_dir])
+        if args.pilot_record_out:
+            command.extend(["--pilot-record-out", args.pilot_record_out])
+        if args.pilot_status:
+            command.extend(["--pilot-status", args.pilot_status])
+        if args.pilot_notes:
+            command.extend(["--pilot-notes", args.pilot_notes])
         if args.force:
             command.append("--force")
         if args.json:
@@ -545,6 +553,18 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("export_pilot_campaign.py", command)
 
+    if args.command == "pilot-board":
+        command = []
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.report:
+            command.extend(["--report", args.report])
+        if args.no_write:
+            command.append("--no-write")
+        if args.json:
+            command.append("--json")
+        return python_script("pilot_board.py", command)
+
     if args.command == "usage-from-issue":
         command = [
             args.issue_body,
@@ -802,6 +822,14 @@ def make_parser() -> argparse.ArgumentParser:
     prepare_next_pilot.add_argument("--min-external-or-multi-project", type=int, help="Target external or multi-project records")
     prepare_next_pilot.add_argument("--min-domains", type=int, help="Target distinct domains")
     prepare_next_pilot.add_argument("--min-installed-init-brief", type=int, help="Target records generated via installed brief-based generation")
+    prepare_next_pilot.add_argument("--pilot-record-dir", help="Optional directory where a prepared-pilot tracking record is written")
+    prepare_next_pilot.add_argument("--pilot-record-out", help="Optional explicit prepared-pilot tracking record path")
+    prepare_next_pilot.add_argument(
+        "--pilot-status",
+        choices=["completed", "converted", "dropped", "invited", "prepared"],
+        help="Status for optional pilot-board record",
+    )
+    prepare_next_pilot.add_argument("--pilot-notes", help="Optional public-safe note for the pilot-board record")
     prepare_next_pilot.add_argument("--force", action="store_true", help="Replace target if it already contains files")
     prepare_next_pilot.add_argument("--json", action="store_true", help="Emit JSON payload")
 
@@ -1023,6 +1051,12 @@ def make_parser() -> argparse.ArgumentParser:
     pilot_campaign.add_argument("--min-installed-init-brief", type=int, help="Target records generated via installed brief-based generation")
     pilot_campaign.add_argument("--no-write", action="store_true", help="Do not write the Markdown campaign")
     pilot_campaign.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    pilot_board = subparsers.add_parser("pilot-board", help="Summarize prepared pilot tracking records")
+    pilot_board.add_argument("--record-dir", help="Directory where prepared pilot JSON records are read")
+    pilot_board.add_argument("--report", help="Pilot board Markdown path")
+    pilot_board.add_argument("--no-write", action="store_true", help="Do not write the Markdown board")
+    pilot_board.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     usage_from_issue = subparsers.add_parser("usage-from-issue", help="Create usage evidence from a GitHub issue-form body")
     usage_from_issue.add_argument("issue_body", help="Markdown issue body path, or '-' for stdin")

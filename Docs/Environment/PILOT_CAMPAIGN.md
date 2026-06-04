@@ -1,14 +1,15 @@
 # External Pilot Campaign
 
-Generated: 2026-06-04T12:50:16Z
+Generated: 2026-06-04T13:02:38Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 
 This campaign packet turns the current beta-exit evidence gaps into
 concrete external or multi-project pilot asks. It is an evidence
 collection plan, not adoption proof.
-Use `codex-harness prepare-next-pilot <target>` to prepare the first
-suggested pilot directly from the current gaps.
+Use `codex-harness prepare-next-pilot <target> --pilot-record-dir Docs/Environment/pilot-records`
+to prepare the first suggested pilot directly from the current gaps and
+track it with `codex-harness pilot-board`.
 
 ## Current Evidence Gap
 
@@ -86,8 +87,9 @@ After each pilot:
 
 1. Review the pilot pack and issue draft for privacy-sensitive text.
 2. Convert acceptable evidence with `codex-harness usage-from-harness` or `codex-harness usage-from-issue`.
-3. Re-run `codex-harness usage-gaps` and refresh this campaign only if gaps remain.
-4. Do not drop the beta label until `codex-harness proof-status` passes with the beta-exit thresholds.
+3. Update or review `codex-harness pilot-board` so completed pilots do not stay stuck as outreach.
+4. Re-run `codex-harness usage-gaps` and refresh this campaign only if gaps remain.
+5. Do not drop the beta label until `codex-harness proof-status` passes with the beta-exit thresholds.
 
 ## Claim Boundary
 

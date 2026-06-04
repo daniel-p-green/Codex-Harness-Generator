@@ -45,6 +45,9 @@ Already proven:
 - Gap-selected pilot preparation through `codex-harness prepare-next-pilot`,
   so maintainers can turn the highest-priority current usage gap into a
   generated pilot harness and evidence kit without copying generated commands.
+- Prepared-pilot tracking through `codex-harness pilot-board`, so maintainers
+  can see pending, completed, converted, and dropped pilots without counting
+  outreach state as usage proof.
 - Checked-in deterministic, create-acceptance, brief-acceptance, and live-create
   examples.
 - Privacy-checked usage-record validation.
@@ -84,8 +87,11 @@ The project can stop calling itself a beta only when all of these are true:
    Use `.github/ISSUE_TEMPLATE/external-usage-report.yml` and
    `Docs/Environment/EXTERNAL_USAGE_EVIDENCE.md`. Use
    `codex-harness prepare-pilot` to create the next generated pilot harness,
-   one-task checklist, and optional issue-body draft in one command. When an
-   existing generated harness already has local task trials, use
+   one-task checklist, and optional issue-body draft in one command. Add
+   `--pilot-record-dir Docs/Environment/pilot-records` to
+   `codex-harness prepare-next-pilot` when the prepared pilot should appear in
+   `codex-harness pilot-board`. When an existing generated harness already has
+   local task trials, use
    `codex-harness pilot-pack` to give the reporter a one-task checklist and
    optional issue-body draft, then use
    `codex-harness usage-from-harness` to draft the privacy-checked record from
@@ -97,8 +103,9 @@ The project can stop calling itself a beta only when all of these are true:
    checked-in usage record. Run `codex-harness usage-gaps` after each record to
    pick the next pilot profile, source type, and generation path by the largest
    remaining beta-exit gap. Use `codex-harness prepare-next-pilot` to prepare
-   that next suggested pilot directly, then run `codex-harness pilot-campaign`
-   when a shareable outreach packet is useful.
+   that next suggested pilot directly, then run `codex-harness pilot-board` to
+   inspect in-flight pilots or `codex-harness pilot-campaign` when a shareable
+   outreach packet is useful.
 
 2. Add more public-safe live examples.
    Prioritize domains where the generated harness has high-risk boundaries:

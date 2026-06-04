@@ -68,6 +68,10 @@ class PrepareNextPilotTests(unittest.TestCase):
             min_external_or_multi_project=3,
             min_domains=4,
             min_installed_init_brief=2,
+            pilot_record_dir=None,
+            pilot_record_out=None,
+            pilot_status="prepared",
+            pilot_notes="",
             force=False,
         )
 
@@ -97,6 +101,31 @@ class PrepareNextPilotTests(unittest.TestCase):
         self.assertIn("### Domain or project type", issue)
         self.assertIn("LLM app", issue)
         self.assertIn("not usage proof", payload["claim_boundary"])
+        self.assertIsNone(payload["pilot_record"])
+
+    def test_prepare_next_pilot_can_write_pilot_board_record(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            record_dir = root / "records"
+            record_dir.mkdir()
+            self.write_record(record_dir)
+            target = root / "pilot"
+            pack_out = root / "PILOT_PACK.md"
+            issue_out = root / "ISSUE.md"
+            pilot_records = root / "pilot-records"
+            args = self.args(record_dir, target, pack_out, issue_out)
+            args.pilot_record_dir = pilot_records.as_posix()
+            args.pilot_notes = "prepared for external reporter"
+
+            payload = prepare_next_pilot.build_payload(args)
+            record_path = Path(payload["pilot_record"]["path"])
+            record = json.loads(record_path.read_text(encoding="utf-8"))
+
+        self.assertEqual("pass", payload["status"], payload)
+        self.assertEqual("pass", payload["pilot_record"]["status"])
+        self.assertEqual("llm-app-pilot", record["slug"])
+        self.assertEqual("prepared", record["status"])
+        self.assertEqual("prepared for external reporter", record["notes"])
 
     def test_select_pilot_rejects_out_of_range_index(self):
         payload = {"suggested_pilots": [{"profile": "llm-app"}]}

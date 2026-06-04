@@ -359,6 +359,12 @@ class CodexHarnessCliTests(unittest.TestCase):
                 "4",
                 "--min-installed-init-brief",
                 "2",
+                "--pilot-record-dir",
+                "/tmp/pilot-records",
+                "--pilot-status",
+                "invited",
+                "--pilot-notes",
+                "sent to reporter",
                 "--force",
                 "--json",
             ]
@@ -418,7 +424,40 @@ class CodexHarnessCliTests(unittest.TestCase):
                 "4",
                 "--min-installed-init-brief",
                 "2",
+                "--pilot-record-dir",
+                "/tmp/pilot-records",
+                "--pilot-status",
+                "invited",
+                "--pilot-notes",
+                "sent to reporter",
                 "--force",
+                "--json",
+            ],
+            command,
+        )
+
+    def test_pilot_board_delegates_to_board_reporter(self):
+        command, _ = self.run_cli(
+            [
+                "pilot-board",
+                "--record-dir",
+                "/tmp/pilot-records",
+                "--report",
+                "/tmp/PILOT_BOARD.md",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/pilot_board.py",
+                "--record-dir",
+                "/tmp/pilot-records",
+                "--report",
+                "/tmp/PILOT_BOARD.md",
+                "--no-write",
                 "--json",
             ],
             command,
