@@ -129,10 +129,14 @@ runs validation so the output is reviewable on disk.
 git clone https://github.com/daniel-p-green/Codex-Harness-Generator.git
 cd Codex-Harness-Generator
 
-# 2. Launch Codex in the directory
+# 2. Optional: install the local helper command
+python -m pip install -e .
+codex-harness --help
+
+# 3. Launch Codex in the directory
 codex
 
-# 3. Create a harness, then answer the prompts
+# 4. Create a harness, then answer the prompts
 /create
 ```
 
@@ -147,6 +151,7 @@ harness deterministically:
 
 ```bash
 python scripts/codex_harness.py profiles
+codex-harness profiles
 python scripts/codex_harness.py profiles --details
 python scripts/codex_harness.py recommend "RAG app with prompts, evals, and retrieval checks"
 python scripts/codex_harness.py profile security-audit
@@ -294,7 +299,7 @@ claims:
 
 ```bash
 python scripts/codex_harness.py usage-validate \
-  --min-records 1 \
+  --min-records 2 \
   --require-non-synthetic \
   --require-success
 ```
@@ -322,6 +327,13 @@ evaluators directly.
 ## Script Entry Point
 
 For local CLI use before or alongside Codex, start with:
+
+```bash
+python -m pip install -e .
+codex-harness --help
+```
+
+If you do not want to install the helper command, call the wrapper directly:
 
 ```bash
 python scripts/codex_harness.py --help

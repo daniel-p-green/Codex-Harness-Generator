@@ -15,6 +15,14 @@ spec.loader.exec_module(codex_harness)
 
 
 class CodexHarnessCliTests(unittest.TestCase):
+    def test_pyproject_exposes_codex_harness_console_script(self):
+        pyproject = (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8")
+
+        self.assertIn('name = "codex-harness-generator"', pyproject)
+        self.assertIn('codex-harness = "scripts.codex_harness:main"', pyproject)
+        self.assertIn('packages = ["scripts"]', pyproject)
+        self.assertTrue((REPO_ROOT / "scripts" / "__init__.py").exists())
+
     def run_cli(self, argv):
         with patch.object(codex_harness.sys, "executable", "/usr/bin/python3"):
             with patch.object(codex_harness.subprocess, "run", return_value=subprocess.CompletedProcess([], 0)) as run:
