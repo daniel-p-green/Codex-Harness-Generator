@@ -256,6 +256,13 @@ deterministic profile generator, including checked-in examples. They do not
 prove that every live `/create` run will be perfect, so meaningful changes should
 still be reviewed against generated artifacts.
 
+For an authenticated local Codex CLI check against a generated harness, run:
+
+```bash
+python scripts/smoke_generated_harness.py --codex-live \
+  examples/create-acceptance/software-development
+```
+
 ## Project Structure
 
 ```text

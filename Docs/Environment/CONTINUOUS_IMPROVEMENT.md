@@ -9,7 +9,7 @@ This project should improve by turning every escaped harness issue into a repeat
 2. **Generated harness fixture eval**: `scripts/eval_generated_harness.py`
    - Scores representative generated harnesses across correctness, Codex compatibility, safety/privacy, user clarity, maintainability, and source alignment.
 3. **Generated harness smoke**: `scripts/smoke_generated_harness.py`
-   - Proves Codex-facing files can be read, parsed, and resolved. CI runs the offline mode; local maintainers can add `--codex-live` for an authenticated Codex CLI instruction-loading check.
+   - Proves Codex-facing files can be read, parsed, and resolved. CI runs the offline mode; local maintainers can add `--codex-live` for an authenticated Codex CLI instruction-loading check through `codex exec`.
 4. **Mutation tests**: `tests/test_generated_harness_contract.py`
    - Starts from valid generated fixtures, breaks one contract at a time, and verifies the evaluator catches the defect.
 5. **Full gate**: `scripts/run_evals.py`
@@ -31,7 +31,8 @@ For a local live smoke check against the Codex CLI, run:
 python scripts/smoke_generated_harness.py --codex-live tests/fixtures/generated_harnesses/software-dev-basic
 ```
 
-Use this only on machines with authenticated Codex CLI access.
+Use this only on machines with authenticated Codex CLI access. The live mode is
+non-interactive and should not start the Codex TUI.
 
 ## Fixture Coverage
 

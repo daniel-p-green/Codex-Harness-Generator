@@ -116,10 +116,13 @@ def smoke_codex_live(root: Path, prompt: str) -> dict:
 
     command = [
         codex,
+        "exec",
         "--cd",
         root.as_posix(),
-        "--ask-for-approval",
-        "never",
+        "--config",
+        'approval_policy="never"',
+        "--skip-git-repo-check",
+        "--ephemeral",
         prompt,
     ]
     completed = subprocess.run(command, text=True, capture_output=True, check=False, timeout=120)

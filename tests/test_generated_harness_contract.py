@@ -1,4 +1,5 @@
 import importlib.util
+from unittest.mock import patch
 import shutil
 import subprocess
 import sys
@@ -9,6 +10,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EVAL_PATH = REPO_ROOT / "scripts" / "eval_generated_harness.py"
+SMOKE_PATH = REPO_ROOT / "scripts" / "smoke_generated_harness.py"
 FIXTURES_ROOT = REPO_ROOT / "tests" / "fixtures" / "generated_harnesses"
 DETERMINISTIC_PROFILES = [
     "data-analysis",
@@ -22,6 +24,12 @@ eval_generated_harness = importlib.util.module_from_spec(spec)
 assert spec.loader is not None
 sys.modules[spec.name] = eval_generated_harness
 spec.loader.exec_module(eval_generated_harness)
+
+smoke_spec = importlib.util.spec_from_file_location("smoke_generated_harness", SMOKE_PATH)
+smoke_generated_harness = importlib.util.module_from_spec(smoke_spec)
+assert smoke_spec.loader is not None
+sys.modules[smoke_spec.name] = smoke_generated_harness
+smoke_spec.loader.exec_module(smoke_generated_harness)
 
 
 def write(path: Path, text: str) -> None:
@@ -74,6 +82,22 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         completed = subprocess.run(command, cwd=REPO_ROOT, text=True, capture_output=True, check=False)
         self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
         self.assertIn('"status": "pass"', completed.stdout)
+
+    def test_codex_live_smoke_uses_non_interactive_exec(self):
+        completed = subprocess.CompletedProcess(args=[], returncode=0, stdout="OK\n", stderr="")
+        with patch.object(smoke_generated_harness.shutil, "which", return_value="/usr/local/bin/codex"):
+            with patch.object(smoke_generated_harness.subprocess, "run", return_value=completed) as run:
+                result = smoke_generated_harness.smoke_codex_live(Path("/tmp/example"), "Reply OK")
+
+        self.assertEqual("pass", result["status"])
+        command = run.call_args.args[0]
+        self.assertEqual("/usr/local/bin/codex", command[0])
+        self.assertEqual("exec", command[1])
+        self.assertIn("--config", command)
+        self.assertIn('approval_policy="never"', command)
+        self.assertIn("--skip-git-repo-check", command)
+        self.assertIn("--ephemeral", command)
+        self.assertNotIn("--ask-for-approval", command)
 
     def test_minimal_generator_lists_supported_profiles(self):
         completed = subprocess.run(

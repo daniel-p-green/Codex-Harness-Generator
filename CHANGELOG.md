@@ -30,6 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Updated docs and templates to use current Codex paths and schema terms: `.agents/skills`, SKILL.md metadata, agent TOML, and permission-profile TOML.
 - Updated README to clarify when the project is useful, when it is not, and what the eval gate actually proves.
 - Updated generator and validation guidance to require ASSUMPTIONS, SOURCE_MAP, MANIFEST, and VALIDATION_REPORT records in generated harnesses.
+- Updated live generated-harness smoke checks to use non-interactive `codex exec` instead of the interactive TUI path.
 
 ## [1.0.0] - 2026-06-01
 
