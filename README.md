@@ -513,7 +513,9 @@ record and refresh `Docs/Environment/USAGE_RECORDS.md`. If the report came
 from a prepared pilot with the same slug, add
 `--pilot-record-dir Docs/Environment/pilot-records` to mark that pilot
 `converted`, validate the usage-record reference, and refresh
-`Docs/Environment/PILOT_BOARD.md` in the same run.
+`Docs/Environment/PILOT_BOARD.md` in the same run. The linked pilot path
+prevalidates the pilot domain, source type, and generation path before writing
+the usage record so a mismatched issue cannot leave half-converted evidence.
 
 Validate checked-in usage records before release:
 
@@ -659,7 +661,7 @@ Common subcommands:
 | `pilot-update <slug>` | `pilot_board.py` | Updates one prepared pilot's status, validates converted usage-record references, and refreshes the pilot board. |
 | `beta-exit-audit` | `beta_exit_audit.py` | Writes a non-gating audit of beta-exit readiness and remaining evidence gaps. |
 | `proof-next` | `proof_next.py` | Writes the next beta-exit proof actions from current usage gaps without counting the plan as evidence. |
-| `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record; add `--no-write` to preview first or `--pilot-record-dir` to convert a matching prepared pilot after write. |
+| `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record; add `--no-write` to preview first or `--pilot-record-dir` to prevalidate and convert a matching prepared pilot. |
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
 | `usage-gaps` | `usage_gaps.py` | Reports remaining beta-exit usage evidence gaps and writes `Docs/Environment/USAGE_GAPS.md`. |
 | `proof-status` | `proof_status.py` | Summarizes checked-in proof readiness, live task-trial coverage, and usage evidence; add `--beta-exit` to apply the roadmap exit thresholds. |

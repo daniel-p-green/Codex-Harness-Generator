@@ -43,6 +43,7 @@ LABEL_MAP = {
 }
 
 NO_RESPONSE_VALUES = {"", "_no response_", "no response"}
+CONVERTIBLE_PILOT_STATUSES = {"prepared", "invited", "completed"}
 
 
 def normalize_label(value: str) -> str:
@@ -133,6 +134,27 @@ def build_record(args: argparse.Namespace) -> UsageRecord:
     )
 
 
+def validate_pilot_conversion(record: UsageRecord, pilot_record_dir: Path) -> dict:
+    path = pilot_board.default_record_path(pilot_record_dir, record.slug)
+    pilot_record = pilot_board.read_record(path)
+    errors = pilot_board.validate_record(pilot_record, path)
+    if pilot_record.get("status") not in CONVERTIBLE_PILOT_STATUSES:
+        errors.append(f"{path.name}: pilot status must be prepared, invited, or completed before conversion")
+    for field, usage_value in (
+        ("domain", record.domain),
+        ("source_type", record.source_type),
+        ("generation_path", record.generation_path),
+    ):
+        pilot_value = str(pilot_record.get(field, "")).strip().casefold()
+        if pilot_value != usage_value.strip().casefold():
+            errors.append(
+                f"{path.name}: pilot {field} mismatch before write: pilot={pilot_record.get(field)!r} usage={usage_value!r}"
+            )
+    if errors:
+        raise SystemExit("Pilot conversion validation failed: " + "; ".join(errors))
+    return pilot_record
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("issue_body", help="Markdown issue body path, or '-' for stdin")
@@ -146,7 +168,7 @@ def main() -> int:
     parser.add_argument("--report", default=DEFAULT_REPORT.as_posix())
     parser.add_argument(
         "--pilot-record-dir",
-        help="Optional pilot-board record directory; matching pilot slug is marked converted after the usage record is written",
+        help="Optional pilot-board record directory; matching pilot slug is prevalidated, then marked converted after the usage record is written",
     )
     parser.add_argument("--pilot-board-report", default=pilot_board.DEFAULT_REPORT.as_posix())
     parser.add_argument("--pilot-notes", default="converted from external usage issue")
@@ -156,10 +178,13 @@ def main() -> int:
     args = parser.parse_args()
 
     record = build_record(args)
+    validate_record(record)
+    if args.pilot_record_dir:
+        validate_pilot_conversion(record, Path(args.pilot_record_dir))
     path = None
     pilot_update = None
     if args.no_write:
-        validate_record(record)
+        pass
     else:
         record_dir = Path(args.record_dir)
         path = write_record(record_dir, record, force=args.force)

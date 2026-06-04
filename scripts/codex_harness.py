@@ -1186,7 +1186,7 @@ def make_parser() -> argparse.ArgumentParser:
     usage_from_issue.add_argument("--report", help="Usage-record Markdown report path")
     usage_from_issue.add_argument(
         "--pilot-record-dir",
-        help="Optional pilot-board record directory; matching pilot slug is marked converted after write",
+        help="Optional pilot-board record directory; matching pilot slug is prevalidated before conversion",
     )
     usage_from_issue.add_argument("--pilot-board-report", help="Pilot-board Markdown report path for linked conversion")
     usage_from_issue.add_argument("--pilot-notes", help="Public-safe note for linked pilot-board conversion")

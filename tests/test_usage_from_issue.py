@@ -259,6 +259,48 @@ class UsageFromIssueTests(unittest.TestCase):
             pilot_record = json.loads(pilot_record_path.read_text(encoding="utf-8"))
             self.assertEqual("prepared", pilot_record["status"])
 
+    def test_usage_from_issue_rejects_pilot_mismatch_before_writing_record(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            issue = temp_path / "issue.md"
+            issue.write_text(ISSUE_BODY.replace("LLM app", "customer support", 1), encoding="utf-8")
+            record_dir = temp_path / "records"
+            report = temp_path / "USAGE_RECORDS.md"
+            pilot_record_dir = temp_path / "pilot-records"
+            pilot_record_path = self.write_matching_pilot_record(pilot_record_dir)
+
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    SCRIPT.as_posix(),
+                    issue.as_posix(),
+                    "--slug",
+                    "external-llm-app",
+                    "--title",
+                    "External LLM app report",
+                    "--record-dir",
+                    record_dir.as_posix(),
+                    "--report",
+                    report.as_posix(),
+                    "--pilot-record-dir",
+                    pilot_record_dir.as_posix(),
+                    "--json",
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertNotEqual(0, completed.returncode)
+            self.assertIn("Pilot conversion validation failed", completed.stderr + completed.stdout)
+            self.assertIn("domain mismatch before write", completed.stderr + completed.stdout)
+            self.assertFalse((record_dir / "external-llm-app.json").exists())
+            self.assertFalse(report.exists())
+            pilot_record = json.loads(pilot_record_path.read_text(encoding="utf-8"))
+            self.assertEqual("prepared", pilot_record["status"])
+            self.assertEqual("", pilot_record["usage_record"])
+
     def test_usage_from_issue_rejects_sensitive_issue_body(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
