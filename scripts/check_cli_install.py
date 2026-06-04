@@ -809,6 +809,7 @@ def build_payload() -> dict:
                         or handoff_payload.get("readiness") != "handoff-ready"
                         or handoff_payload.get("handoff_count", 0) < 1
                         or not (pilot_handoff_root / "llm-app-pilot" / "README.md").exists()
+                        or not (pilot_handoff_root / "llm-app-pilot" / "REPORTER_HANDOFF.md").exists()
                     ):
                         step["status"] = "fail"
                         step["returncode"] = 1

@@ -160,9 +160,9 @@ replacement. What is proven today:
   active pilot-board records with invite tracking and evidence-conversion
   commands.
 - `scripts/export_pilot_handoff.py` and `codex-harness pilot-handoff` write
-  shareable per-pilot folders with reporter message, pilot pack, issue draft,
-  and maintainer commands so active pilots are easier to send without counting
-  the handoff as usage proof.
+  shareable per-pilot folders with a single `REPORTER_HANDOFF.md`, reporter
+  message, pilot pack, issue draft, and maintainer commands so active pilots
+  are easier to send without counting the handoff as usage proof.
 - `scripts/prepare_pilot.py` and `codex-harness prepare-pilot` combine
   brief-based quickstart generation with an external pilot pack and issue-body
   draft, so the next beta-exit pilot can be prepared with one command before a
@@ -726,7 +726,7 @@ Common subcommands:
 | `pilot-board` | `pilot_board.py` | Summarizes prepared pilot records and cross-checks converted pilots against usage records without counting outreach as proof. |
 | `pilot-update <slug>` | `pilot_board.py` | Updates one prepared pilot's status, validates converted usage-record references, and refreshes the pilot board. |
 | `pilot-outreach` | `export_pilot_outreach.py` | Writes reporter-ready outreach copy, tracking commands, and conversion commands from active pilot-board records. |
-| `pilot-handoff` | `export_pilot_handoff.py` | Writes shareable per-pilot handoff folders with reporter message, pilot pack, issue draft, and maintainer commands. |
+| `pilot-handoff` | `export_pilot_handoff.py` | Writes shareable per-pilot handoff folders with a single reporter handoff, pilot pack, issue draft, and maintainer commands. |
 | `beta-exit-audit` | `beta_exit_audit.py` | Writes a non-gating audit of beta-exit readiness and remaining evidence gaps. |
 | `proof-next` | `proof_next.py` | Writes the next beta-exit proof actions and candidate coverage projection from current usage gaps without counting the plan as evidence. |
 | `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record; infers the slug from the issue body when present, and supports `--lint-only`, `--no-write`, or `--pilot-record-dir` for linked pilot conversion. |

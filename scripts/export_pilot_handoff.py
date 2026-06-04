@@ -141,6 +141,40 @@ def readme_markdown(record: dict, files: dict, payload: dict) -> str:
     return "\n".join(lines)
 
 
+def reporter_handoff_markdown(record: dict, files: dict, payload: dict, directory: Path) -> str:
+    lines = [
+        f"# {record['title']} Reporter Handoff",
+        "",
+        "## Message",
+        "",
+        record["reporter_message"],
+        "",
+        "## Pilot Pack",
+        "",
+    ]
+    pilot_pack = files["pilot_pack"]
+    if pilot_pack["status"] == "copied":
+        lines.append((directory / "PILOT_PACK.md").read_text(encoding="utf-8").rstrip())
+    else:
+        lines.append(f"_Pilot pack not copied: {pilot_pack['reason']}._")
+    lines.extend(["", "## Usage Issue Draft", ""])
+    issue_draft = files["issue_draft"]
+    if issue_draft["status"] == "copied":
+        lines.append((directory / "USAGE_ISSUE_DRAFT.md").read_text(encoding="utf-8").rstrip())
+    else:
+        lines.append(f"_Usage issue draft not copied: {issue_draft['reason']}._")
+    lines.extend(
+        [
+            "",
+            "## Claim Boundary",
+            "",
+            payload["claim_boundary"],
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
 def build_outreach_args(args: argparse.Namespace) -> SimpleNamespace:
     return SimpleNamespace(
         record_dir=args.record_dir,
@@ -216,9 +250,11 @@ def write_handoff(output_root: Path, payload: dict, force: bool) -> None:
         safe_write(directory / "REPORTER_MESSAGE.txt", record["reporter_message"] + "\n")
         safe_write(directory / "MAINTAINER_COMMANDS.md", command_markdown(record["commands"]))
         safe_write(directory / "README.md", readme_markdown(record, files, payload))
+        safe_write(directory / "REPORTER_HANDOFF.md", reporter_handoff_markdown(record, files, payload, directory))
         index_lines.append(f"- `{record['slug']}`: `{Path(record['directory']).name}/`")
         record["files"] = {
             "README.md": (directory / "README.md").as_posix(),
+            "REPORTER_HANDOFF.md": (directory / "REPORTER_HANDOFF.md").as_posix(),
             "REPORTER_MESSAGE.txt": (directory / "REPORTER_MESSAGE.txt").as_posix(),
             "MAINTAINER_COMMANDS.md": (directory / "MAINTAINER_COMMANDS.md").as_posix(),
             "PILOT_PACK.md": files["pilot_pack"],
