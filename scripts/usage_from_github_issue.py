@@ -27,6 +27,7 @@ from record_usage_case import (
 
 MAINTAINER_FOLLOWUP_MARKER = "<!-- codex-harness-maintainer-followup -->"
 USAGE_LINT_MARKER = "<!-- codex-harness-usage-lint -->"
+MAINTAINER_AUTHOR_ASSOCIATIONS = {"OWNER", "MEMBER", "COLLABORATOR"}
 
 
 def fetch_github_issue(issue: str, repo: str = "", gh_bin: str = "gh", *, include_comments: bool = False) -> dict:
@@ -52,12 +53,25 @@ def fetch_github_issue(issue: str, repo: str = "", gh_bin: str = "gh", *, includ
     return payload
 
 
+def comment_author_association(comment: dict) -> str:
+    return str(comment.get("authorAssociation", "")).upper()
+
+
+def is_reporter_comment(comment: dict) -> bool:
+    body = str(comment.get("body", "")).strip()
+    if not body:
+        return False
+    if MAINTAINER_FOLLOWUP_MARKER in body or USAGE_LINT_MARKER in body:
+        return False
+    return comment_author_association(comment) not in MAINTAINER_AUTHOR_ASSOCIATIONS
+
+
 def comment_bodies(payload: dict) -> list[str]:
     bodies = []
     for comment in payload.get("comments") or []:
-        body = str(comment.get("body", "")).strip()
-        if MAINTAINER_FOLLOWUP_MARKER in body or USAGE_LINT_MARKER in body:
+        if not is_reporter_comment(comment):
             continue
+        body = str(comment.get("body", "")).strip()
         if body:
             bodies.append(body)
     return bodies

@@ -53,6 +53,38 @@ def github_issue_line(payload: dict) -> str:
     return "Issue: unavailable"
 
 
+def conversion_command_lines(payload: dict) -> list[str]:
+    issue = payload.get("github_issue") or {}
+    selector = issue.get("url") or issue.get("number") or "<issue-number-or-url>"
+    base = (
+        "codex-harness usage-from-github-issue "
+        f"{selector} "
+        "--include-comments "
+        "--record-dir Docs/Environment/usage-records "
+        "--report Docs/Environment/USAGE_RECORDS.md "
+        "--pilot-record-dir Docs/Environment/pilot-records "
+        "--pilot-board-report Docs/Environment/PILOT_BOARD.md"
+    )
+    return [
+        "### Maintainer preview command",
+        "",
+        "Run this before writing a usage record:",
+        "",
+        "```bash",
+        f"{base} --no-write --json",
+        "```",
+        "",
+        "### Maintainer conversion command",
+        "",
+        "Run this only after previewing the public-safe record:",
+        "",
+        "```bash",
+        f"{base} --json",
+        "```",
+        "",
+    ]
+
+
 def reply_template_lines(missing_fields: list[str]) -> list[str]:
     if not missing_fields:
         return []
@@ -105,8 +137,7 @@ def format_comment(payload: dict) -> str:
             [
                 "Result: ready for maintainer preview.",
                 "",
-                "A maintainer should still run `codex-harness usage-from-github-issue ... --no-write --json` before converting evidence.",
-                "",
+                *conversion_command_lines(payload),
             ]
         )
     else:

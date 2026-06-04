@@ -359,6 +359,78 @@ Add at least two public-safe bullets about what the generated harness helped you
         self.assertIn("outcome", payload["missing_fields"])
         self.assertTrue(payload["github_issue"]["comments_included"])
 
+    def test_include_comments_ignores_unmarked_owner_comments(self):
+        incomplete_body = ISSUE_BODY.replace("success", "_no response_")
+        incomplete_body = incomplete_body.replace(
+            "The generated harness helped organize prompts, evals, and source-grounded review steps.",
+            "_no response_",
+        )
+        incomplete_body = incomplete_body.replace(
+            "- Generated AGENTS.md matched the project shape.\n- The harness made verification steps explicit.",
+            "_no response_",
+        )
+        incomplete_body = incomplete_body.replace(
+            "- Ran the generated smoke check successfully.\n- Completed one real task using the generated reviewer guidance.",
+            "_no response_",
+        )
+        incomplete_body = incomplete_body.replace(
+            "Removed private repo names, local paths, customer details, credentials, and raw logs.",
+            "_no response_",
+        )
+        incomplete_body = incomplete_body.replace("- One project and one task.", "_no response_")
+        owner_comment = """### Outcome
+
+success
+
+### Public-safe task summary
+
+Maintainer note that should not count as reporter evidence.
+
+### Evidence
+
+- Owner-maintained evidence line one.
+- Owner-maintained evidence line two.
+
+### Verification performed
+
+- Owner-maintained verification one.
+- Owner-maintained verification two.
+
+### Privacy review
+
+Owner-maintained privacy review.
+
+### Limitations
+
+- Owner-maintained limitation.
+"""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_matching_pilot_record(root)
+
+            payload = usage_from_github_issue.build_payload(
+                self.args(root, include_comments=True, lint_only=True),
+                github_payload=self.github_payload(
+                    body=incomplete_body,
+                    comments=[
+                        {
+                            "author": {"login": "daniel-p-green"},
+                            "authorAssociation": "OWNER",
+                            "body": owner_comment,
+                            "url": "https://github.com/example/repo/issues/12#issuecomment-3",
+                        }
+                    ],
+                ),
+            )
+
+        self.assertEqual("fail", payload["status"])
+        self.assertEqual("needs-input", payload["readiness"])
+        self.assertEqual(0, payload["github_issue"]["comment_count"])
+        self.assertEqual(0, payload["github_issue"]["reporter_comment_count"])
+        self.assertEqual(1, payload["github_issue"]["total_comment_count"])
+        self.assertIn("outcome", payload["missing_fields"])
+        self.assertNotIn("Maintainer note", str(payload))
+
     def test_include_comments_ignores_automated_usage_lint_comments(self):
         lint_comment = """<!-- codex-harness-usage-lint -->
 

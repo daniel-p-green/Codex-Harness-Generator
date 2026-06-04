@@ -143,6 +143,7 @@ def comment_metadata(comment: dict) -> dict:
         "url": str(comment.get("url", "")),
         "created_at": comment_created_at(comment),
         "author": str(author.get("login", "")),
+        "author_association": str(comment.get("authorAssociation", "")),
     }
 
 
@@ -160,8 +161,7 @@ def maintainer_followup_comment(github_payload: dict) -> dict:
 def reporter_reply_summary(github_payload: dict, maintainer_comment: dict) -> dict:
     replies = []
     for comment in github_payload.get("comments") or []:
-        body = str(comment.get("body", ""))
-        if MAINTAINER_FOLLOWUP_MARKER in body or USAGE_LINT_MARKER in body:
+        if not usage_from_github_issue.is_reporter_comment(comment):
             continue
         replies.append(comment_metadata(comment))
     latest = max(replies, key=lambda item: item.get("created_at", ""), default={})
