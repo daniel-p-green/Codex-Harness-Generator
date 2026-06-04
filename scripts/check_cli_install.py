@@ -79,6 +79,7 @@ def build_payload() -> dict:
         usage_report = temp_root / "USAGE_RECORDS.md"
         usage_gaps_report = temp_root / "USAGE_GAPS.md"
         pilot_campaign_report = temp_root / "PILOT_CAMPAIGN.md"
+        migration_plan_report = temp_root / "CODEX_MIGRATION_PLAN.md"
         issue_body = temp_root / "external-usage-issue.md"
         linked_pilot_issue_body = temp_root / "linked-pilot-usage-issue.md"
         issue_body.write_text(
@@ -578,7 +579,17 @@ def build_payload() -> dict:
                     "--json",
                 ],
             ),
-            ("migration_audit", [(venv / "bin" / "codex-harness").as_posix(), "migration-audit", generated.as_posix(), "--json"]),
+            (
+                "migration_audit",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "migration-audit",
+                    generated.as_posix(),
+                    "--report",
+                    migration_plan_report.as_posix(),
+                    "--json",
+                ],
+            ),
             ("eval", [(venv / "bin" / "codex-harness").as_posix(), "eval", generated.as_posix()]),
         ]
 

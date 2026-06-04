@@ -358,6 +358,10 @@ def build_command(args: argparse.Namespace) -> list[str]:
 
     if args.command == "migration-audit":
         command = list(args.paths)
+        if args.report:
+            command.extend(["--report", args.report])
+        if args.no_write:
+            command.append("--no-write")
         if args.json:
             command.append("--json")
         return python_script("migration_audit.py", command)
@@ -959,6 +963,8 @@ def make_parser() -> argparse.ArgumentParser:
 
     migration_audit = subparsers.add_parser("migration-audit", help="Audit legacy harness directories for Codex migration work")
     migration_audit.add_argument("paths", nargs="+", help="Harness directories to audit")
+    migration_audit.add_argument("--report", help="Optional Markdown migration plan report path")
+    migration_audit.add_argument("--no-write", action="store_true", help="Do not write --report")
     migration_audit.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     gate = subparsers.add_parser("gate", help="Run the repo eval gate")

@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shlex
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -126,6 +127,7 @@ def audit_path(root: Path) -> dict:
         "warning_count": warn_count,
         "findings": [finding.to_dict() for finding in findings],
         "next_steps": next_steps(findings),
+        "migration_plan": migration_plan(root, findings),
     }
 
 
@@ -144,6 +146,50 @@ def next_steps(findings: list[Finding]) -> list[str]:
         steps.append("Review legacy wording warnings and translate tool/model/config assumptions explicitly.")
     steps.append("After migration, run codex-harness validate <path> and codex-harness doctor.")
     return steps
+
+
+def migration_plan(root: Path, findings: list[Finding]) -> dict:
+    path = root.as_posix()
+    quoted_path = shlex.quote(path)
+    if not findings:
+        return {
+            "readiness": "codex-native",
+            "commands": [
+                f"codex-harness doctor",
+                f"codex-harness validate {quoted_path}",
+            ],
+            "manual_steps": [
+                "Review AGENTS.md and .codex/config.toml against the current project before publishing.",
+            ],
+        }
+
+    legacy_paths = sorted({finding.path for finding in findings if finding.kind == "legacy_path"})
+    missing_codex_paths = sorted({finding.path for finding in findings if finding.kind == "missing_codex_path"})
+    legacy_text_paths = sorted({finding.path for finding in findings if finding.kind == "legacy_text"})
+    blueprint = shlex.quote("/tmp/codex-migration-blueprint")
+    report = shlex.quote("/tmp/HARNESS_ADOPTION_PLAN.md")
+    copy_script = shlex.quote("/tmp/copy-codex-harness-adds.sh")
+    return {
+        "readiness": "needs-manual-migration",
+        "commands": [
+            f"codex-harness migration-audit {quoted_path} --report /tmp/CODEX_MIGRATION_PLAN.md",
+            f"codex-harness init {blueprint} --from-project {quoted_path} --project-name 'Codex Migration Blueprint' --force --json",
+            f"codex-harness adoption-plan {quoted_path} --blueprint-out {blueprint} --report {report} --copy-script {copy_script} --json",
+            copy_script,
+            f"codex-harness validate {quoted_path}",
+            "codex-harness doctor",
+        ],
+        "manual_steps": [
+            "Move durable project instructions from CLAUDE.md into AGENTS.md, preserving source-specific constraints.",
+            "Translate .claude/settings.json into .codex/config.toml instead of copying provider-specific settings verbatim.",
+            "Rewrite Claude agents, commands, hooks, and skills into Codex subagents, AGENTS.md routing, explicit validation commands, or .agents/skills.",
+            "Review any add-only copy script output before merging conflicts; never overwrite existing project guidance blindly.",
+            "Run validation after each manual merge phase and record remaining gaps in Docs/Environment/IMPROVEMENT_LOG.md.",
+        ],
+        "legacy_paths": legacy_paths,
+        "missing_codex_paths": missing_codex_paths,
+        "legacy_text_paths": legacy_text_paths,
+    }
 
 
 def build_payload(paths: list[str]) -> dict:
@@ -165,15 +211,68 @@ def print_text(payload: dict) -> None:
             print(f"    {finding['recommendation']}")
         for step in result["next_steps"]:
             print(f"  next: {step}")
+        for command in result["migration_plan"]["commands"]:
+            print(f"  command: {command}")
+
+
+def write_report(path: Path, payload: dict) -> None:
+    lines = [
+        "# Codex Migration Plan",
+        "",
+        f"Status: {payload['status'].upper()}",
+        "",
+        "This report is an audit and migration plan. It does not rewrite files or prove the migrated harness is ready.",
+        "",
+    ]
+    for result in payload["results"]:
+        lines.extend(
+            [
+                f"## {result['path']}",
+                "",
+                f"- Status: {result['status'].upper()}",
+                f"- Failures: {result['failure_count']}",
+                f"- Warnings: {result['warning_count']}",
+                f"- Migration readiness: {result['migration_plan']['readiness']}",
+                "",
+                "### Findings",
+                "",
+            ]
+        )
+        if result["findings"]:
+            lines.extend(["| Status | Kind | Path | Recommendation |", "|---|---|---|---|"])
+            for finding in result["findings"]:
+                lines.append(
+                    "| {status} | {kind} | `{path}` | {recommendation} |".format(
+                        status=finding["status"],
+                        kind=finding["kind"],
+                        path=finding["path"],
+                        recommendation=finding["recommendation"],
+                    )
+                )
+        else:
+            lines.append("- No migration findings.")
+        lines.extend(["", "### Commands", ""])
+        for command in result["migration_plan"]["commands"]:
+            lines.append(f"- `{command}`")
+        lines.extend(["", "### Manual Steps", ""])
+        for step in result["migration_plan"]["manual_steps"]:
+            lines.append(f"- {step}")
+        lines.append("")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("paths", nargs="+", help="Harness directories to audit for migration readiness")
+    parser.add_argument("--report", help="Optional Markdown migration plan report path")
+    parser.add_argument("--no-write", action="store_true", help="Do not write --report")
     parser.add_argument("--json", action="store_true", help="Emit JSON payload")
     args = parser.parse_args(argv)
 
     payload = build_payload(args.paths)
+    if args.report and not args.no_write:
+        write_report(Path(args.report), payload)
     if args.json:
         print(json.dumps(payload, indent=2))
     else:

@@ -324,8 +324,13 @@ still require manual review.
 To inspect an older harness before manually porting it to Codex-native files:
 
 ```bash
-python scripts/codex_harness.py migration-audit /path/to/harness
+python scripts/codex_harness.py migration-audit /path/to/harness \
+  --report /tmp/CODEX_MIGRATION_PLAN.md
 ```
+
+The report lists legacy paths, missing Codex-native artifacts, legacy
+tool/config wording, and a command sequence for generating a Codex blueprint
+plus a non-destructive adoption plan.
 
 The deterministic generator currently supports the four base starter profiles
 and 16 bundled domain presets listed by:
@@ -620,7 +625,7 @@ Common subcommands:
 | `smoke <paths...>` | `smoke_generated_harness.py` | Parses config, resolves agents and skills, optionally runs Codex live smoke. |
 | `validate <paths...>` | `validate_generated_harness.py` | Runs eval, offline smoke, and the generated local self-check together. |
 | `local-eval <path>` | generated `scripts/run-harness-evals.py` | Runs the copied harness's embedded eval report without depending on this generator repo. |
-| `migration-audit <paths...>` | `migration_audit.py` | Audits legacy harness artifacts and lists the Codex-native migration work. |
+| `migration-audit <paths...>` | `migration_audit.py` | Audits legacy harness artifacts and writes an optional Codex migration plan report. |
 | `gate` | `run_evals.py` | Runs the repo release gate. |
 | `refresh-examples` | `refresh_generated_surfaces.py` | Refreshes checked-in generated fixtures and example families from the current generator, then runs the example inventory contract check. |
 | `live-trials` | `run_live_example_task_trials.py` | Runs authenticated Codex tasks against checked-in live examples. |

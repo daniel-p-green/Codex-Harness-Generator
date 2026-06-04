@@ -70,7 +70,7 @@ class CheckCliInstallTests(unittest.TestCase):
         self.assertTrue(any("codex-harness" in command[0] and "usage-gaps" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "beta-exit-audit" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "pilot-campaign" in command for command in calls))
-        self.assertTrue(any("codex-harness" in command[0] and "migration-audit" in command for command in calls))
+        self.assertTrue(any("codex-harness" in command[0] and "migration-audit" in command and "--report" in command for command in calls))
         self.assertTrue(any("--brief" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "eval" in command for command in calls))
 

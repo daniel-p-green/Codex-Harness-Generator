@@ -1008,13 +1008,25 @@ class CodexHarnessCliTests(unittest.TestCase):
         )
 
     def test_migration_audit_delegates_to_migration_audit_script(self):
-        command, _ = self.run_cli(["migration-audit", "/tmp/example", "--json"])
+        command, _ = self.run_cli(
+            [
+                "migration-audit",
+                "/tmp/example",
+                "--report",
+                "/tmp/CODEX_MIGRATION_PLAN.md",
+                "--no-write",
+                "--json",
+            ]
+        )
 
         self.assertEqual(
             [
                 "/usr/bin/python3",
                 "scripts/migration_audit.py",
                 "/tmp/example",
+                "--report",
+                "/tmp/CODEX_MIGRATION_PLAN.md",
+                "--no-write",
                 "--json",
             ],
             command,
