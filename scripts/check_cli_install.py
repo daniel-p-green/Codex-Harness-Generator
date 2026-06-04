@@ -86,6 +86,7 @@ def build_payload() -> dict:
                     "--json",
                 ],
             ),
+            ("validate", [(venv / "bin" / "codex-harness").as_posix(), "validate", generated.as_posix(), "--json"]),
             ("eval", [(venv / "bin" / "codex-harness").as_posix(), "eval", generated.as_posix()]),
         ]
 

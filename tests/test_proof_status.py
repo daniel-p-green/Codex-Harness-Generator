@@ -28,6 +28,7 @@ class ProofStatusTests(unittest.TestCase):
             "steps": [
                 {"name": "profiles", "status": "pass", "profile_count": 20},
                 {"name": "init", "status": "pass"},
+                {"name": "validate", "status": "pass"},
                 {"name": "eval", "status": "pass"},
             ],
         }
@@ -67,6 +68,8 @@ Status: PASS
         self.assertEqual(8, payload["task_trials"]["trial_count"])
         self.assertEqual("pass", payload["example_inventory"]["status"])
         self.assertEqual("pass", payload["installable_cli"]["status"])
+        install_check = next(check for check in payload["checks"] if check["name"] == "installable_cli")
+        self.assertIn("validate=pass", install_check["detail"])
         self.assertIn("installable_cli", [check["name"] for check in payload["checks"]])
         self.assertEqual(4, payload["example_inventory"]["brief_example_count"])
         self.assertGreaterEqual(payload["usage_summary"]["non_synthetic"], 1)

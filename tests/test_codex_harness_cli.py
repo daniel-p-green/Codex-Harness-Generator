@@ -270,6 +270,35 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_validate_delegates_to_combined_validator(self):
+        command, _ = self.run_cli(
+            [
+                "validate",
+                "/tmp/example",
+                "--min-score",
+                "95",
+                "--codex-live",
+                "--prompt",
+                "Reply OK",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/validate_generated_harness.py",
+                "/tmp/example",
+                "--min-score",
+                "95",
+                "--codex-live",
+                "--prompt",
+                "Reply OK",
+                "--json",
+            ],
+            command,
+        )
+
     def test_semantic_alignment_delegates_to_checker(self):
         command, _ = self.run_cli(["semantic-alignment", "--timeout", "5", "--no-write", "--json"])
 

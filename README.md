@@ -141,6 +141,7 @@ codex-harness init /tmp/codex-rag-harness \
   --brief "RAG app with prompts, evals, and retrieval checks" \
   --project-name "RAG Quality Harness" \
   --force
+codex-harness validate /tmp/codex-rag-harness
 
 # 3. Launch Codex in the directory
 codex
@@ -166,6 +167,7 @@ codex-harness init /tmp/codex-rag-harness \
   --brief "RAG app with prompts, evals, and retrieval checks" \
   --project-name "RAG Quality Harness" \
   --force
+codex-harness validate /tmp/codex-rag-harness
 python scripts/codex_harness.py profiles --details
 python scripts/codex_harness.py recommend "RAG app with prompts, evals, and retrieval checks"
 python scripts/codex_harness.py profile security-audit
@@ -174,6 +176,7 @@ python scripts/codex_harness.py brief-acceptance /tmp/codex-rag-harness \
   --project-name "RAG Quality Harness" \
   --force
 python scripts/codex_harness.py generate /tmp/codex-harness-example --force
+python scripts/codex_harness.py validate /tmp/codex-harness-example
 python scripts/codex_harness.py eval /tmp/codex-harness-example
 python scripts/codex_harness.py smoke /tmp/codex-harness-example
 ```
@@ -376,6 +379,7 @@ Common subcommands:
 | `brief-acceptance <target>` | `run_brief_acceptance.py` | Recommends a profile from a brief, runs deterministic acceptance, and records `PROFILE_SELECTION.md`. |
 | `eval <paths...>` | `eval_generated_harness.py` | Checks generated harness contract quality. |
 | `smoke <paths...>` | `smoke_generated_harness.py` | Parses config, resolves agents and skills, optionally runs Codex live smoke. |
+| `validate <paths...>` | `validate_generated_harness.py` | Runs eval and smoke together for generated harnesses. |
 | `gate` | `run_evals.py` | Runs the repo release gate. |
 | `live-trials` | `run_live_example_task_trials.py` | Runs authenticated Codex tasks against checked-in live examples. |
 | `source-freshness` | `check_source_freshness.py` | Confirms official OpenAI source URLs are reachable. |

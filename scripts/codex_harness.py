@@ -121,6 +121,18 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.extend(["--prompt", args.prompt])
         return python_script("smoke_generated_harness.py", command)
 
+    if args.command == "validate":
+        command = list(args.paths)
+        if args.min_score is not None:
+            command.extend(["--min-score", str(args.min_score)])
+        if args.codex_live:
+            command.append("--codex-live")
+        if args.prompt:
+            command.extend(["--prompt", args.prompt])
+        if args.json:
+            command.append("--json")
+        return python_script("validate_generated_harness.py", command)
+
     if args.command == "gate":
         command: list[str] = []
         if args.codex_live:
@@ -303,6 +315,13 @@ def make_parser() -> argparse.ArgumentParser:
     smoke.add_argument("paths", nargs="+", help="Generated harness directory paths")
     smoke.add_argument("--codex-live", action="store_true", help="Also run authenticated Codex CLI smoke")
     smoke.add_argument("--prompt", help="Prompt to use with --codex-live")
+
+    validate = subparsers.add_parser("validate", help="Evaluate and smoke-test generated harness directories")
+    validate.add_argument("paths", nargs="+", help="Generated harness directory paths")
+    validate.add_argument("--min-score", type=int, help="Minimum passing eval score")
+    validate.add_argument("--codex-live", action="store_true", help="Also run authenticated Codex CLI smoke")
+    validate.add_argument("--prompt", help="Prompt to use with --codex-live")
+    validate.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     gate = subparsers.add_parser("gate", help="Run the repo eval gate")
     gate.add_argument("--codex-live", action="store_true", help="Include authenticated Codex CLI live smoke")

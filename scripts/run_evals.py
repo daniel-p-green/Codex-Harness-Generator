@@ -259,6 +259,7 @@ def main() -> int:
                     "scripts/run_live_example_task_trials.py",
                     "scripts/simulate_create_trigger.py",
                     "scripts/smoke_generated_harness.py",
+                    "scripts/validate_generated_harness.py",
                     "scripts/validate_usage_records.py",
                     "tests/test_cli_install.py",
                     "tests/test_create_acceptance.py",
@@ -281,6 +282,7 @@ def main() -> int:
                     "tests/test_semantic_alignment.py",
                     "tests/test_source_freshness.py",
                     "tests/test_validate_usage_records.py",
+                    "tests/test_validate_generated_harness.py",
                 ],
             ),
         ]
