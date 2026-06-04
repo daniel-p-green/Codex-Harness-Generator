@@ -8,6 +8,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+import pilot_board
 from record_usage_case import find_sensitive_text
 from usage_gaps import DEFAULT_TARGETS, build_payload as build_usage_gap_payload
 
@@ -39,7 +40,19 @@ def build_prepare_next_command(pilot: dict, args: argparse.Namespace) -> str:
     return " ".join(parts)
 
 
-def build_command_sequence(gaps_payload: dict, args: argparse.Namespace) -> list[dict]:
+def active_pilot_for_next(gaps_payload: dict, board_payload: dict) -> dict | None:
+    next_pilot = (gaps_payload.get("suggested_pilots") or [None])[0]
+    if not next_pilot:
+        return None
+    slug = next_pilot["slug"]
+    active_statuses = {"completed", "invited", "prepared"}
+    for record in board_payload.get("records", []):
+        if record.get("slug") == slug and record.get("status") in active_statuses:
+            return record
+    return None
+
+
+def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: argparse.Namespace) -> list[dict]:
     pilots = gaps_payload.get("suggested_pilots", [])
     commands = [
         {
@@ -48,7 +61,51 @@ def build_command_sequence(gaps_payload: dict, args: argparse.Namespace) -> list
             "purpose": "confirm the beta-exit usage gap before preparing more outreach",
         }
     ]
-    if pilots:
+    if active_pilot:
+        commands.append(
+            {
+                "name": "review active pilot",
+                "command": (
+                    "codex-harness pilot-board "
+                    f"--record-dir {args.pilot_record_dir} "
+                    f"--usage-record-dir {args.record_dir} "
+                    f"--report {args.pilot_board_report}"
+                ),
+                "purpose": "continue the already prepared pilot instead of preparing a duplicate",
+            }
+        )
+        if active_pilot["status"] == "prepared":
+            commands.append(
+                {
+                    "name": "mark pilot invited",
+                    "command": (
+                        f"codex-harness pilot-update {active_pilot['slug']} "
+                        "--status invited "
+                        f"--record-dir {args.pilot_record_dir} "
+                        f"--usage-record-dir {args.record_dir} "
+                        f"--report {args.pilot_board_report} "
+                        "--notes \"sent to reporter\""
+                    ),
+                    "purpose": "record outreach after the pilot pack is sent to a reporter",
+                }
+            )
+        commands.append(
+            {
+                "name": "convert completed evidence",
+                "command": (
+                    "codex-harness usage-from-issue <completed-issue.md> "
+                    f"--slug {active_pilot['slug']} "
+                    f"--title {json.dumps(active_pilot['title'])} "
+                    f"--record-dir {args.record_dir} "
+                    f"--report {args.usage_report} "
+                    f"--pilot-record-dir {args.pilot_record_dir} "
+                    f"--pilot-board-report {args.pilot_board_report} "
+                    "--json"
+                ),
+                "purpose": "convert a completed reporter issue into checked usage evidence and update the pilot board",
+            }
+        )
+    elif pilots:
         pilot = pilots[0]
         commands.extend(
             [
@@ -113,16 +170,25 @@ def build_payload(args: argparse.Namespace) -> dict:
         min_domains=args.min_domains,
         min_installed_init_brief=args.min_installed_init_brief,
     )
+    board_payload = pilot_board.build_payload(Path(args.pilot_record_dir), usage_record_dir=Path(args.record_dir))
     next_pilot = (gaps_payload.get("suggested_pilots") or [None])[0]
+    active_pilot = active_pilot_for_next(gaps_payload, board_payload)
     return {
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "status": gaps_payload["status"],
+        "status": "pass" if gaps_payload["status"] == "pass" and board_payload["status"] == "pass" else "fail",
         "readiness": gaps_payload["readiness"],
         "summary": gaps_payload["summary"],
         "gaps": gaps_payload["gaps"],
         "recommendations": gaps_payload["recommendations"],
         "next_pilot": next_pilot,
-        "command_sequence": build_command_sequence(gaps_payload, args),
+        "active_pilot": active_pilot,
+        "pilot_board": {
+            "status": board_payload["status"],
+            "readiness": board_payload["readiness"],
+            "summary": board_payload["summary"],
+            "errors": board_payload["errors"],
+        },
+        "command_sequence": build_command_sequence(gaps_payload, active_pilot, args),
         "claim_boundary": (
             "This packet gives next actions for collecting evidence; it does not itself prove external adoption, "
             "beta-exit readiness, or production suitability."
@@ -170,6 +236,21 @@ def write_report(path: Path, payload: dict) -> None:
         )
     else:
         lines.append("- No pilot needed from usage gaps; run the final proof commands below.")
+    lines.extend(["", "## Active Pilot", ""])
+    if payload["active_pilot"]:
+        active = payload["active_pilot"]
+        lines.extend(
+            [
+                f"- Slug: `{active['slug']}`",
+                f"- Status: `{active['status']}`",
+                f"- Pilot pack: `{active['pilot_pack']}`",
+                f"- Issue draft: `{active.get('issue_draft', '') or 'not recorded'}`",
+                "",
+                "Continue this pilot instead of preparing a duplicate.",
+            ]
+        )
+    else:
+        lines.append("- none")
     lines.extend(["", "## Command Sequence", ""])
     for index, item in enumerate(payload["command_sequence"], start=1):
         lines.extend(

@@ -1,6 +1,6 @@
 # Proof Next Actions
 
-Generated: 2026-06-04T14:11:03Z
+Generated: 2026-06-04T14:24:01Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 
@@ -22,6 +22,15 @@ It is a collection plan, not evidence by itself.
 - Generation path: `installed-quickstart`
 - Slug: `llm-app-pilot`
 
+## Active Pilot
+
+- Slug: `llm-app-pilot`
+- Status: `prepared`
+- Pilot pack: `Docs/Environment/LLM_APP_PILOT_PACK.md`
+- Issue draft: `Docs/Environment/LLM_APP_USAGE_ISSUE_DRAFT.md`
+
+Continue this pilot instead of preparing a duplicate.
+
 ## Command Sequence
 
 1. refresh gaps
@@ -32,20 +41,20 @@ Purpose: confirm the beta-exit usage gap before preparing more outreach
 codex-harness usage-gaps --record-dir Docs/Environment/usage-records
 ```
 
-2. prepare next pilot
+2. review active pilot
 
-Purpose: generate the next recommended harness, pilot pack, issue draft, and prepared-pilot record
-
-```bash
-codex-harness prepare-next-pilot /tmp/codex-llm-app-pilot --record-dir Docs/Environment/usage-records --pilot-record-dir Docs/Environment/pilot-records --out /tmp/NEXT_EXTERNAL_PILOT_PACK.md --issue-out /tmp/NEXT_EXTERNAL_USAGE_ISSUE_DRAFT.md --force
-```
-
-3. review pilot board
-
-Purpose: verify the prepared pilot is tracked but not counted as usage proof
+Purpose: continue the already prepared pilot instead of preparing a duplicate
 
 ```bash
 codex-harness pilot-board --record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records --report Docs/Environment/PILOT_BOARD.md
+```
+
+3. mark pilot invited
+
+Purpose: record outreach after the pilot pack is sent to a reporter
+
+```bash
+codex-harness pilot-update llm-app-pilot --status invited --record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records --report Docs/Environment/PILOT_BOARD.md --notes "sent to reporter"
 ```
 
 4. convert completed evidence

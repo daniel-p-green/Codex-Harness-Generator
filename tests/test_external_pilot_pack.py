@@ -58,6 +58,7 @@ class ExternalPilotPackTests(unittest.TestCase):
         self.assertIn("python scripts/run-harness-evals.py --min-successes 1", pack)
         self.assertIn("python scripts/codex_harness.py evidence-packet <generated-harness>", pack)
         self.assertIn("python scripts/codex_harness.py usage-from-harness <generated-harness>", pack)
+        self.assertIn("Fill out `EXTERNAL_USAGE_ISSUE_DRAFT.md`", pack)
         self.assertIn("Do not claim broad", pack)
         self.assertIn("adoption, production readiness", pack)
         self.assertIn("### Domain or project type", issue)
@@ -65,6 +66,32 @@ class ExternalPilotPackTests(unittest.TestCase):
         self.assertIn("private-summary", issue)
         self.assertIn("_No response_", issue)
         self.assertIn("One task in one generated harness", issue)
+
+    def test_detects_profile_from_profile_selection_report(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            harness = temp_path / "harness"
+            shutil.copytree(FIXTURE, harness)
+            profile_selection = harness / "Docs" / "Environment" / "PROFILE_SELECTION.md"
+            profile_selection.write_text(
+                "# Profile Selection\n\n## Selected Profile\n\n- Profile: llm-app\n",
+                encoding="utf-8",
+            )
+            args = self.base_args(temp_path, harness=harness.as_posix())
+            payload = export_pilot_pack.build_payload(args)
+
+        self.assertEqual("llm-app", payload["profile"])
+
+    def test_pack_uses_custom_issue_draft_filename(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            args = self.base_args(temp_path, issue_out=(temp_path / "LLM_APP_USAGE_ISSUE_DRAFT.md").as_posix())
+            payload = export_pilot_pack.build_payload(args)
+            result = export_pilot_pack.write_outputs(args, payload)
+
+            pack = Path(result["pack"]).read_text(encoding="utf-8")
+
+        self.assertIn("Fill out `LLM_APP_USAGE_ISSUE_DRAFT.md`", pack)
 
     def test_prefills_issue_draft_from_latest_complete_task_trial(self):
         with tempfile.TemporaryDirectory() as temp_dir:

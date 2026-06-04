@@ -1,6 +1,6 @@
 # Beta Exit Audit
 
-Generated: 2026-06-04T13:23:30Z
+Generated: 2026-06-04T14:24:01Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 
@@ -25,7 +25,7 @@ This audit reports beta-exit readiness; it does not itself prove external adopti
 - External or multi-project records: 0
 - Distinct domains: 1
 - Installed brief-based generation records: 0
-- Pending pilots: 0
+- Pending pilots: 1
 - Completed but not converted pilots: 0
 - Converted pilots with validated usage records: 0
 

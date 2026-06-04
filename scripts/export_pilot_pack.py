@@ -34,6 +34,13 @@ def infer_profile(harness: Path) -> str:
         value = line.split("profile:", 1)[-1].strip(" -*`")
         if value:
             return value
+    profile_selection = read_optional(harness / "Docs" / "Environment" / "PROFILE_SELECTION.md").lower()
+    for marker in ("- profile:", "selected profile:"):
+        if marker in profile_selection:
+            line = next((line for line in profile_selection.splitlines() if marker in line), "")
+            value = line.split(marker, 1)[-1].strip(" -*`")
+            if value:
+                return value
     return "not recorded"
 
 
@@ -136,10 +143,10 @@ def build_issue_draft(payload: dict) -> str:
     ).rstrip() + "\n"
 
 
-def build_pack(payload: dict, include_issue_draft: bool) -> str:
+def build_pack(payload: dict, issue_draft_name: str | None) -> str:
     issue_line = ""
-    if include_issue_draft:
-        issue_line = "- Fill out `EXTERNAL_USAGE_ISSUE_DRAFT.md`, then paste it into the GitHub External usage report issue.\n"
+    if issue_draft_name:
+        issue_line = f"- Fill out `{issue_draft_name}`, then paste it into the GitHub External usage report issue.\n"
     prefill_note = "This issue draft is blank until the reporter fills it in."
     if payload.get("prefill"):
         prefill_note = "This issue draft is prefilled from the latest complete task-trial record; review and redact it before sharing."
@@ -255,7 +262,7 @@ def build_payload(args: argparse.Namespace) -> dict:
 def write_outputs(args: argparse.Namespace, payload: dict) -> dict:
     out = Path(args.out) if args.out else Path(args.harness).resolve() / "Docs" / "Environment" / DEFAULT_PACK_NAME
     issue_out = Path(args.issue_out) if args.issue_out else None
-    pack = build_pack(payload, include_issue_draft=issue_out is not None)
+    pack = build_pack(payload, issue_draft_name=issue_out.name if issue_out else None)
     issue = build_issue_draft(payload) if issue_out else ""
     findings = find_sensitive_text(pack + "\n" + issue + "\n" + json.dumps(payload, sort_keys=True))
     if findings:
