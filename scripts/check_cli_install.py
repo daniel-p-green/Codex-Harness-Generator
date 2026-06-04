@@ -55,6 +55,7 @@ def build_payload() -> dict:
         temp_root = Path(temp_dir)
         venv = temp_root / "venv"
         generated = temp_root / "generated"
+        quickstart_generated = temp_root / "quickstart-generated"
         inspected_generated = temp_root / "inspected-generated"
         demo_generated = temp_root / "demo-generated"
         adoption_report = temp_root / "ADOPTION_PLAN.md"
@@ -149,6 +150,20 @@ def build_payload() -> dict:
                     "RAG app with prompts, evals, and retrieval checks",
                     "--project-name",
                     "Install Smoke RAG Harness",
+                    "--force",
+                    "--json",
+                ],
+            ),
+            (
+                "quickstart",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "quickstart",
+                    quickstart_generated.as_posix(),
+                    "--brief",
+                    "RAG app with prompts, evals, and retrieval checks",
+                    "--project-name",
+                    "Install Smoke Quickstart Harness",
                     "--force",
                     "--json",
                 ],

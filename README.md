@@ -40,6 +40,9 @@ replacement. What is proven today:
 - `scripts/run_demo_capture.py` creates a short public-safe demo harness from a
   brief, writes `Docs/Environment/DEMO_CAPTURE.md`, and validates the result so
   reviewers can inspect profile selection, `AGENTS.md`, and local checks.
+- `scripts/run_quickstart.py` and `codex-harness quickstart` turn the first-use
+  path into one command: generate from a brief, validate, run the copied local
+  eval, and write `Docs/Environment/QUICKSTART_REPORT.md`.
 - `scripts/inspect_project.py` and `codex-harness inspect` scan local project
   metadata such as config filenames, top-level directories, and extensions to
   recommend deterministic starter profiles before generation.
@@ -91,7 +94,7 @@ replacement. What is proven today:
   for security audit, legal research, financial analysis, hiring, and customer
   support scenarios.
 - `scripts/codex_harness.py` gives users one thin local entry point for
-  profile listing, profile descriptions, project inspection, generation,
+  profile listing, profile descriptions, quickstart, project inspection, generation,
   inspected generation, acceptance, eval, smoke, copied local eval reports,
   migration audit, evidence-packet, gate, demo-capture, live-trial,
   source-freshness, and snapshot workflows.
@@ -200,6 +203,10 @@ cd Codex-Harness-Generator
 python -m pip install -e .
 codex-harness --help
 codex-harness doctor
+codex-harness quickstart /tmp/codex-rag-harness \
+  --brief "RAG app with prompts, evals, and retrieval checks" \
+  --project-name "RAG Quality Harness" \
+  --force
 codex-harness init /tmp/codex-rag-harness \
   --brief "RAG app with prompts, evals, and retrieval checks" \
   --project-name "RAG Quality Harness" \
@@ -227,6 +234,10 @@ python scripts/codex_harness.py profiles
 codex-harness profiles
 codex-harness doctor
 codex-harness inspect .
+codex-harness quickstart /tmp/codex-rag-harness \
+  --brief "RAG app with prompts, evals, and retrieval checks" \
+  --project-name "RAG Quality Harness" \
+  --force
 codex-harness init /tmp/codex-existing-project-harness \
   --from-project . \
   --project-name "Existing Project Harness" \

@@ -53,9 +53,9 @@ CAPABILITIES = [
     {
         "name": "Generation",
         "original_need": "Create a ready-to-use harness directory.",
-        "codex_surface": "codex-harness init/generate/brief-acceptance/create-acceptance flows.",
-        "evidence_paths": ["scripts/generate_minimal_harness.py", "scripts/run_brief_acceptance.py", "examples/brief-acceptance"],
-        "commands": ["codex-harness init <target> --brief <brief>", "codex-harness brief-acceptance <target> --brief <brief>"],
+        "codex_surface": "codex-harness quickstart/init/generate/brief-acceptance/create-acceptance flows.",
+        "evidence_paths": ["scripts/generate_minimal_harness.py", "scripts/run_quickstart.py", "scripts/run_brief_acceptance.py", "examples/brief-acceptance"],
+        "commands": ["codex-harness quickstart <target> --brief <brief>", "codex-harness init <target> --brief <brief>", "codex-harness brief-acceptance <target> --brief <brief>"],
     },
     {
         "name": "Validation",

@@ -80,6 +80,32 @@ def build_command(args: argparse.Namespace) -> list[str]:
             return python_script("profile_catalog.py", command)
         return python_script("generate_minimal_harness.py", ["--list-profiles"])
 
+    if args.command == "quickstart":
+        command = [args.target]
+        if args.brief:
+            command.extend(["--brief", args.brief])
+        if args.project_name:
+            command.extend(["--project-name", args.project_name])
+        if args.notes:
+            command.extend(["--notes", args.notes])
+        if args.limit is not None:
+            command.extend(["--limit", str(args.limit)])
+        if args.allow_low_confidence:
+            command.append("--allow-low-confidence")
+        if args.target_label:
+            command.extend(["--target-label", args.target_label])
+        if args.force:
+            command.append("--force")
+        if args.min_score is not None:
+            command.extend(["--min-score", str(args.min_score)])
+        if args.min_successes is not None:
+            command.extend(["--min-successes", str(args.min_successes)])
+        if args.no_write:
+            command.append("--no-write")
+        if args.json:
+            command.append("--json")
+        return python_script("run_quickstart.py", command)
+
     if args.command == "profile":
         command = ["--profile", args.profile]
         if args.json:
@@ -557,6 +583,20 @@ def make_parser() -> argparse.ArgumentParser:
     profiles = subparsers.add_parser("profiles", help="List deterministic starter profiles")
     profiles.add_argument("--details", action="store_true", help="Show profile descriptions, first tasks, and guardrails")
     profiles.add_argument("--json", action="store_true", help="Emit profile catalog JSON")
+
+    quickstart = subparsers.add_parser("quickstart", help="Generate, validate, and locally eval a starter harness")
+    quickstart.add_argument("target", nargs="?", default="/tmp/codex-quickstart-harness", help="Generated harness target directory")
+    quickstart.add_argument("--brief", default="RAG app with prompts, evals, and retrieval checks", help="Short project brief")
+    quickstart.add_argument("--project-name", default="Quickstart Harness", help="Human-readable project name")
+    quickstart.add_argument("--notes", default="quickstart path", help="Notes for creation context")
+    quickstart.add_argument("--limit", type=int, default=3, help="Number of profile recommendations to record")
+    quickstart.add_argument("--allow-low-confidence", action="store_true", help="Allow generation when no profile scores above zero")
+    quickstart.add_argument("--target-label", help="Override the target path written inside CREATION_CONTEXT.md")
+    quickstart.add_argument("--force", action="store_true", help="Replace target if it already contains files")
+    quickstart.add_argument("--min-score", type=int, default=90, help="Minimum validation score")
+    quickstart.add_argument("--min-successes", type=int, default=0, help="Minimum success task trials expected by local eval")
+    quickstart.add_argument("--no-write", action="store_true", help="Do not write QUICKSTART_REPORT.md")
+    quickstart.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     profile = subparsers.add_parser("profile", help="Describe one deterministic starter profile")
     profile.add_argument("profile", help="Profile slug")

@@ -1,6 +1,6 @@
 # Proof Status
 
-Generated: 2026-06-04T11:27:32Z
+Generated: 2026-06-04T11:36:48Z
 Status: PASS
 Readiness: Codex-equivalent beta with checked-in self-dogfood proof
 
@@ -18,7 +18,7 @@ conservative and should be read with `PROOF_MATRIX.md`.
 | `pilot_campaign_report` | PASS | Docs/Environment/PILOT_CAMPAIGN.md |
 | `task_trials_report` | PASS | examples/live-create/TASK_TRIALS.md |
 | `checked_in_example_inventory` | PASS | profiles=20 brief_examples=4 failures=0 |
-| `installable_cli` | PASS | profiles=20 doctor=pass init=pass init_from_project=pass demo_capture=pass validate=pass inspect=pass adoption_plan=pass equivalence=pass local_eval=pass evidence_packet=pass pilot_pack=pass usage_from_harness=pass usage_from_issue=pass usage_gaps=pass pilot_campaign=pass migration_audit=pass eval=pass |
+| `installable_cli` | PASS | profiles=20 doctor=pass init=pass quickstart=pass init_from_project=pass demo_capture=pass validate=pass inspect=pass adoption_plan=pass equivalence=pass local_eval=pass evidence_packet=pass pilot_pack=pass usage_from_harness=pass usage_from_issue=pass usage_gaps=pass pilot_campaign=pass migration_audit=pass eval=pass |
 | `live_task_trials` | PASS | 8/8 pass; required >= 8 |
 | `non_synthetic_usage` | PASS | records=2 non_synthetic=2 success=2 external_or_multi_project=0 domains=1 installed_init_brief=0 |
 

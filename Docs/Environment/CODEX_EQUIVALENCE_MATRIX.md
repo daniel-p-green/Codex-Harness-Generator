@@ -1,6 +1,6 @@
 # Codex Equivalence Matrix
 
-Generated: 2026-06-04T11:25:44Z
+Generated: 2026-06-04T11:36:44Z
 Status: PASS
 
 This matrix maps the earlier harness-generator responsibilities to the
@@ -15,7 +15,7 @@ performance.
 | Subagents | PASS | Specialized workers for intake, architecture, generation, validation, and upgrade work. | .codex/agents/*.toml plus generated reviewer agents. | `.codex/agents`<br>`Docs/Templates/Agents`<br>`tests/test_eval_codex_port.py` | `codex-harness validate <generated-harness>` |
 | Skills | PASS | Reusable triggered workflows for create, validate, update, and upgrade paths. | .agents/skills/*/SKILL.md plus generated health-check skills. | `.agents/skills`<br>`scripts/eval_codex_port.py`<br>`tests/test_eval_codex_port.py` | `python scripts/eval_codex_port.py` |
 | Profile catalog | PASS | Domain-specific starting points instead of one generic setup. | 20 deterministic starter profiles with brief-based recommendation. | `scripts/profile_catalog.py`<br>`Docs/StarterProfiles`<br>`tests/test_profile_catalog.py` | `codex-harness profiles`<br>`codex-harness recommend <brief>` |
-| Generation | PASS | Create a ready-to-use harness directory. | codex-harness init/generate/brief-acceptance/create-acceptance flows. | `scripts/generate_minimal_harness.py`<br>`scripts/run_brief_acceptance.py`<br>`examples/brief-acceptance` | `codex-harness init <target> --brief <brief>`<br>`codex-harness brief-acceptance <target> --brief <brief>` |
+| Generation | PASS | Create a ready-to-use harness directory. | codex-harness quickstart/init/generate/brief-acceptance/create-acceptance flows. | `scripts/generate_minimal_harness.py`<br>`scripts/run_quickstart.py`<br>`scripts/run_brief_acceptance.py`<br>`examples/brief-acceptance` | `codex-harness quickstart <target> --brief <brief>`<br>`codex-harness init <target> --brief <brief>`<br>`codex-harness brief-acceptance <target> --brief <brief>` |
 | Validation | PASS | Verify generated environments before trusting them. | Generated local checks, repo evals, smoke tests, and validation reports. | `scripts/validate_generated_harness.py`<br>`scripts/eval_generated_harness.py`<br>`scripts/smoke_generated_harness.py` | `codex-harness validate <generated-harness>`<br>`codex-harness gate` |
 | Existing-project adoption | PASS | Adopt a harness into an existing project without overwriting work. | Project inspection, adoption plans, add-only copy scripts, and migration audit. | `scripts/inspect_project.py`<br>`scripts/plan_project_adoption.py`<br>`scripts/migration_audit.py` | `codex-harness inspect <path>`<br>`codex-harness adoption-plan <path>`<br>`codex-harness migration-audit <path>` |
 | Copied-harness autonomy | PASS | A copied harness should keep working away from the generator repo. | Generated local check, local eval report, task-trial recorder, and improvement recorder. | `tests/test_generated_harness_contract.py`<br>`examples/deterministic/software-development/scripts/run-harness-evals.py` | `codex-harness local-eval <generated-harness>` |

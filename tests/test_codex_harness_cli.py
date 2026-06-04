@@ -157,6 +157,59 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_quickstart_delegates_to_quickstart_runner(self):
+        command, _ = self.run_cli(
+            [
+                "quickstart",
+                "/tmp/quick",
+                "--brief",
+                "RAG app with prompts and evals",
+                "--project-name",
+                "Quick Harness",
+                "--notes",
+                "trial",
+                "--limit",
+                "2",
+                "--allow-low-confidence",
+                "--target-label",
+                "tmp/quick",
+                "--force",
+                "--min-score",
+                "95",
+                "--min-successes",
+                "1",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/run_quickstart.py",
+                "/tmp/quick",
+                "--brief",
+                "RAG app with prompts and evals",
+                "--project-name",
+                "Quick Harness",
+                "--notes",
+                "trial",
+                "--limit",
+                "2",
+                "--allow-low-confidence",
+                "--target-label",
+                "tmp/quick",
+                "--force",
+                "--min-score",
+                "95",
+                "--min-successes",
+                "1",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
     def test_adoption_plan_delegates_to_planner(self):
         command, _ = self.run_cli(
             [

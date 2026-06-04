@@ -37,6 +37,7 @@ REQUIRED_FILES = (
     "scripts/codex_harness.py",
     "scripts/generate_minimal_harness.py",
     "scripts/inspect_project.py",
+    "scripts/run_quickstart.py",
     "scripts/run_inspected_acceptance.py",
     "scripts/run_evals.py",
 )
@@ -44,6 +45,7 @@ REQUIRED_FILES = (
 NEXT_COMMANDS = (
     "codex-harness profiles",
     "codex-harness inspect .",
+    'codex-harness quickstart /tmp/codex-rag-harness --brief "RAG app with prompts, evals, and retrieval checks" --force',
     'codex-harness init /tmp/codex-rag-harness --brief "RAG app with prompts, evals, and retrieval checks" --force',
     "codex-harness validate /tmp/codex-rag-harness",
     "codex-harness gate",
@@ -137,6 +139,7 @@ def check_installable_cli() -> tuple[dict, dict]:
     failed = next((step for step in payload["steps"] if step["status"] != "pass"), None)
     profile_step = next((step for step in payload["steps"] if step["name"] == "profiles"), {})
     doctor_step = next((step for step in payload["steps"] if step["name"] == "doctor"), {})
+    quickstart_step = next((step for step in payload["steps"] if step["name"] == "quickstart"), {})
     init_from_project_step = next((step for step in payload["steps"] if step["name"] == "init_from_project"), {})
     validate_step = next((step for step in payload["steps"] if step["name"] == "validate"), {})
     inspect_step = next((step for step in payload["steps"] if step["name"] == "inspect"), {})
@@ -153,9 +156,10 @@ def check_installable_cli() -> tuple[dict, dict]:
     if failed:
         detail = f"failed at {failed['name']}"
     else:
-        detail = "profiles={profiles} doctor={doctor_status} init=pass init_from_project={init_from_project_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} equivalence={equivalence_status} local_eval={local_eval_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue={usage_from_issue_status} usage_gaps={usage_gaps_status} pilot_campaign={pilot_campaign_status} migration_audit={migration_status} eval=pass".format(
+        detail = "profiles={profiles} doctor={doctor_status} init=pass quickstart={quickstart_status} init_from_project={init_from_project_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} equivalence={equivalence_status} local_eval={local_eval_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue={usage_from_issue_status} usage_gaps={usage_gaps_status} pilot_campaign={pilot_campaign_status} migration_audit={migration_status} eval=pass".format(
             profiles=profile_step.get("profile_count", "unknown"),
             doctor_status=doctor_step.get("status", "unknown"),
+            quickstart_status=quickstart_step.get("status", "unknown"),
             init_from_project_status=init_from_project_step.get("status", "unknown"),
             validate_status=validate_step.get("status", "unknown"),
             inspect_status=inspect_step.get("status", "unknown"),
