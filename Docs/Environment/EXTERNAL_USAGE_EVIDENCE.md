@@ -14,7 +14,7 @@ Good reports include:
 - The domain or project type.
 - The generated harness profile or public-safe label, if known.
 - The source type: `external`, `multi-project`, or `self-dogfood`.
-- The generation path, such as `installed-init-brief`,
+- The generation path, such as `installed-quickstart`, `installed-init-brief`,
   `installed-init-from-project`, `adoption-plan`, `manual-migration`,
   `live-create`, `repo-dogfood`, or `unknown`.
 - A public-safe task summary.
@@ -51,7 +51,7 @@ python scripts/codex_harness.py pilot-pack /path/to/generated-harness \
   --title "External example" \
   --harness-label "private-summary: external reporter" \
   --source-type external \
-  --generation-path installed-init-brief \
+  --generation-path installed-quickstart \
   --prefill-from-trials \
   --issue-out /tmp/EXTERNAL_USAGE_ISSUE_DRAFT.md
 ```
@@ -100,7 +100,7 @@ python scripts/codex_harness.py usage-record \
   --outcome success \
   --evidence-type private-summary \
   --source-type external \
-  --generation-path installed-init-brief \
+  --generation-path installed-quickstart \
   --evidence "Evidence bullet from issue." \
   --evidence "Second evidence bullet from issue." \
   --verification "Verification bullet from issue." \
@@ -136,6 +136,10 @@ python scripts/codex_harness.py usage-validate \
   --min-domains 4 \
   --min-installed-init-brief 2
 ```
+
+The threshold flag name is kept for older scripts; it counts installed
+brief-based generation through either `codex-harness quickstart` or
+`codex-harness init --brief`.
 
 ## Claim Discipline
 

@@ -62,15 +62,15 @@ class UsageGapsTests(unittest.TestCase):
         self.assertEqual(4, len(result["suggested_pilots"]))
         self.assertEqual("llm-app", result["suggested_pilots"][0]["profile"])
         self.assertEqual("external", result["suggested_pilots"][0]["source_type"])
-        self.assertEqual("installed-init-brief", result["suggested_pilots"][0]["generation_path"])
-        self.assertIn("codex-harness init", result["suggested_pilots"][0]["commands"][0])
+        self.assertEqual("installed-quickstart", result["suggested_pilots"][0]["generation_path"])
+        self.assertIn("codex-harness quickstart", result["suggested_pilots"][0]["commands"][0])
 
     def test_build_payload_marks_ready_when_targets_are_satisfied(self):
         records = []
         for index, (slug, domain, source_type, generation_path) in enumerate(
             [
                 ("external-llm-app", "LLM app", "external", "installed-init-brief"),
-                ("multi-project-docs", "Documentation", "multi-project", "installed-init-brief"),
+                ("multi-project-docs", "Documentation", "multi-project", "installed-quickstart"),
                 ("external-data-tool", "Data tooling", "external", "installed-init-from-project"),
                 ("self-dogfood-cli", "CLI tooling", "self-dogfood", "manual-migration"),
                 ("self-dogfood-evals", "Evaluation", "self-dogfood", "repo-dogfood"),

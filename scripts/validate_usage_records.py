@@ -126,11 +126,11 @@ def validate_record_dir(
         requirement_errors.append(
             f"requires at least {min_domains} distinct usage domain(s); found {summary['distinct_domains']}"
         )
-    if summary["installed_init_brief"] < min_installed_init_brief:
+    if summary["installed_brief_generation"] < min_installed_init_brief:
         requirement_errors.append(
-            "requires at least {required} installed init --brief usage record(s); found {found}".format(
+            "requires at least {required} installed brief-based generation usage record(s); found {found}".format(
                 required=min_installed_init_brief,
-                found=summary["installed_init_brief"],
+                found=summary["installed_brief_generation"],
             )
         )
     status = "pass" if all(result["status"] == "pass" for result in results) and not requirement_errors else "fail"
@@ -152,7 +152,7 @@ def main() -> int:
     parser.add_argument("--require-success", action="store_true", help="Fail unless at least one successful usage record exists")
     parser.add_argument("--min-external-or-multi-project", type=int, default=0, help="Minimum external or multi-project usage records")
     parser.add_argument("--min-domains", type=int, default=0, help="Minimum distinct usage domains")
-    parser.add_argument("--min-installed-init-brief", type=int, default=0, help="Minimum usage records generated via installed init --brief")
+    parser.add_argument("--min-installed-init-brief", type=int, default=0, help="Minimum usage records generated via installed init --brief or quickstart")
     parser.add_argument("--json", action="store_true", help="Emit JSON")
     args = parser.parse_args()
 
@@ -173,7 +173,7 @@ def main() -> int:
         print(f"- records: {payload['record_count']}")
         summary = payload["summary"]
         print(
-            "- summary: total={total} synthetic={synthetic} sanitized={sanitized} private-summary={private_summary} non-synthetic={non_synthetic} success={success} external-or-multi-project={external_or_multi_project} domains={distinct_domains} installed-init-brief={installed_init_brief}".format(
+            "- summary: total={total} synthetic={synthetic} sanitized={sanitized} private-summary={private_summary} non-synthetic={non_synthetic} success={success} external-or-multi-project={external_or_multi_project} domains={distinct_domains} installed-brief-generation={installed_brief_generation}".format(
                 **summary
             )
         )

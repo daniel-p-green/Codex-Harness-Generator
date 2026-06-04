@@ -414,7 +414,7 @@ python scripts/codex_harness.py usage-record \
   --outcome success \
   --evidence-type private-summary \
   --source-type external \
-  --generation-path installed-init-brief \
+  --generation-path installed-quickstart \
   --evidence "Generated harness guided implementation and verification." \
   --evidence "Sanitized artifact checklist completed; raw evidence retained privately." \
   --verification "Tests passed; raw logs retained privately." \
@@ -435,7 +435,7 @@ python scripts/codex_harness.py pilot-pack /tmp/codex-rag-harness \
   --title "RAG harness trial" \
   --harness-label "RAG harness private repo" \
   --source-type external \
-  --generation-path installed-init-brief \
+  --generation-path installed-quickstart \
   --prefill-from-trials \
   --issue-out /tmp/EXTERNAL_USAGE_ISSUE_DRAFT.md
 python scripts/codex_harness.py evidence-packet /tmp/codex-rag-harness \
@@ -448,7 +448,7 @@ python scripts/codex_harness.py usage-from-harness /tmp/codex-rag-harness \
   --harness-label "RAG harness private repo" \
   --evidence-type private-summary \
   --source-type external \
-  --generation-path installed-init-brief \
+  --generation-path installed-quickstart \
   --privacy-review "Private-summary evidence only; no secrets, personal data, private repository names, or raw logs." \
   --limitation "Single private task trial, not longitudinal proof" \
   --json
@@ -477,9 +477,9 @@ python scripts/codex_harness.py equivalence
 python scripts/codex_harness.py usage-gaps
 ```
 
-The report includes suggested pilot targets with starter `init` and `pilot-pack`
-commands so maintainers can collect the next records by profile, source type,
-and generation path instead of guessing.
+The report includes suggested pilot targets with starter `quickstart` or `init`
+commands plus `pilot-pack` follow-up so maintainers can collect the next records
+by profile, source type, and generation path instead of guessing.
 
 Write a shareable campaign packet from those gaps:
 
@@ -512,6 +512,10 @@ python scripts/codex_harness.py usage-validate \
   --min-domains 4 \
   --min-installed-init-brief 2
 ```
+
+The `--min-installed-init-brief` flag is retained for compatibility; it now
+counts installed brief-based generation records from either `codex-harness
+quickstart` or `codex-harness init --brief`.
 
 Summarize the checked-in product-proof package:
 
@@ -563,6 +567,7 @@ Common subcommands:
 
 | Subcommand | Delegates to | What it proves |
 |---|---|---|
+| `quickstart <target>` | `run_quickstart.py` | Generates from a brief, validates the harness, runs the copied local eval, and writes `QUICKSTART_REPORT.md`. |
 | `init <target>` | `generate_minimal_harness.py` or `run_brief_acceptance.py` | One-command starter path; add `--brief` to recommend a profile and record `PROFILE_SELECTION.md`. |
 | `init <target> --from-project <path>` | `run_inspected_acceptance.py` | Inspects project metadata, generates through deterministic acceptance, and records `PROJECT_INSPECTION.md`. |
 | `profiles` | `generate_minimal_harness.py --list-profiles` or `profile_catalog.py` | Shows supported deterministic starters; add `--details` or `--json` for a chooser-friendly catalog. |

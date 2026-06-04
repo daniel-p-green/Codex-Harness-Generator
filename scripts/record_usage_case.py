@@ -22,12 +22,14 @@ EXTERNAL_OR_MULTI_PROJECT_SOURCE_TYPES = {"external", "multi-project"}
 ALLOWED_GENERATION_PATHS = {
     "installed-init-brief",
     "installed-init-from-project",
+    "installed-quickstart",
     "adoption-plan",
     "manual-migration",
     "live-create",
     "repo-dogfood",
     "unknown",
 }
+INSTALLED_BRIEF_GENERATION_PATHS = {"installed-init-brief", "installed-quickstart"}
 GENERATED_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 
 SENSITIVE_PATTERNS = [
@@ -214,6 +216,11 @@ def summarize_records(records: list[dict]) -> dict:
         "external_or_multi_project": external_or_multi_project,
         "distinct_domains": len(domains),
         "installed_init_brief": by_generation_path.get("installed-init-brief", 0),
+        "installed_quickstart": by_generation_path.get("installed-quickstart", 0),
+        "installed_brief_generation": sum(
+            by_generation_path.get(generation_path, 0)
+            for generation_path in INSTALLED_BRIEF_GENERATION_PATHS
+        ),
         "source_types": by_source_type,
         "generation_paths": by_generation_path,
     }
@@ -231,9 +238,9 @@ def write_report(report_path: Path, records: list[dict]) -> None:
         "",
         "## Summary",
         "",
-        "| Total | Non-Synthetic | Success | External/Multi-Project | Distinct Domains | Installed Init Brief |",
+        "| Total | Non-Synthetic | Success | External/Multi-Project | Distinct Domains | Installed Brief Generation |",
         "|---:|---:|---:|---:|---:|---:|",
-        "| {total} | {non_synthetic} | {success} | {external_or_multi_project} | {distinct_domains} | {installed_init_brief} |".format(
+        "| {total} | {non_synthetic} | {success} | {external_or_multi_project} | {distinct_domains} | {installed_brief_generation} |".format(
             **summary
         ),
         "",

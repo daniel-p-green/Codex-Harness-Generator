@@ -118,6 +118,29 @@ class ValidateUsageRecordsTests(unittest.TestCase):
         self.assertEqual("pass", result["status"], result)
         self.assertEqual(2, result["summary"]["external_or_multi_project"])
         self.assertEqual(2, result["summary"]["distinct_domains"])
+        self.assertEqual(2, result["summary"]["installed_brief_generation"])
+
+    def test_installed_quickstart_counts_toward_installed_brief_generation_threshold(self):
+        first = self.valid_payload()
+        first["slug"] = "external-quickstart"
+        first["source_type"] = "external"
+        first["generation_path"] = "installed-quickstart"
+        second = self.valid_payload()
+        second["slug"] = "external-init"
+        second["source_type"] = "external"
+        second["generation_path"] = "installed-init-brief"
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_payload(root, "external-quickstart", first)
+            self.write_payload(root, "external-init", second)
+
+            result = validate_usage_records.validate_record_dir(root, min_installed_init_brief=2)
+
+        self.assertEqual("pass", result["status"], result)
+        self.assertEqual(1, result["summary"]["installed_quickstart"])
+        self.assertEqual(1, result["summary"]["installed_init_brief"])
+        self.assertEqual(2, result["summary"]["installed_brief_generation"])
 
     def test_validate_record_dir_fails_beta_evidence_thresholds_for_self_dogfood(self):
         with tempfile.TemporaryDirectory() as temp_dir:

@@ -54,6 +54,7 @@ body:
       description: How did this harness enter the workflow?
       options:
         - installed-init-brief
+        - installed-quickstart
         - installed-init-from-project
         - adoption-plan
         - manual-migration

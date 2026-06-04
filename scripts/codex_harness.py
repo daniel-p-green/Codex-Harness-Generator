@@ -720,6 +720,7 @@ def make_parser() -> argparse.ArgumentParser:
             "adoption-plan",
             "installed-init-brief",
             "installed-init-from-project",
+            "installed-quickstart",
             "live-create",
             "manual-migration",
             "repo-dogfood",
@@ -752,6 +753,7 @@ def make_parser() -> argparse.ArgumentParser:
             "adoption-plan",
             "installed-init-brief",
             "installed-init-from-project",
+            "installed-quickstart",
             "live-create",
             "manual-migration",
             "repo-dogfood",
@@ -791,6 +793,7 @@ def make_parser() -> argparse.ArgumentParser:
             "adoption-plan",
             "installed-init-brief",
             "installed-init-from-project",
+            "installed-quickstart",
             "live-create",
             "manual-migration",
             "repo-dogfood",
@@ -810,7 +813,7 @@ def make_parser() -> argparse.ArgumentParser:
     pilot_campaign.add_argument("--min-records", type=int, help="Target valid usage records")
     pilot_campaign.add_argument("--min-external-or-multi-project", type=int, help="Target external or multi-project records")
     pilot_campaign.add_argument("--min-domains", type=int, help="Target distinct domains")
-    pilot_campaign.add_argument("--min-installed-init-brief", type=int, help="Target records generated via installed init --brief")
+    pilot_campaign.add_argument("--min-installed-init-brief", type=int, help="Target records generated via installed init --brief or quickstart")
     pilot_campaign.add_argument("--no-write", action="store_true", help="Do not write the Markdown campaign")
     pilot_campaign.add_argument("--json", action="store_true", help="Emit JSON payload")
 
@@ -826,6 +829,7 @@ def make_parser() -> argparse.ArgumentParser:
             "adoption-plan",
             "installed-init-brief",
             "installed-init-from-project",
+            "installed-quickstart",
             "live-create",
             "manual-migration",
             "repo-dogfood",
@@ -846,7 +850,7 @@ def make_parser() -> argparse.ArgumentParser:
     usage_validate.add_argument("--require-success", action="store_true", help="Fail unless at least one successful usage record exists")
     usage_validate.add_argument("--min-external-or-multi-project", type=int, help="Minimum external or multi-project usage records")
     usage_validate.add_argument("--min-domains", type=int, help="Minimum distinct usage domains")
-    usage_validate.add_argument("--min-installed-init-brief", type=int, help="Minimum usage records generated via installed init --brief")
+    usage_validate.add_argument("--min-installed-init-brief", type=int, help="Minimum usage records generated via installed init --brief or quickstart")
     usage_validate.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     usage_gaps = subparsers.add_parser("usage-gaps", help="Report remaining beta-exit usage evidence gaps")
@@ -855,7 +859,7 @@ def make_parser() -> argparse.ArgumentParser:
     usage_gaps.add_argument("--min-records", type=int, help="Target valid usage records")
     usage_gaps.add_argument("--min-external-or-multi-project", type=int, help="Target external or multi-project records")
     usage_gaps.add_argument("--min-domains", type=int, help="Target distinct domains")
-    usage_gaps.add_argument("--min-installed-init-brief", type=int, help="Target records generated via installed init --brief")
+    usage_gaps.add_argument("--min-installed-init-brief", type=int, help="Target records generated via installed init --brief or quickstart")
     usage_gaps.add_argument("--no-write", action="store_true", help="Do not write the Markdown report")
     usage_gaps.add_argument("--json", action="store_true", help="Emit JSON payload")
 
@@ -864,7 +868,7 @@ def make_parser() -> argparse.ArgumentParser:
     proof_status.add_argument("--min-usage-records", type=int, help="Minimum valid usage records required")
     proof_status.add_argument("--min-external-or-multi-project", type=int, help="Minimum external or multi-project usage records")
     proof_status.add_argument("--min-domains", type=int, help="Minimum distinct usage domains")
-    proof_status.add_argument("--min-installed-init-brief", type=int, help="Minimum usage records generated via installed init --brief")
+    proof_status.add_argument("--min-installed-init-brief", type=int, help="Minimum usage records generated via installed init --brief or quickstart")
     proof_status.add_argument("--record-dir", help="Directory where usage record JSON files are read")
     proof_status.add_argument("--report", help="Proof-status Markdown report path")
     proof_status.add_argument("--no-write", action="store_true", help="Do not rewrite PROOF_STATUS.md")

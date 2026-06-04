@@ -107,6 +107,8 @@ class RecordUsageCaseTests(unittest.TestCase):
         self.assertEqual(1, summary["private_summary"])
         self.assertEqual(1, summary["non_synthetic"])
         self.assertEqual(2, summary["installed_init_brief"])
+        self.assertEqual(0, summary["installed_quickstart"])
+        self.assertEqual(2, summary["installed_brief_generation"])
         self.assertEqual(1, summary["distinct_domains"])
 
     def test_write_record_requires_force_for_existing_slug(self):

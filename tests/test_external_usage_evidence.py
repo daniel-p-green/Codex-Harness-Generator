@@ -30,7 +30,7 @@ class ExternalUsageEvidenceTests(unittest.TestCase):
             self.assertIn(f"- {evidence_type}", text)
         for source_type in ("external", "multi-project", "self-dogfood"):
             self.assertIn(f"- {source_type}", text)
-        for generation_path in ("installed-init-brief", "installed-init-from-project", "adoption-plan", "manual-migration"):
+        for generation_path in ("installed-init-brief", "installed-quickstart", "installed-init-from-project", "adoption-plan", "manual-migration"):
             self.assertIn(f"- {generation_path}", text)
         for outcome in ("success", "partial", "inconclusive", "failed"):
             self.assertIn(f"- {outcome}", text)
@@ -60,7 +60,7 @@ class ExternalUsageEvidenceTests(unittest.TestCase):
         self.assertIn("python scripts/codex_harness.py usage-record", text)
         self.assertIn("--evidence-type private-summary", text)
         self.assertIn("--source-type external", text)
-        self.assertIn("--generation-path installed-init-brief", text)
+        self.assertIn("--generation-path installed-quickstart", text)
         self.assertIn("python scripts/codex_harness.py usage-validate", text)
         self.assertIn("Do not claim broad adoption", text)
 

@@ -49,7 +49,7 @@ def build_gaps(summary: dict, targets: dict) -> dict:
         ),
         "domains": max(targets["min_domains"] - summary["distinct_domains"], 0),
         "installed_init_brief": max(
-            targets["min_installed_init_brief"] - summary["installed_init_brief"],
+            targets["min_installed_init_brief"] - summary["installed_brief_generation"],
             0,
         ),
     }
@@ -65,7 +65,7 @@ def build_recommendations(gaps: dict) -> list[str]:
         )
     if gaps["installed_init_brief"]:
         recommendations.append(
-            f"Make at least {gaps['installed_init_brief']} of the next record(s) use the installed `codex-harness init --brief` path."
+            f"Make at least {gaps['installed_init_brief']} of the next record(s) use installed brief-based generation (`codex-harness quickstart` or `codex-harness init --brief`)."
         )
     if gaps["domains"]:
         recommendations.append(
@@ -107,10 +107,20 @@ def build_suggested_pilots(domains: list[str], gaps: dict) -> list[dict]:
     pilots = []
     for index, profile in enumerate(candidates[:target_count]):
         source_type = "external" if index < gaps["external_or_multi_project"] else "multi-project"
-        generation_path = "installed-init-brief" if index < gaps["installed_init_brief"] else "installed-init-from-project"
+        generation_path = "installed-quickstart"
         slug = f"{profile['slug']}-pilot"
         brief = f"{profile['target']} with one privacy-safe task, local eval, and public-safe usage evidence"
         target_path = f"/tmp/codex-{slug}"
+        generation_command = [
+            "codex-harness",
+            "quickstart",
+            target_path,
+            "--brief",
+            json.dumps(brief),
+            "--project-name",
+            json.dumps(f"{profile['default_project_name']} Pilot"),
+            "--force",
+        ]
         pilots.append(
             {
                 "profile": profile["slug"],
@@ -119,18 +129,7 @@ def build_suggested_pilots(domains: list[str], gaps: dict) -> list[dict]:
                 "generation_path": generation_path,
                 "brief": brief,
                 "commands": [
-                    " ".join(
-                        [
-                            "codex-harness",
-                            "init",
-                            target_path,
-                            "--brief",
-                            json.dumps(brief),
-                            "--project-name",
-                            json.dumps(f"{profile['default_project_name']} Pilot"),
-                            "--force",
-                        ]
-                    ),
+                    " ".join(generation_command),
                     " ".join(
                         [
                             "codex-harness",
@@ -204,7 +203,7 @@ def write_report(path: Path, payload: dict) -> None:
         f"- Total usage records: {payload['targets']['min_records']}",
         f"- External or multi-project records: {payload['targets']['min_external_or_multi_project']}",
         f"- Distinct domains: {payload['targets']['min_domains']}",
-        f"- Installed `codex-harness init --brief` records: {payload['targets']['min_installed_init_brief']}",
+        f"- Installed brief-based generation records: {payload['targets']['min_installed_init_brief']}",
         "",
         "## Current Summary",
         "",
@@ -213,14 +212,14 @@ def write_report(path: Path, payload: dict) -> None:
         f"- Successful records: {payload['summary']['success']}",
         f"- External or multi-project records: {payload['summary']['external_or_multi_project']}",
         f"- Distinct domains: {payload['summary']['distinct_domains']}",
-        f"- Installed `init --brief` records: {payload['summary']['installed_init_brief']}",
+        f"- Installed brief-based generation records: {payload['summary']['installed_brief_generation']}",
         "",
         "## Remaining Gaps",
         "",
         f"- Usage records: {payload['gaps']['records']}",
         f"- External or multi-project records: {payload['gaps']['external_or_multi_project']}",
         f"- Distinct domains: {payload['gaps']['domains']}",
-        f"- Installed `init --brief` records: {payload['gaps']['installed_init_brief']}",
+        f"- Installed brief-based generation records: {payload['gaps']['installed_init_brief']}",
         "",
         "## Represented Domains",
         "",

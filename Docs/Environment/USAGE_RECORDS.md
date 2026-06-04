@@ -7,7 +7,7 @@ secrets, personal data, proprietary source, or local machine paths.
 
 ## Summary
 
-| Total | Non-Synthetic | Success | External/Multi-Project | Distinct Domains | Installed Init Brief |
+| Total | Non-Synthetic | Success | External/Multi-Project | Distinct Domains | Installed Brief Generation |
 |---:|---:|---:|---:|---:|---:|
 | 2 | 2 | 2 | 0 | 1 | 0 |
 

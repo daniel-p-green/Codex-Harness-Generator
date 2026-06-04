@@ -14,6 +14,7 @@ Already proven:
 - Codex-native structure and generated-harness contracts.
 - 20 deterministic starter profiles.
 - Brief-driven `codex-harness init --brief`.
+- Verified first-run `codex-harness quickstart`.
 - Metadata-based project inspection for starter profile selection.
 - Metadata-inspected `codex-harness init --from-project`.
 - Non-destructive `codex-harness adoption-plan` previews for existing projects,
@@ -62,7 +63,8 @@ The project can stop calling itself a beta only when all of these are true:
 - At least 5 non-synthetic usage records are checked in.
 - At least 3 records are from external or multi-project usage, not self-dogfood.
 - At least 4 different domains are represented across those records.
-- At least 2 records used the installed `codex-harness init --brief` path.
+- At least 2 records used installed brief-based generation:
+  `codex-harness quickstart` or `codex-harness init --brief`.
 - `python scripts/codex_harness.py proof-status --min-usage-records 5 --min-external-or-multi-project 3 --min-domains 4 --min-installed-init-brief 2` passes.
 - `python scripts/codex_harness.py gate` passes on CI and locally.
 - `python scripts/codex_harness.py source-freshness` and
@@ -90,9 +92,9 @@ The project can stop calling itself a beta only when all of these are true:
    customer support.
 
 3. Record and maintain the short demo capture.
-   Keep `examples/demo-capture/rag-quality` current as the public-safe walkthrough
-   for `codex-harness init --brief`, profile selection, eval, local check, and
-   `AGENTS.md` inspection.
+  Keep `examples/demo-capture/rag-quality` current as the public-safe walkthrough
+  for brief-based generation, profile selection, eval, local check, and
+  `AGENTS.md` inspection.
 
 4. Deepen source drift checks.
    Move beyond concept presence when official Codex docs expose stable

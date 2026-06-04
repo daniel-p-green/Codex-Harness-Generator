@@ -172,7 +172,7 @@ def build_payload(
         {
             "name": "non_synthetic_usage",
             "status": usage["status"],
-            "detail": "records={total} non_synthetic={non_synthetic} success={success} external_or_multi_project={external_or_multi_project} domains={distinct_domains} installed_init_brief={installed_init_brief}".format(
+            "detail": "records={total} non_synthetic={non_synthetic} success={success} external_or_multi_project={external_or_multi_project} domains={distinct_domains} installed_brief_generation={installed_brief_generation}".format(
                 **usage["summary"]
             ),
             "requirement_errors": usage["requirement_errors"],
@@ -230,7 +230,7 @@ def write_report(path: Path, payload: dict) -> None:
             f"- Successful records: {usage['success']}",
             f"- External or multi-project records: {usage['external_or_multi_project']}",
             f"- Distinct domains: {usage['distinct_domains']}",
-            f"- Installed init --brief records: {usage['installed_init_brief']}",
+            f"- Installed brief-based generation records: {usage['installed_brief_generation']}",
             "",
             "## What This Does Not Prove",
             "",
@@ -248,7 +248,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--min-usage-records", type=int, default=2, help="Minimum valid usage records required")
     parser.add_argument("--min-external-or-multi-project", type=int, default=0, help="Minimum external or multi-project usage records")
     parser.add_argument("--min-domains", type=int, default=0, help="Minimum distinct usage domains")
-    parser.add_argument("--min-installed-init-brief", type=int, default=0, help="Minimum usage records generated via installed init --brief")
+    parser.add_argument("--min-installed-init-brief", type=int, default=0, help="Minimum usage records generated via installed init --brief or quickstart")
     parser.add_argument("--record-dir", default=DEFAULT_RECORD_DIR.as_posix())
     parser.add_argument("--report", default=DEFAULT_REPORT.as_posix())
     parser.add_argument("--no-write", action="store_true", help="Do not write PROOF_STATUS.md")

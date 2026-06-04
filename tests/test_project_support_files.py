@@ -52,7 +52,7 @@ class ProjectSupportFilesTests(unittest.TestCase):
             "At least 5 non-synthetic usage records",
             "At least 3 records are from external or multi-project usage",
             "At least 4 different domains",
-            "installed `codex-harness init --brief` path",
+            "installed brief-based generation",
             "source-freshness",
             "semantic-alignment",
             "short demo capture",

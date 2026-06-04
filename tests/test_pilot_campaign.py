@@ -52,7 +52,7 @@ class PilotCampaignTests(unittest.TestCase):
         self.assertEqual("missing-beta-exit-evidence", result["readiness"])
         self.assertEqual(2, result["pilot_count"])
         self.assertEqual("llm-app", result["pilots"][0]["profile"])
-        self.assertEqual("installed-init-brief", result["pilots"][0]["generation_path"])
+        self.assertEqual("installed-quickstart", result["pilots"][0]["generation_path"])
 
     def test_write_report_includes_privacy_and_claim_boundaries(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -77,7 +77,7 @@ class PilotCampaignTests(unittest.TestCase):
         for index, (slug, domain, source_type, generation_path) in enumerate(
             [
                 ("external-llm-app", "LLM app", "external", "installed-init-brief"),
-                ("multi-project-docs", "Documentation", "multi-project", "installed-init-brief"),
+                ("multi-project-docs", "Documentation", "multi-project", "installed-quickstart"),
                 ("external-data-tool", "Data tooling", "external", "installed-init-from-project"),
                 ("self-dogfood-cli", "CLI tooling", "self-dogfood", "manual-migration"),
                 ("self-dogfood-evals", "Evaluation", "self-dogfood", "repo-dogfood"),
