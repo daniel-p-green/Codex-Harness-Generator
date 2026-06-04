@@ -11,6 +11,24 @@ from pathlib import Path
 
 MARKER = "<!-- codex-harness-usage-lint -->"
 
+FIELD_LABELS = {
+    "outcome": "Outcome",
+    "task_summary": "Public-safe task summary",
+    "evidence": "Evidence",
+    "verification": "Verification performed",
+    "privacy_review": "Privacy review",
+    "limitations": "Limitations",
+}
+
+FIELD_GUIDANCE = {
+    "outcome": "Use `success`, `partial`, `failed`, or `inconclusive`.",
+    "task_summary": "Summarize one real task without private repo names, secrets, personal data, raw logs, or proprietary source.",
+    "evidence": "Add at least two public-safe bullets about what the generated harness helped you do or verify.",
+    "verification": "Add at least two bullets naming the checks you actually ran or reviews you performed.",
+    "privacy_review": "State that the report excludes secrets, personal data, private paths, proprietary source, raw logs, and raw private transcripts.",
+    "limitations": "Add at least one bullet describing the scope limit, such as one task, one repo, one reporter, or incomplete coverage.",
+}
+
 
 def load_payload(path: str) -> dict:
     text = sys.stdin.read() if path == "-" else Path(path).read_text(encoding="utf-8")
@@ -33,6 +51,29 @@ def github_issue_line(payload: dict) -> str:
     if number:
         return f"Issue: #{number}"
     return "Issue: unavailable"
+
+
+def reply_template_lines(missing_fields: list[str]) -> list[str]:
+    if not missing_fields:
+        return []
+    lines = [
+        "### Reporter reply template",
+        "",
+        "Copy this into a new issue comment and replace each guidance line with your public-safe result:",
+        "",
+    ]
+    for field in missing_fields:
+        label = FIELD_LABELS.get(field, field.replace("_", " ").title())
+        guidance = FIELD_GUIDANCE.get(field, "Add a public-safe value for this field.")
+        lines.extend(
+            [
+                f"#### {label}",
+                "",
+                guidance,
+                "",
+            ]
+        )
+    return lines
 
 
 def format_comment(payload: dict) -> str:
@@ -76,6 +117,7 @@ def format_comment(payload: dict) -> str:
                 "",
                 *bullet_lines(missing_fields),
                 "",
+                *reply_template_lines(missing_fields),
                 "### Errors",
                 "",
                 *bullet_lines(errors),

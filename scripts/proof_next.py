@@ -226,6 +226,14 @@ def build_pilot_github_sync_command(args: argparse.Namespace) -> str:
     )
 
 
+def public_pilot_lint_command() -> dict:
+    return {
+        "name": "refresh public pilot lint comments",
+        "command": "gh workflow run usage-evidence-lint.yml -f issue=all-open-pilots",
+        "purpose": "refresh one marker-managed readiness comment per open public pilot issue without writing usage records",
+    }
+
+
 def active_pilot_for_next(gaps_payload: dict, board_payload: dict) -> dict | None:
     next_pilot = (gaps_payload.get("suggested_pilots") or [None])[0]
     if not next_pilot:
@@ -315,6 +323,7 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
                 "purpose": "fetch live pilot issues and identify which reporter updates are ready to convert",
             }
         )
+        commands.append(public_pilot_lint_command())
         if active_pilot["status"] == "prepared":
             commands.append(
                 {
@@ -385,6 +394,7 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
                     "command": build_pilot_github_sync_command(args),
                     "purpose": "fetch live pilot issues and identify which reporter updates are ready to convert",
                 },
+                public_pilot_lint_command(),
             ]
         )
         commands.extend(build_conversion_commands(pilot, args))

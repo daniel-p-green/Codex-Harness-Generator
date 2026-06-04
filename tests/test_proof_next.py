@@ -138,6 +138,7 @@ class ProofNextTests(unittest.TestCase):
         self.assertTrue(any("codex-harness pilot-handoff" in command for command in commands))
         self.assertTrue(any("codex-harness pilot-github-issues" in command for command in commands))
         self.assertTrue(any("codex-harness pilot-github-sync" in command for command in commands))
+        self.assertTrue(any("gh workflow run usage-evidence-lint.yml -f issue=all-open-pilots" in command for command in commands))
         self.assertTrue(any("pilot-update llm-app-pilot --status invited" in command for command in commands))
         self.assertTrue(any("pilot-update llm-app-pilot --status completed" in command for command in commands))
         self.assertTrue(any("usage-from-harness <generated-harness> --slug llm-app-pilot" in command for command in commands))

@@ -685,6 +685,9 @@ The `Usage Evidence Lint` GitHub Action runs the same lint-only importer path on
 public usage issues and reporter comments, updating one marker-managed issue
 comment with readiness, missing fields, and evidence counts. It never writes a
 usage record and does not make the issue adoption proof.
+To refresh every open public pilot issue in one pass, manually dispatch the
+workflow with `issue=all-open-pilots`; it still upserts one marker-managed
+comment per issue rather than creating duplicate comments.
 Post follow-ups only when the selected action is still missing public-safe
 evidence, verification, privacy, or limitation fields. Maintainer follow-ups
 carry a hidden marker so they do not count as reporter evidence and do not get

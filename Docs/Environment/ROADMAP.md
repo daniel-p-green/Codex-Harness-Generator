@@ -128,12 +128,14 @@ The project can stop calling itself a beta only when all of these are true:
    Docs/Environment/pilot-github-followups` to fetch live issue bodies and
    comments, then post the generated `gh issue comment --body-file ...`
    follow-up commands from `Docs/Environment/PILOT_GITHUB_SYNC.md` when a
-   reporter still owes public-safe evidence fields. After the reporter updates
-   the issue, rerun `codex-harness pilot-github-sync` and preview conversion
-   with `codex-harness usage-from-github-issue --include-comments` before
-   writing the checked-in usage record. Run `codex-harness proof-next` after
-   each record to refresh the next pilot, board, conversion, audit, and final
-   proof commands. Use `codex-harness usage-gaps` for the raw gap report,
+   reporter still owes public-safe evidence fields. Use the `Usage Evidence
+   Lint` workflow with `issue=all-open-pilots` when the public queue needs one
+   marker-managed readiness refresh across every open pilot issue. After the
+   reporter updates the issue, rerun `codex-harness pilot-github-sync` and
+   preview conversion with `codex-harness usage-from-github-issue --include-comments`
+   before writing the checked-in usage record. Run
+   `codex-harness proof-next` after each record to refresh the next pilot,
+   board, conversion, audit, and final proof commands. Use `codex-harness usage-gaps` for the raw gap report,
    `codex-harness prepare-next-pilot` to prepare the next suggested pilot
    directly, `codex-harness pilot-board` to inspect in-flight pilots,
    `codex-harness pilot-handoff` plus `codex-harness pilot-handoff-audit`

@@ -39,6 +39,7 @@ class FormatUsageLintCommentTests(unittest.TestCase):
         self.assertIn("does not write usage records", comment)
         self.assertIn("does not write usage records, convert pilots, or count as adoption proof", comment)
         self.assertIn("Evidence bullets: `2`", comment)
+        self.assertNotIn("Reporter reply template", comment)
 
     def test_formats_missing_fields_comment(self):
         payload = {
@@ -63,6 +64,12 @@ class FormatUsageLintCommentTests(unittest.TestCase):
         self.assertIn("Missing required issue field", comment)
         self.assertIn("Evidence bullets: `0`", comment)
         self.assertIn("Privacy boundary", comment)
+        self.assertIn("Reporter reply template", comment)
+        self.assertIn("Copy this into a new issue comment", comment)
+        self.assertIn("#### Outcome", comment)
+        self.assertIn("Use `success`, `partial`, `failed`, or `inconclusive`.", comment)
+        self.assertIn("#### Evidence", comment)
+        self.assertIn("Add at least two public-safe bullets", comment)
 
 
 if __name__ == "__main__":
