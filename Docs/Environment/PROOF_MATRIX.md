@@ -25,6 +25,7 @@ the stated scope, not more.
 | Eval scores and gates can be tracked over time. | `scripts/record_eval_snapshot.py`, `Docs/Environment/EVAL_TRENDS.md`, `Docs/Environment/eval-history/` | `python scripts/record_eval_snapshot.py` | Maintainers can archive compact eval snapshots and review pass/fail trends without depending on CI log retention. |
 | Official OpenAI source citations have a freshness check. | `scripts/check_source_freshness.py`, `Docs/Environment/SOURCE_FRESHNESS.md`, `Docs/Environment/SOURCE_FRESHNESS.json` | `python scripts/check_source_freshness.py` | Maintainers can verify cited `developers.openai.com` docs are reachable and trigger semantic review when official sources move or disappear. |
 | Core local guidance has a semantic drift signal. | `scripts/check_semantic_alignment.py`, `Docs/Environment/SEMANTIC_ALIGNMENT.md`, `Docs/Environment/SEMANTIC_ALIGNMENT.json` | `python scripts/check_semantic_alignment.py` | Maintainers can verify that local guidance and official OpenAI docs still share the named concepts this repo depends on: AGENTS.md loading, permissions, subagents, skills, and config model controls. |
+| Real usage evidence has a privacy-checked capture path. | `scripts/record_usage_case.py`, `Docs/Environment/USAGE_RECORDS.md`, `tests/test_record_usage_case.py` | `python -m unittest tests.test_record_usage_case -q` | Maintainers can record synthetic, sanitized, or private-summary usage records while rejecting obvious secrets, credentials, email addresses, and local machine paths. |
 | The standard release gate is CI-safe and offline. | `scripts/run_evals.py`, `.github/workflows/evals.yml` | `python scripts/run_evals.py` | Static port checks, fixture evals, offline smokes, deterministic generation, checked-in deterministic/create-acceptance/live-create examples, unit/mutation tests, and compile checks pass without authenticated live services. |
 | Authenticated local live smoke works through Codex CLI. | `scripts/smoke_generated_harness.py`, `scripts/run_evals.py --codex-live` | `python scripts/run_evals.py --codex-live` | On a machine with authenticated Codex CLI, checked-in create-acceptance examples can be loaded through non-interactive `codex exec`. |
 
@@ -63,6 +64,7 @@ python scripts/run_evals.py --codex-live --codex-live-profile all
 
 - Add more live examples for specialized or higher-risk domains such as legal,
   finance, hiring, and support.
-- Add non-synthetic real-world usage records once safe to publish or summarize.
+- Add non-synthetic real-world usage records using the privacy-checked recorder
+  once safe to publish or summarize.
 - Deepen semantic drift checks beyond concept presence when stable
   machine-readable official-doc metadata is available.

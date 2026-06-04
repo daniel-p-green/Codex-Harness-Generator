@@ -61,6 +61,9 @@ replacement. What is proven today:
 - `scripts/check_semantic_alignment.py` checks that key local guidance still
   names the core concepts present in official Codex docs and writes
   `Docs/Environment/SEMANTIC_ALIGNMENT.md`.
+- `scripts/record_usage_case.py` provides a privacy-checked path for recording
+  sanitized real-world or private-summary usage evidence under
+  `Docs/Environment/usage-records/`.
 
 What still needs product proof:
 
@@ -230,6 +233,23 @@ depends on:
 python scripts/codex_harness.py semantic-alignment
 ```
 
+To record a sanitized usage case after a generated harness has been used on a
+real or public-safe task:
+
+```bash
+python scripts/codex_harness.py usage-record \
+  --slug example-real-task \
+  --title "Example real task" \
+  --domain "software development" \
+  --harness-path "private-summary: client repo" \
+  --task-summary "Public-safe summary of the task." \
+  --outcome success \
+  --evidence-type private-summary \
+  --evidence "Generated harness guided implementation and verification." \
+  --verification "Tests passed; raw logs retained privately." \
+  --privacy-review "No secrets, personal data, proprietary source, or local paths included."
+```
+
 The wrapper is intentionally thin. It delegates to the underlying scripts so
 advanced users can still call `scripts/generate_minimal_harness.py`,
 `scripts/run_create_acceptance.py`, `scripts/run_evals.py`, and the individual
@@ -265,6 +285,7 @@ Common subcommands:
 | `live-trials` | `run_live_example_task_trials.py` | Runs authenticated Codex tasks against checked-in live examples. |
 | `source-freshness` | `check_source_freshness.py` | Confirms official OpenAI source URLs are reachable. |
 | `semantic-alignment` | `check_semantic_alignment.py` | Checks local guidance against official Codex doc concepts. |
+| `usage-record` | `record_usage_case.py` | Records sanitized generated-harness usage evidence. |
 | `snapshot` | `record_eval_snapshot.py` | Records an eval trend snapshot. |
 
 ## Presets

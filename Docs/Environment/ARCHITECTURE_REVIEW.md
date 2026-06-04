@@ -59,6 +59,9 @@ transcript.
   customer support scenarios.
 - Semantic drift: a live maintainer check now compares core local Codex concepts
   against official OpenAI docs and records a review signal.
+- Real usage evidence: a privacy-checked usage-record workflow now exists, so
+  maintainers can add sanitized or private-summary records without exposing
+  secrets, personal data, proprietary source, or local paths.
 - Claim calibration: README language now describes utility and limits without
   implying deterministic perfection.
 
@@ -67,6 +70,8 @@ transcript.
 - Expand live sample-generation examples into more high-risk domains once safe
   synthetic briefs are available; security audit now has a public-safe
   task-trial fixture.
+- Add actual non-synthetic usage records through the privacy-checked recorder
+  once safe summaries are available.
 - Extend high-risk domain guardrail mutations as new bundled domains are added
   or official Codex safety guidance changes.
 - Expand semantic drift checks from concept presence toward deeper schema-aware

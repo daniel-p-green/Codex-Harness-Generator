@@ -145,6 +145,77 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_usage_record_delegates_to_recorder(self):
+        command, _ = self.run_cli(
+            [
+                "usage-record",
+                "--slug",
+                "demo",
+                "--title",
+                "Demo",
+                "--domain",
+                "software",
+                "--harness-path",
+                "examples/demo",
+                "--task-summary",
+                "Public-safe task.",
+                "--outcome",
+                "success",
+                "--evidence-type",
+                "synthetic",
+                "--evidence",
+                "report written",
+                "--verification",
+                "tests passed",
+                "--privacy-review",
+                "Synthetic only.",
+                "--limitation",
+                "One task.",
+                "--record-dir",
+                "/tmp/records",
+                "--report",
+                "/tmp/USAGE_RECORDS.md",
+                "--force",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/record_usage_case.py",
+                "--slug",
+                "demo",
+                "--title",
+                "Demo",
+                "--domain",
+                "software",
+                "--harness-path",
+                "examples/demo",
+                "--task-summary",
+                "Public-safe task.",
+                "--outcome",
+                "success",
+                "--evidence-type",
+                "synthetic",
+                "--privacy-review",
+                "Synthetic only.",
+                "--evidence",
+                "report written",
+                "--verification",
+                "tests passed",
+                "--limitation",
+                "One task.",
+                "--record-dir",
+                "/tmp/records",
+                "--report",
+                "/tmp/USAGE_RECORDS.md",
+                "--force",
+                "--json",
+            ],
+            command,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

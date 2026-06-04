@@ -94,6 +94,41 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("check_semantic_alignment.py", command)
 
+    if args.command == "usage-record":
+        command = [
+            "--slug",
+            args.slug,
+            "--title",
+            args.title,
+            "--domain",
+            args.domain,
+            "--harness-path",
+            args.harness_path,
+            "--task-summary",
+            args.task_summary,
+            "--outcome",
+            args.outcome,
+            "--evidence-type",
+            args.evidence_type,
+            "--privacy-review",
+            args.privacy_review,
+        ]
+        for evidence in args.evidence:
+            command.extend(["--evidence", evidence])
+        for verification in args.verification:
+            command.extend(["--verification", verification])
+        for limitation in args.limitation:
+            command.extend(["--limitation", limitation])
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.report:
+            command.extend(["--report", args.report])
+        if args.force:
+            command.append("--force")
+        if args.json:
+            command.append("--json")
+        return python_script("record_usage_case.py", command)
+
     if args.command == "snapshot":
         return python_script("record_eval_snapshot.py", [])
 
@@ -141,6 +176,23 @@ def make_parser() -> argparse.ArgumentParser:
     semantic_alignment.add_argument("--timeout", type=int, help="HTTP timeout in seconds")
     semantic_alignment.add_argument("--no-write", action="store_true", help="Do not write JSON/report files")
     semantic_alignment.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    usage = subparsers.add_parser("usage-record", help="Record sanitized generated-harness usage evidence")
+    usage.add_argument("--slug", required=True, help="Stable record slug")
+    usage.add_argument("--title", required=True, help="Short record title")
+    usage.add_argument("--domain", required=True, help="Usage domain")
+    usage.add_argument("--harness-path", required=True, help="Generated harness path or public label")
+    usage.add_argument("--task-summary", required=True, help="Public-safe task summary")
+    usage.add_argument("--outcome", choices=["failed", "inconclusive", "partial", "success"], required=True)
+    usage.add_argument("--evidence-type", choices=["private-summary", "sanitized", "synthetic"], required=True)
+    usage.add_argument("--evidence", action="append", required=True, help="Public-safe evidence item; repeatable")
+    usage.add_argument("--verification", action="append", required=True, help="Verification item; repeatable")
+    usage.add_argument("--privacy-review", required=True, help="Public-safe privacy review note")
+    usage.add_argument("--limitation", action="append", default=[], help="Known limitation; repeatable")
+    usage.add_argument("--record-dir", help="Directory where usage record JSON files are written")
+    usage.add_argument("--report", help="Usage-record Markdown report path")
+    usage.add_argument("--force", action="store_true", help="Replace existing record with same slug")
+    usage.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     subparsers.add_parser("snapshot", help="Record an eval trend snapshot")
 
