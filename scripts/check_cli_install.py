@@ -56,6 +56,7 @@ def build_payload() -> dict:
         venv = temp_root / "venv"
         generated = temp_root / "generated"
         quickstart_generated = temp_root / "quickstart-generated"
+        pilot_generated = temp_root / "pilot-generated"
         inspected_generated = temp_root / "inspected-generated"
         demo_generated = temp_root / "demo-generated"
         adoption_report = temp_root / "ADOPTION_PLAN.md"
@@ -65,6 +66,8 @@ def build_payload() -> dict:
         evidence_packet = temp_root / "HARNESS_EVIDENCE_PACKET.md"
         pilot_pack = temp_root / "EXTERNAL_PILOT_PACK.md"
         pilot_issue = temp_root / "EXTERNAL_USAGE_ISSUE_DRAFT.md"
+        prepared_pilot_pack = temp_root / "PREPARED_EXTERNAL_PILOT_PACK.md"
+        prepared_pilot_issue = temp_root / "PREPARED_EXTERNAL_USAGE_ISSUE_DRAFT.md"
         usage_records = temp_root / "usage-records"
         usage_report = temp_root / "USAGE_RECORDS.md"
         usage_gaps_report = temp_root / "USAGE_GAPS.md"
@@ -180,6 +183,30 @@ def build_payload() -> dict:
                     "Install Smoke Demo Harness",
                     "--target-label",
                     "install-smoke-demo",
+                    "--force",
+                    "--json",
+                ],
+            ),
+            (
+                "prepare_pilot",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "prepare-pilot",
+                    pilot_generated.as_posix(),
+                    "--brief",
+                    "LLM-powered app, RAG, agent, prompt, and eval workflow development with one privacy-safe task",
+                    "--project-name",
+                    "Install Smoke External Pilot Harness",
+                    "--domain",
+                    "install smoke pilot",
+                    "--slug",
+                    "install-smoke-prepared-pilot",
+                    "--title",
+                    "Install smoke prepared pilot",
+                    "--out",
+                    prepared_pilot_pack.as_posix(),
+                    "--issue-out",
+                    prepared_pilot_issue.as_posix(),
                     "--force",
                     "--json",
                 ],

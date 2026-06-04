@@ -75,9 +75,12 @@ The project can stop calling itself a beta only when all of these are true:
 
 1. Add external usage records.
    Use `.github/ISSUE_TEMPLATE/external-usage-report.yml` and
-   `Docs/Environment/EXTERNAL_USAGE_EVIDENCE.md`. When a generated harness has
-   local task trials, use `codex-harness pilot-pack` to give the reporter a
-   one-task checklist and optional issue-body draft, then use
+   `Docs/Environment/EXTERNAL_USAGE_EVIDENCE.md`. Use
+   `codex-harness prepare-pilot` to create the next generated pilot harness,
+   one-task checklist, and optional issue-body draft in one command. When an
+   existing generated harness already has local task trials, use
+   `codex-harness pilot-pack` to give the reporter a one-task checklist and
+   optional issue-body draft, then use
    `codex-harness usage-from-harness` to draft the privacy-checked record from
    copied-harness evidence. When an external report arrives as a GitHub issue,
    use `codex-harness usage-from-issue` to convert the issue body into the

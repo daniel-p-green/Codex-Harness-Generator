@@ -40,9 +40,25 @@ and limits.
 
 ## Maintainer Conversion
 
-Before asking someone outside this repo to report a trial, create a pilot pack
-from the copied generated harness. The pack gives the reporter a one-task loop,
-safe evidence boundaries, maintainer commands, and an optional issue-body draft:
+Before asking someone outside this repo to report a trial, prepare a pilot
+harness and evidence kit. This creates the generated harness, runs quickstart
+validation, and writes a one-task pilot pack plus issue-body draft:
+
+```bash
+python scripts/codex_harness.py prepare-pilot /tmp/codex-llm-app-pilot \
+  --brief "LLM-powered app, RAG, agent, prompt, and eval workflow development with one privacy-safe task" \
+  --domain "LLM app" \
+  --slug external-example \
+  --title "External example" \
+  --source-type external \
+  --generation-path installed-quickstart \
+  --force \
+  --json
+```
+
+When a copied generated harness already exists, create a pilot pack from that
+harness. The pack gives the reporter a one-task loop, safe evidence boundaries,
+maintainer commands, and an optional issue-body draft:
 
 ```bash
 python scripts/codex_harness.py pilot-pack /path/to/generated-harness \

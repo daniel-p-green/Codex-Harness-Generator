@@ -106,6 +106,49 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("run_quickstart.py", command)
 
+    if args.command == "prepare-pilot":
+        command = [args.target]
+        if args.brief:
+            command.extend(["--brief", args.brief])
+        if args.project_name:
+            command.extend(["--project-name", args.project_name])
+        if args.notes:
+            command.extend(["--notes", args.notes])
+        command.extend(["--domain", args.domain])
+        command.extend(["--slug", args.slug])
+        command.extend(["--title", args.title])
+        if args.source_type:
+            command.extend(["--source-type", args.source_type])
+        if args.generation_path:
+            command.extend(["--generation-path", args.generation_path])
+        if args.harness_label:
+            command.extend(["--harness-label", args.harness_label])
+        if args.out:
+            command.extend(["--out", args.out])
+        if args.issue_out:
+            command.extend(["--issue-out", args.issue_out])
+        if args.min_successes is not None:
+            command.extend(["--min-successes", str(args.min_successes)])
+        if args.min_score is not None:
+            command.extend(["--min-score", str(args.min_score)])
+        if args.target_label:
+            command.extend(["--target-label", args.target_label])
+        if args.limit is not None:
+            command.extend(["--limit", str(args.limit)])
+        if args.allow_low_confidence:
+            command.append("--allow-low-confidence")
+        if args.generated_date:
+            command.extend(["--generated-date", args.generated_date])
+        if args.created:
+            command.extend(["--created", args.created])
+        if args.generated:
+            command.extend(["--generated", args.generated])
+        if args.force:
+            command.append("--force")
+        if args.json:
+            command.append("--json")
+        return python_script("prepare_pilot.py", command)
+
     if args.command == "profile":
         command = ["--profile", args.profile]
         if args.json:
@@ -621,6 +664,43 @@ def make_parser() -> argparse.ArgumentParser:
     quickstart.add_argument("--min-successes", type=int, default=0, help="Minimum success task trials expected by local eval")
     quickstart.add_argument("--no-write", action="store_true", help="Do not write QUICKSTART_REPORT.md")
     quickstart.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    prepare_pilot = subparsers.add_parser("prepare-pilot", help="Generate a pilot harness and external evidence kit")
+    prepare_pilot.add_argument("target", nargs="?", default="/tmp/codex-external-pilot", help="Generated pilot harness target directory")
+    prepare_pilot.add_argument("--brief", help="Short pilot project brief")
+    prepare_pilot.add_argument("--project-name", help="Human-readable project name")
+    prepare_pilot.add_argument("--notes", help="Notes for creation context")
+    prepare_pilot.add_argument("--domain", required=True, help="Public-safe usage domain")
+    prepare_pilot.add_argument("--slug", required=True, help="Suggested usage-record slug")
+    prepare_pilot.add_argument("--title", required=True, help="Suggested usage-record title")
+    prepare_pilot.add_argument("--source-type", choices=["external", "multi-project", "self-dogfood"], help="Usage source type")
+    prepare_pilot.add_argument(
+        "--generation-path",
+        choices=[
+            "adoption-plan",
+            "installed-init-brief",
+            "installed-init-from-project",
+            "installed-quickstart",
+            "live-create",
+            "manual-migration",
+            "repo-dogfood",
+            "unknown",
+        ],
+        help="Usage generation path",
+    )
+    prepare_pilot.add_argument("--harness-label", help="Public-safe harness label")
+    prepare_pilot.add_argument("--out", help="Pilot pack path")
+    prepare_pilot.add_argument("--issue-out", help="Issue-body draft path")
+    prepare_pilot.add_argument("--min-successes", type=int, help="Minimum passing success task trials expected for the later pilot")
+    prepare_pilot.add_argument("--min-score", type=int, help="Minimum generated harness validation score")
+    prepare_pilot.add_argument("--target-label", help="Override target path written inside CREATION_CONTEXT.md")
+    prepare_pilot.add_argument("--limit", type=int, help="Number of profile recommendations to record")
+    prepare_pilot.add_argument("--allow-low-confidence", action="store_true", help="Allow generation when no profile scores above zero")
+    prepare_pilot.add_argument("--generated-date", help="Stable generated date for generated docs")
+    prepare_pilot.add_argument("--created", help="Stable created timestamp for CREATION_CONTEXT.md")
+    prepare_pilot.add_argument("--generated", help="UTC timestamp for pilot pack metadata")
+    prepare_pilot.add_argument("--force", action="store_true", help="Replace target if it already contains files")
+    prepare_pilot.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     profile = subparsers.add_parser("profile", help="Describe one deterministic starter profile")
     profile.add_argument("profile", help="Profile slug")

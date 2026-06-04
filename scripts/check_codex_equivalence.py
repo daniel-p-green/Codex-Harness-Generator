@@ -88,14 +88,15 @@ CAPABILITIES = [
     {
         "name": "Usage evidence",
         "original_need": "Record whether generated harnesses actually help with real tasks.",
-        "codex_surface": "Usage records, validation thresholds, gap reporting, pilot packs, and pilot campaigns.",
+        "codex_surface": "Usage records, validation thresholds, prepared pilots, pilot packs, and pilot campaigns.",
         "evidence_paths": [
             "Docs/Environment/USAGE_RECORDS.md",
             "Docs/Environment/USAGE_GAPS.md",
             "Docs/Environment/PILOT_CAMPAIGN.md",
+            "scripts/prepare_pilot.py",
             "scripts/record_usage_case.py",
         ],
-        "commands": ["codex-harness usage-validate", "codex-harness usage-gaps", "codex-harness pilot-campaign"],
+        "commands": ["codex-harness prepare-pilot <target>", "codex-harness usage-validate", "codex-harness usage-gaps", "codex-harness pilot-campaign"],
     },
     {
         "name": "Release proof",

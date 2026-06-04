@@ -63,7 +63,8 @@ class UsageGapsTests(unittest.TestCase):
         self.assertEqual("llm-app", result["suggested_pilots"][0]["profile"])
         self.assertEqual("external", result["suggested_pilots"][0]["source_type"])
         self.assertEqual("installed-quickstart", result["suggested_pilots"][0]["generation_path"])
-        self.assertIn("codex-harness quickstart", result["suggested_pilots"][0]["commands"][0])
+        self.assertIn("codex-harness prepare-pilot", result["suggested_pilots"][0]["commands"][0])
+        self.assertIn("--domain \"LLM app\"", result["suggested_pilots"][0]["commands"][0])
 
     def test_build_payload_marks_ready_when_targets_are_satisfied(self):
         records = []
@@ -114,7 +115,7 @@ class UsageGapsTests(unittest.TestCase):
         self.assertIn("## Remaining Gaps", text)
         self.assertIn("- External or multi-project records: 3", text)
         self.assertIn("## Suggested Pilot Targets", text)
-        self.assertIn("codex-harness pilot-pack", text)
+        self.assertIn("codex-harness prepare-pilot", text)
         self.assertIn("## Recommended Next Moves", text)
 
     def test_build_payload_fails_when_records_are_only_synthetic(self):

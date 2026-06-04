@@ -1,6 +1,6 @@
 # Usage Evidence Gaps
 
-Generated: 2026-06-04T11:44:12Z
+Generated: 2026-06-04T12:30:15Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 
@@ -43,8 +43,7 @@ honestly stop calling itself a beta.
 - Brief: LLM-powered app, RAG, agent, prompt, and eval workflow development with one privacy-safe task, local eval, and public-safe usage evidence
 
 ```bash
-codex-harness quickstart /tmp/codex-llm-app-pilot --brief "LLM-powered app, RAG, agent, prompt, and eval workflow development with one privacy-safe task, local eval, and public-safe usage evidence" --project-name "LLM App Workspace Pilot" --force
-codex-harness pilot-pack /tmp/codex-llm-app-pilot --slug llm-app-pilot --title "LLM app pilot" --domain "LLM app" --source-type external --generation-path installed-quickstart --prefill-from-trials
+codex-harness prepare-pilot /tmp/codex-llm-app-pilot --brief "LLM-powered app, RAG, agent, prompt, and eval workflow development with one privacy-safe task, local eval, and public-safe usage evidence" --project-name "LLM App Workspace Pilot" --domain "LLM app" --slug llm-app-pilot --title "LLM app pilot" --source-type external --generation-path installed-quickstart --force
 ```
 
 ### 2. security audit (`security-audit`)
@@ -54,8 +53,7 @@ codex-harness pilot-pack /tmp/codex-llm-app-pilot --slug llm-app-pilot --title "
 - Brief: defensive security audit, vulnerability review, threat model, and remediation work with one privacy-safe task, local eval, and public-safe usage evidence
 
 ```bash
-codex-harness quickstart /tmp/codex-security-audit-pilot --brief "defensive security audit, vulnerability review, threat model, and remediation work with one privacy-safe task, local eval, and public-safe usage evidence" --project-name "Security Audit Workspace Pilot" --force
-codex-harness pilot-pack /tmp/codex-security-audit-pilot --slug security-audit-pilot --title "security audit pilot" --domain "security audit" --source-type external --generation-path installed-quickstart --prefill-from-trials
+codex-harness prepare-pilot /tmp/codex-security-audit-pilot --brief "defensive security audit, vulnerability review, threat model, and remediation work with one privacy-safe task, local eval, and public-safe usage evidence" --project-name "Security Audit Workspace Pilot" --domain "security audit" --slug security-audit-pilot --title "security audit pilot" --source-type external --generation-path installed-quickstart --force
 ```
 
 ### 3. customer support (`customer-support`)
@@ -65,15 +63,14 @@ codex-harness pilot-pack /tmp/codex-security-audit-pilot --slug security-audit-p
 - Brief: customer-support documentation, FAQ, response, escalation, and support-ops work with one privacy-safe task, local eval, and public-safe usage evidence
 
 ```bash
-codex-harness quickstart /tmp/codex-customer-support-pilot --brief "customer-support documentation, FAQ, response, escalation, and support-ops work with one privacy-safe task, local eval, and public-safe usage evidence" --project-name "Customer Support Workspace Pilot" --force
-codex-harness pilot-pack /tmp/codex-customer-support-pilot --slug customer-support-pilot --title "customer support pilot" --domain "customer support" --source-type external --generation-path installed-quickstart --prefill-from-trials
+codex-harness prepare-pilot /tmp/codex-customer-support-pilot --brief "customer-support documentation, FAQ, response, escalation, and support-ops work with one privacy-safe task, local eval, and public-safe usage evidence" --project-name "Customer Support Workspace Pilot" --domain "customer support" --slug customer-support-pilot --title "customer support pilot" --source-type external --generation-path installed-quickstart --force
 ```
 
 
 ## Recommended Next Moves
 
 - Collect 3 more external or multi-project usage record(s).
-- Make at least 2 of the next record(s) use installed brief-based generation (`codex-harness quickstart` or `codex-harness init --brief`).
+- Make at least 2 of the next record(s) use installed brief-based generation (`codex-harness prepare-pilot`, `codex-harness quickstart`, or `codex-harness init --brief`).
 - Cover 3 more distinct usage domain(s) instead of adding more same-domain proof.
 - Add 3 more valid non-synthetic usage record(s).
-- For each pilot, run `codex-harness pilot-pack <generated-harness> --prefill-from-trials`, review the draft, then convert it with `usage-from-harness` or `usage-from-issue`.
+- For each new pilot, run `codex-harness prepare-pilot <target>`, review the generated pack, then convert completed evidence with `usage-from-harness` or `usage-from-issue`.

@@ -127,6 +127,10 @@ replacement. What is proven today:
 - `scripts/export_pilot_campaign.py` and `codex-harness pilot-campaign` write
   `Docs/Environment/PILOT_CAMPAIGN.md`, a shareable external-pilot campaign
   plan derived from the current usage gaps.
+- `scripts/prepare_pilot.py` and `codex-harness prepare-pilot` combine
+  brief-based quickstart generation with an external pilot pack and issue-body
+  draft, so the next beta-exit pilot can be prepared with one command before a
+  reporter runs a real task.
 - `scripts/usage_from_harness.py` and `codex-harness usage-from-harness`
   convert a generated harness's local eval report and task trials into a
   privacy-checked usage record.
@@ -573,6 +577,7 @@ Common subcommands:
 | Subcommand | Delegates to | What it proves |
 |---|---|---|
 | `quickstart <target>` | `run_quickstart.py` | Generates from a brief, validates the harness, runs the copied local eval, and writes `QUICKSTART_REPORT.md`. |
+| `prepare-pilot <target>` | `prepare_pilot.py` | Generates and validates a pilot harness from a brief, then writes an external pilot pack and issue-body draft for the reporter. |
 | `init <target>` | `generate_minimal_harness.py` or `run_brief_acceptance.py` | One-command starter path; add `--brief` to recommend a profile and record `PROFILE_SELECTION.md`. |
 | `init <target> --from-project <path>` | `run_inspected_acceptance.py` | Inspects project metadata, generates through deterministic acceptance, and records `PROJECT_INSPECTION.md`. |
 | `profiles` | `generate_minimal_harness.py --list-profiles` or `profile_catalog.py` | Shows supported deterministic starters; add `--details` or `--json` for a chooser-friendly catalog. |

@@ -65,7 +65,7 @@ def build_recommendations(gaps: dict) -> list[str]:
         )
     if gaps["installed_init_brief"]:
         recommendations.append(
-            f"Make at least {gaps['installed_init_brief']} of the next record(s) use installed brief-based generation (`codex-harness quickstart` or `codex-harness init --brief`)."
+            f"Make at least {gaps['installed_init_brief']} of the next record(s) use installed brief-based generation (`codex-harness prepare-pilot`, `codex-harness quickstart`, or `codex-harness init --brief`)."
         )
     if gaps["domains"]:
         recommendations.append(
@@ -74,7 +74,7 @@ def build_recommendations(gaps: dict) -> list[str]:
     if gaps["records"]:
         recommendations.append(f"Add {gaps['records']} more valid non-synthetic usage record(s).")
     recommendations.append(
-        "For each pilot, run `codex-harness pilot-pack <generated-harness> --prefill-from-trials`, review the draft, then convert it with `usage-from-harness` or `usage-from-issue`."
+        "For each new pilot, run `codex-harness prepare-pilot <target>`, review the generated pack, then convert completed evidence with `usage-from-harness` or `usage-from-issue`."
     )
     return recommendations
 
@@ -111,14 +111,24 @@ def build_suggested_pilots(domains: list[str], gaps: dict) -> list[dict]:
         slug = f"{profile['slug']}-pilot"
         brief = f"{profile['target']} with one privacy-safe task, local eval, and public-safe usage evidence"
         target_path = f"/tmp/codex-{slug}"
-        generation_command = [
+        prepare_command = [
             "codex-harness",
-            "quickstart",
+            "prepare-pilot",
             target_path,
             "--brief",
             json.dumps(brief),
             "--project-name",
             json.dumps(f"{profile['default_project_name']} Pilot"),
+            "--domain",
+            json.dumps(profile["domain"]),
+            "--slug",
+            slug,
+            "--title",
+            json.dumps(f"{profile['domain']} pilot"),
+            "--source-type",
+            source_type,
+            "--generation-path",
+            generation_path,
             "--force",
         ]
         pilots.append(
@@ -129,25 +139,7 @@ def build_suggested_pilots(domains: list[str], gaps: dict) -> list[dict]:
                 "generation_path": generation_path,
                 "brief": brief,
                 "commands": [
-                    " ".join(generation_command),
-                    " ".join(
-                        [
-                            "codex-harness",
-                            "pilot-pack",
-                            target_path,
-                            "--slug",
-                            slug,
-                            "--title",
-                            json.dumps(f"{profile['domain']} pilot"),
-                            "--domain",
-                            json.dumps(profile["domain"]),
-                            "--source-type",
-                            source_type,
-                            "--generation-path",
-                            generation_path,
-                            "--prefill-from-trials",
-                        ]
-                    ),
+                    " ".join(prepare_command),
                 ],
             }
         )

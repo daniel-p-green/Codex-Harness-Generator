@@ -67,7 +67,7 @@ class PilotCampaignTests(unittest.TestCase):
 
         self.assertIn("# External Pilot Campaign", text)
         self.assertIn("## Pilot Slots", text)
-        self.assertIn("codex-harness pilot-pack", text)
+        self.assertIn("codex-harness prepare-pilot", text)
         self.assertIn("Reporter evidence checklist", text)
         self.assertIn("Do not drop the beta label", text)
         self.assertIn("They do not prove broad external adoption", text)
