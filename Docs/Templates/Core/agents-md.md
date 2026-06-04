@@ -7,6 +7,8 @@
 
   QUALITY CRITERIA:
   - Target: < 250 lines (every line must earn its place)
+  - Keep total loaded project guidance under Codex's default project_doc_max_bytes cap
+    of 32 KiB unless the user intentionally raises it
   - Every constraint includes WHY (intent-behind-rules)
   - No role-setting prompts ("Act as...", "You are a senior...")
   - 2-3 canonical behavior examples (few-shot)
@@ -26,6 +28,9 @@
   GPT-5.5 follows instructions stated once without degradation. Front-load the most
   important constraints. Use few-shot examples instead of exhaustive rule lists.
   Keep it concise -- bloated AGENTS.md files cause Codex to IGNORE instructions.
+  Codex can also load AGENTS.override.md and configured fallback files from
+  project_doc_fallback_filenames, so generated root guidance should stay compact
+  enough to compose with nested overrides.
 -->
 
 <!-- ============================================================

@@ -57,6 +57,8 @@ transcript.
 - High-risk domain coverage: generated-harness mutation tests now fail missing
   guardrails for security audit, legal research, financial analysis, hiring, and
   customer support scenarios.
+- Semantic drift: a live maintainer check now compares core local Codex concepts
+  against official OpenAI docs and records a review signal.
 - Claim calibration: README language now describes utility and limits without
   implying deterministic perfection.
 
@@ -66,8 +68,8 @@ transcript.
   synthetic briefs are available.
 - Extend high-risk domain guardrail mutations as new bundled domains are added
   or official Codex safety guidance changes.
-- Add semantic-drift checks that compare local guidance against official docs,
-  beyond the current official-source reachability check.
+- Expand semantic drift checks from concept presence toward deeper schema-aware
+  comparison as the official docs expose more stable machine-readable metadata.
 - Keep the thin `scripts/codex_harness.py` wrapper aligned with the underlying
   scripts as workflows evolve, so users have one obvious first command without
   duplicating generator logic.

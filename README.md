@@ -57,6 +57,9 @@ replacement. What is proven today:
   `Docs/Environment/eval-history/` and updates `Docs/Environment/EVAL_TRENDS.md`.
 - `scripts/check_source_freshness.py` verifies official OpenAI documentation
   citations are still reachable and writes `Docs/Environment/SOURCE_FRESHNESS.md`.
+- `scripts/check_semantic_alignment.py` checks that key local guidance still
+  names the core concepts present in official Codex docs and writes
+  `Docs/Environment/SEMANTIC_ALIGNMENT.md`.
 
 What still needs product proof:
 
@@ -218,6 +221,13 @@ To check official OpenAI source freshness:
 python scripts/codex_harness.py source-freshness
 ```
 
+To check whether core local guidance still names the official Codex concepts it
+depends on:
+
+```bash
+python scripts/codex_harness.py semantic-alignment
+```
+
 The wrapper is intentionally thin. It delegates to the underlying scripts so
 advanced users can still call `scripts/generate_minimal_harness.py`,
 `scripts/run_create_acceptance.py`, `scripts/run_evals.py`, and the individual
@@ -252,6 +262,7 @@ Common subcommands:
 | `gate` | `run_evals.py` | Runs the repo release gate. |
 | `live-trials` | `run_live_example_task_trials.py` | Runs authenticated Codex tasks against checked-in live examples. |
 | `source-freshness` | `check_source_freshness.py` | Confirms official OpenAI source URLs are reachable. |
+| `semantic-alignment` | `check_semantic_alignment.py` | Checks local guidance against official Codex doc concepts. |
 | `snapshot` | `record_eval_snapshot.py` | Records an eval trend snapshot. |
 
 ## Presets

@@ -115,6 +115,36 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_semantic_alignment_delegates_to_checker(self):
+        command, _ = self.run_cli(["semantic-alignment", "--timeout", "5", "--no-write", "--json"])
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/check_semantic_alignment.py",
+                "--timeout",
+                "5",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
+    def test_source_freshness_passes_no_write_and_json(self):
+        command, _ = self.run_cli(["source-freshness", "--timeout", "5", "--no-write", "--json"])
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/check_source_freshness.py",
+                "--timeout",
+                "5",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

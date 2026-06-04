@@ -1,0 +1,81 @@
+{
+  "generated": "2026-06-04T04:50:59Z",
+  "status": "pass",
+  "checks": [
+    {
+      "name": "AGENTS.md instruction loading",
+      "status": "pass",
+      "url": "https://developers.openai.com/codex/guides/agents-md",
+      "http_status": 200,
+      "error": null,
+      "official_missing_terms": [],
+      "local_missing_paths": [],
+      "local_missing_terms": [],
+      "local_paths": [
+        "Docs/AgentGuidelines/Topics/01-rules.md",
+        "Docs/Templates/Core/agents-md.md",
+        "README.md"
+      ]
+    },
+    {
+      "name": "Config permission schema",
+      "status": "pass",
+      "url": "https://developers.openai.com/codex/permissions",
+      "http_status": 200,
+      "error": null,
+      "official_missing_terms": [],
+      "local_missing_paths": [],
+      "local_missing_terms": [],
+      "local_paths": [
+        "Docs/AgentGuidelines/Topics/11-permissions.md",
+        "Docs/Templates/Core/codex-config-toml.md",
+        "scripts/eval_generated_harness.py"
+      ]
+    },
+    {
+      "name": "Subagent schema",
+      "status": "pass",
+      "url": "https://developers.openai.com/codex/subagents",
+      "http_status": 200,
+      "error": null,
+      "official_missing_terms": [],
+      "local_missing_paths": [],
+      "local_missing_terms": [],
+      "local_paths": [
+        "Docs/AgentGuidelines/Topics/02-agents.md",
+        "Docs/Templates/Agents/reviewer.md",
+        "scripts/eval_generated_harness.py"
+      ]
+    },
+    {
+      "name": "Skill schema",
+      "status": "pass",
+      "url": "https://developers.openai.com/codex/skills",
+      "http_status": 200,
+      "error": null,
+      "official_missing_terms": [],
+      "local_missing_paths": [],
+      "local_missing_terms": [],
+      "local_paths": [
+        "Docs/AgentGuidelines/Topics/03-skills.md",
+        "Docs/Templates/Skills/health-check.md",
+        "scripts/eval_generated_harness.py"
+      ]
+    },
+    {
+      "name": "Config model controls",
+      "status": "pass",
+      "url": "https://developers.openai.com/codex/config-reference",
+      "http_status": 200,
+      "error": null,
+      "official_missing_terms": [],
+      "local_missing_paths": [],
+      "local_missing_terms": [],
+      "local_paths": [
+        "Docs/AgentGuidelines/Topics/13-gpt-5-5-specifics.md",
+        "Docs/Templates/Core/codex-config-toml.md",
+        "scripts/generate_minimal_harness.py"
+      ]
+    }
+  ]
+}

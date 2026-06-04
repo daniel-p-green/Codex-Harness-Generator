@@ -62,6 +62,21 @@
 - **Anti-pattern**: Including standard conventions or things Codex already does correctly.
   Every unnecessary line dilutes the signal of important instructions.
 
+## 1.4.1 AGENTS.md Discovery And Overrides
+
+- **Established**: 2026-06-04 semantic alignment pass
+- **Source**: https://developers.openai.com/codex/guides/agents-md | Tier 1
+- **Recommendation**: Treat AGENTS.md as layered project guidance. Codex first applies
+  global guidance from `~/.codex/AGENTS.override.md` when present, otherwise
+  `~/.codex/AGENTS.md`. At project scope, Codex walks from the project root to the
+  current directory and loads at most one instruction file per directory, preferring
+  `AGENTS.override.md`, then `AGENTS.md`, then configured fallback names from
+  `project_doc_fallback_filenames`. Keep total discovered guidance below the default
+  `project_doc_max_bytes` cap of 32 KiB unless the user intentionally raises it.
+- **Anti-pattern**: Assuming a generated root `AGENTS.md` is the only active instruction
+  source. Nested `AGENTS.override.md` files, fallback names, and global guidance can
+  override or extend root behavior.
+
 ## 1.5 Emphasis Tuning
 
 - **Established**: Baseline

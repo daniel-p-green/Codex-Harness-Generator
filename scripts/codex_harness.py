@@ -78,7 +78,21 @@ def build_command(args: argparse.Namespace) -> list[str]:
         command = []
         if args.timeout is not None:
             command.extend(["--timeout", str(args.timeout)])
+        if args.no_write:
+            command.append("--no-write")
+        if args.json:
+            command.append("--json")
         return python_script("check_source_freshness.py", command)
+
+    if args.command == "semantic-alignment":
+        command = []
+        if args.timeout is not None:
+            command.extend(["--timeout", str(args.timeout)])
+        if args.no_write:
+            command.append("--no-write")
+        if args.json:
+            command.append("--json")
+        return python_script("check_semantic_alignment.py", command)
 
     if args.command == "snapshot":
         return python_script("record_eval_snapshot.py", [])
@@ -120,6 +134,13 @@ def make_parser() -> argparse.ArgumentParser:
 
     source_freshness = subparsers.add_parser("source-freshness", help="Check official OpenAI source URL reachability")
     source_freshness.add_argument("--timeout", type=int, help="HTTP timeout in seconds")
+    source_freshness.add_argument("--no-write", action="store_true", help="Do not write JSON/report files")
+    source_freshness.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    semantic_alignment = subparsers.add_parser("semantic-alignment", help="Check local guidance against official Codex doc concepts")
+    semantic_alignment.add_argument("--timeout", type=int, help="HTTP timeout in seconds")
+    semantic_alignment.add_argument("--no-write", action="store_true", help="Do not write JSON/report files")
+    semantic_alignment.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     subparsers.add_parser("snapshot", help="Record an eval trend snapshot")
 

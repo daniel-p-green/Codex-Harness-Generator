@@ -24,6 +24,7 @@ the stated scope, not more.
 | High-risk generated harnesses require explicit domain guardrails. | `scripts/eval_generated_harness.py`, `tests/test_generated_harness_contract.py` | `python -m unittest tests.test_generated_harness_contract -q` | The evaluator fails security audit, legal research, financial analysis, hiring, and customer support harness mutations that omit key safety, boundary, privacy, source, escalation, or bias guardrails. |
 | Eval scores and gates can be tracked over time. | `scripts/record_eval_snapshot.py`, `Docs/Environment/EVAL_TRENDS.md`, `Docs/Environment/eval-history/` | `python scripts/record_eval_snapshot.py` | Maintainers can archive compact eval snapshots and review pass/fail trends without depending on CI log retention. |
 | Official OpenAI source citations have a freshness check. | `scripts/check_source_freshness.py`, `Docs/Environment/SOURCE_FRESHNESS.md`, `Docs/Environment/SOURCE_FRESHNESS.json` | `python scripts/check_source_freshness.py` | Maintainers can verify cited `developers.openai.com` docs are reachable and trigger semantic review when official sources move or disappear. |
+| Core local guidance has a semantic drift signal. | `scripts/check_semantic_alignment.py`, `Docs/Environment/SEMANTIC_ALIGNMENT.md`, `Docs/Environment/SEMANTIC_ALIGNMENT.json` | `python scripts/check_semantic_alignment.py` | Maintainers can verify that local guidance and official OpenAI docs still share the named concepts this repo depends on: AGENTS.md loading, permissions, subagents, skills, and config model controls. |
 | The standard release gate is CI-safe and offline. | `scripts/run_evals.py`, `.github/workflows/evals.yml` | `python scripts/run_evals.py` | Static port checks, fixture evals, offline smokes, deterministic generation, checked-in deterministic/create-acceptance/live-create examples, unit/mutation tests, and compile checks pass without authenticated live services. |
 | Authenticated local live smoke works through Codex CLI. | `scripts/smoke_generated_harness.py`, `scripts/run_evals.py --codex-live` | `python scripts/run_evals.py --codex-live` | On a machine with authenticated Codex CLI, checked-in create-acceptance examples can be loaded through non-interactive `codex exec`. |
 
@@ -63,4 +64,5 @@ python scripts/run_evals.py --codex-live --codex-live-profile all
 - Add more live examples for specialized or higher-risk domains such as
   security, legal, finance, hiring, and support.
 - Add non-synthetic real-world usage records once safe to publish or summarize.
-- Add more semantic drift checks for official OpenAI documentation changes.
+- Deepen semantic drift checks beyond concept presence when stable
+  machine-readable official-doc metadata is available.
