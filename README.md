@@ -43,6 +43,9 @@ replacement. What is proven today:
 - `scripts/inspect_project.py` and `codex-harness inspect` scan local project
   metadata such as config filenames, top-level directories, and extensions to
   recommend deterministic starter profiles before generation.
+- `codex-harness init --from-project` turns that metadata inspection into a
+  generated harness and records `Docs/Environment/PROJECT_INSPECTION.md` inside
+  the output.
 - `examples/create-acceptance/` contains checked-in snapshots of that
   deterministic preset `/create` acceptance flow for every supported profile and
   bundled domain preset.
@@ -85,8 +88,9 @@ replacement. What is proven today:
   support scenarios.
 - `scripts/codex_harness.py` gives users one thin local entry point for
   profile listing, profile descriptions, project inspection, generation,
-  acceptance, eval, smoke, copied local eval reports, migration audit, gate,
-  demo-capture, live-trial, source-freshness, and snapshot workflows.
+  inspected generation, acceptance, eval, smoke, copied local eval reports,
+  migration audit, gate, demo-capture, live-trial, source-freshness, and
+  snapshot workflows.
 - `pyproject.toml` exposes that wrapper as an installable `codex-harness`
   console command, and the release gate smokes the non-editable install path.
 - `scripts/record_eval_snapshot.py` records eval-gate snapshots under
@@ -199,6 +203,10 @@ python scripts/codex_harness.py profiles
 codex-harness profiles
 codex-harness doctor
 codex-harness inspect .
+codex-harness init /tmp/codex-existing-project-harness \
+  --from-project . \
+  --project-name "Existing Project Harness" \
+  --force
 codex-harness init /tmp/codex-rag-harness \
   --brief "RAG app with prompts, evals, and retrieval checks" \
   --project-name "RAG Quality Harness" \
@@ -208,6 +216,10 @@ codex-harness local-eval /tmp/codex-rag-harness
 python scripts/codex_harness.py profiles --details
 python scripts/codex_harness.py recommend "RAG app with prompts, evals, and retrieval checks"
 python scripts/codex_harness.py inspect .
+python scripts/codex_harness.py init /tmp/codex-existing-project-harness \
+  --from-project . \
+  --project-name "Existing Project Harness" \
+  --force
 python scripts/codex_harness.py profile security-audit
 python scripts/codex_harness.py brief-acceptance /tmp/codex-rag-harness \
   --brief "RAG app with prompts, evals, and retrieval checks" \
@@ -446,6 +458,7 @@ Common subcommands:
 | Subcommand | Delegates to | What it proves |
 |---|---|---|
 | `init <target>` | `generate_minimal_harness.py` or `run_brief_acceptance.py` | One-command starter path; add `--brief` to recommend a profile and record `PROFILE_SELECTION.md`. |
+| `init <target> --from-project <path>` | `run_inspected_acceptance.py` | Inspects project metadata, generates through deterministic acceptance, and records `PROJECT_INSPECTION.md`. |
 | `profiles` | `generate_minimal_harness.py --list-profiles` or `profile_catalog.py` | Shows supported deterministic starters; add `--details` or `--json` for a chooser-friendly catalog. |
 | `profile <slug>` | `profile_catalog.py` | Describes one deterministic starter, including first tasks and domain guardrails. |
 | `recommend <brief>` | `profile_catalog.py` | Recommends deterministic starters from a short project brief using explainable keyword matches, confidence labels, and low-confidence guidance. |

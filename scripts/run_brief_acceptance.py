@@ -15,12 +15,12 @@ from run_create_acceptance import DEFAULT_CREATED, DEFAULT_GENERATED_DATE, appen
 PROFILE_SELECTION_PATH = Path("Docs") / "Environment" / "PROFILE_SELECTION.md"
 
 
-def write_profile_selection(target: Path, brief: str, recommendations: dict) -> Path:
+def write_profile_selection(target: Path, brief: str, recommendations: dict, flow: str = "deterministic brief-based acceptance") -> Path:
     selected = recommendations["recommendations"][0]
     lines = [
         "# Profile Selection",
         "",
-        "Flow: deterministic brief-based acceptance.",
+        f"Flow: {flow}.",
         f"Brief: {brief}",
         "",
         "## Selected Profile",

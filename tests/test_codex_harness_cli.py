@@ -106,6 +106,57 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_init_from_project_delegates_to_inspected_acceptance(self):
+        command, _ = self.run_cli(
+            [
+                "init",
+                "/tmp/generated",
+                "--from-project",
+                "/tmp/source",
+                "--project-name",
+                "Source Project",
+                "--notes",
+                "inspect trial",
+                "--limit",
+                "2",
+                "--max-files",
+                "25",
+                "--allow-low-confidence",
+                "--target-label",
+                "tmp/generated",
+                "--source-label",
+                "public source",
+                "--force",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/run_inspected_acceptance.py",
+                "/tmp/generated",
+                "--from-project",
+                "/tmp/source",
+                "--project-name",
+                "Source Project",
+                "--notes",
+                "inspect trial",
+                "--limit",
+                "2",
+                "--max-files",
+                "25",
+                "--allow-low-confidence",
+                "--target-label",
+                "tmp/generated",
+                "--source-label",
+                "public source",
+                "--force",
+                "--json",
+            ],
+            command,
+        )
+
     def test_profiles_details_delegates_to_profile_catalog(self):
         command, _ = self.run_cli(["profiles", "--details"])
 

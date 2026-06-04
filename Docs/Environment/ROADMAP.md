@@ -15,6 +15,7 @@ Already proven:
 - 20 deterministic starter profiles.
 - Brief-driven `codex-harness init --brief`.
 - Metadata-based project inspection for starter profile selection.
+- Metadata-inspected `codex-harness init --from-project`.
 - Non-editable install smoke for the public CLI.
 - Generated harness eval plans with smoke, acceptance, reviewer, and regression
   checks.

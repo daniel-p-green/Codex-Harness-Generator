@@ -55,6 +55,7 @@ def build_payload() -> dict:
         temp_root = Path(temp_dir)
         venv = temp_root / "venv"
         generated = temp_root / "generated"
+        inspected_generated = temp_root / "inspected-generated"
         demo_generated = temp_root / "demo-generated"
         usage_records = temp_root / "usage-records"
         usage_report = temp_root / "USAGE_RECORDS.md"
@@ -153,6 +154,24 @@ def build_payload() -> dict:
             ),
             ("validate", [(venv / "bin" / "codex-harness").as_posix(), "validate", generated.as_posix(), "--json"]),
             ("inspect", [(venv / "bin" / "codex-harness").as_posix(), "inspect", generated.as_posix(), "--json"]),
+            (
+                "init_from_project",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "init",
+                    inspected_generated.as_posix(),
+                    "--from-project",
+                    generated.as_posix(),
+                    "--project-name",
+                    "Install Smoke Inspected Harness",
+                    "--source-label",
+                    "install-smoke generated harness",
+                    "--target-label",
+                    "install-smoke-inspected",
+                    "--force",
+                    "--json",
+                ],
+            ),
             (
                 "record_task_trial",
                 [

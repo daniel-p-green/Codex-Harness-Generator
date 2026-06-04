@@ -28,6 +28,7 @@ class ProofStatusTests(unittest.TestCase):
             "steps": [
                 {"name": "profiles", "status": "pass", "profile_count": 20},
                 {"name": "init", "status": "pass"},
+                {"name": "init_from_project", "status": "pass"},
                 {"name": "validate", "status": "pass"},
                 {"name": "inspect", "status": "pass"},
                 {"name": "local_eval", "status": "pass"},
@@ -75,6 +76,7 @@ Status: PASS
         self.assertEqual("pass", payload["installable_cli"]["status"])
         install_check = next(check for check in payload["checks"] if check["name"] == "installable_cli")
         self.assertIn("validate=pass", install_check["detail"])
+        self.assertIn("init_from_project=pass", install_check["detail"])
         self.assertIn("inspect=pass", install_check["detail"])
         self.assertIn("local_eval=pass", install_check["detail"])
         self.assertIn("usage_from_harness=pass", install_check["detail"])

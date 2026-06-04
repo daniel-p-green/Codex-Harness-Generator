@@ -31,13 +31,14 @@ class CheckCliInstallTests(unittest.TestCase):
 
         self.assertEqual("pass", payload["status"])
         names = [step["name"] for step in payload["steps"]]
-        self.assertEqual(["create_venv", "install_package", "profiles", "doctor", "init", "demo_capture", "validate", "inspect", "record_task_trial", "local_eval", "usage_from_harness", "usage_from_issue", "migration_audit", "eval"], names)
+        self.assertEqual(["create_venv", "install_package", "profiles", "doctor", "init", "demo_capture", "validate", "inspect", "init_from_project", "record_task_trial", "local_eval", "usage_from_harness", "usage_from_issue", "migration_audit", "eval"], names)
         self.assertTrue(any("pip" in command and "install" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "doctor" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "init" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "demo-capture" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "validate" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "inspect" in command for command in calls))
+        self.assertTrue(any("codex-harness" in command[0] and "init" in command and "--from-project" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "local-eval" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "usage-from-harness" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "usage-from-issue" in command for command in calls))
