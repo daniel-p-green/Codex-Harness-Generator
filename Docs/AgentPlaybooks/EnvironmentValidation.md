@@ -43,9 +43,9 @@ Overall: PASS | WARN | FAIL
 ## Validation checklist
 
 The full check list is the single source of truth in
-`Docs/Templates/References/validation-guide.md` (55 checks: 22 core + 27
-conditional + 6 hub, with verdict logic and report format). Do not re-list the
-checks here. Run them per that guide. For each skill, generate domain-appropriate
+`Docs/Templates/References/validation-guide.md` (core, conditional, and hub
+checks with verdict logic and report format). Do not re-list the checks here.
+Run them per that guide. For each skill, generate domain-appropriate
 triggering test sets -- 3 obvious + 2 paraphrased + 2-3 near-miss negative
 triggers (phrases where a sibling skill or built-in could confusably fire) --
 per checks 3 and 22.

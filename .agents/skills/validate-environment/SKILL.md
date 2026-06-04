@@ -1,6 +1,6 @@
 ---
 name: validate-environment
-description: Validates an existing Codex environment against structural correctness and quality standards (file references resolve, SKILL.md metadata is valid, size limits hold, routing is complete, hub registry matches disk). Use when user says "validate environment", "check my environment", "is my setup correct", "validate my config", "audit my environment", "run the validator", or "/validate-environment". Do NOT use for creating new environments or for best-practice upgrade recommendations (use /upgrade-environment for the latter).
+description: Validates an existing Codex environment against structural correctness and quality standards (file references resolve, SKILL.md metadata is valid, size limits hold, routing is complete, manifest entries resolve, assumptions are documented, hub registry matches disk). Use when user says "validate environment", "check my environment", "is my setup correct", "validate my config", "audit my environment", "run the validator", or "/validate-environment". Do NOT use for creating new environments or for best-practice upgrade recommendations (use /upgrade-environment for the latter).
 ---
 
 ## Critical
@@ -10,7 +10,7 @@ This skill validates an EXISTING environment. It is read-only with respect to th
 ## What this skill does
 
 1. Get the environment path from the user
-2. Detect environment shape (single or hub) and read the relevant GENESIS/ARCHITECTURE files
+2. Detect environment shape (single or hub) and read the relevant GENESIS/ARCHITECTURE files plus MANIFEST, ASSUMPTIONS, and SOURCE_MAP when present
 3. Load the current validation checklist from validation-guide.md
 4. Run every applicable check
 5. Write a validation report
@@ -43,6 +43,7 @@ Read `Docs/Templates/References/validation-guide.md` in its entirety. It contain
 - Structural checks
 - Routing and logic checks
 - Size and quality checks
+- Environment-record checks for MANIFEST, ASSUMPTIONS, SOURCE_MAP, and validation reports
 - Conditional checks (triggered by specific GENESIS/ARCHITECTURE contents)
 - Hub-mode checks (run only when shape is HUB)
 

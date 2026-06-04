@@ -5,7 +5,7 @@ after generation. Each gate prevents a specific class of failure.
 
 The full post-generation checklist is NOT enumerated in this rule. It lives in
 `Docs/Templates/References/validation-guide.md` -- the single source of truth
-(55 checks: 22 core + 27 conditional + 6 hub). This rule states the gate
+(core, conditional, and hub checks). This rule states the gate
 *contract*; the validator agent and the validation guide carry the detail.
 Do not re-list the checks here; keep the validation guide the single source of truth.
 
@@ -39,11 +39,12 @@ On FAIL: the orchestrator delegates targeted fixes to component-generator, then
 re-runs the validator. Maximum 2 fix-and-revalidate cycles. The validator is
 read-only; it never fixes issues itself.
 
-Two boundary-crossing checks (guide v2) catch what existence checks miss: 16b
+Boundary-crossing checks catch what existence checks miss: 16b
 cross-validates the ARCHITECTURE.md Component Manifest against files actually
-written (planned-but-not-written, or written-but-unplanned); 20b confirms the
-GENESIS domain vocabulary actually appears in the generated AGENTS.md (intake
-absorbed, not generic).
+written (planned-but-not-written, or written-but-unplanned); 16c verifies the
+environment MANIFEST.md entries actually exist on disk; 20b confirms the GENESIS
+domain vocabulary actually appears in the generated AGENTS.md (intake absorbed,
+not generic).
 
 ## Skill description quality bar
 

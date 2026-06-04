@@ -57,9 +57,9 @@ validator can check it.
 
 ### Step 3: Write Architecture Files
 
-**Single mode**: write the complete architecture to `<target_path>/Docs/Environment/ARCHITECTURE.md`.
+**Single mode**: write the complete architecture to `<target_path>/Docs/Environment/ARCHITECTURE.md` and write `<target_path>/Docs/Environment/ASSUMPTIONS.md` with explicit assumptions, limits, and verification steps.
 
-**Hub mode**: write `<target_path>/Docs/Environment/HUB_ARCHITECTURE.md` for the shared layer, then one `<target_path>/<area-slug>/Docs/Environment/ARCHITECTURE.md` per work area. Each per-area ARCHITECTURE.md must include a `Parent Overrides` subsection listing any parent components it supersedes.
+**Hub mode**: write `<target_path>/Docs/Environment/HUB_ARCHITECTURE.md` for the shared layer, then one `<target_path>/<area-slug>/Docs/Environment/ARCHITECTURE.md` and `<target_path>/<area-slug>/Docs/Environment/ASSUMPTIONS.md` per work area. Each per-area ARCHITECTURE.md must include a `Parent Overrides` subsection listing any parent components it supersedes.
 
 Before writing, run all quality gates from the guide to verify completeness. For hub mode, additionally verify: (a) no component name collides across parent + areas unless declared as override; (b) cumulative AGENTS.md budget holds; (c) the work-area registry in HUB_ARCHITECTURE.md matches the set of per-area ARCHITECTURE.md files written.
 
@@ -67,15 +67,15 @@ Before writing, run all quality gates from the guide to verify completeness. For
 
 - Depends on: intake (GENESIS.md / HUB_GENESIS.md with INTAKE_STATUS: COMPLETE).
 - Outputs used by: component-generator (reads the Component Manifest + per-pass specs) and environment-validator (matches files to the manifest, check 16b).
-- Handoff: ARCHITECTURE.md (single) or HUB_ARCHITECTURE.md + per-area ARCHITECTURE.md (hub), each with a Component Manifest, routing table, and the chosen team pattern + execution mode; custom mode also writes DOMAIN_PROFILE.md. Return only a short summary + paths.
+- Handoff: ARCHITECTURE.md plus ASSUMPTIONS.md (single) or HUB_ARCHITECTURE.md + per-area ARCHITECTURE.md/ASSUMPTIONS.md (hub), each with a Component Manifest, routing table, chosen team pattern + execution mode, and explicit assumption/limit/verification notes; custom mode also writes DOMAIN_PROFILE.md. Return only a short summary + paths.
 
 ## Task Boundaries
 
 - DO: Read GENESIS.md / HUB_GENESIS.md, topic files, starter profiles, ComponentQuality.md, and architecture-guide.md
-- DO: Write ARCHITECTURE.md (single) or HUB_ARCHITECTURE.md + per-area ARCHITECTURE.md (hub)
+- DO: Write ARCHITECTURE.md plus ASSUMPTIONS.md (single) or HUB_ARCHITECTURE.md + per-area ARCHITECTURE.md/ASSUMPTIONS.md (hub)
 - DO: Create `<target>/Docs/Environment/` and `<target>/<area-slug>/Docs/Environment/` directories as needed
 - DO NOT: Generate any environment files (that is the component-generator's job)
 - DO NOT: Modify GENESIS.md or HUB_GENESIS.md (immutable after intake)
 - DO NOT: Read source code from the user's project
-- DO NOT: Make assumptions beyond what the GENESIS files state
+- DO NOT: Hide assumptions; when a design requires an inferred default, record it in ASSUMPTIONS.md with its limit and verification step
 """

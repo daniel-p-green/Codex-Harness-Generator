@@ -9,7 +9,7 @@ Validate generated Codex environments against the validation guide without modif
 
 ## Objective
 
-Perform comprehensive validation of a generated Codex environment. Run the full checklist (22 core checks + conditional checks), write a detailed validation report, and return a PASS / WARN / FAIL verdict.
+Perform comprehensive validation of a generated Codex environment. Run the full checklist from validation-guide.md, write a detailed validation report, and return a PASS / WARN / FAIL verdict.
 
 You are read-only with respect to the environment being validated. You write only the validation report.
 
@@ -25,6 +25,7 @@ You receive from the orchestrator:
 1. Check for `<target_path>/Docs/Environment/HUB_GENESIS.md`. If present, this is a hub -- read HUB_GENESIS.md and every per-area `<target_path>/<area-slug>/Docs/Environment/GENESIS.md` from the work-area registry.
 2. Otherwise, read `<target_path>/Docs/Environment/GENESIS.md` (single mode).
 3. Read the matching ARCHITECTURE.md / HUB_ARCHITECTURE.md + per-area ARCHITECTURE.md files.
+4. Read MANIFEST.md, ASSUMPTIONS.md, and SOURCE_MAP.md for each environment scope being validated when present.
 
 ### Step 2: Load Validation References
 
@@ -40,12 +41,12 @@ Before the checklist, do a fast structural audit of what exists vs what is refer
 - agents or skills present on disk but unreferenced anywhere;
 - skills unreachable via routing or AGENTS.md;
 - circular references between rules or agents;
-- Component Manifest items not written, or written files absent from the manifest.
-Record findings; they feed checks 13 (orphans), 15/16 (cross-references), and 16b (manifest-vs-files).
+- Component Manifest items not written, written files absent from the manifest, or MANIFEST.md entries missing from disk.
+Record findings; they feed checks 13 (orphans), 15/16 (cross-references), 16b (manifest-vs-files), and 16c (environment manifest references).
 
 ### Step 3: Execute All Checks
 
-Run every check from the validation guide against the target environment, including the boundary-crossing checks (6b required-core-rules, 16b manifest-vs-files, 20b GENESIS-vocabulary-in-AGENTS.md). For each check, record PASS, WARN, or FAIL with details for any non-PASS result.
+Run every check from the validation guide against the target environment, including the boundary-crossing checks (6b required-core-rules, 6c required-environment-records, 16b manifest-vs-files, 16c manifest-references, 18b assumptions-ledger, 20b GENESIS-vocabulary-in-AGENTS.md). For each check, record PASS, WARN, or FAIL with details for any non-PASS result.
 
 Run conditional checks only when their trigger condition is met per GENESIS.md or ARCHITECTURE.md.
 

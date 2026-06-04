@@ -1,12 +1,14 @@
 # Validation Guide
 
-**VERSION: 2 (2026-05-31)** -- single source of truth for the environment
+**VERSION: 3 (2026-06-04)** -- single source of truth for the environment
 validation checklist. `.codex/rules/03-quality-gates.md` (the always-loaded
 rule) and `Docs/AgentPlaybooks/EnvironmentValidation.md` (functional/smoke/edge
 tests) both reference this file by name and do not re-list checks. When you add,
 remove, or renumber a check, do it here and bump the version below.
 
 Changelog:
+- v3 (2026-06-04): added required environment-record checks for assumptions,
+  source map, validation report, and manifest entries that resolve to disk.
 - v2 (2026-05-31): designated single source of truth. Added the precise check-
   count statement; added checks 6b (required core rules present), 16b (manifest-
   vs-files boundary crossing), 20b (GENESIS vocabulary in AGENTS.md). Added tier
@@ -22,7 +24,7 @@ grading criteria.
 ## Check scope and count
 
 The checklist is **22 core checks** (numbered 1-22, always run; plus the always-
-run sub-checks 6b, 16b, 20b and the conditional sub-check 21b) + **27 conditional
+run sub-checks 6b, 6c, 16b, 16c, 18b, 20b and the conditional sub-check 21b) + **27 conditional
 checks** (23-49, run only when the trigger condition is met) + **6 hub checks**
 (50-55, run only for multi-area hubs). Earlier docs that said "22-point
 checklist" referred to the core set; "50" counted core+conditional; both describe
@@ -38,7 +40,7 @@ Tier legend (severity when a check is violated):
 
 Run every check. Record PASS, WARN, or FAIL for each with details for non-PASS.
 
-### Structural Checks (1-6b) -- BLOCKING
+### Structural Checks (1-6c) -- BLOCKING
 
 **1. AGENTS.md file references exist**: Read AGENTS.md, extract every file path
 reference (rules, agents, skills, docs). Verify each exists on disk.
@@ -79,6 +81,12 @@ error-handling rule, and a self-learning rule (the required core components from
 routing/orchestrator rule is missing; WARN per missing autonomy/context/error/
 self-learning rule. (Closes the gap where standards required these but no check
 verified their presence.)
+
+**6c. Required environment records present**: `Docs/Environment/` must include
+the generation record (`GENESIS.md` or hub equivalent), the architecture record,
+`MANIFEST.md`, `ASSUMPTIONS.md`, `SOURCE_MAP.md`, and `VALIDATION_REPORT.md`.
+FAIL if any record is missing. These files let a reviewer reconstruct what was
+asked, what was built, what was assumed, and what was validated.
 
 ### Routing and Logic Checks (7-13) -- CRITICAL
 
@@ -130,6 +138,11 @@ check, not an existence check: it catches a generator that wrote a file the
 architecture never planned, or planned a file it never wrote. FAIL on any
 mismatch. (For hubs, scope per area + parent shell.)
 
+**16c. Environment manifest references resolve**: Every file entry in
+`Docs/Environment/MANIFEST.md` must exist on disk. FAIL on any missing entry.
+This catches stale handoff metadata even when the architecture manifest is
+otherwise coherent.
+
 **17. No role-setting prompts**: Search all generated files for "Act as a...",
 "You are a [role] who...", "Pretend to be...", "Your role is...". FAIL if found.
 Acceptable: "You help users with [task]", "This environment manages [domain]".
@@ -138,6 +151,10 @@ Acceptable: "You help users with [task]", "This environment manages [domain]".
 
 **18. GETTING_STARTED.md complete**: Must exist with: what the environment does,
 how to start, available commands, suggested first tasks (2+). FAIL if missing.
+
+**18b. Assumptions ledger useful**: `Docs/Environment/ASSUMPTIONS.md` must state
+the explicit assumptions, known limits, and verification steps for the generated
+environment. WARN if any of those three concepts is missing.
 
 **19. VCS ignore guidance present**: `.gitignore`, `.p4ignore`, or generated
 GETTING_STARTED.md guidance must exclude `Docs/_working/` and project-specific

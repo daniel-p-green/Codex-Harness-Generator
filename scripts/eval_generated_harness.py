@@ -188,6 +188,7 @@ def check_required_paths(root: Path, findings: list[Finding]) -> None:
         "Docs/Environment/MANIFEST.md",
         "Docs/Environment/GENESIS.md",
         "Docs/Environment/ARCHITECTURE.md",
+        "Docs/Environment/ASSUMPTIONS.md",
         "Docs/Environment/VALIDATION_REPORT.md",
         "Docs/Environment/SOURCE_MAP.md",
     ]
@@ -419,6 +420,36 @@ def check_docs(root: Path, findings: list[Finding]) -> None:
             if source not in text:
                 add(findings, "source_map", "source_alignment", "warn", "Docs/Environment/SOURCE_MAP.md", f"Source map should cite {source}.")
 
+    assumptions = root / "Docs/Environment/ASSUMPTIONS.md"
+    if assumptions.exists():
+        text = read_text(assumptions).lower()
+        for phrase in ["assumption", "limit", "verify"]:
+            if phrase not in text:
+                add(findings, "assumptions", "maintainability", "warn", "Docs/Environment/ASSUMPTIONS.md", f"Assumptions ledger should mention {phrase}.")
+
+
+def check_manifest(root: Path, findings: list[Finding]) -> None:
+    manifest = root / "Docs/Environment/MANIFEST.md"
+    if not manifest.exists():
+        return
+
+    for line_no, line in enumerate(read_text(manifest).splitlines(), 1):
+        stripped = line.strip()
+        if not stripped.startswith("- "):
+            continue
+        entry = stripped[2:].strip().split(" #", 1)[0].strip("` ")
+        if not entry or " " in entry:
+            continue
+        if not (root / entry).exists():
+            add(
+                findings,
+                "manifest_reference",
+                "correctness",
+                "fail",
+                f"Docs/Environment/MANIFEST.md:{line_no}",
+                f"Manifest entry does not exist on disk: {entry}",
+            )
+
 
 def score_findings(findings: list[Finding]) -> tuple[int, dict[str, int]]:
     category_scores = dict(CATEGORY_WEIGHTS)
@@ -440,6 +471,7 @@ def evaluate(root: Path) -> dict:
     check_skill_contracts(root, config, findings)
     check_rules(root, findings)
     check_docs(root, findings)
+    check_manifest(root, findings)
     score, category_scores = score_findings(findings)
     fail_count = sum(1 for finding in findings if finding.severity == "fail")
     warn_count = sum(1 for finding in findings if finding.severity == "warn")

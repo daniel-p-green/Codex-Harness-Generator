@@ -2,173 +2,189 @@
 
 **v1.0.0** | Built for Codex GPT-5.5 (`gpt-5.5`) | MIT
 
-> Generate a production-ready, best-practice Codex **harness** -- fully tailored to your use case, in minutes, at any skill level. Or validate, update, and improve a harness you already have.
+Codex Harness Generator helps you create and validate a project-specific Codex
+harness: `AGENTS.md`, `.codex/config.toml`, `.codex/agents/`, `.agents/skills/`,
+rules, memory scaffolding, setup docs, validation records, and a small
+self-improvement loop.
 
-A *harness* is a complete Codex setup for a project: `AGENTS.md` + rules + specialized agents + triggerable skills + memory + scoped permissions + self-learning. Normally you hand-craft all of that over days and still end up with contradictions, bloat, and broken references. The Harness Generator interviews you (or takes a preset), then builds the whole thing -- coherent, validated, and immediately usable.
+A harness is the operating layer around a project. It tells Codex what the
+project is, which files matter, which subagents and skills exist, what can be
+changed safely, how to save state, and how to verify the setup over time.
 
 [![Tutorial Video](https://img.youtube.com/vi/0R3JPNTEljU/0.jpg)](https://www.youtube.com/watch?v=0R3JPNTEljU)
+
+## Why this exists
+
+OpenAI's Codex customization has several layers: project instructions, config,
+subagents, skills, permissions, MCP servers, memory, and docs. Teams can
+hand-write those pieces, but the result often drifts: broken file references,
+oversized instructions, generic routing, unclear permission boundaries, and
+undocumented assumptions.
+
+This repo turns that setup work into a repeatable Codex workflow. The generator
+interviews you or starts from a preset, writes the harness in focused passes, and
+runs validation so the output is reviewable on disk.
+
+## When it is useful
+
+- You create similar Codex setups across several projects, teams, or domains.
+- You want repeatable local conventions instead of one-off prompt notes.
+- You need specialized subagents, skills, permissions, and memory to stay aligned.
+- You want a generated harness that leaves an audit trail: source map,
+  assumptions, manifest, architecture, and validation report.
+
+## When it is not useful
+
+- A small one-off project only needs a short `AGENTS.md`.
+- You want a deterministic scaffold CLI. This project is primarily a Codex-driven
+  generation workflow with deterministic eval scripts around it.
+- You need a compliance or policy engine. The harness can document and reinforce
+  boundaries, but it is not a substitute for organization-level controls.
+- You are not willing to run and maintain evals as Codex docs and APIs evolve.
 
 ## Quick Start
 
 ```bash
-# 1. Download this project
-git clone https://github.com/Popschlock/Codex-Harness-Generator.git
+# 1. Download this repo
+git clone https://github.com/daniel-p-green/Codex-Harness-Generator.git
 cd Codex-Harness-Generator
 
 # 2. Launch Codex in the directory
 codex
 
-# 3. Create your harness -- then just answer the prompts
+# 3. Create a harness, then answer the prompts
 /create
 ```
 
-That is the whole flow. Answer a short interview -- your domain, tools, team shape, how autonomous Codex should be -- and the Harness Generator writes a complete, tailored harness to **a path you choose**. No Codex expertise required: the interview does the work, and everything generated follows current best practices.
+The create flow asks about your domain, tools, team shape, existing files, risk
+tolerance, and how much autonomy Codex should have. It then writes a harness to
+the path you choose.
 
-It tailors to whoever you are:
-
-- **Solo dev or enterprise team** -- memory tier, roles, and coordination scale to team size
-- **With or without source control** -- Git, Perforce, or none
-- **With or without MCP servers / external tools** -- only the integrations your intake justifies, never speculative
-- **One focused project or a multi-area hub** -- several related work areas sharing a parent configuration layer
-- **Any domain** -- software, data, DevOps, game dev, research, legal, finance, hiring, support, and more
-
-The full run takes about 10-20 minutes including the interview.
-
-## What it does
-
-**1. Create a new harness.** Pick a **preset** (one of 4 base profiles or 16 ready-to-use bundled domains -- fast) or request a **custom** build where the architect synthesizes a reusable profile for your exact use case. The Generator then designs the architecture, generates every file in five focused passes, and validates the result before handing it to you.
-
-**2. Improve a harness you already have.**
+## Commands
 
 | Command | What it does |
-|---------|-------------|
-| `/validate-environment` | Structural + quality check of an existing harness (references resolve, Codex TOML and SKILL.md metadata are valid, sizes, routing, hub registry) |
-| `/upgrade-environment` | Audits an existing harness against current best practices, interviews you about pain points, and implements the improvements you approve (including single <-> multi-area-hub conversions) |
-| `/update` | Refreshes the Generator's own best-practices knowledge base (web research, or a local-only mode that just ingests the `ProvideKnowledge` folder) |
-
-## Prerequisites
-
-- [Codex CLI](https://developers.openai.com/codex)
-- An OpenAI API key or a Codex subscription
+|---|---|
+| `/create` | Interviews you or uses a preset, designs the harness, generates files, and validates the output. |
+| `/validate-environment` | Checks an existing harness for broken references, invalid config, missing metadata, weak skill triggers, and quality issues. |
+| `/upgrade-environment` | Audits an existing harness and proposes improvements before making approved changes. |
+| `/update` | Refreshes the generator's local knowledge base from web research or `Docs/ProvideKnowledge/` in local-only mode. |
 
 ## Presets
 
-The intake offers a **preset** path (fast) or a **custom** path (more tokens/time,
-best for long-lived harnesses) where the architect synthesizes a reusable
-`DOMAIN_PROFILE.md`. `Docs/StarterProfiles/DOMAIN_REFERENCE.md` maps ~20 common
-domains to a recommended starting point.
+The intake supports a fast preset path and a custom path. Presets live in:
 
-### Base profiles (slim, ~110-170 lines each)
+- `Docs/StarterProfiles/` for base profiles: software development, knowledge
+  work, data and analysis, DevOps and infrastructure.
+- `Docs/DomainLibrary/` for bundled domains: API design, book publishing,
+  course design, customer support, data engineering, data science, financial
+  modeling, game development, grant writing, hiring pipeline, legal research,
+  LLM app work, market research, product management, security audit, and social
+  media.
 
-| Profile | For |
-|---------|-----|
-| **Software Development** | Web apps, APIs, libraries, CLI tools |
-| **Knowledge Work** | Legal, research, finance, writing |
-| **Data & Analysis** | Accountants, analysts, reporting, dashboards |
-| **DevOps & Infrastructure** | DevOps engineers, SRE teams, platform engineers |
+Custom mode runs a deeper interview and writes a reusable domain profile for the
+target environment.
 
-### Bundled domain profiles (16)
+## What Gets Generated
 
-Ready-to-use, adversarially audited domain profiles in `Docs/DomainLibrary/`:
-api-design, book-publishing, course-design, customer-support,
-data-engineering, data-science, financial-modeling, game-development,
-grant-writing, hiring-pipeline, legal-research, llm-app, market-research,
-product-management, security-audit, social-media. The high-stakes domains (legal,
-finance, security, support, hiring) ship with the relevant professional/regulatory
-safeguards built in.
-
-Don't fit any preset? The custom path builds a configuration from scratch via a deep interview.
-
-## What gets generated
-
-```
+```text
 your-project/
-|-- AGENTS.md                    # AI assistant behavior and routing
+|-- AGENTS.md
 |-- .codex/
-|   |-- config.toml              # Model, sandbox, permissions, skills, agents, MCP, hooks
-|   |-- rules/                   # Orchestration, autonomy, context, self-learning, errors
-|   |-- agents/                  # Specialized AI agents for your domain
+|   |-- config.toml
+|   |-- rules/
+|   |-- agents/
 |-- .agents/
-|   |-- skills/                  # Triggerable skills: state-save, state-load, update, health-check
+|   |-- skills/
 |-- Docs/
-    |-- GETTING_STARTED.md       # Plain-language guide for your team
-    |-- Memory/                  # Project knowledge (scales with your team)
-    |-- State/                   # Session snapshots for save/resume
-    |-- Retro/                   # Self-learning observations and proposals
-    |-- Environment/             # Generation metadata and evolution log
+    |-- GETTING_STARTED.md
+    |-- Environment/
+    |   |-- GENESIS.md
+    |   |-- ARCHITECTURE.md
+    |   |-- ASSUMPTIONS.md
+    |   |-- MANIFEST.md
+    |   |-- SOURCE_MAP.md
+    |   |-- VALIDATION_REPORT.md
+    |-- Memory/
+    |-- State/
+    |-- Retro/
 ```
 
-Generated harnesses are immediately effective out of the box. The built-in
-self-learning system (`/update`) then refines routing, agents, and rules based on
-your actual usage, closing in on a hand-tuned configuration within weeks.
-
-### Key generated commands
-
-| Command | What it does |
-|---------|-------------|
-| `/state-save` | Saves session progress so you can close and resume later |
-| `/state-load` | Restores context from a saved session |
-| `/update` | Analyzes usage patterns and proposes improvements |
-| `/health-check` | Validates harness integrity and reports issues |
+The exact file set depends on the project. The important contract is that the
+generated harness should be explicit about why each component exists, what was
+assumed, which sources informed it, and how to validate it.
 
 ## Architecture
 
-The Harness Generator uses an orchestrator + subagent pattern with 5 agents:
+The repo uses a Codex orchestrator plus five configured agents:
 
-- **Orchestrator** (AGENTS.md + rules): routes requests, coordinates the pipeline, presents results
-- **Intake Interviewer** (medium-effort GPT-5.5): deep project interviews when presets don't fit
-- **Environment Architect** (GPT-5.5): designs the architecture from intake answers + best practices; picks a team-architecture pattern and execution mode; writes `DOMAIN_PROFILE.md` for custom builds
-- **Component Generator** (GPT-5.5): writes harness files in five focused passes
-- **Environment Validator** (medium-effort GPT-5.5): runs the quality checklist + skill-triggering tests, a Phase-0 drift audit, and boundary-crossing checks
-- **Upgrade Analyzer** (GPT-5.5): compares an existing harness against best practices and writes tiered recommendations
+- `intake-interviewer`: gathers project context when presets do not fit.
+- `environment-architect`: turns intake into a component manifest, routing plan,
+  assumptions ledger, and architecture record.
+- `component-generator`: writes the harness in focused passes.
+- `environment-validator`: checks the generated environment against the
+  validation guide and writes `VALIDATION_REPORT.md`.
+- `upgrade-analyzer`: reviews an existing harness and proposes improvements.
 
-All agent output is written to disk (artifact-first), keeping the main context lean.
+The core design is artifact-first. Important intermediate decisions are written
+to `Docs/Environment/` instead of living only in chat context.
 
-## Quality gates
+## Quality Gates
 
-Run the full eval gate before publishing changes:
+Run the full local gate before publishing changes:
 
 ```bash
 python scripts/run_evals.py
 ```
 
-This runs the static Codex port evaluator, generated-harness fixture evaluator,
-offline generated-harness smoke checks, mutation tests, and compile checks. See
-`Docs/Environment/CONTINUOUS_IMPROVEMENT.md` for the escaped-issue protocol.
+This runs:
 
-## Project structure
+- Static Codex port checks.
+- Generated-harness fixture evaluation.
+- Offline smoke checks for generated harnesses.
+- Contract and mutation tests.
+- Python compile checks.
 
-```
+The evals prove structural and contract quality against golden fixtures. They do
+not prove that every live `/create` run will be perfect, so meaningful changes
+should still be reviewed against generated artifacts.
+
+## Project Structure
+
+```text
 Codex-Harness-Generator/
-|-- AGENTS.md                           # Generator behavior
+|-- AGENTS.md
 |-- .codex/
-|   |-- rules/                          # 4 rules (creator-core, intake-protocol, generation-standards, quality-gates)
-|   |-- agents/                         # 5 agents (interviewer, architect, generator, validator, upgrade-analyzer)
+|   |-- config.toml
+|   |-- agents/
+|   |-- rules/
 |-- .agents/
-|   |-- skills/                         # 4 skills (create, validate-environment, upgrade-environment, update)
+|   |-- skills/
 |-- Docs/
-    |-- AgentGuidelines/                # Best-practices knowledge base (18 topics)
-    |-- AgentPlaybooks/                 # 6 step-by-step process guides (+INDEX)
-    |-- Templates/                      # Annotated reference implementations (52 files)
-    |-- StarterProfiles/                # 4 slim base profiles (+ PROFILE_FORMAT, DOMAIN_REFERENCE)
-    |-- DomainLibrary/                  # 16 bundled domain profiles
-    |-- ProvideKnowledge/               # Drop zone for user-contributed knowledge
+|   |-- AgentGuidelines/
+|   |-- AgentPlaybooks/
+|   |-- DomainLibrary/
+|   |-- StarterProfiles/
+|   |-- Templates/
+|   |-- Environment/
+|-- scripts/
+|-- tests/
 ```
 
-## How it works (technical)
+## Value Assessment
 
-1. The `/create` skill verifies the target directory and writes `CREATION_CONTEXT.md`
-2. The orchestrator runs intake -- experience level, work-area shape, preset-vs-custom (or a deep interview)
-3. Intake answers are written to `GENESIS.md` in the target directory (multi-area hubs also get `HUB_GENESIS.md`)
-4. The environment-architect designs the full architecture (`ARCHITECTURE.md`); custom builds also write a reusable `DOMAIN_PROFILE.md`
-5. The component-generator writes files in five passes (foundation -> agents -> skills -> infrastructure -> docs); hubs add a shell pass
-6. The environment-validator runs the quality checklist (see `Docs/Templates/References/validation-guide.md`)
-7. The orchestrator presents the result with smoke-test instructions
+The project is valuable when the user cares about repeatable Codex setup,
+reviewable local artifacts, and validation discipline. Its strongest utility is
+compressing a lot of Codex configuration knowledge into a guided workflow while
+leaving enough files on disk for inspection and improvement.
+
+The main limitation is that generation is model-mediated. The repo should be
+judged by its output contracts, eval coverage, and maintenance loop, not by an
+assumption that the first generated harness is always ideal.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add starter profiles or bundled
-domains, create or update templates, improve the knowledge base, and test changes.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add profiles, bundled domains,
+templates, docs, and eval coverage.
 
 ## License
 

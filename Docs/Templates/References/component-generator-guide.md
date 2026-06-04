@@ -134,7 +134,8 @@ Read `Docs/Templates/Core/memory-scaffold.md` for guidance.
 
 **Topic files to load**: `Docs/AgentGuidelines/Topics/` -- 10-integration, 12-user-experience, 21-rag, 23-multi-modal, 18-cost + `Docs/Templates/References/tool-registry.md`
 
-Files: GETTING_STARTED.md, README.md, VERSION.md, cross-reference verification
+Files: GETTING_STARTED.md, README.md, VERSION.md, MANIFEST.md, ASSUMPTIONS.md,
+SOURCE_MAP.md, validation handoff, cross-reference verification
 
 Key requirements:
 - GETTING_STARTED.md is the primary onboarding document. Written in plain language adapted to the user's technical level from GENESIS.md. Must include:
@@ -187,6 +188,18 @@ Key requirements:
   - Changelog placeholder for the user to track their own modifications
   - Codex compatibility note
   - A note that users can re-run `/validate-environment` to check for structural issues, broken references, or staleness in their environment
+- MANIFEST.md must list every generated file that is part of the harness handoff.
+  Use relative paths from the environment root, one bullet per file. Verify every
+  listed path exists before marking Pass 5 complete.
+- ASSUMPTIONS.md must list explicit assumptions, known limits, and verification
+  steps. Use this file for inferred defaults, untested integrations, and anything
+  the user or a reviewer should confirm before relying on the harness.
+- SOURCE_MAP.md must cite the Codex/OpenAI docs and local generator templates used
+  to create the environment. It should distinguish official sources from local
+  profile/template sources.
+- VALIDATION_REPORT.md is written by the validator. During Pass 5, include a
+  placeholder only if the manifest needs to reserve the path; the validator must
+  replace it with real results before release.
 - README.md: Brief project-level README if one does not already exist (do not overwrite existing).
 - Cross-reference verification: Read every generated file and verify:
   - All file paths referenced in AGENTS.md exist

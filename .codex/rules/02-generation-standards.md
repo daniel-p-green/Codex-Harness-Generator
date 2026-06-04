@@ -35,7 +35,8 @@ and environment-validator both enforce them.
 13. **.gitignore / ignore guidance** -- appropriate patterns for generated working files
 13b. **.gitignore** (or `.p4ignore`) -- must exclude `Docs/_working/`; its own manifest row
 14. **Docs/GETTING_STARTED.md** -- plain-language onboarding
-15. **Docs/Environment/** metadata (VERSION.md, GENESIS.md, ARCHITECTURE.md)
+15. **Docs/Environment/** metadata (VERSION.md, GENESIS.md, ARCHITECTURE.md,
+    MANIFEST.md, ASSUMPTIONS.md, SOURCE_MAP.md, VALIDATION_REPORT.md)
 
 ## Conditional components (17-29)
 
@@ -107,7 +108,7 @@ a different OpenAI model. Tune depth with `model_reasoning_effort` or per-agent
 | 2 Agents | All agent definitions | ARCHITECTURE (agent specs) |
 | 3 Skills | All skill definitions | ARCHITECTURE (skill specs) |
 | 4 Infrastructure | Wiki, working memory, self-learning | ARCHITECTURE (memory specs) |
-| 5 Documentation | GETTING_STARTED, VERSION, cross-refs | All generated files |
+| 5 Documentation | GETTING_STARTED, VERSION, MANIFEST, ASSUMPTIONS, SOURCE_MAP, validation handoff, cross-refs | All generated files |
 
 Track progress in `<target>/Docs/Environment/GENERATION_PROGRESS.md`.
 

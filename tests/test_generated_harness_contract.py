@@ -93,6 +93,37 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertEqual("fail", result["status"])
         self.assert_has_check(result, "required_path")
 
+    def test_missing_assumptions_ledger_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        (target / "Docs/Environment/ASSUMPTIONS.md").unlink()
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"])
+        self.assert_has_check(result, "required_path")
+
+    def test_weak_assumptions_ledger_warns(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        assumptions = target / "Docs/Environment/ASSUMPTIONS.md"
+        assumptions.write_text("# Assumptions\n\n- Assumption: This fixture is compact.\n", encoding="utf-8")
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("pass", result["status"], result)
+        self.assertGreater(result["warning_count"], 0, result)
+        self.assertLess(result["score"], 100, result)
+        self.assert_has_check(result, "assumptions")
+
+    def test_manifest_reference_to_missing_file_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        manifest = target / "Docs/Environment/MANIFEST.md"
+        manifest.write_text(manifest.read_text(encoding="utf-8") + "- missing/file.md\n", encoding="utf-8")
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"])
+        self.assert_has_check(result, "manifest_reference")
+
     def test_broken_skills_config_target_fails(self):
         temp_dir, target = self.copy_fixture()
         self.addCleanup(temp_dir.cleanup)
