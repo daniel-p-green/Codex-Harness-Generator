@@ -177,7 +177,8 @@ replacement. What is proven today:
   through the usage importer, and report which issues are conversion-ready
   without counting live issues or passing lint as proof. Waiting issues include
   copyable reporter follow-up files and `gh issue comment` commands for the
-  exact missing public-safe fields.
+  exact missing public-safe fields; marker-protected maintainer comments are
+  ignored as evidence and used only to avoid duplicate follow-up commands.
 - `scripts/pilot_next_action.py` and `codex-harness pilot-next-action`
   summarize the live pilot GitHub issue queue into one next maintainer action:
   post a reporter follow-up, preview a conversion-ready issue, fix sync
@@ -670,9 +671,10 @@ follow-up files, and `gh issue comment --body-file ...` commands for waiting
 issues. `pilot-next-action` writes `Docs/Environment/PILOT_NEXT_ACTION.md` and
 prints the single next maintainer command from that same live readiness check.
 Post follow-ups only when the selected action is still missing public-safe
-evidence, verification, privacy, or limitation fields; after the reporter
-updates the issue, rerun sync and preview conversion before writing a usage
-record.
+evidence, verification, privacy, or limitation fields. Maintainer follow-ups
+carry a hidden marker so they do not count as reporter evidence and do not get
+recommended repeatedly; after the reporter updates the issue, rerun sync and
+preview conversion before writing a usage record.
 
 Require actual non-synthetic success evidence before making real-world usage
 claims:

@@ -172,6 +172,26 @@ class PilotNextActionTests(unittest.TestCase):
         self.assertEqual(1, len(payload["waiting_followups"]))
         self.assertIn("outcome", payload["waiting_followups"][0]["missing_fields"])
 
+    def test_posted_followup_next_action_waits_for_reporter_response(self):
+        maintainer_comment = f"{pilot_next_action.sync_pilot_github_issues.MAINTAINER_FOLLOWUP_MARKER}\n\nPlease add the missing fields."
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_pilot_record(root)
+
+            payload = pilot_next_action.build_payload(
+                self.args(root),
+                fetch_issue=lambda *args, **kwargs: self.github_payload(comments=[{"body": maintainer_comment}]),
+            )
+
+        self.assertEqual("pass", payload["status"], payload)
+        self.assertEqual("waiting-for-reporters", payload["readiness"])
+        self.assertEqual("wait-for-reporter-response", payload["next_action"]["type"])
+        self.assertEqual("llm-app-pilot", payload["next_action"]["slug"])
+        self.assertIn("pilot-github-sync", payload["next_action"]["command"])
+        self.assertEqual(1, len(payload["waiting_followups"]))
+        self.assertTrue(payload["waiting_followups"][0]["maintainer_followup_posted"])
+        self.assertEqual("", payload["waiting_followups"][0]["command"])
+
     def test_conversion_ready_issue_next_action_previews_before_writing(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)

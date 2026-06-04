@@ -1,6 +1,6 @@
 # Pilot GitHub Issue Sync
 
-Generated: 2026-06-04T19:22:01Z
+Generated: 2026-06-04T19:34:36Z
 Status: PASS
 Readiness: waiting-for-reporters
 
@@ -12,6 +12,7 @@ Pilot GitHub issue sync checks public intake readiness only; it is not usage pro
 - Live issue URLs: 3
 - Conversion-ready issues: 0
 - Waiting for reporter: 3
+- Maintainer follow-ups already posted: 0
 - Needs attention: 0
 - Missing live issue URL: 0
 
@@ -24,6 +25,7 @@ Pilot GitHub issue sync checks public intake readiness only; it is not usage pro
 - Issue: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3
 - GitHub state: `OPEN`
 - Comments included: 0
+- Maintainer follow-up already posted: `false`
 - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
 - Follow-up file: `Docs/Environment/pilot-github-followups/llm-app-pilot-followup.md`
 
@@ -85,6 +87,7 @@ Once those sections are present, a maintainer can run `codex-harness pilot-githu
 - Issue: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1
 - GitHub state: `OPEN`
 - Comments included: 0
+- Maintainer follow-up already posted: `false`
 - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
 - Follow-up file: `Docs/Environment/pilot-github-followups/security-audit-pilot-followup.md`
 
@@ -146,6 +149,7 @@ Once those sections are present, a maintainer can run `codex-harness pilot-githu
 - Issue: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2
 - GitHub state: `OPEN`
 - Comments included: 0
+- Maintainer follow-up already posted: `false`
 - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
 - Follow-up file: `Docs/Environment/pilot-github-followups/customer-support-pilot-followup.md`
 

@@ -1,6 +1,6 @@
 # Pilot Next Action
 
-Generated: 2026-06-04T19:22:00Z
+Generated: 2026-06-04T19:34:36Z
 Status: PASS
 Readiness: waiting-for-reporters
 
@@ -11,6 +11,7 @@ This chooses the next public pilot action; it does not prove adoption. Count onl
 - Tracked pilots: 3
 - Conversion-ready issues: 0
 - Waiting for reporter: 3
+- Maintainer follow-ups already posted: 0
 - Needs attention: 0
 - Missing live issue URL: 0
 
@@ -30,14 +31,17 @@ gh issue comment https://github.com/daniel-p-green/Codex-Harness-Generator/issue
 
 - `llm-app-pilot`: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3
   - Follow-up file: `Docs/Environment/pilot-github-followups/llm-app-pilot-followup.md`
+  - Maintainer follow-up already posted: `false`
   - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
   - Command: `gh issue comment https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --body-file Docs/Environment/pilot-github-followups/llm-app-pilot-followup.md`
 - `security-audit-pilot`: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1
   - Follow-up file: `Docs/Environment/pilot-github-followups/security-audit-pilot-followup.md`
+  - Maintainer follow-up already posted: `false`
   - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
   - Command: `gh issue comment https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --body-file Docs/Environment/pilot-github-followups/security-audit-pilot-followup.md`
 - `customer-support-pilot`: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2
   - Follow-up file: `Docs/Environment/pilot-github-followups/customer-support-pilot-followup.md`
+  - Maintainer follow-up already posted: `false`
   - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
   - Command: `gh issue comment https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --body-file Docs/Environment/pilot-github-followups/customer-support-pilot-followup.md`
 

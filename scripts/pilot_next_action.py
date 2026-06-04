@@ -26,6 +26,13 @@ def first_record(records: list[dict], readiness: str) -> dict | None:
     return None
 
 
+def first_unposted_followup(records: list[dict]) -> dict | None:
+    for record in records:
+        if record.get("readiness") == "waiting-for-reporter" and record.get("commands", {}).get("comment_followup"):
+            return record
+    return None
+
+
 def sync_command(args: argparse.Namespace) -> str:
     parts = [
         "codex-harness",
@@ -76,7 +83,7 @@ def build_next_action(sync_payload: dict, args: argparse.Namespace) -> dict:
             "reason": "A live pilot issue has enough public-safe evidence to preview conversion before writing a usage record.",
         }
 
-    record = first_record(records, "waiting-for-reporter")
+    record = first_unposted_followup(records)
     if record:
         return {
             "type": "post-reporter-followup",
@@ -87,6 +94,19 @@ def build_next_action(sync_payload: dict, args: argparse.Namespace) -> dict:
             "missing_fields": record["missing_fields"],
             "command": record["commands"]["comment_followup"],
             "reason": "A live pilot issue is missing public-safe evidence fields; post the generated follow-up comment.",
+        }
+
+    record = first_record(records, "waiting-for-reporter")
+    if record:
+        return {
+            "type": "wait-for-reporter-response",
+            "priority": "medium",
+            "slug": record["slug"],
+            "issue_url": record["issue_url"],
+            "followup_file": "",
+            "missing_fields": record["missing_fields"],
+            "command": sync_command(args),
+            "reason": "A maintainer follow-up is already posted; wait for reporter evidence, then rerun sync.",
         }
 
     record = first_record(records, "needs-live-issue")
@@ -129,6 +149,7 @@ def build_payload(
                 "followup_file": record["display_followup_file"],
                 "missing_fields": record["missing_fields"],
                 "command": record["commands"].get("comment_followup", ""),
+                "maintainer_followup_posted": record.get("maintainer_followup_posted", False),
             }
             for record in sync_payload["records"]
             if record.get("readiness") == "waiting-for-reporter"
@@ -166,6 +187,7 @@ def write_report(path: Path, payload: dict) -> None:
         f"- Tracked pilots: {payload['summary']['total']}",
         f"- Conversion-ready issues: {payload['summary']['conversion_ready']}",
         f"- Waiting for reporter: {payload['summary']['waiting_for_reporter']}",
+        f"- Maintainer follow-ups already posted: {payload['summary'].get('maintainer_followups_posted', 0)}",
         f"- Needs attention: {payload['summary']['needs_attention']}",
         f"- Missing live issue URL: {payload['summary']['missing_issue_url']}",
         "",
@@ -189,9 +211,10 @@ def write_report(path: Path, payload: dict) -> None:
             lines.extend(
                 [
                     f"- `{item['slug']}`: {item['issue_url']}",
-                    f"  - Follow-up file: `{item['followup_file']}`",
+                    f"  - Follow-up file: `{item['followup_file'] or 'already posted'}`",
+                    f"  - Maintainer follow-up already posted: `{str(item.get('maintainer_followup_posted', False)).lower()}`",
                     f"  - Missing fields: {', '.join(item['missing_fields']) if item['missing_fields'] else 'none'}",
-                    f"  - Command: `{item['command']}`",
+                    f"  - Command: `{item['command'] or 'wait for reporter reply, then rerun sync'}`",
                 ]
             )
     else:

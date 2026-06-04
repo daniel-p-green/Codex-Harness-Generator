@@ -114,6 +114,13 @@ def followup_path(args: argparse.Namespace, record: dict) -> Path:
     return Path(args.followup_dir) / f"{record['slug']}-followup.md"
 
 
+def maintainer_followup_posted(github_payload: dict) -> bool:
+    for comment in github_payload.get("comments") or []:
+        if MAINTAINER_FOLLOWUP_MARKER in str(comment.get("body", "")):
+            return True
+    return False
+
+
 FIELD_LABELS = {
     "outcome": "Outcome",
     "task_summary": "Public-safe task summary",
@@ -191,6 +198,7 @@ def issue_sync_record(
         "reporter_followup": "",
         "followup_file": "",
         "display_followup_file": "",
+        "maintainer_followup_posted": False,
     }
     if not issue_url:
         base["errors"] = ["Pilot record has no live GitHub issue URL in notes or status history."]
@@ -204,6 +212,7 @@ def issue_sync_record(
     }
     try:
         github_payload = fetch_issue(issue_url, repo=args.repo or "", gh_bin=args.gh_bin, include_comments=True)
+        base["maintainer_followup_posted"] = maintainer_followup_posted(github_payload)
         lint_payload = usage_from_github_issue.build_payload(
             lint_args(args, record, issue_url),
             github_payload=github_payload,
@@ -224,10 +233,15 @@ def issue_sync_record(
     base["github_issue"] = lint_payload.get("github_issue", {})
     base["reporter_followup"] = reporter_followup(base)
     if base["readiness"] == "waiting-for-reporter":
-        path = followup_path(args, record)
-        base["followup_file"] = path.as_posix()
-        base["display_followup_file"] = display_path(path)
-        base["commands"]["comment_followup"] = gh_issue_comment_command(issue_url, base["display_followup_file"])
+        if base["maintainer_followup_posted"]:
+            base["reporter_followup"] = (
+                "Maintainer follow-up already posted; wait for a reporter reply with the missing public-safe evidence fields."
+            )
+        else:
+            path = followup_path(args, record)
+            base["followup_file"] = path.as_posix()
+            base["display_followup_file"] = display_path(path)
+            base["commands"]["comment_followup"] = gh_issue_comment_command(issue_url, base["display_followup_file"])
     return base
 
 
@@ -239,6 +253,7 @@ def summarize(records: list[dict]) -> dict:
         "waiting_for_reporter": sum(1 for record in records if record.get("readiness") == "waiting-for-reporter"),
         "needs_attention": sum(1 for record in records if record.get("readiness") == "needs-attention"),
         "missing_issue_url": sum(1 for record in records if record.get("readiness") == "needs-live-issue"),
+        "maintainer_followups_posted": sum(1 for record in records if record.get("maintainer_followup_posted")),
     }
 
 
@@ -318,6 +333,7 @@ def write_report(path: Path, payload: dict) -> None:
         f"- Live issue URLs: {summary['live_issue_count']}",
         f"- Conversion-ready issues: {summary['conversion_ready']}",
         f"- Waiting for reporter: {summary['waiting_for_reporter']}",
+        f"- Maintainer follow-ups already posted: {summary['maintainer_followups_posted']}",
         f"- Needs attention: {summary['needs_attention']}",
         f"- Missing live issue URL: {summary['missing_issue_url']}",
         "",
@@ -336,6 +352,7 @@ def write_report(path: Path, payload: dict) -> None:
                 f"- Issue: {record['issue_url'] or 'not recorded'}",
                 f"- GitHub state: `{record.get('github_issue', {}).get('state', 'unknown')}`",
                 f"- Comments included: {record.get('github_issue', {}).get('comment_count', 0)}",
+                f"- Maintainer follow-up already posted: `{str(record.get('maintainer_followup_posted', False)).lower()}`",
                 f"- Missing fields: {', '.join(record['missing_fields']) if record['missing_fields'] else 'none'}",
                 f"- Follow-up file: `{record['display_followup_file']}`" if record.get("display_followup_file") else "- Follow-up file: not needed",
             ]

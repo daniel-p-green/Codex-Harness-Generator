@@ -179,6 +179,29 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertIn("gh issue comment https://github.com/example/repo/issues/42", record["commands"]["comment_followup"])
         self.assertIn("--body-file", record["commands"]["comment_followup"])
 
+    def test_posted_maintainer_followup_does_not_recommend_duplicate_comment(self):
+        maintainer_comment = f"{sync_pilot_github_issues.MAINTAINER_FOLLOWUP_MARKER}\n\nPlease add the missing fields."
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_pilot_record(root)
+
+            payload = sync_pilot_github_issues.build_payload(
+                self.args(root),
+                fetch_issue=lambda *args, **kwargs: self.github_payload(comments=[{"body": maintainer_comment}]),
+            )
+
+        self.assertEqual("pass", payload["status"], payload)
+        self.assertEqual("waiting-for-reporters", payload["readiness"])
+        self.assertEqual(1, payload["summary"]["waiting_for_reporter"])
+        self.assertEqual(1, payload["summary"]["maintainer_followups_posted"])
+        record = payload["records"][0]
+        self.assertEqual("waiting-for-reporter", record["readiness"])
+        self.assertTrue(record["maintainer_followup_posted"])
+        self.assertEqual(0, record["github_issue"]["comment_count"])
+        self.assertEqual("", record["followup_file"])
+        self.assertNotIn("comment_followup", record["commands"])
+        self.assertIn("already posted", record["reporter_followup"])
+
     def test_repo_local_default_paths_render_as_relative_commands(self):
         args = argparse.Namespace(
             usage_record_dir=(REPO_ROOT / "Docs" / "Environment" / "usage-records").as_posix(),
