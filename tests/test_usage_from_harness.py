@@ -21,6 +21,8 @@ assert spec.loader is not None
 sys.modules[spec.name] = usage_from_harness
 spec.loader.exec_module(usage_from_harness)
 
+import pilot_board
+
 
 class UsageFromHarnessTests(unittest.TestCase):
     def copy_fixture(self) -> tuple[tempfile.TemporaryDirectory, Path]:
@@ -57,6 +59,34 @@ class UsageFromHarnessTests(unittest.TestCase):
             check=False,
         )
         self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+
+    def write_matching_pilot_record(self, pilot_record_dir: Path, domain: str = "software development") -> Path:
+        payload = {
+            "generated": "2026-06-04T00:00:00Z",
+            "selected_index": 1,
+            "selected_pilot": {
+                "slug": "usage-proof-smoke",
+                "title": "Usage proof smoke",
+                "domain": domain,
+                "profile": "software-development",
+                "source_type": "external",
+                "generation_path": "installed-init-brief",
+                "project_name": "Usage Proof Pilot",
+            },
+            "prepared_pilot": {
+                "target": "/tmp/usage-proof-smoke",
+                "pilot_pack": {
+                    "harness_label": "synthetic copied harness",
+                    "pack": "/tmp/PILOT_PACK.md",
+                    "issue_draft": "/tmp/ISSUE.md",
+                },
+            },
+            "claim_boundary": "Preparing the next pilot is not usage proof until converted into a checked usage record.",
+        }
+        pilot_record_dir.mkdir(parents=True, exist_ok=True)
+        record_path = pilot_record_dir / "usage-proof-smoke.json"
+        pilot_board.write_record(record_path, pilot_board.build_record(payload), force=True)
+        return record_path
 
     def test_usage_from_harness_writes_privacy_checked_record(self):
         temp_dir, target = self.copy_fixture()
@@ -111,6 +141,117 @@ class UsageFromHarnessTests(unittest.TestCase):
         self.assertTrue(any("Complete task-trial records reviewed: 1" in item for item in record["verification"]))
         self.assertTrue((record_dir / "usage-proof-smoke.json").is_file())
         self.assertIn("usage-proof-smoke", report.read_text(encoding="utf-8"))
+
+    def test_usage_from_harness_can_convert_matching_pilot_record(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        self.record_trial(target)
+        temp_path = Path(temp_dir.name)
+        record_dir = temp_path / "records"
+        report = temp_path / "USAGE_RECORDS.md"
+        pilot_record_dir = temp_path / "pilot-records"
+        board_report = temp_path / "PILOT_BOARD.md"
+        pilot_record_path = self.write_matching_pilot_record(pilot_record_dir)
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                SCRIPT.as_posix(),
+                target.as_posix(),
+                "--slug",
+                "usage-proof-smoke",
+                "--title",
+                "Usage proof smoke",
+                "--domain",
+                "software development",
+                "--harness-label",
+                "synthetic copied harness",
+                "--evidence-type",
+                "private-summary",
+                "--source-type",
+                "external",
+                "--generation-path",
+                "installed-init-brief",
+                "--privacy-review",
+                "Public-safe copied-harness evidence only.",
+                "--record-dir",
+                record_dir.as_posix(),
+                "--report",
+                report.as_posix(),
+                "--pilot-record-dir",
+                pilot_record_dir.as_posix(),
+                "--pilot-board-report",
+                board_report.as_posix(),
+                "--json",
+            ],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+        payload = json.loads(completed.stdout)
+        self.assertEqual("pass", payload["status"])
+        self.assertEqual("pass", payload["pilot_update"]["status"])
+        self.assertEqual("pass", payload["pilot_update"]["board_status"])
+        pilot_record = json.loads(pilot_record_path.read_text(encoding="utf-8"))
+        self.assertEqual("converted", pilot_record["status"])
+        self.assertEqual("usage-proof-smoke", pilot_record["usage_record"])
+        self.assertTrue(pilot_record["validated_usage_record"].endswith("usage-proof-smoke.json"))
+        self.assertIn("Converted with validated usage records: 1", board_report.read_text(encoding="utf-8"))
+
+    def test_usage_from_harness_rejects_pilot_mismatch_before_writing_record(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        self.record_trial(target)
+        temp_path = Path(temp_dir.name)
+        record_dir = temp_path / "records"
+        report = temp_path / "USAGE_RECORDS.md"
+        pilot_record_dir = temp_path / "pilot-records"
+        pilot_record_path = self.write_matching_pilot_record(pilot_record_dir, domain="customer support")
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                SCRIPT.as_posix(),
+                target.as_posix(),
+                "--slug",
+                "usage-proof-smoke",
+                "--title",
+                "Usage proof smoke",
+                "--domain",
+                "software development",
+                "--evidence-type",
+                "private-summary",
+                "--source-type",
+                "external",
+                "--generation-path",
+                "installed-init-brief",
+                "--privacy-review",
+                "Public-safe copied-harness evidence only.",
+                "--record-dir",
+                record_dir.as_posix(),
+                "--report",
+                report.as_posix(),
+                "--pilot-record-dir",
+                pilot_record_dir.as_posix(),
+                "--json",
+            ],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertNotEqual(0, completed.returncode)
+        self.assertIn("Pilot conversion validation failed", completed.stderr + completed.stdout)
+        self.assertIn("domain mismatch before write", completed.stderr + completed.stdout)
+        self.assertFalse((record_dir / "usage-proof-smoke.json").exists())
+        self.assertFalse(report.exists())
+        pilot_record = json.loads(pilot_record_path.read_text(encoding="utf-8"))
+        self.assertEqual("prepared", pilot_record["status"])
+        self.assertEqual("", pilot_record["usage_record"])
 
     def test_usage_from_harness_requires_complete_task_trial(self):
         temp_dir, target = self.copy_fixture()

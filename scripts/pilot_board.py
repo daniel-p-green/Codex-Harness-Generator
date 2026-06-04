@@ -16,6 +16,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_RECORD_DIR = REPO_ROOT / "Docs" / "Environment" / "pilot-records"
 DEFAULT_REPORT = REPO_ROOT / "Docs" / "Environment" / "PILOT_BOARD.md"
 ALLOWED_STATUSES = {"prepared", "invited", "completed", "converted", "dropped"}
+CONVERTIBLE_STATUSES = {"prepared", "invited", "completed"}
 INSTALLED_BRIEF_GENERATION_PATHS = {
     "installed-init-brief",
     "installed-quickstart",
@@ -117,6 +118,33 @@ def validate_converted_usage_record(record: dict, path: Path, usage_record_dir: 
                 f"{path.name}: converted usage_record {field} mismatch: pilot={record.get(field)!r} usage={payload.get(field)!r}"
             )
     return errors, resolved.as_posix()
+
+
+def validate_pre_conversion(
+    record_dir: Path,
+    slug: str,
+    domain: str,
+    source_type: str,
+    generation_path: str,
+) -> dict:
+    path = default_record_path(record_dir, slug)
+    record = read_record(path)
+    errors = validate_record(record, path)
+    if record.get("status") not in CONVERTIBLE_STATUSES:
+        errors.append(f"{path.name}: pilot status must be prepared, invited, or completed before conversion")
+    for field, usage_value in (
+        ("domain", domain),
+        ("source_type", source_type),
+        ("generation_path", generation_path),
+    ):
+        pilot_value = str(record.get(field, "")).strip().casefold()
+        if pilot_value != usage_value.strip().casefold():
+            errors.append(
+                f"{path.name}: pilot {field} mismatch before write: pilot={record.get(field)!r} usage={usage_value!r}"
+            )
+    if errors:
+        raise SystemExit("Pilot conversion validation failed: " + "; ".join(errors))
+    return record
 
 
 def read_record(path: Path) -> dict:

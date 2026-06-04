@@ -207,7 +207,7 @@ python scripts/codex_harness.py evidence-packet <generated-harness> --harness-la
 If the packet is public-safe and complete, convert the copied-harness evidence:
 
 ```bash
-python scripts/codex_harness.py usage-from-harness <generated-harness> --slug "{payload["slug"]}" --title "{payload["title"]}" --domain "{payload["domain"]}" --harness-label "{payload["harness_label"]}" --evidence-type private-summary --source-type {payload["source_type"]} --generation-path {payload["generation_path"]} --privacy-review "Reporter confirmed public-safe private-summary evidence only."
+python scripts/codex_harness.py usage-from-harness <generated-harness> --slug "{payload["slug"]}" --title "{payload["title"]}" --domain "{payload["domain"]}" --harness-label "{payload["harness_label"]}" --evidence-type private-summary --source-type {payload["source_type"]} --generation-path {payload["generation_path"]} --privacy-review "Reporter confirmed public-safe private-summary evidence only." --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md
 ```
 
 Or convert the GitHub issue body after review:

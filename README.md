@@ -157,7 +157,9 @@ replacement. What is proven today:
   board.
 - `scripts/usage_from_harness.py` and `codex-harness usage-from-harness`
   convert a generated harness's local eval report and task trials into a
-  privacy-checked usage record.
+  privacy-checked usage record; add
+  `--pilot-record-dir Docs/Environment/pilot-records` to convert the matching
+  prepared pilot in the same run.
 - Generated `Docs/GETTING_STARTED.md` files now include a first useful task
   loop, profile-specific verification menu, task-trial recording command, local
   eval command, and privacy-safe reporting boundary.
@@ -493,6 +495,8 @@ python scripts/codex_harness.py usage-from-harness /tmp/codex-rag-harness \
   --generation-path installed-quickstart \
   --privacy-review "Private-summary evidence only; no secrets, personal data, private repository names, or raw logs." \
   --limitation "Single private task trial, not longitudinal proof" \
+  --pilot-record-dir Docs/Environment/pilot-records \
+  --pilot-board-report Docs/Environment/PILOT_BOARD.md \
   --json
 ```
 
@@ -509,13 +513,13 @@ python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
 
 After reviewing the preview for concrete evidence, verification, privacy
 boundaries, and limitations, rerun without `--no-write` to write the checked-in
-record and refresh `Docs/Environment/USAGE_RECORDS.md`. If the report came
-from a prepared pilot with the same slug, add
+record and refresh `Docs/Environment/USAGE_RECORDS.md`. If copied-harness or
+issue-body evidence came from a prepared pilot with the same slug, add
 `--pilot-record-dir Docs/Environment/pilot-records` to mark that pilot
 `converted`, validate the usage-record reference, and refresh
 `Docs/Environment/PILOT_BOARD.md` in the same run. The linked pilot path
 prevalidates the pilot domain, source type, and generation path before writing
-the usage record so a mismatched issue cannot leave half-converted evidence.
+the usage record so mismatched evidence cannot leave a half-converted pilot.
 
 Validate checked-in usage records before release:
 
@@ -653,7 +657,7 @@ Common subcommands:
 | `semantic-alignment` | `check_semantic_alignment.py` | Checks local guidance against official Codex doc concepts. |
 | `equivalence` | `check_codex_equivalence.py` | Checks and writes the Codex-native equivalence matrix. |
 | `usage-record` | `record_usage_case.py` | Records sanitized generated-harness usage evidence. |
-| `usage-from-harness` | `usage_from_harness.py` | Converts copied-harness task trials and eval reports into a privacy-checked usage record. |
+| `usage-from-harness` | `usage_from_harness.py` | Converts copied-harness task trials and eval reports into a privacy-checked usage record; add `--pilot-record-dir` to prevalidate and convert a matching prepared pilot. |
 | `evidence-packet <path>` | `export_evidence_packet.py` | Exports a public-safe Markdown evidence packet from copied-harness local eval and task trials. |
 | `pilot-pack <path>` | `export_pilot_pack.py` | Writes an external pilot guide and optional GitHub issue-body draft for one privacy-safe generated-harness trial. |
 | `pilot-campaign` | `export_pilot_campaign.py` | Writes a shareable external-pilot campaign plan from current usage evidence gaps. |
