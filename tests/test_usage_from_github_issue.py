@@ -356,6 +356,9 @@ Add at least two public-safe bullets about what the generated harness helped you
         self.assertEqual(0, payload["github_issue"]["comment_count"])
         self.assertEqual(0, payload["github_issue"]["reporter_comment_count"])
         self.assertEqual(1, payload["github_issue"]["total_comment_count"])
+        self.assertEqual(1, payload["github_issue"]["maintainer_comment_count"])
+        self.assertEqual(0, payload["github_issue"]["automation_comment_count"])
+        self.assertEqual(1, payload["github_issue"]["excluded_comment_count"])
         self.assertIn("outcome", payload["missing_fields"])
         self.assertTrue(payload["github_issue"]["comments_included"])
 
@@ -428,8 +431,46 @@ Owner-maintained privacy review.
         self.assertEqual(0, payload["github_issue"]["comment_count"])
         self.assertEqual(0, payload["github_issue"]["reporter_comment_count"])
         self.assertEqual(1, payload["github_issue"]["total_comment_count"])
+        self.assertEqual(1, payload["github_issue"]["maintainer_comment_count"])
+        self.assertEqual(0, payload["github_issue"]["automation_comment_count"])
+        self.assertEqual(1, payload["github_issue"]["excluded_comment_count"])
         self.assertIn("outcome", payload["missing_fields"])
         self.assertNotIn("Maintainer note", str(payload))
+
+    def test_include_comments_ignores_unmarked_automation_comments(self):
+        automation_comment = """### Outcome
+
+success
+
+### Evidence
+
+- Automated evidence line one.
+- Automated evidence line two.
+"""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_matching_pilot_record(root)
+
+            payload = usage_from_github_issue.build_payload(
+                self.args(root, include_comments=True, lint_only=True),
+                github_payload=self.github_payload(
+                    comments=[
+                        {
+                            "author": {"login": "github-actions"},
+                            "authorAssociation": "NONE",
+                            "body": automation_comment,
+                            "url": "https://github.com/example/repo/issues/12#issuecomment-4",
+                        }
+                    ],
+                ),
+            )
+
+        self.assertEqual("pass", payload["status"], payload)
+        self.assertEqual("conversion-ready", payload["readiness"])
+        self.assertEqual(0, payload["github_issue"]["reporter_comment_count"])
+        self.assertEqual(1, payload["github_issue"]["automation_comment_count"])
+        self.assertEqual(1, payload["github_issue"]["excluded_comment_count"])
+        self.assertNotIn("Automated evidence", str(payload))
 
     def test_include_comments_ignores_automated_usage_lint_comments(self):
         lint_comment = """<!-- codex-harness-usage-lint -->
@@ -460,6 +501,9 @@ Reporter comment count: `1`
         self.assertEqual(0, payload["github_issue"]["comment_count"])
         self.assertEqual(0, payload["github_issue"]["reporter_comment_count"])
         self.assertEqual(1, payload["github_issue"]["total_comment_count"])
+        self.assertEqual(0, payload["github_issue"]["maintainer_comment_count"])
+        self.assertEqual(1, payload["github_issue"]["automation_comment_count"])
+        self.assertEqual(1, payload["github_issue"]["excluded_comment_count"])
         self.assertTrue(payload["github_issue"]["comments_included"])
 
     def test_sensitive_comment_fails_lint(self):

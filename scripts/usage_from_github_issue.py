@@ -28,6 +28,7 @@ from record_usage_case import (
 MAINTAINER_FOLLOWUP_MARKER = "<!-- codex-harness-maintainer-followup -->"
 USAGE_LINT_MARKER = "<!-- codex-harness-usage-lint -->"
 MAINTAINER_AUTHOR_ASSOCIATIONS = {"OWNER", "MEMBER", "COLLABORATOR"}
+AUTOMATION_AUTHOR_LOGINS = {"github-actions", "github-actions[bot]", "dependabot[bot]"}
 
 
 def fetch_github_issue(issue: str, repo: str = "", gh_bin: str = "gh", *, include_comments: bool = False) -> dict:
@@ -57,13 +58,65 @@ def comment_author_association(comment: dict) -> str:
     return str(comment.get("authorAssociation", "")).upper()
 
 
+def comment_author_login(comment: dict) -> str:
+    author = comment.get("author") or {}
+    return str(author.get("login", "")).lower()
+
+
+def is_automation_comment(comment: dict) -> bool:
+    body = str(comment.get("body", ""))
+    return USAGE_LINT_MARKER in body or comment_author_login(comment) in AUTOMATION_AUTHOR_LOGINS
+
+
+def is_maintainer_comment(comment: dict) -> bool:
+    body = str(comment.get("body", ""))
+    return MAINTAINER_FOLLOWUP_MARKER in body or comment_author_association(comment) in MAINTAINER_AUTHOR_ASSOCIATIONS
+
+
 def is_reporter_comment(comment: dict) -> bool:
     body = str(comment.get("body", "")).strip()
     if not body:
         return False
-    if MAINTAINER_FOLLOWUP_MARKER in body or USAGE_LINT_MARKER in body:
+    if is_maintainer_comment(comment) or is_automation_comment(comment):
         return False
-    return comment_author_association(comment) not in MAINTAINER_AUTHOR_ASSOCIATIONS
+    return True
+
+
+def comment_classification_counts(payload: dict, *, include_comments: bool) -> dict[str, int]:
+    if not include_comments:
+        return {
+            "total_comment_count": 0,
+            "reporter_comment_count": 0,
+            "maintainer_comment_count": 0,
+            "automation_comment_count": 0,
+            "empty_comment_count": 0,
+            "excluded_comment_count": 0,
+        }
+    counts = {
+        "total_comment_count": 0,
+        "reporter_comment_count": 0,
+        "maintainer_comment_count": 0,
+        "automation_comment_count": 0,
+        "empty_comment_count": 0,
+        "excluded_comment_count": 0,
+    }
+    for comment in payload.get("comments") or []:
+        counts["total_comment_count"] += 1
+        body = str(comment.get("body", "")).strip()
+        if not body:
+            counts["empty_comment_count"] += 1
+            continue
+        if is_automation_comment(comment):
+            counts["automation_comment_count"] += 1
+            continue
+        if is_maintainer_comment(comment):
+            counts["maintainer_comment_count"] += 1
+            continue
+        counts["reporter_comment_count"] += 1
+    counts["excluded_comment_count"] = (
+        counts["maintainer_comment_count"] + counts["automation_comment_count"] + counts["empty_comment_count"]
+    )
+    return counts
 
 
 def comment_bodies(payload: dict) -> list[str]:
@@ -107,17 +160,15 @@ def importer_args(args: argparse.Namespace, body: str) -> argparse.Namespace:
 
 
 def issue_metadata(payload: dict, *, include_comments: bool) -> dict:
-    reporter_comment_count = len(comment_bodies(payload)) if include_comments else 0
-    total_comment_count = len(payload.get("comments") or []) if include_comments else 0
+    comment_counts = comment_classification_counts(payload, include_comments=include_comments)
     return {
         "number": payload.get("number"),
         "title": payload.get("title", ""),
         "url": payload.get("url", ""),
         "state": payload.get("state", ""),
         "comments_included": include_comments,
-        "comment_count": reporter_comment_count,
-        "reporter_comment_count": reporter_comment_count,
-        "total_comment_count": total_comment_count,
+        "comment_count": comment_counts["reporter_comment_count"],
+        **comment_counts,
     }
 
 

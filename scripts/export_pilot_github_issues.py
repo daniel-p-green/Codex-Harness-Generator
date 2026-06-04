@@ -60,7 +60,20 @@ def reporter_completion_reply_template(record: dict) -> str:
     )
 
 
-def issue_body_markdown(record: dict, payload: dict) -> str:
+def issue_completion_instruction(live_issue_url: str, import_commands: dict[str, str]) -> str:
+    if live_issue_url:
+        return (
+            "After completing one privacy-safe task, reply to this issue with the completion template below. "
+            "If the reply passes lint, maintainers can preview it with "
+            f"`{import_commands['preview_github_issue']}` before writing a usage record."
+        )
+    return (
+        "After completing one privacy-safe task, reply to this issue with the completion template below. "
+        "If the reply passes lint, the Usage Evidence Lint bot will post exact maintainer preview and conversion commands."
+    )
+
+
+def issue_body_markdown(record: dict, payload: dict, live_issue_url: str, import_commands: dict[str, str]) -> str:
     return "\n".join(
         [
             f"# External Usage Pilot: {record['title']}",
@@ -71,7 +84,7 @@ def issue_body_markdown(record: dict, payload: dict) -> str:
             "",
             record["reporter_message"],
             "",
-            "After completing one privacy-safe task, reply to this issue with the completion template below. Maintainers can then run `codex-harness usage-from-github-issue ... --include-comments` without asking you to edit the original issue body.",
+            issue_completion_instruction(live_issue_url, import_commands),
             "Keep evidence public-safe: no secrets, personal data, proprietary source, private repository names, local machine paths, raw logs, or raw private transcripts.",
             "",
             "## Reporter Completion Reply Template",
@@ -195,10 +208,10 @@ def build_payload(args: argparse.Namespace) -> dict:
         filename = f"{export_pilot_handoff.safe_slug(record['slug'])}-github-issue.md"
         body_path = Path(args.out_dir) / filename
         title = f"External usage pilot: {record['title']}"
-        body = issue_body_markdown(record, {"claim_boundary": CLAIM_BOUNDARY})
         issue_url = live_issue_url(record)
         issue_selector = issue_url or "<issue-number-or-url>"
         import_commands = github_issue_import_commands(issue_selector, args)
+        body = issue_body_markdown(record, {"claim_boundary": CLAIM_BOUNDARY}, issue_url, import_commands)
         records.append(
             {
                 "slug": record["slug"],

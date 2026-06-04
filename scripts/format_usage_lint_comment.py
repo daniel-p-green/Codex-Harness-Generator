@@ -128,6 +128,7 @@ def format_comment(payload: dict) -> str:
         f"Comments included: `{str(github_issue.get('comments_included', False)).lower()}`",
         f"Fetched GitHub comment count: `{github_issue.get('total_comment_count', 0)}`",
         f"Reporter comment count: `{github_issue.get('reporter_comment_count', github_issue.get('comment_count', 0))}`",
+        f"Excluded maintainer/automation comment count: `{github_issue.get('excluded_comment_count', 0)}`",
         "",
         "This automated check only lints public-safe usage evidence. It does not write usage records, convert pilots, or count as adoption proof.",
         "",

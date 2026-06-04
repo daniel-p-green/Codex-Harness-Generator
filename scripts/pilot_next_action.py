@@ -237,6 +237,7 @@ def write_report(path: Path, payload: dict) -> None:
         f"- Waiting for reporter: {payload['summary']['waiting_for_reporter']}",
         f"- Maintainer follow-ups already posted: {payload['summary'].get('maintainer_followups_posted', 0)}",
         f"- GitHub comments fetched: {payload['summary'].get('github_comment_count', 0)}",
+        f"- Maintainer/automation comments excluded: {payload['summary'].get('excluded_comment_count', 0)}",
         f"- Reporter replies: {payload['summary'].get('reporter_reply_count', 0)}",
         f"- Reporter replies after latest maintainer follow-up: {payload['summary'].get('reporter_replies_after_followup', 0)}",
         f"- Follow-up reminders due: {payload['summary'].get('reminders_due', 0)}",

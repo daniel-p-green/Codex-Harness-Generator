@@ -330,6 +330,7 @@ class PilotNextActionTests(unittest.TestCase):
         self.assertIn("# Pilot Next Action", text)
         self.assertIn("post-reporter-followup", text)
         self.assertIn("GitHub comments fetched: 0", text)
+        self.assertIn("Maintainer/automation comments excluded: 0", text)
         self.assertIn("Count only converted, validated usage records", text)
         self.assertIn("gh issue comment https://github.com/example/repo/issues/42", text)
 

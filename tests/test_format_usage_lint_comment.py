@@ -40,6 +40,7 @@ class FormatUsageLintCommentTests(unittest.TestCase):
                 "comment_count": 1,
                 "reporter_comment_count": 1,
                 "total_comment_count": 3,
+                "excluded_comment_count": 2,
             },
         }
 
@@ -52,6 +53,7 @@ class FormatUsageLintCommentTests(unittest.TestCase):
         self.assertIn("does not write usage records, convert pilots, or count as adoption proof", comment)
         self.assertIn("Fetched GitHub comment count: `3`", comment)
         self.assertIn("Reporter comment count: `1`", comment)
+        self.assertIn("Excluded maintainer/automation comment count: `2`", comment)
         self.assertIn("Maintainer preview command", comment)
         self.assertIn("Maintainer conversion command", comment)
         self.assertIn("codex-harness usage-from-github-issue https://github.com/example/repo/issues/12", comment)
@@ -77,6 +79,7 @@ class FormatUsageLintCommentTests(unittest.TestCase):
                 "comment_count": 0,
                 "reporter_comment_count": 0,
                 "total_comment_count": 2,
+                "excluded_comment_count": 2,
             },
         }
 
@@ -85,6 +88,7 @@ class FormatUsageLintCommentTests(unittest.TestCase):
         self.assertIn("Readiness: `needs-input`", comment)
         self.assertIn("Fetched GitHub comment count: `2`", comment)
         self.assertIn("Reporter comment count: `0`", comment)
+        self.assertIn("Excluded maintainer/automation comment count: `2`", comment)
         self.assertIn("- outcome", comment)
         self.assertIn("- evidence", comment)
         self.assertIn("Missing required issue field", comment)

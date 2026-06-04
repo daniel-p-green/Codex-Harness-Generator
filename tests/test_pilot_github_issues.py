@@ -99,6 +99,8 @@ class PilotGithubIssuesTests(unittest.TestCase):
         self.assertIn("llm-app-pilot", record["body"])
         self.assertIn("## Reporter Completion Reply Template", record["body"])
         self.assertIn("reply to this issue with the completion template", record["body"])
+        self.assertIn("Usage Evidence Lint bot will post exact maintainer preview and conversion commands", record["body"])
+        self.assertNotIn("usage-from-github-issue ...", record["body"])
         self.assertIn("reporter_reply_template", record)
         self.assertIn("GitHub issue drafts help open public pilot intake issues", payload["claim_boundary"])
 
@@ -133,7 +135,10 @@ class PilotGithubIssuesTests(unittest.TestCase):
         record = payload["records"][0]
         self.assertEqual("https://github.com/example/repo/issues/42", record["live_issue_url"])
         self.assertIn("usage-from-github-issue https://github.com/example/repo/issues/42", record["convert_github_issue"])
+        self.assertIn("usage-from-github-issue https://github.com/example/repo/issues/42", record["body"])
+        self.assertIn("--no-write --json", record["body"])
         self.assertNotIn("<issue-number-or-url>", record["convert_github_issue"])
+        self.assertNotIn("usage-from-github-issue ...", record["body"])
 
     def test_write_outputs_creates_body_and_report(self):
         with tempfile.TemporaryDirectory() as temp_dir:

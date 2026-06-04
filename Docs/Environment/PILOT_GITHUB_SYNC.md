@@ -1,6 +1,6 @@
 # Pilot GitHub Issue Sync
 
-Generated: 2026-06-04T21:56:14Z
+Generated: 2026-06-04T22:09:44Z
 Status: PASS
 Readiness: waiting-for-reporters
 
@@ -14,6 +14,7 @@ Pilot GitHub issue sync checks public intake readiness only; it is not usage pro
 - Waiting for reporter: 3
 - Maintainer follow-ups already posted: 3
 - GitHub comments fetched: 6
+- Maintainer/automation comments excluded: 6
 - Reporter replies: 0
 - Reporter replies after latest maintainer follow-up: 0
 - Follow-up reminders due: 0
@@ -31,10 +32,11 @@ Pilot GitHub issue sync checks public intake readiness only; it is not usage pro
 - GitHub state: `OPEN`
 - GitHub comments fetched: 2
 - Reporter comments included: 0
+- Maintainer/automation comments excluded: 2
 - Maintainer follow-up already posted: `true`
 - Maintainer follow-up URL: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3#issuecomment-4625495059
 - Maintainer follow-up posted at: `2026-06-04T19:38:17Z`
-- Maintainer follow-up age: `2.3` hours
+- Maintainer follow-up age: `2.52` hours
 - Reminder due: `false`
 - Next reminder review at: `2026-06-07T19:38:17Z`
 - Reporter replies: 0
@@ -71,10 +73,11 @@ Maintainer follow-up already posted; wait for a reporter reply with the missing 
 - GitHub state: `OPEN`
 - GitHub comments fetched: 2
 - Reporter comments included: 0
+- Maintainer/automation comments excluded: 2
 - Maintainer follow-up already posted: `true`
 - Maintainer follow-up URL: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1#issuecomment-4625495203
 - Maintainer follow-up posted at: `2026-06-04T19:38:18Z`
-- Maintainer follow-up age: `2.3` hours
+- Maintainer follow-up age: `2.52` hours
 - Reminder due: `false`
 - Next reminder review at: `2026-06-07T19:38:18Z`
 - Reporter replies: 0
@@ -111,10 +114,11 @@ Maintainer follow-up already posted; wait for a reporter reply with the missing 
 - GitHub state: `OPEN`
 - GitHub comments fetched: 2
 - Reporter comments included: 0
+- Maintainer/automation comments excluded: 2
 - Maintainer follow-up already posted: `true`
 - Maintainer follow-up URL: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2#issuecomment-4625495326
 - Maintainer follow-up posted at: `2026-06-04T19:38:19Z`
-- Maintainer follow-up age: `2.3` hours
+- Maintainer follow-up age: `2.52` hours
 - Reminder due: `false`
 - Next reminder review at: `2026-06-07T19:38:19Z`
 - Reporter replies: 0

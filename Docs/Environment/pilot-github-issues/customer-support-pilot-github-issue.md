@@ -16,7 +16,7 @@ and share either the completed issue draft or a private copied harness directory
 Do not include secrets, personal data, proprietary source, private repository names, local machine paths, raw logs, or raw private transcripts.
 A private-summary report is fine if the raw evidence cannot be public.
 
-After completing one privacy-safe task, reply to this issue with the completion template below. Maintainers can then run `codex-harness usage-from-github-issue ... --include-comments` without asking you to edit the original issue body.
+After completing one privacy-safe task, reply to this issue with the completion template below. If the reply passes lint, maintainers can preview it with `codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json` before writing a usage record.
 Keep evidence public-safe: no secrets, personal data, proprietary source, private repository names, local machine paths, raw logs, or raw private transcripts.
 
 ## Reporter Completion Reply Template

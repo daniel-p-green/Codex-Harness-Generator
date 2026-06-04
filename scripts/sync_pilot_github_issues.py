@@ -345,6 +345,7 @@ def summarize(records: list[dict]) -> dict:
         "missing_issue_url": sum(1 for record in records if record.get("readiness") == "needs-live-issue"),
         "maintainer_followups_posted": sum(1 for record in records if record.get("maintainer_followup_posted")),
         "github_comment_count": sum(record.get("github_issue", {}).get("total_comment_count", 0) for record in records),
+        "excluded_comment_count": sum(record.get("github_issue", {}).get("excluded_comment_count", 0) for record in records),
         "reporter_reply_count": sum(record.get("reporter_replies", {}).get("count", 0) for record in records),
         "reporter_replies_after_followup": sum(
             1 for record in records if record.get("reporter_replies", {}).get("after_latest_maintainer_followup")
@@ -432,6 +433,7 @@ def write_report(path: Path, payload: dict) -> None:
         f"- Waiting for reporter: {summary['waiting_for_reporter']}",
         f"- Maintainer follow-ups already posted: {summary['maintainer_followups_posted']}",
         f"- GitHub comments fetched: {summary.get('github_comment_count', 0)}",
+        f"- Maintainer/automation comments excluded: {summary.get('excluded_comment_count', 0)}",
         f"- Reporter replies: {summary['reporter_reply_count']}",
         f"- Reporter replies after latest maintainer follow-up: {summary['reporter_replies_after_followup']}",
         f"- Follow-up reminders due: {summary.get('reminders_due', 0)}",
@@ -455,6 +457,7 @@ def write_report(path: Path, payload: dict) -> None:
                 f"- GitHub state: `{record.get('github_issue', {}).get('state', 'unknown')}`",
                 f"- GitHub comments fetched: {record.get('github_issue', {}).get('total_comment_count', 0)}",
                 f"- Reporter comments included: {record.get('github_issue', {}).get('reporter_comment_count', record.get('github_issue', {}).get('comment_count', 0))}",
+                f"- Maintainer/automation comments excluded: {record.get('github_issue', {}).get('excluded_comment_count', 0)}",
                 f"- Maintainer follow-up already posted: `{str(record.get('maintainer_followup_posted', False)).lower()}`",
                 f"- Maintainer follow-up URL: {record.get('maintainer_followup_comment', {}).get('url') or 'none'}",
                 f"- Maintainer follow-up posted at: `{record.get('maintainer_followup_comment', {}).get('created_at') or 'none'}`",
