@@ -5,14 +5,24 @@
   "generation_path": "installed-quickstart",
   "harness_label": "Customer Support Workspace Pilot",
   "issue_draft": "Docs/Environment/beta-exit-pilot-materials/customer-support-pilot-usage-issue.md",
-  "notes": "",
+  "notes": "opened public pilot issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2",
   "pilot_pack": "Docs/Environment/beta-exit-pilot-materials/customer-support-pilot-pilot-pack.md",
   "profile": "customer-support",
   "selected_index": 3,
   "slug": "customer-support-pilot",
   "source_type": "external",
-  "status": "prepared",
+  "status": "invited",
+  "status_history": [
+    {
+      "at": "2026-06-04T18:29:00Z",
+      "from": "prepared",
+      "notes": "opened public pilot issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2",
+      "to": "invited",
+      "usage_record": ""
+    }
+  ],
   "target": "generated pilot harness: customer-support-pilot",
   "title": "customer support pilot",
+  "updated": "2026-06-04T18:29:00Z",
   "usage_record": ""
 }

@@ -1,6 +1,6 @@
 # Pilot Outreach Packet
 
-Generated: 2026-06-04T17:53:47Z
+Generated: 2026-06-04T18:33:09Z
 Status: PASS
 Readiness: outreach-ready
 
@@ -16,7 +16,7 @@ Outreach packets help request and track pilots; they are not usage proof until a
 
 ### 1. LLM app pilot (`llm-app-pilot`)
 
-- Status: `prepared`
+- Status: `invited`
 - Domain: LLM app
 - Source type: `external`
 - Generation path: `installed-quickstart`
@@ -63,7 +63,7 @@ codex-harness usage-from-harness <generated-harness> --slug llm-app-pilot --evid
 
 ### 2. security audit pilot (`security-audit-pilot`)
 
-- Status: `prepared`
+- Status: `invited`
 - Domain: security audit
 - Source type: `external`
 - Generation path: `installed-quickstart`
@@ -110,7 +110,7 @@ codex-harness usage-from-harness <generated-harness> --slug security-audit-pilot
 
 ### 3. customer support pilot (`customer-support-pilot`)
 
-- Status: `prepared`
+- Status: `invited`
 - Domain: customer support
 - Source type: `external`
 - Generation path: `installed-quickstart`

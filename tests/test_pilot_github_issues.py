@@ -62,10 +62,19 @@ class PilotGithubIssuesTests(unittest.TestCase):
         values.update(overrides)
         return Namespace(**values)
 
-    def write_pilot_record(self, root: Path, status: str = "prepared", slug: str = "llm-app-pilot") -> None:
+    def write_pilot_record(
+        self,
+        root: Path,
+        status: str = "prepared",
+        slug: str = "llm-app-pilot",
+        notes: str = "",
+    ) -> None:
         record_dir = root / "pilot-records"
         record_dir.mkdir(parents=True, exist_ok=True)
         record = pilot_board.build_record(self.pilot_payload(slug=slug), status=status)
+        if notes:
+            record["notes"] = notes
+            record["status_history"] = [{"notes": notes}]
         (record_dir / f"{slug}.json").write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
 
     def test_build_payload_writes_github_issue_command(self):
@@ -87,6 +96,22 @@ class PilotGithubIssuesTests(unittest.TestCase):
         self.assertIn("### Pilot or usage-record slug", record["body"])
         self.assertIn("llm-app-pilot", record["body"])
         self.assertIn("GitHub issue drafts help open public pilot intake issues", payload["claim_boundary"])
+
+    def test_build_payload_uses_live_issue_url_from_pilot_notes(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_pilot_record(
+                root,
+                status="invited",
+                notes="opened public pilot issue https://github.com/example/repo/issues/42",
+            )
+
+            payload = export_pilot_github_issues.build_payload(self.args(root))
+
+        record = payload["records"][0]
+        self.assertEqual("https://github.com/example/repo/issues/42", record["live_issue_url"])
+        self.assertIn("usage-from-github-issue https://github.com/example/repo/issues/42", record["convert_github_issue"])
+        self.assertNotIn("<issue-number-or-url>", record["convert_github_issue"])
 
     def test_write_outputs_creates_body_and_report(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -110,6 +135,26 @@ class PilotGithubIssuesTests(unittest.TestCase):
         self.assertIn("After the reporter completes the public issue", report_text)
         self.assertIn("usage-from-github-issue <issue-number-or-url>", report_text)
         self.assertIn("Opening an issue or marking a pilot invited is not adoption evidence", report_text)
+
+    def test_report_with_live_issue_warns_not_to_duplicate(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_pilot_record(
+                root,
+                status="invited",
+                notes="opened public pilot issue https://github.com/example/repo/issues/42",
+            )
+            args = self.args(root)
+            payload = export_pilot_github_issues.build_payload(args)
+
+            export_pilot_github_issues.write_outputs(payload)
+
+            report_text = (root / "PILOT_GITHUB_ISSUES.md").read_text(encoding="utf-8")
+
+        self.assertIn("- Live issue: https://github.com/example/repo/issues/42", report_text)
+        self.assertIn("Do not create a duplicate", report_text)
+        self.assertNotIn("Create public issue:", report_text)
+        self.assertIn("usage-from-github-issue https://github.com/example/repo/issues/42", report_text)
 
     def test_no_active_pilots_is_still_a_pass(self):
         with tempfile.TemporaryDirectory() as temp_dir:

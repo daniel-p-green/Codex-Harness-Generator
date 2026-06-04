@@ -63,7 +63,7 @@ class ProofNextTests(unittest.TestCase):
     def write_payload(self, root: Path, payload: dict) -> None:
         (root / f"{payload['slug']}.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
-    def write_pilot_record(self, root: Path, status: str = "prepared") -> None:
+    def write_pilot_record(self, root: Path, status: str = "prepared", notes: str = "") -> None:
         root.mkdir(parents=True, exist_ok=True)
         record = {
             "claim_boundary": "Preparing the next pilot is not usage proof until converted into a checked usage record.",
@@ -72,7 +72,7 @@ class ProofNextTests(unittest.TestCase):
             "generation_path": "installed-quickstart",
             "harness_label": "LLM App Workspace Pilot",
             "issue_draft": "Docs/Environment/LLM_APP_USAGE_ISSUE_DRAFT.md",
-            "notes": "",
+            "notes": notes,
             "pilot_pack": "Docs/Environment/LLM_APP_PILOT_PACK.md",
             "profile": "llm-app",
             "selected_index": 1,
@@ -83,6 +83,8 @@ class ProofNextTests(unittest.TestCase):
             "title": "LLM app pilot",
             "usage_record": "",
         }
+        if notes:
+            record["status_history"] = [{"notes": notes}]
         (root / "llm-app-pilot.json").write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     def test_build_payload_turns_usage_gaps_into_operator_commands(self):
@@ -155,6 +157,25 @@ class ProofNextTests(unittest.TestCase):
         commands = [item["command"] for item in payload["command_sequence"]]
         self.assertFalse(any("--status invited" in command for command in commands))
         self.assertTrue(any("pilot-update llm-app-pilot --status completed" in command for command in commands))
+
+    def test_build_payload_uses_live_issue_url_for_invited_pilot_import(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            record_dir = root / "records"
+            pilot_record_dir = root / "pilot-records"
+            record_dir.mkdir()
+            self.write_payload(record_dir, self.valid_payload())
+            self.write_pilot_record(
+                pilot_record_dir,
+                status="invited",
+                notes="opened public pilot issue https://github.com/example/repo/issues/42",
+            )
+
+            payload = proof_next.build_payload(self.args(record_dir, pilot_record_dir=pilot_record_dir))
+
+        commands = [item["command"] for item in payload["command_sequence"]]
+        self.assertTrue(any("usage-from-github-issue https://github.com/example/repo/issues/42" in command for command in commands))
+        self.assertFalse(any("usage-from-github-issue <issue-number-or-url>" in command for command in commands))
 
     def test_build_payload_does_not_recomplete_completed_pilot(self):
         with tempfile.TemporaryDirectory() as temp_dir:

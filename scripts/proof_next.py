@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -22,6 +23,7 @@ DEFAULT_USAGE_REPORT_TEXT = "Docs/Environment/USAGE_RECORDS.md"
 DEFAULT_PILOT_HANDOFF_OUT_TEXT = "Docs/Environment/pilot-handoffs"
 DEFAULT_PILOT_GITHUB_ISSUES_OUT_TEXT = "Docs/Environment/pilot-github-issues"
 DEFAULT_PILOT_GITHUB_ISSUES_REPORT_TEXT = "Docs/Environment/PILOT_GITHUB_ISSUES.md"
+GITHUB_ISSUE_RE = re.compile(r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/issues/\d+")
 
 
 def build_prepare_next_command(pilot: dict, args: argparse.Namespace) -> str:
@@ -52,6 +54,17 @@ def pilot_value(pilot: dict, key: str, fallback: str = "") -> str:
     if value is None:
         return fallback
     return str(value)
+
+
+def live_issue_selector(pilot: dict) -> str:
+    candidates = [str(pilot.get("notes", ""))]
+    for item in pilot.get("status_history") or []:
+        candidates.append(str(item.get("notes", "")))
+    for candidate in reversed(candidates):
+        match = GITHUB_ISSUE_RE.search(candidate)
+        if match:
+            return match.group(0)
+    return "<issue-number-or-url>"
 
 
 def build_usage_from_harness_command(pilot: dict, args: argparse.Namespace, *, no_write: bool) -> str:
@@ -103,6 +116,7 @@ def build_usage_from_issue_command(pilot: dict, args: argparse.Namespace, *, lin
 
 
 def build_conversion_commands(pilot: dict, args: argparse.Namespace) -> list[dict]:
+    issue_selector = live_issue_selector(pilot)
     return [
         {
             "name": "preview copied-harness evidence",
@@ -137,7 +151,7 @@ def build_conversion_commands(pilot: dict, args: argparse.Namespace) -> list[dic
         {
             "name": "lint GitHub issue evidence",
             "command": (
-                "codex-harness usage-from-github-issue <issue-number-or-url> "
+                f"codex-harness usage-from-github-issue {issue_selector} "
                 "--include-comments "
                 f"--record-dir {args.record_dir} "
                 f"--report {args.usage_report} "
@@ -150,7 +164,7 @@ def build_conversion_commands(pilot: dict, args: argparse.Namespace) -> list[dic
         {
             "name": "convert GitHub issue evidence",
             "command": (
-                "codex-harness usage-from-github-issue <issue-number-or-url> "
+                f"codex-harness usage-from-github-issue {issue_selector} "
                 "--include-comments "
                 f"--record-dir {args.record_dir} "
                 f"--report {args.usage_report} "

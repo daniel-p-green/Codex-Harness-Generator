@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shlex
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,6 +18,7 @@ from record_usage_case import find_sensitive_text
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUT_DIR = REPO_ROOT / "Docs" / "Environment" / "pilot-github-issues"
 DEFAULT_REPORT = REPO_ROOT / "Docs" / "Environment" / "PILOT_GITHUB_ISSUES.md"
+GITHUB_ISSUE_RE = re.compile(r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/issues/\d+")
 
 
 def display_path(path: Path) -> str:
@@ -108,6 +110,31 @@ def gh_issue_command(title: str, body_file: str, labels: list[str]) -> str:
     return " ".join(shlex.quote(part) for part in parts)
 
 
+def live_issue_url(record: dict) -> str:
+    candidates = [str(record.get("notes", ""))]
+    for item in record.get("status_history") or []:
+        candidates.append(str(item.get("notes", "")))
+    for candidate in reversed(candidates):
+        match = GITHUB_ISSUE_RE.search(candidate)
+        if match:
+            return match.group(0)
+    return ""
+
+
+def github_issue_import_commands(issue_selector: str, args: argparse.Namespace) -> dict[str, str]:
+    base = (
+        f"codex-harness usage-from-github-issue {issue_selector} "
+        "--include-comments "
+        f"--record-dir {args.usage_record_dir} --report {args.usage_report} "
+        f"--pilot-record-dir {args.record_dir} --pilot-board-report {args.pilot_board_report} "
+    )
+    return {
+        "lint_github_issue": base + "--lint-only --json",
+        "preview_github_issue": base + "--no-write --json",
+        "convert_github_issue": base + "--json",
+    }
+
+
 def build_outreach_args(args: argparse.Namespace) -> argparse.Namespace:
     return argparse.Namespace(
         record_dir=args.record_dir,
@@ -129,6 +156,9 @@ def build_payload(args: argparse.Namespace) -> dict:
         body_path = Path(args.out_dir) / filename
         title = f"External usage pilot: {record['title']}"
         body = issue_body_markdown(record, {"claim_boundary": CLAIM_BOUNDARY})
+        issue_url = live_issue_url(record)
+        issue_selector = issue_url or "<issue-number-or-url>"
+        import_commands = github_issue_import_commands(issue_selector, args)
         records.append(
             {
                 "slug": record["slug"],
@@ -141,31 +171,12 @@ def build_payload(args: argparse.Namespace) -> dict:
                 "display_body_file": display_path(body_path),
                 "body": body,
                 "labels": labels,
+                "live_issue_url": issue_url,
                 "gh_issue_create": gh_issue_command(title, display_path(body_path), labels),
                 "mark_invited": record["commands"]["mark_invited"],
                 "lint_issue": record["commands"]["lint_issue"].replace("<completed-issue.md>", display_path(body_path)),
                 "preview_issue": record["commands"]["preview_issue"].replace("<completed-issue.md>", display_path(body_path)),
-                "lint_github_issue": (
-                    "codex-harness usage-from-github-issue <issue-number-or-url> "
-                    "--include-comments "
-                    f"--record-dir {args.usage_record_dir} --report {args.usage_report} "
-                    f"--pilot-record-dir {args.record_dir} --pilot-board-report {args.pilot_board_report} "
-                    "--lint-only --json"
-                ),
-                "preview_github_issue": (
-                    "codex-harness usage-from-github-issue <issue-number-or-url> "
-                    "--include-comments "
-                    f"--record-dir {args.usage_record_dir} --report {args.usage_report} "
-                    f"--pilot-record-dir {args.record_dir} --pilot-board-report {args.pilot_board_report} "
-                    "--no-write --json"
-                ),
-                "convert_github_issue": (
-                    "codex-harness usage-from-github-issue <issue-number-or-url> "
-                    "--include-comments "
-                    f"--record-dir {args.usage_record_dir} --report {args.usage_report} "
-                    f"--pilot-record-dir {args.record_dir} --pilot-board-report {args.pilot_board_report} "
-                    "--json"
-                ),
+                **import_commands,
             }
         )
     return {
@@ -241,19 +252,36 @@ def write_report(path: Path, payload: dict) -> None:
                 f"- Source type: `{record['source_type']}`",
                 f"- Generation path: `{record['generation_path']}`",
                 f"- Body file: `{record['display_body_file']}`",
+                f"- Live issue: {record['live_issue_url'] or 'not opened yet'}",
                 "",
-                "Create public issue:",
-                "",
-                "```bash",
-                record["gh_issue_create"],
-                "```",
-                "",
-                "Then mark the pilot invited:",
-                "",
-                "```bash",
-                record["mark_invited"],
-                "```",
-                "",
+            ]
+        )
+        if record["live_issue_url"]:
+            lines.extend(
+                [
+                    "Public issue is already open. Do not create a duplicate.",
+                    "",
+                ]
+            )
+        else:
+            lines.extend(
+                [
+                    "Create public issue:",
+                    "",
+                    "```bash",
+                    record["gh_issue_create"],
+                    "```",
+                    "",
+                    "Then mark the pilot invited:",
+                    "",
+                    "```bash",
+                    record["mark_invited"],
+                    "```",
+                    "",
+                ]
+            )
+        lines.extend(
+            [
                 "Preview the incomplete issue body before sending if desired:",
                 "",
                 "```bash",

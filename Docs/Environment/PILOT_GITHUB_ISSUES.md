@@ -1,6 +1,6 @@
 # Pilot GitHub Issue Queue
 
-Generated: 2026-06-04T18:25:00Z
+Generated: 2026-06-04T18:33:09Z
 Status: PASS
 Readiness: github-issue-ready
 
@@ -16,23 +16,14 @@ GitHub issue drafts help open public pilot intake issues; they are not usage pro
 
 ### 1. External usage pilot: LLM app pilot (`llm-app-pilot`)
 
-- Status: `prepared`
+- Status: `invited`
 - Domain: LLM app
 - Source type: `external`
 - Generation path: `installed-quickstart`
 - Body file: `Docs/Environment/pilot-github-issues/llm-app-pilot-github-issue.md`
+- Live issue: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3
 
-Create public issue:
-
-```bash
-gh issue create --title 'External usage pilot: LLM app pilot' --body-file Docs/Environment/pilot-github-issues/llm-app-pilot-github-issue.md
-```
-
-Then mark the pilot invited:
-
-```bash
-codex-harness pilot-update llm-app-pilot --status invited --record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records --report Docs/Environment/PILOT_BOARD.md --notes "sent to reporter"
-```
+Public issue is already open. Do not create a duplicate.
 
 Preview the incomplete issue body before sending if desired:
 
@@ -44,30 +35,21 @@ codex-harness usage-from-issue Docs/Environment/pilot-github-issues/llm-app-pilo
 After the reporter completes the public issue, lint, preview, and convert from GitHub:
 
 ```bash
-codex-harness usage-from-github-issue <issue-number-or-url> --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
-codex-harness usage-from-github-issue <issue-number-or-url> --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
-codex-harness usage-from-github-issue <issue-number-or-url> --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
 ```
 
 ### 2. External usage pilot: security audit pilot (`security-audit-pilot`)
 
-- Status: `prepared`
+- Status: `invited`
 - Domain: security audit
 - Source type: `external`
 - Generation path: `installed-quickstart`
 - Body file: `Docs/Environment/pilot-github-issues/security-audit-pilot-github-issue.md`
+- Live issue: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1
 
-Create public issue:
-
-```bash
-gh issue create --title 'External usage pilot: security audit pilot' --body-file Docs/Environment/pilot-github-issues/security-audit-pilot-github-issue.md
-```
-
-Then mark the pilot invited:
-
-```bash
-codex-harness pilot-update security-audit-pilot --status invited --record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records --report Docs/Environment/PILOT_BOARD.md --notes "sent to reporter"
-```
+Public issue is already open. Do not create a duplicate.
 
 Preview the incomplete issue body before sending if desired:
 
@@ -79,30 +61,21 @@ codex-harness usage-from-issue Docs/Environment/pilot-github-issues/security-aud
 After the reporter completes the public issue, lint, preview, and convert from GitHub:
 
 ```bash
-codex-harness usage-from-github-issue <issue-number-or-url> --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
-codex-harness usage-from-github-issue <issue-number-or-url> --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
-codex-harness usage-from-github-issue <issue-number-or-url> --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
 ```
 
 ### 3. External usage pilot: customer support pilot (`customer-support-pilot`)
 
-- Status: `prepared`
+- Status: `invited`
 - Domain: customer support
 - Source type: `external`
 - Generation path: `installed-quickstart`
 - Body file: `Docs/Environment/pilot-github-issues/customer-support-pilot-github-issue.md`
+- Live issue: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2
 
-Create public issue:
-
-```bash
-gh issue create --title 'External usage pilot: customer support pilot' --body-file Docs/Environment/pilot-github-issues/customer-support-pilot-github-issue.md
-```
-
-Then mark the pilot invited:
-
-```bash
-codex-harness pilot-update customer-support-pilot --status invited --record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records --report Docs/Environment/PILOT_BOARD.md --notes "sent to reporter"
-```
+Public issue is already open. Do not create a duplicate.
 
 Preview the incomplete issue body before sending if desired:
 
@@ -114,9 +87,9 @@ codex-harness usage-from-issue Docs/Environment/pilot-github-issues/customer-sup
 After the reporter completes the public issue, lint, preview, and convert from GitHub:
 
 ```bash
-codex-harness usage-from-github-issue <issue-number-or-url> --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
-codex-harness usage-from-github-issue <issue-number-or-url> --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
-codex-harness usage-from-github-issue <issue-number-or-url> --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
 ```
 
 ## Claim Boundary

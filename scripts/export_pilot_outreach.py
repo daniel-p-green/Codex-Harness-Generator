@@ -126,6 +126,8 @@ def build_payload(args: argparse.Namespace) -> dict:
             "harness_label": record.get("harness_label") or record["title"],
             "source_type": record["source_type"],
             "generation_path": record["generation_path"],
+            "notes": record.get("notes", ""),
+            "status_history": record.get("status_history", []),
             "pilot_pack": display_path(record.get("pilot_pack", "")),
             "issue_draft": display_path(record.get("issue_draft", "")),
             "reporter_message": reporter_message(record),

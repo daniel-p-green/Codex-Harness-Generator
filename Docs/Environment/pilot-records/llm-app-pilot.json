@@ -5,14 +5,24 @@
   "generation_path": "installed-quickstart",
   "harness_label": "LLM App Workspace Pilot",
   "issue_draft": "Docs/Environment/beta-exit-pilot-materials/llm-app-pilot-usage-issue.md",
-  "notes": "",
+  "notes": "opened public pilot issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3",
   "pilot_pack": "Docs/Environment/beta-exit-pilot-materials/llm-app-pilot-pilot-pack.md",
   "profile": "llm-app",
   "selected_index": 1,
   "slug": "llm-app-pilot",
   "source_type": "external",
-  "status": "prepared",
+  "status": "invited",
+  "status_history": [
+    {
+      "at": "2026-06-04T18:29:00Z",
+      "from": "prepared",
+      "notes": "opened public pilot issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3",
+      "to": "invited",
+      "usage_record": ""
+    }
+  ],
   "target": "generated pilot harness: llm-app-pilot",
   "title": "LLM app pilot",
+  "updated": "2026-06-04T18:29:00Z",
   "usage_record": ""
 }

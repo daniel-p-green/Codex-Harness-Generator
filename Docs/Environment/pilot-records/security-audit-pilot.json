@@ -5,14 +5,24 @@
   "generation_path": "installed-quickstart",
   "harness_label": "Security Audit Workspace Pilot",
   "issue_draft": "Docs/Environment/beta-exit-pilot-materials/security-audit-pilot-usage-issue.md",
-  "notes": "",
+  "notes": "opened public pilot issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1",
   "pilot_pack": "Docs/Environment/beta-exit-pilot-materials/security-audit-pilot-pilot-pack.md",
   "profile": "security-audit",
   "selected_index": 2,
   "slug": "security-audit-pilot",
   "source_type": "external",
-  "status": "prepared",
+  "status": "invited",
+  "status_history": [
+    {
+      "at": "2026-06-04T18:29:00Z",
+      "from": "prepared",
+      "notes": "opened public pilot issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1",
+      "to": "invited",
+      "usage_record": ""
+    }
+  ],
   "target": "generated pilot harness: security-audit-pilot",
   "title": "security audit pilot",
+  "updated": "2026-06-04T18:29:00Z",
   "usage_record": ""
 }
