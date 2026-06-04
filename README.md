@@ -172,6 +172,10 @@ replacement. What is proven today:
   pilot-github-issues` write GitHub-ready issue bodies plus `gh issue create`
   commands for active pilots, so public intake can start from the same
   privacy-safe reporter fields without counting opened issues as usage proof.
+- `scripts/usage_from_github_issue.py` and `codex-harness
+  usage-from-github-issue <issue-number-or-url>` fetch a completed public issue
+  with `gh`, then reuse the same lint, preview, conversion, privacy, and
+  pilot-board validation path as `usage-from-issue`.
 - `scripts/prepare_pilot.py` and `codex-harness prepare-pilot` combine
   brief-based quickstart generation with an external pilot pack and issue-body
   draft, so the next beta-exit pilot can be prepared with one command before a
@@ -557,8 +561,8 @@ issue body and title plus fallback harness label, source type, and generation
 path from the same pilot record. Provide those flags directly for standalone
 conversions when the issue body or pilot record does not include them.
 When an external usage report arrives through the GitHub issue template, save
-the issue body and lint it before previewing the normalized record or writing
-files:
+the issue body or fetch the public issue with `gh`, then lint it before
+previewing the normalized record or writing files:
 
 ```bash
 python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
@@ -569,6 +573,12 @@ python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
 python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
   --title "External RAG harness trial" \
   --no-write \
+  --json
+
+python scripts/codex_harness.py usage-from-github-issue <issue-number-or-url> \
+  --pilot-record-dir Docs/Environment/pilot-records \
+  --pilot-board-report Docs/Environment/PILOT_BOARD.md \
+  --lint-only \
   --json
 ```
 
@@ -618,7 +628,7 @@ python scripts/codex_harness.py proof-next
 `proof-next` writes `Docs/Environment/PROOF_NEXT.md`. It packages the next
 pilot target, candidate coverage projection, `prepare-next-pilot`,
 `prepare-pilot-batch`, `pilot-board`, `pilot-outreach`, `pilot-handoff`,
-`pilot-handoff-audit`, `pilot-github-issues`, preview-first `usage-from-harness` and `usage-from-issue` conversion commands,
+`pilot-handoff-audit`, `pilot-github-issues`, preview-first `usage-from-harness`, `usage-from-issue`, and `usage-from-github-issue` conversion commands,
 `beta-exit-audit`, and final `proof-status --beta-exit` commands while keeping
 the claim boundary explicit: the packet is a plan, not usage proof. Use the
 copied-harness route when the generated harness directory is available; use the
@@ -739,6 +749,7 @@ Common subcommands:
 | `pilot-handoff` | `export_pilot_handoff.py` | Writes shareable per-pilot handoff folders with a single reporter handoff, pilot pack, copied issue draft, prefilled usage-report draft, and maintainer commands. |
 | `pilot-handoff-audit` | `audit_pilot_handoffs.py` | Checks handoff folders for required reporter files, claim boundaries, and importer-shaped usage-report drafts before sending. |
 | `pilot-github-issues` | `export_pilot_github_issues.py` | Writes GitHub-ready issue bodies and `gh issue create` commands from active pilot-board records without treating opened issues as usage proof. |
+| `usage-from-github-issue` | `usage_from_github_issue.py` | Fetches a completed public GitHub issue with `gh`, then lints, previews, or converts it through the same privacy-checked usage-record importer. |
 | `beta-exit-audit` | `beta_exit_audit.py` | Writes a non-gating audit of beta-exit readiness and remaining evidence gaps. |
 | `proof-next` | `proof_next.py` | Writes the next beta-exit proof actions and candidate coverage projection from current usage gaps without counting the plan as evidence. |
 | `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record; infers the slug from the issue body when present, and supports `--lint-only`, `--no-write`, or `--pilot-record-dir` for linked pilot conversion. |

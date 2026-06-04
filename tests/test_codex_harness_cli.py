@@ -1966,6 +1966,81 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_usage_from_github_issue_delegates_to_github_issue_importer_script(self):
+        command, _ = self.run_cli(
+            [
+                "usage-from-github-issue",
+                "12",
+                "--repo",
+                "daniel-p-green/Codex-Harness-Generator",
+                "--gh-bin",
+                "gh",
+                "--slug",
+                "external-demo",
+                "--title",
+                "External demo",
+                "--harness-label",
+                "public harness label",
+                "--source-type",
+                "external",
+                "--generation-path",
+                "installed-init-brief",
+                "--generated",
+                "2026-06-04T00:00:00Z",
+                "--record-dir",
+                "/tmp/records",
+                "--report",
+                "/tmp/USAGE_RECORDS.md",
+                "--pilot-record-dir",
+                "/tmp/pilot-records",
+                "--pilot-board-report",
+                "/tmp/PILOT_BOARD.md",
+                "--pilot-notes",
+                "converted from GitHub issue",
+                "--force",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/usage_from_github_issue.py",
+                "12",
+                "--repo",
+                "daniel-p-green/Codex-Harness-Generator",
+                "--gh-bin",
+                "gh",
+                "--slug",
+                "external-demo",
+                "--title",
+                "External demo",
+                "--harness-label",
+                "public harness label",
+                "--source-type",
+                "external",
+                "--generation-path",
+                "installed-init-brief",
+                "--generated",
+                "2026-06-04T00:00:00Z",
+                "--record-dir",
+                "/tmp/records",
+                "--report",
+                "/tmp/USAGE_RECORDS.md",
+                "--pilot-record-dir",
+                "/tmp/pilot-records",
+                "--pilot-board-report",
+                "/tmp/PILOT_BOARD.md",
+                "--pilot-notes",
+                "converted from GitHub issue",
+                "--force",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
     def test_usage_gaps_delegates_to_gap_report(self):
         command, _ = self.run_cli(
             [

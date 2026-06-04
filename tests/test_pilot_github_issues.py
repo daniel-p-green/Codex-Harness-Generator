@@ -83,6 +83,7 @@ class PilotGithubIssuesTests(unittest.TestCase):
         self.assertIn("--body-file", record["gh_issue_create"])
         self.assertIn("--label pilot", record["gh_issue_create"])
         self.assertIn("pilot-update llm-app-pilot --status invited", record["mark_invited"])
+        self.assertIn("usage-from-github-issue <issue-number-or-url>", record["convert_github_issue"])
         self.assertIn("### Pilot or usage-record slug", record["body"])
         self.assertIn("llm-app-pilot", record["body"])
         self.assertIn("GitHub issue drafts help open public pilot intake issues", payload["claim_boundary"])
@@ -106,6 +107,8 @@ class PilotGithubIssuesTests(unittest.TestCase):
         self.assertIn("_no response_", body_text)
         self.assertIn("# Pilot GitHub Issue Queue", report_text)
         self.assertIn("Create public issue:", report_text)
+        self.assertIn("After the reporter completes the public issue", report_text)
+        self.assertIn("usage-from-github-issue <issue-number-or-url>", report_text)
         self.assertIn("Opening an issue or marking a pilot invited is not adoption evidence", report_text)
 
     def test_no_active_pilots_is_still_a_pass(self):

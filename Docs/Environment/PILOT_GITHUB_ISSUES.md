@@ -1,6 +1,6 @@
 # Pilot GitHub Issue Queue
 
-Generated: 2026-06-04T18:06:54Z
+Generated: 2026-06-04T18:17:14Z
 Status: PASS
 Readiness: github-issue-ready
 
@@ -41,6 +41,14 @@ codex-harness usage-from-issue Docs/Environment/pilot-github-issues/llm-app-pilo
 codex-harness usage-from-issue Docs/Environment/pilot-github-issues/llm-app-pilot-github-issue.md --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
 ```
 
+After the reporter completes the public issue, lint, preview, and convert from GitHub:
+
+```bash
+codex-harness usage-from-github-issue <issue-number-or-url> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
+codex-harness usage-from-github-issue <issue-number-or-url> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
+codex-harness usage-from-github-issue <issue-number-or-url> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+```
+
 ### 2. External usage pilot: security audit pilot (`security-audit-pilot`)
 
 - Status: `prepared`
@@ -68,6 +76,14 @@ codex-harness usage-from-issue Docs/Environment/pilot-github-issues/security-aud
 codex-harness usage-from-issue Docs/Environment/pilot-github-issues/security-audit-pilot-github-issue.md --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
 ```
 
+After the reporter completes the public issue, lint, preview, and convert from GitHub:
+
+```bash
+codex-harness usage-from-github-issue <issue-number-or-url> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
+codex-harness usage-from-github-issue <issue-number-or-url> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
+codex-harness usage-from-github-issue <issue-number-or-url> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+```
+
 ### 3. External usage pilot: customer support pilot (`customer-support-pilot`)
 
 - Status: `prepared`
@@ -93,6 +109,14 @@ Preview the incomplete issue body before sending if desired:
 ```bash
 codex-harness usage-from-issue Docs/Environment/pilot-github-issues/customer-support-pilot-github-issue.md --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
 codex-harness usage-from-issue Docs/Environment/pilot-github-issues/customer-support-pilot-github-issue.md --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
+```
+
+After the reporter completes the public issue, lint, preview, and convert from GitHub:
+
+```bash
+codex-harness usage-from-github-issue <issue-number-or-url> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
+codex-harness usage-from-github-issue <issue-number-or-url> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
+codex-harness usage-from-github-issue <issue-number-or-url> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
 ```
 
 ## Claim Boundary

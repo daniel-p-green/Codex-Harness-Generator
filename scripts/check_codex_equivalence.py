@@ -123,8 +123,9 @@ CAPABILITIES = [
             "scripts/pilot_board.py",
             "scripts/record_usage_case.py",
             "scripts/usage_from_issue.py",
+            "scripts/usage_from_github_issue.py",
         ],
-        "commands": ["codex-harness prepare-pilot <target>", "codex-harness prepare-next-pilot [target]", "codex-harness prepare-pilot-batch", "codex-harness pilot-board", "codex-harness pilot-update <slug>", "codex-harness pilot-outreach", "codex-harness pilot-handoff", "codex-harness pilot-handoff-audit", "codex-harness pilot-github-issues", "codex-harness usage-from-issue <issue-body>", "codex-harness usage-validate", "codex-harness usage-gaps", "codex-harness pilot-campaign"],
+        "commands": ["codex-harness prepare-pilot <target>", "codex-harness prepare-next-pilot [target]", "codex-harness prepare-pilot-batch", "codex-harness pilot-board", "codex-harness pilot-update <slug>", "codex-harness pilot-outreach", "codex-harness pilot-handoff", "codex-harness pilot-handoff-audit", "codex-harness pilot-github-issues", "codex-harness usage-from-issue <issue-body>", "codex-harness usage-from-github-issue <issue-number-or-url>", "codex-harness usage-validate", "codex-harness usage-gaps", "codex-harness pilot-campaign"],
     },
     {
         "name": "Release proof",

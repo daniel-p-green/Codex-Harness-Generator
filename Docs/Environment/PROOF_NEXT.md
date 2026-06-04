@@ -1,6 +1,6 @@
 # Proof Next Actions
 
-Generated: 2026-06-04T18:06:18Z
+Generated: 2026-06-04T18:17:14Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 
@@ -163,7 +163,23 @@ Purpose: write the checked usage record and convert the matching pilot after pre
 codex-harness usage-from-issue <completed-issue.md> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
 ```
 
-15. audit beta exit
+15. lint GitHub issue evidence
+
+Purpose: lint a completed public GitHub pilot issue without copying its body into a local file first
+
+```bash
+codex-harness usage-from-github-issue <issue-number-or-url> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
+```
+
+16. convert GitHub issue evidence
+
+Purpose: fetch a completed public GitHub pilot issue, write the checked usage record, and convert the matching pilot
+
+```bash
+codex-harness usage-from-github-issue <issue-number-or-url> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+```
+
+17. audit beta exit
 
 Purpose: refresh the non-gating readiness audit after each converted usage record
 
@@ -171,7 +187,7 @@ Purpose: refresh the non-gating readiness audit after each converted usage recor
 codex-harness beta-exit-audit --record-dir Docs/Environment/usage-records --pilot-record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records
 ```
 
-16. run final proof status
+18. run final proof status
 
 Purpose: only use this as a beta-exit gate after usage thresholds are satisfied
 

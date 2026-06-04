@@ -134,6 +134,30 @@ def build_conversion_commands(pilot: dict, args: argparse.Namespace) -> list[dic
             "command": build_usage_from_issue_command(pilot, args, no_write=False),
             "purpose": "write the checked usage record and convert the matching pilot after preview output is reviewed",
         },
+        {
+            "name": "lint GitHub issue evidence",
+            "command": (
+                "codex-harness usage-from-github-issue <issue-number-or-url> "
+                f"--record-dir {args.record_dir} "
+                f"--report {args.usage_report} "
+                f"--pilot-record-dir {args.pilot_record_dir} "
+                f"--pilot-board-report {args.pilot_board_report} "
+                "--lint-only --json"
+            ),
+            "purpose": "lint a completed public GitHub pilot issue without copying its body into a local file first",
+        },
+        {
+            "name": "convert GitHub issue evidence",
+            "command": (
+                "codex-harness usage-from-github-issue <issue-number-or-url> "
+                f"--record-dir {args.record_dir} "
+                f"--report {args.usage_report} "
+                f"--pilot-record-dir {args.pilot_record_dir} "
+                f"--pilot-board-report {args.pilot_board_report} "
+                "--json"
+            ),
+            "purpose": "fetch a completed public GitHub pilot issue, write the checked usage record, and convert the matching pilot",
+        },
     ]
 
 

@@ -72,7 +72,7 @@ class CheckCliInstallTests(unittest.TestCase):
 
         self.assertEqual("pass", payload["status"])
         names = [step["name"] for step in payload["steps"]]
-        self.assertEqual(["create_venv", "install_package", "profiles", "doctor", "init", "quickstart", "demo_capture", "prepare_pilot", "validate", "inspect", "adoption_plan", "equivalence", "upstream_drift", "init_from_project", "record_task_trial", "local_eval", "public_usage_report", "evidence_packet", "pilot_pack", "usage_from_harness", "usage_from_issue_lint", "usage_from_issue_preview", "usage_from_issue", "prepare_next_pilot", "prepare_pilot_batch_dry_run", "pilot_board", "pilot_update", "pilot_outreach", "pilot_handoff", "pilot_handoff_audit", "pilot_github_issues", "usage_from_issue_pilot_conversion", "usage_gaps", "beta_exit_audit", "pilot_campaign", "proof_next", "migration_audit", "prepare_migration", "eval"], names)
+        self.assertEqual(["create_venv", "install_package", "profiles", "doctor", "init", "quickstart", "demo_capture", "prepare_pilot", "validate", "inspect", "adoption_plan", "equivalence", "upstream_drift", "init_from_project", "record_task_trial", "local_eval", "public_usage_report", "evidence_packet", "pilot_pack", "usage_from_harness", "usage_from_issue_lint", "usage_from_issue_preview", "usage_from_issue", "prepare_next_pilot", "prepare_pilot_batch_dry_run", "pilot_board", "pilot_update", "pilot_outreach", "pilot_handoff", "pilot_handoff_audit", "pilot_github_issues", "usage_from_issue_pilot_conversion", "usage_from_github_issue_lint", "usage_gaps", "beta_exit_audit", "pilot_campaign", "proof_next", "migration_audit", "prepare_migration", "eval"], names)
         self.assertTrue(any("pip" in command and "install" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "doctor" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "init" in command for command in calls))
@@ -105,6 +105,7 @@ class CheckCliInstallTests(unittest.TestCase):
         self.assertTrue(any("codex-harness" in command[0] and "pilot-handoff-audit" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "pilot-github-issues" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "usage-from-issue" in command and "--pilot-record-dir" in command for command in calls))
+        self.assertTrue(any("codex-harness" in command[0] and "usage-from-github-issue" in command and "--lint-only" in command for command in calls))
         linked_issue_calls = [
             command
             for command in calls

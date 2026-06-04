@@ -206,6 +206,21 @@ def build_payload() -> dict:
             + "\n",
             encoding="utf-8",
         )
+        fake_gh = temp_root / "fake-gh"
+        fake_gh_payload = {
+            "number": 12,
+            "title": "External usage pilot: LLM app pilot",
+            "url": "https://github.com/example/repo/issues/12",
+            "state": "OPEN",
+            "body": linked_pilot_issue_body.read_text(encoding="utf-8"),
+        }
+        fake_gh.write_text(
+            "#!/usr/bin/env python3\n"
+            "import json\n"
+            f"print(json.dumps({json.dumps(fake_gh_payload)}))\n",
+            encoding="utf-8",
+        )
+        fake_gh.chmod(0o755)
 
         commands = [
             ("create_venv", [sys.executable, "-m", "venv", "--system-site-packages", venv.as_posix()]),
@@ -680,6 +695,28 @@ def build_payload() -> dict:
                     pilot_records.as_posix(),
                     "--pilot-board-report",
                     pilot_board_report.as_posix(),
+                    "--json",
+                ],
+            ),
+            (
+                "usage_from_github_issue_lint",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "usage-from-github-issue",
+                    "12",
+                    "--repo",
+                    "example/repo",
+                    "--gh-bin",
+                    fake_gh.as_posix(),
+                    "--record-dir",
+                    usage_records.as_posix(),
+                    "--report",
+                    usage_report.as_posix(),
+                    "--pilot-record-dir",
+                    pilot_records.as_posix(),
+                    "--pilot-board-report",
+                    pilot_board_report.as_posix(),
+                    "--lint-only",
                     "--json",
                 ],
             ),

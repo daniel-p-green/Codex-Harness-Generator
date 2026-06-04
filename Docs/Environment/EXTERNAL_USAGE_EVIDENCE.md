@@ -171,8 +171,26 @@ python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
   --json
 ```
 
-The importer reads the GitHub issue-form headings and applies the same
-required-field and sensitive-text checks as `usage-record` in both preview and
+If the issue is already public on GitHub, maintainers can skip the local body
+file and fetch it with `gh` while still using the same lint, preview, conversion,
+privacy, and pilot-board checks:
+
+```bash
+python scripts/codex_harness.py usage-from-github-issue <issue-number-or-url> \
+  --pilot-record-dir Docs/Environment/pilot-records \
+  --pilot-board-report Docs/Environment/PILOT_BOARD.md \
+  --lint-only \
+  --json
+
+python scripts/codex_harness.py usage-from-github-issue <issue-number-or-url> \
+  --pilot-record-dir Docs/Environment/pilot-records \
+  --pilot-board-report Docs/Environment/PILOT_BOARD.md \
+  --no-write \
+  --json
+```
+
+The importers read the GitHub issue-form headings and apply the same
+required-field and sensitive-text checks as `usage-record` in lint, preview, and
 write modes.
 
 For manual conversion or cleanup, use:

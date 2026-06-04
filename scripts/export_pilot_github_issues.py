@@ -145,6 +145,24 @@ def build_payload(args: argparse.Namespace) -> dict:
                 "mark_invited": record["commands"]["mark_invited"],
                 "lint_issue": record["commands"]["lint_issue"].replace("<completed-issue.md>", display_path(body_path)),
                 "preview_issue": record["commands"]["preview_issue"].replace("<completed-issue.md>", display_path(body_path)),
+                "lint_github_issue": (
+                    "codex-harness usage-from-github-issue <issue-number-or-url> "
+                    f"--record-dir {args.usage_record_dir} --report {args.usage_report} "
+                    f"--pilot-record-dir {args.record_dir} --pilot-board-report {args.pilot_board_report} "
+                    "--lint-only --json"
+                ),
+                "preview_github_issue": (
+                    "codex-harness usage-from-github-issue <issue-number-or-url> "
+                    f"--record-dir {args.usage_record_dir} --report {args.usage_report} "
+                    f"--pilot-record-dir {args.record_dir} --pilot-board-report {args.pilot_board_report} "
+                    "--no-write --json"
+                ),
+                "convert_github_issue": (
+                    "codex-harness usage-from-github-issue <issue-number-or-url> "
+                    f"--record-dir {args.usage_record_dir} --report {args.usage_report} "
+                    f"--pilot-record-dir {args.record_dir} --pilot-board-report {args.pilot_board_report} "
+                    "--json"
+                ),
             }
         )
     return {
@@ -238,6 +256,14 @@ def write_report(path: Path, payload: dict) -> None:
                 "```bash",
                 record["lint_issue"],
                 record["preview_issue"],
+                "```",
+                "",
+                "After the reporter completes the public issue, lint, preview, and convert from GitHub:",
+                "",
+                "```bash",
+                record["lint_github_issue"],
+                record["preview_github_issue"],
+                record["convert_github_issue"],
                 "```",
                 "",
             ]

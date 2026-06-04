@@ -107,6 +107,7 @@ class ProofNextTests(unittest.TestCase):
         self.assertTrue(any("codex-harness usage-from-harness <generated-harness>" in command for command in commands))
         self.assertTrue(any("usage-from-issue <completed-issue.md>" in command and "--lint-only --json" in command for command in commands))
         self.assertTrue(any("usage-from-issue <completed-issue.md>" in command and "--no-write --json" in command for command in commands))
+        self.assertTrue(any("usage-from-github-issue <issue-number-or-url>" in command and "--lint-only --json" in command for command in commands))
         self.assertTrue(any("usage-from-harness <generated-harness>" in command and "--no-write --json" in command for command in commands))
         self.assertTrue(any("codex-harness proof-status --beta-exit" in command for command in commands))
         self.assertIn("does not itself prove", payload["claim_boundary"])
@@ -136,6 +137,7 @@ class ProofNextTests(unittest.TestCase):
         self.assertFalse(any("usage-from-issue <completed-issue.md>" in command and "--slug" in command for command in commands))
         self.assertTrue(any("usage-from-issue <completed-issue.md>" in command and "--lint-only --json" in command for command in commands))
         self.assertTrue(any("usage-from-issue <completed-issue.md>" in command and "--no-write --json" in command for command in commands))
+        self.assertTrue(any("usage-from-github-issue <issue-number-or-url>" in command and "--json" in command for command in commands))
         self.assertTrue(any("usage-from-harness <generated-harness>" in command and "--no-write --json" in command for command in commands))
         self.assertFalse(any("usage-from-issue <completed-issue.md>" in command and "--title" in command for command in commands))
 

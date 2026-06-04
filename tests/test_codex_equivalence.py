@@ -29,6 +29,7 @@ class CodexEquivalenceTests(unittest.TestCase):
         self.assertIn("Docs/Environment/PILOT_HANDOFF_AUDIT.md", usage["evidence_paths"])
         self.assertIn("Docs/Environment/PILOT_GITHUB_ISSUES.md", usage["evidence_paths"])
         self.assertIn("codex-harness usage-from-issue <issue-body>", usage["commands"])
+        self.assertIn("codex-harness usage-from-github-issue <issue-number-or-url>", usage["commands"])
         self.assertIn("codex-harness pilot-handoff-audit", usage["commands"])
         self.assertIn("codex-harness pilot-github-issues", usage["commands"])
 

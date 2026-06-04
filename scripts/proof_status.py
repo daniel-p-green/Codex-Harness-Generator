@@ -154,6 +154,7 @@ def check_installable_cli() -> tuple[dict, dict]:
     usage_from_issue_lint_step = next((step for step in payload["steps"] if step["name"] == "usage_from_issue_lint"), {})
     usage_from_issue_preview_step = next((step for step in payload["steps"] if step["name"] == "usage_from_issue_preview"), {})
     usage_from_issue_step = next((step for step in payload["steps"] if step["name"] == "usage_from_issue"), {})
+    usage_from_github_issue_lint_step = next((step for step in payload["steps"] if step["name"] == "usage_from_github_issue_lint"), {})
     prepare_next_pilot_step = next((step for step in payload["steps"] if step["name"] == "prepare_next_pilot"), {})
     prepare_pilot_batch_step = next(
         (step for step in payload["steps"] if step["name"] == "prepare_pilot_batch_dry_run"), {}
@@ -177,7 +178,7 @@ def check_installable_cli() -> tuple[dict, dict]:
     if failed:
         detail = f"failed at {failed['name']}"
     else:
-        detail = "profiles={profiles} doctor={doctor_status} init={init_status} quickstart={quickstart_status} prepare_pilot={prepare_pilot_status} init_from_project={init_from_project_status} demo_capture={demo_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} equivalence={equivalence_status} upstream_drift={upstream_drift_status} local_eval={local_eval_status} public_usage_report={public_usage_report_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue_lint={usage_from_issue_lint_status} usage_from_issue_preview={usage_from_issue_preview_status} usage_from_issue={usage_from_issue_status} prepare_next_pilot={prepare_next_pilot_status} prepare_pilot_batch={prepare_pilot_batch_status} pilot_board={pilot_board_status} pilot_update={pilot_update_status} pilot_outreach={pilot_outreach_status} pilot_handoff={pilot_handoff_status} pilot_handoff_audit={pilot_handoff_audit_status} pilot_github_issues={pilot_github_issues_status} usage_from_issue_pilot_conversion={usage_from_issue_pilot_conversion_status} usage_gaps={usage_gaps_status} beta_exit_audit={beta_exit_audit_status} pilot_campaign={pilot_campaign_status} proof_next={proof_next_status} migration_audit={migration_status} prepare_migration={prepare_migration_status} eval={eval_status}".format(
+        detail = "profiles={profiles} doctor={doctor_status} init={init_status} quickstart={quickstart_status} prepare_pilot={prepare_pilot_status} init_from_project={init_from_project_status} demo_capture={demo_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} equivalence={equivalence_status} upstream_drift={upstream_drift_status} local_eval={local_eval_status} public_usage_report={public_usage_report_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue_lint={usage_from_issue_lint_status} usage_from_issue_preview={usage_from_issue_preview_status} usage_from_issue={usage_from_issue_status} usage_from_github_issue_lint={usage_from_github_issue_lint_status} prepare_next_pilot={prepare_next_pilot_status} prepare_pilot_batch={prepare_pilot_batch_status} pilot_board={pilot_board_status} pilot_update={pilot_update_status} pilot_outreach={pilot_outreach_status} pilot_handoff={pilot_handoff_status} pilot_handoff_audit={pilot_handoff_audit_status} pilot_github_issues={pilot_github_issues_status} usage_from_issue_pilot_conversion={usage_from_issue_pilot_conversion_status} usage_gaps={usage_gaps_status} beta_exit_audit={beta_exit_audit_status} pilot_campaign={pilot_campaign_status} proof_next={proof_next_status} migration_audit={migration_status} prepare_migration={prepare_migration_status} eval={eval_status}".format(
             profiles=profile_step.get("profile_count", "unknown"),
             doctor_status=doctor_step.get("status", "unknown"),
             init_status=init_step.get("status", "unknown"),
@@ -198,6 +199,7 @@ def check_installable_cli() -> tuple[dict, dict]:
             usage_from_issue_lint_status=usage_from_issue_lint_step.get("status", "unknown"),
             usage_from_issue_preview_status=usage_from_issue_preview_step.get("status", "unknown"),
             usage_from_issue_status=usage_from_issue_step.get("status", "unknown"),
+            usage_from_github_issue_lint_status=usage_from_github_issue_lint_step.get("status", "unknown"),
             prepare_next_pilot_status=prepare_next_pilot_step.get("status", "unknown"),
             prepare_pilot_batch_status=prepare_pilot_batch_step.get("status", "unknown"),
             pilot_board_status=pilot_board_step.get("status", "unknown"),
