@@ -49,6 +49,7 @@ class ProofStatusTests(unittest.TestCase):
                 {"name": "usage_gaps", "status": "pass"},
                 {"name": "beta_exit_audit", "status": "pass"},
                 {"name": "pilot_campaign", "status": "pass"},
+                {"name": "proof_next", "status": "pass"},
                 {"name": "migration_audit", "status": "pass"},
                 {"name": "eval", "status": "pass"},
             ],
@@ -111,11 +112,13 @@ Status: PASS
         self.assertIn("usage_gaps=pass", install_check["detail"])
         self.assertIn("beta_exit_audit=pass", install_check["detail"])
         self.assertIn("pilot_campaign=pass", install_check["detail"])
+        self.assertIn("proof_next=pass", install_check["detail"])
         self.assertIn("migration_audit=pass", install_check["detail"])
         self.assertIn("installable_cli", [check["name"] for check in payload["checks"]])
         self.assertIn("source_freshness_report", [check["name"] for check in payload["checks"]])
         self.assertIn("semantic_alignment_report", [check["name"] for check in payload["checks"]])
         self.assertIn("pilot_board_report", [check["name"] for check in payload["checks"]])
+        self.assertIn("proof_next_report", [check["name"] for check in payload["checks"]])
         self.assertIn("beta_exit_audit_report", [check["name"] for check in payload["checks"]])
         self.assertEqual(4, payload["example_inventory"]["brief_example_count"])
         self.assertGreaterEqual(payload["usage_summary"]["non_synthetic"], 1)

@@ -1459,6 +1459,71 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_proof_next_delegates_to_next_action_report(self):
+        command, _ = self.run_cli(
+            [
+                "proof-next",
+                "/tmp/next-pilot",
+                "--record-dir",
+                "/tmp/records",
+                "--pilot-record-dir",
+                "/tmp/pilots",
+                "--pilot-board-report",
+                "/tmp/PILOT_BOARD.md",
+                "--usage-report",
+                "/tmp/USAGE_RECORDS.md",
+                "--pilot-pack-out",
+                "/tmp/NEXT_PACK.md",
+                "--issue-out",
+                "/tmp/NEXT_ISSUE.md",
+                "--report",
+                "/tmp/PROOF_NEXT.md",
+                "--min-records",
+                "5",
+                "--min-external-or-multi-project",
+                "3",
+                "--min-domains",
+                "4",
+                "--min-installed-init-brief",
+                "2",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/proof_next.py",
+                "/tmp/next-pilot",
+                "--record-dir",
+                "/tmp/records",
+                "--pilot-record-dir",
+                "/tmp/pilots",
+                "--pilot-board-report",
+                "/tmp/PILOT_BOARD.md",
+                "--usage-report",
+                "/tmp/USAGE_RECORDS.md",
+                "--pilot-pack-out",
+                "/tmp/NEXT_PACK.md",
+                "--issue-out",
+                "/tmp/NEXT_ISSUE.md",
+                "--report",
+                "/tmp/PROOF_NEXT.md",
+                "--min-records",
+                "5",
+                "--min-external-or-multi-project",
+                "3",
+                "--min-domains",
+                "4",
+                "--min-installed-init-brief",
+                "2",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
     def test_proof_status_delegates_to_status_script(self):
         command, _ = self.run_cli(
             [

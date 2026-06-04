@@ -147,6 +147,7 @@ Then verify:
 ```bash
 python scripts/codex_harness.py equivalence
 python scripts/codex_harness.py usage-gaps
+python scripts/codex_harness.py proof-next
 python scripts/codex_harness.py pilot-campaign
 python scripts/codex_harness.py usage-validate \
   --min-records 3 \

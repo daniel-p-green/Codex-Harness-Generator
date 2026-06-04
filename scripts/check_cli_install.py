@@ -79,6 +79,7 @@ def build_payload() -> dict:
         usage_report = temp_root / "USAGE_RECORDS.md"
         usage_gaps_report = temp_root / "USAGE_GAPS.md"
         pilot_campaign_report = temp_root / "PILOT_CAMPAIGN.md"
+        proof_next_report = temp_root / "PROOF_NEXT.md"
         migration_plan_report = temp_root / "CODEX_MIGRATION_PLAN.md"
         issue_body = temp_root / "external-usage-issue.md"
         linked_pilot_issue_body = temp_root / "linked-pilot-usage-issue.md"
@@ -576,6 +577,29 @@ def build_payload() -> dict:
                     usage_records.as_posix(),
                     "--out",
                     pilot_campaign_report.as_posix(),
+                    "--json",
+                ],
+            ),
+            (
+                "proof_next",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "proof-next",
+                    next_pilot_generated.as_posix(),
+                    "--record-dir",
+                    usage_records.as_posix(),
+                    "--pilot-record-dir",
+                    pilot_records.as_posix(),
+                    "--pilot-board-report",
+                    pilot_board_report.as_posix(),
+                    "--usage-report",
+                    usage_report.as_posix(),
+                    "--pilot-pack-out",
+                    next_pilot_pack.as_posix(),
+                    "--issue-out",
+                    next_pilot_issue.as_posix(),
+                    "--report",
+                    proof_next_report.as_posix(),
                     "--json",
                 ],
             ),

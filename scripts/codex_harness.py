@@ -681,6 +681,38 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("usage_gaps.py", command)
 
+    if args.command == "proof-next":
+        command = []
+        if args.target:
+            command.append(args.target)
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.pilot_record_dir:
+            command.extend(["--pilot-record-dir", args.pilot_record_dir])
+        if args.pilot_board_report:
+            command.extend(["--pilot-board-report", args.pilot_board_report])
+        if args.usage_report:
+            command.extend(["--usage-report", args.usage_report])
+        if args.pilot_pack_out:
+            command.extend(["--pilot-pack-out", args.pilot_pack_out])
+        if args.issue_out:
+            command.extend(["--issue-out", args.issue_out])
+        if args.report:
+            command.extend(["--report", args.report])
+        if args.min_records is not None:
+            command.extend(["--min-records", str(args.min_records)])
+        if args.min_external_or_multi_project is not None:
+            command.extend(["--min-external-or-multi-project", str(args.min_external_or_multi_project)])
+        if args.min_domains is not None:
+            command.extend(["--min-domains", str(args.min_domains)])
+        if args.min_installed_init_brief is not None:
+            command.extend(["--min-installed-init-brief", str(args.min_installed_init_brief)])
+        if args.no_write:
+            command.append("--no-write")
+        if args.json:
+            command.append("--json")
+        return python_script("proof_next.py", command)
+
     if args.command == "proof-status":
         command = []
         if args.beta_exit:
@@ -1181,6 +1213,22 @@ def make_parser() -> argparse.ArgumentParser:
     usage_gaps.add_argument("--min-installed-init-brief", type=int, help="Target records generated via installed brief-based generation")
     usage_gaps.add_argument("--no-write", action="store_true", help="Do not write the Markdown report")
     usage_gaps.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    proof_next = subparsers.add_parser("proof-next", help="Write the next beta-exit proof actions")
+    proof_next.add_argument("target", nargs="?", help="Optional next pilot target directory")
+    proof_next.add_argument("--record-dir", help="Usage record JSON directory")
+    proof_next.add_argument("--pilot-record-dir", help="Prepared-pilot tracking directory")
+    proof_next.add_argument("--pilot-board-report", help="Pilot board Markdown path")
+    proof_next.add_argument("--usage-report", help="Usage records Markdown path")
+    proof_next.add_argument("--pilot-pack-out", help="Pilot pack output path for the next prepare command")
+    proof_next.add_argument("--issue-out", help="Issue draft output path for the next prepare command")
+    proof_next.add_argument("--report", help="Proof-next Markdown path")
+    proof_next.add_argument("--min-records", type=int, help="Target valid usage records")
+    proof_next.add_argument("--min-external-or-multi-project", type=int, help="Target external or multi-project records")
+    proof_next.add_argument("--min-domains", type=int, help="Target distinct domains")
+    proof_next.add_argument("--min-installed-init-brief", type=int, help="Target records generated via installed brief-based generation")
+    proof_next.add_argument("--no-write", action="store_true", help="Do not write the Markdown report")
+    proof_next.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     proof_status = subparsers.add_parser("proof-status", help="Summarize checked-in product-proof readiness")
     proof_status.add_argument("--beta-exit", action="store_true", help="Apply roadmap beta-exit thresholds")

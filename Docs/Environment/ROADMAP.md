@@ -58,6 +58,9 @@ Already proven:
 - Beta-exit usage-gap reporting, suggested pilot targets, and a shareable
   campaign packet through `codex-harness usage-gaps` and
   `codex-harness pilot-campaign`.
+- A next-action proof packet through `codex-harness proof-next`, so maintainers
+  can move from current gaps to prepare, board, conversion, audit, and final
+  proof commands without treating the packet as evidence.
 - A non-gating beta-exit audit through `codex-harness beta-exit-audit`, so the
   repo can publish missing criteria without confusing "audit ran" with
   "external adoption is proven."
@@ -107,13 +110,13 @@ The project can stop calling itself a beta only when all of these are true:
    harness to produce a public-safe issue-body draft after a successful real
    task trial. When an external report arrives as a GitHub issue, use
    `codex-harness usage-from-issue` to convert the issue body into the
-   checked-in usage record. Run `codex-harness usage-gaps` after each record to
-   pick the next pilot profile, source type, and generation path by the largest
-   remaining beta-exit gap. Use `codex-harness prepare-next-pilot` to prepare
-   that next suggested pilot directly, then run `codex-harness pilot-board` to
-   inspect in-flight pilots, `codex-harness pilot-update` after outreach or
-   conversion steps, or `codex-harness pilot-campaign` when a shareable outreach
-   packet is useful.
+   checked-in usage record. Run `codex-harness proof-next` after each record to
+   refresh the next pilot, board, conversion, audit, and final proof commands.
+   Use `codex-harness usage-gaps` for the raw gap report,
+   `codex-harness prepare-next-pilot` to prepare the next suggested pilot
+   directly, `codex-harness pilot-board` to inspect in-flight pilots,
+   `codex-harness pilot-update` after outreach or conversion steps, or
+   `codex-harness pilot-campaign` when a shareable outreach packet is useful.
 
 2. Add more public-safe live examples.
    Prioritize domains where the generated harness has high-risk boundaries:
