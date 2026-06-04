@@ -111,7 +111,8 @@ replacement. What is proven today:
   and installed-generation proof thresholds when making real-world usage claims.
 - `scripts/usage_gaps.py` and `codex-harness usage-gaps` write
   `Docs/Environment/USAGE_GAPS.md`, a concrete list of the remaining beta-exit
-  evidence gaps.
+  evidence gaps plus suggested external pilot targets from the supported Codex
+  profile catalog.
 - `scripts/usage_from_harness.py` and `codex-harness usage-from-harness`
   convert a generated harness's local eval report and task trials into a
   privacy-checked usage record.
@@ -456,6 +457,10 @@ Report what beta-exit usage evidence is still missing:
 ```bash
 python scripts/codex_harness.py usage-gaps
 ```
+
+The report includes suggested pilot targets with starter `init` and `pilot-pack`
+commands so maintainers can collect the next records by profile, source type,
+and generation path instead of guessing.
 
 To collect privacy-safe evidence from outside this repository, use the
 **External usage report** GitHub issue template and

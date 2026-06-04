@@ -59,6 +59,11 @@ class UsageGapsTests(unittest.TestCase):
         self.assertEqual(3, result["gaps"]["domains"])
         self.assertEqual(1, result["gaps"]["installed_init_brief"])
         self.assertTrue(any("external or multi-project" in item for item in result["recommendations"]))
+        self.assertEqual(4, len(result["suggested_pilots"]))
+        self.assertEqual("llm-app", result["suggested_pilots"][0]["profile"])
+        self.assertEqual("external", result["suggested_pilots"][0]["source_type"])
+        self.assertEqual("installed-init-brief", result["suggested_pilots"][0]["generation_path"])
+        self.assertIn("codex-harness init", result["suggested_pilots"][0]["commands"][0])
 
     def test_build_payload_marks_ready_when_targets_are_satisfied(self):
         records = []
@@ -89,6 +94,7 @@ class UsageGapsTests(unittest.TestCase):
         self.assertEqual("beta-exit-evidence-ready", result["readiness"])
         self.assertFalse(any(result["gaps"].values()))
         self.assertIn("Beta-exit usage thresholds are satisfied", result["recommendations"][0])
+        self.assertEqual([], result["suggested_pilots"])
 
     def test_write_report_includes_gap_sections(self):
         payload = self.valid_payload("self-dogfood-docs")
@@ -107,6 +113,8 @@ class UsageGapsTests(unittest.TestCase):
         self.assertIn("# Usage Evidence Gaps", text)
         self.assertIn("## Remaining Gaps", text)
         self.assertIn("- External or multi-project records: 3", text)
+        self.assertIn("## Suggested Pilot Targets", text)
+        self.assertIn("codex-harness pilot-pack", text)
         self.assertIn("## Recommended Next Moves", text)
 
     def test_build_payload_fails_when_records_are_only_synthetic(self):

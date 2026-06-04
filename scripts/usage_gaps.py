@@ -8,6 +8,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from profile_catalog import catalog_payload
 from record_usage_case import DEFAULT_RECORD_DIR, load_records
 from validate_usage_records import validate_record_dir
 
@@ -20,6 +21,19 @@ DEFAULT_TARGETS = {
     "min_domains": 4,
     "min_installed_init_brief": 2,
 }
+PILOT_PROFILE_PRIORITY = [
+    "llm-app",
+    "security-audit",
+    "customer-support",
+    "data-analysis",
+    "legal-research",
+    "financial-modeling",
+    "hiring-pipeline",
+    "software-development",
+    "api-design",
+    "product-management",
+    "knowledge-work",
+]
 
 
 def record_domains(records: list[dict]) -> list[str]:
@@ -65,6 +79,82 @@ def build_recommendations(gaps: dict) -> list[str]:
     return recommendations
 
 
+def profile_candidates() -> list[dict]:
+    profiles = {profile["slug"]: profile for profile in catalog_payload()["profiles"]}
+    ordered = [profiles[slug] for slug in PILOT_PROFILE_PRIORITY if slug in profiles]
+    ordered.extend(profile for slug, profile in sorted(profiles.items()) if slug not in PILOT_PROFILE_PRIORITY)
+    return ordered
+
+
+def build_suggested_pilots(domains: list[str], gaps: dict) -> list[dict]:
+    target_count = max(gaps.values()) if gaps else 0
+    if target_count == 0:
+        return []
+
+    represented = {domain.casefold() for domain in domains}
+    candidates = [
+        profile
+        for profile in profile_candidates()
+        if profile["domain"].casefold() not in represented
+    ]
+    if len(candidates) < target_count:
+        candidates.extend(
+            profile
+            for profile in profile_candidates()
+            if profile["domain"].casefold() in represented
+        )
+
+    pilots = []
+    for index, profile in enumerate(candidates[:target_count]):
+        source_type = "external" if index < gaps["external_or_multi_project"] else "multi-project"
+        generation_path = "installed-init-brief" if index < gaps["installed_init_brief"] else "installed-init-from-project"
+        slug = f"{profile['slug']}-pilot"
+        brief = f"{profile['target']} with one privacy-safe task, local eval, and public-safe usage evidence"
+        target_path = f"/tmp/codex-{slug}"
+        pilots.append(
+            {
+                "profile": profile["slug"],
+                "domain": profile["domain"],
+                "source_type": source_type,
+                "generation_path": generation_path,
+                "brief": brief,
+                "commands": [
+                    " ".join(
+                        [
+                            "codex-harness",
+                            "init",
+                            target_path,
+                            "--brief",
+                            json.dumps(brief),
+                            "--project-name",
+                            json.dumps(f"{profile['default_project_name']} Pilot"),
+                            "--force",
+                        ]
+                    ),
+                    " ".join(
+                        [
+                            "codex-harness",
+                            "pilot-pack",
+                            target_path,
+                            "--slug",
+                            slug,
+                            "--title",
+                            json.dumps(f"{profile['domain']} pilot"),
+                            "--domain",
+                            json.dumps(profile["domain"]),
+                            "--source-type",
+                            source_type,
+                            "--generation-path",
+                            generation_path,
+                            "--prefill-from-trials",
+                        ]
+                    ),
+                ],
+            }
+        )
+    return pilots
+
+
 def build_payload(
     record_dir: Path,
     min_records: int = DEFAULT_TARGETS["min_records"],
@@ -83,6 +173,7 @@ def build_payload(
     domains = record_domains(records)
     gaps = build_gaps(validation["summary"], targets)
     ready = validation["status"] == "pass" and not any(gaps.values())
+    suggested_pilots = build_suggested_pilots(domains, gaps)
     return {
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "status": validation["status"],
@@ -92,6 +183,7 @@ def build_payload(
         "gaps": gaps,
         "domains": domains,
         "recommendations": build_recommendations(gaps),
+        "suggested_pilots": suggested_pilots,
         "validation": validation,
     }
 
@@ -137,6 +229,25 @@ def write_report(path: Path, payload: dict) -> None:
         lines.extend(f"- {domain}" for domain in payload["domains"])
     else:
         lines.append("- none")
+    lines.extend(["", "## Suggested Pilot Targets", ""])
+    if payload["suggested_pilots"]:
+        for index, pilot in enumerate(payload["suggested_pilots"], start=1):
+            lines.extend(
+                [
+                    f"### {index}. {pilot['domain']} (`{pilot['profile']}`)",
+                    "",
+                    f"- Source type: `{pilot['source_type']}`",
+                    f"- Generation path: `{pilot['generation_path']}`",
+                    f"- Brief: {pilot['brief']}",
+                    "",
+                    "```bash",
+                    *pilot["commands"],
+                    "```",
+                    "",
+                ]
+            )
+    else:
+        lines.append("- none")
     lines.extend(["", "## Recommended Next Moves", ""])
     lines.extend(f"- {item}" for item in payload["recommendations"])
     if payload["validation"]["requirement_errors"]:
@@ -173,6 +284,8 @@ def main() -> int:
         print(f"Usage evidence gaps: {payload['readiness']}")
         for key, value in payload["gaps"].items():
             print(f"- {key}: {value}")
+        for pilot in payload["suggested_pilots"]:
+            print(f"- pilot: {pilot['domain']} ({pilot['profile']}) via {pilot['generation_path']}")
         for item in payload["recommendations"]:
             print(f"- next: {item}")
     return 0 if payload["status"] == "pass" else 1
