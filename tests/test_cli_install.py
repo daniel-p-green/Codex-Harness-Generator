@@ -40,6 +40,7 @@ class CheckCliInstallTests(unittest.TestCase):
                 (output / "llm-app-pilot").mkdir(parents=True, exist_ok=True)
                 (output / "llm-app-pilot" / "README.md").write_text("# LLM app pilot Handoff\n", encoding="utf-8")
                 (output / "llm-app-pilot" / "REPORTER_HANDOFF.md").write_text("# Reporter Handoff\n", encoding="utf-8")
+                (output / "llm-app-pilot" / "USAGE_REPORT_DRAFT.md").write_text("### Evidence\n\n_no response_\n", encoding="utf-8")
                 stdout = json.dumps({"status": "pass", "readiness": "handoff-ready", "handoff_count": 1})
             elif "upstream-drift" in command:
                 stdout = json.dumps({"status": "pass", "ahead_behind": {"upstream_only": 0, "target_only": 0}})

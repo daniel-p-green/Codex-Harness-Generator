@@ -98,6 +98,61 @@ def command_markdown(commands: dict) -> str:
     )
 
 
+def usage_report_draft_markdown(record: dict) -> str:
+    return "\n".join(
+        [
+            "### Pilot or usage-record slug",
+            "",
+            record["slug"],
+            "",
+            "### Domain or project type",
+            "",
+            record["domain"],
+            "",
+            "### Generated harness profile or label",
+            "",
+            record["title"],
+            "",
+            "### Evidence type",
+            "",
+            "private-summary",
+            "",
+            "### Source type",
+            "",
+            record["source_type"],
+            "",
+            "### Generation path",
+            "",
+            record["generation_path"],
+            "",
+            "### Outcome",
+            "",
+            "_no response_",
+            "",
+            "### Public-safe task summary",
+            "",
+            "_no response_",
+            "",
+            "### Evidence",
+            "",
+            "_no response_",
+            "",
+            "### Verification performed",
+            "",
+            "_no response_",
+            "",
+            "### Privacy review",
+            "",
+            "_no response_",
+            "",
+            "### Limitations",
+            "",
+            "_no response_",
+            "",
+        ]
+    )
+
+
 def readme_markdown(record: dict, files: dict, payload: dict) -> str:
     missing = [name for name, item in files.items() if item["status"] != "copied"]
     lines = [
@@ -115,6 +170,7 @@ def readme_markdown(record: dict, files: dict, payload: dict) -> str:
         "- `REPORTER_MESSAGE.txt`: message to send with the pilot.",
         "- `PILOT_PACK.md`: one-task pilot guide, copied when available.",
         "- `USAGE_ISSUE_DRAFT.md`: issue-body evidence template, copied when available.",
+        "- `USAGE_REPORT_DRAFT.md`: prefilled issue-body draft to complete after the pilot task.",
         "",
         "## Maintainer Files",
         "",
@@ -163,6 +219,15 @@ def reporter_handoff_markdown(record: dict, files: dict, payload: dict, director
         lines.append((directory / "USAGE_ISSUE_DRAFT.md").read_text(encoding="utf-8").rstrip())
     else:
         lines.append(f"_Usage issue draft not copied: {issue_draft['reason']}._")
+    lines.extend(
+        [
+            "",
+            "## Usage Report Draft",
+            "",
+            "After the pilot task, complete `USAGE_REPORT_DRAFT.md`. The maintainer can lint it with "
+            "`codex-harness usage-from-issue USAGE_REPORT_DRAFT.md --pilot-record-dir <pilot-records> --lint-only`.",
+        ]
+    )
     lines.extend(
         [
             "",
@@ -248,6 +313,7 @@ def write_handoff(output_root: Path, payload: dict, force: bool) -> None:
             "issue_draft": copy_material(record["source_materials"]["issue_draft"], directory / "USAGE_ISSUE_DRAFT.md"),
         }
         safe_write(directory / "REPORTER_MESSAGE.txt", record["reporter_message"] + "\n")
+        safe_write(directory / "USAGE_REPORT_DRAFT.md", usage_report_draft_markdown(record))
         safe_write(directory / "MAINTAINER_COMMANDS.md", command_markdown(record["commands"]))
         safe_write(directory / "README.md", readme_markdown(record, files, payload))
         safe_write(directory / "REPORTER_HANDOFF.md", reporter_handoff_markdown(record, files, payload, directory))
@@ -256,6 +322,7 @@ def write_handoff(output_root: Path, payload: dict, force: bool) -> None:
             "README.md": (directory / "README.md").as_posix(),
             "REPORTER_HANDOFF.md": (directory / "REPORTER_HANDOFF.md").as_posix(),
             "REPORTER_MESSAGE.txt": (directory / "REPORTER_MESSAGE.txt").as_posix(),
+            "USAGE_REPORT_DRAFT.md": (directory / "USAGE_REPORT_DRAFT.md").as_posix(),
             "MAINTAINER_COMMANDS.md": (directory / "MAINTAINER_COMMANDS.md").as_posix(),
             "PILOT_PACK.md": files["pilot_pack"],
             "USAGE_ISSUE_DRAFT.md": files["issue_draft"],

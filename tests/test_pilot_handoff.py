@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -89,15 +90,42 @@ class PilotHandoffTests(unittest.TestCase):
             self.assertTrue((handoff / "README.md").exists())
             self.assertTrue((handoff / "REPORTER_HANDOFF.md").exists())
             self.assertTrue((handoff / "REPORTER_MESSAGE.txt").exists())
+            self.assertTrue((handoff / "USAGE_REPORT_DRAFT.md").exists())
             self.assertTrue((handoff / "MAINTAINER_COMMANDS.md").exists())
             self.assertEqual("# Pilot Pack", (handoff / "PILOT_PACK.md").read_text(encoding="utf-8").splitlines()[0])
             self.assertEqual("# Usage Issue Draft", (handoff / "USAGE_ISSUE_DRAFT.md").read_text(encoding="utf-8").splitlines()[0])
+            usage_report_draft = (handoff / "USAGE_REPORT_DRAFT.md").read_text(encoding="utf-8")
+            self.assertIn("### Pilot or usage-record slug\n\nllm-app-pilot", usage_report_draft)
+            self.assertIn("### Domain or project type\n\nLLM app", usage_report_draft)
+            self.assertIn("### Source type\n\nexternal", usage_report_draft)
+            self.assertIn("### Generation path\n\ninstalled-quickstart", usage_report_draft)
+            self.assertIn("_no response_", usage_report_draft)
             reporter_handoff = (handoff / "REPORTER_HANDOFF.md").read_text(encoding="utf-8")
             self.assertIn("Would you be willing", reporter_handoff)
             self.assertIn("# Pilot Pack", reporter_handoff)
             self.assertIn("# Usage Issue Draft", reporter_handoff)
+            self.assertIn("USAGE_REPORT_DRAFT.md", reporter_handoff)
             self.assertIn("usage-from-issue", (handoff / "MAINTAINER_COMMANDS.md").read_text(encoding="utf-8"))
             self.assertIn("not usage proof", (Path(args.out) / "README.md").read_text(encoding="utf-8"))
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    (REPO_ROOT / "scripts" / "usage_from_issue.py").as_posix(),
+                    (handoff / "USAGE_REPORT_DRAFT.md").as_posix(),
+                    "--pilot-record-dir",
+                    (root / "pilot-records").as_posix(),
+                    "--lint-only",
+                    "--json",
+                ],
+                capture_output=True,
+                encoding="utf-8",
+                check=False,
+            )
+            self.assertEqual(1, completed.returncode)
+            lint_payload = json.loads(completed.stdout)
+            self.assertEqual("needs-input", lint_payload["readiness"])
+            self.assertEqual("llm-app-pilot", lint_payload["slug"])
+            self.assertIn("Missing required issue field(s)", "\n".join(lint_payload["errors"]))
 
     def test_no_active_pilots_previews_without_writing_records(self):
         with tempfile.TemporaryDirectory() as temp_dir:
