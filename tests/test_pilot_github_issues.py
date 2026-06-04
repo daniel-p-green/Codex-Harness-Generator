@@ -116,10 +116,10 @@ class PilotGithubIssuesTests(unittest.TestCase):
 
         for field in ("outcome", "task_summary", "evidence", "verification", "privacy_review", "limitations"):
             self.assertIn(field, sections)
-            self.assertTrue(sections[field].strip())
-        self.assertGreaterEqual(len(usage_from_issue.parse_items(sections["evidence"])), 2)
-        self.assertGreaterEqual(len(usage_from_issue.parse_items(sections["verification"])), 2)
-        self.assertGreaterEqual(len(usage_from_issue.parse_items(sections["limitations"])), 1)
+            self.assertEqual("", sections[field])
+        self.assertEqual((), usage_from_issue.parse_items(sections["evidence"]))
+        self.assertEqual((), usage_from_issue.parse_items(sections["verification"]))
+        self.assertEqual((), usage_from_issue.parse_items(sections["limitations"]))
 
     def test_build_payload_uses_live_issue_url_from_pilot_notes(self):
         with tempfile.TemporaryDirectory() as temp_dir:

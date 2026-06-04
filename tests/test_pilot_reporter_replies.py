@@ -84,6 +84,8 @@ class PilotReporterRepliesTests(unittest.TestCase):
         self.assertEqual("https://github.com/example/repo/issues/42", record["issue_url"])
         self.assertIn("### Outcome", record["reply_template"])
         self.assertIn("### Evidence", record["reply_template"])
+        self.assertIn("_no response_", record["reply_template"])
+        self.assertIn("<!-- Add at least two public-safe bullets", record["reply_template"])
         self.assertIn("usage-from-github-issue https://github.com/example/repo/issues/42", record["preview_github_issue"])
         for field in ("outcome", "task_summary", "evidence", "verification", "privacy_review", "limitations"):
             self.assertIn(field, record["section_names"])
