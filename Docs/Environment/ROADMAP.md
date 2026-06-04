@@ -79,6 +79,9 @@ Already proven:
 - A non-gating beta-exit audit through `codex-harness beta-exit-audit`, so the
   repo can publish missing criteria without confusing "audit ran" with
   "external adoption is proven."
+- A beta-status operator dashboard through `codex-harness beta-status`, so
+  maintainers can see remaining evidence gaps, live pilot queue state, the next
+  action, and strict beta-exit doctor readiness in one report.
 - Short deterministic demo capture through `codex-harness demo-capture`.
 
 Still unproven:

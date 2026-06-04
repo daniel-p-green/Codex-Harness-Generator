@@ -58,6 +58,7 @@ class ProofStatusTests(unittest.TestCase):
                 {"name": "usage_from_issue_pilot_conversion", "status": "pass"},
                 {"name": "usage_gaps", "status": "pass"},
                 {"name": "beta_exit_audit", "status": "pass"},
+                {"name": "beta_status", "status": "pass"},
                 {"name": "pilot_campaign", "status": "pass"},
                 {"name": "proof_next", "status": "pass"},
                 {"name": "migration_audit", "status": "pass"},
@@ -132,6 +133,7 @@ Status: PASS
         self.assertIn("usage_from_issue_pilot_conversion=pass", install_check["detail"])
         self.assertIn("usage_gaps=pass", install_check["detail"])
         self.assertIn("beta_exit_audit=pass", install_check["detail"])
+        self.assertIn("beta_status=pass", install_check["detail"])
         self.assertIn("pilot_campaign=pass", install_check["detail"])
         self.assertIn("proof_next=pass", install_check["detail"])
         self.assertIn("migration_audit=pass", install_check["detail"])
@@ -148,6 +150,7 @@ Status: PASS
         self.assertIn("pilot_github_followups", [check["name"] for check in payload["checks"]])
         self.assertIn("proof_next_report", [check["name"] for check in payload["checks"]])
         self.assertIn("beta_exit_audit_report", [check["name"] for check in payload["checks"]])
+        self.assertIn("beta_status_report", [check["name"] for check in payload["checks"]])
         self.assertIn("upstream_drift_report", [check["name"] for check in payload["checks"]])
         ci_check = next(check for check in payload["checks"] if check["name"] == "ci_eval_workflow")
         self.assertEqual("pass", ci_check["status"])
@@ -382,6 +385,7 @@ Status: PASS
         self.assertIn("pilot_next_action_report", text)
         self.assertIn("pilot_github_followups", text)
         self.assertIn("beta_exit_audit_report", text)
+        self.assertIn("beta_status_report", text)
         self.assertIn("ci_eval_workflow", text)
         self.assertIn("What This Does Not Prove", text)
 

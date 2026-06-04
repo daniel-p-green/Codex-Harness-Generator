@@ -897,6 +897,50 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("beta_exit_audit.py", command)
 
+    if args.command == "beta-status":
+        command = []
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.pilot_record_dir:
+            command.extend(["--pilot-record-dir", args.pilot_record_dir])
+        if args.usage_report:
+            command.extend(["--usage-report", args.usage_report])
+        if args.pilot_board_report:
+            command.extend(["--pilot-board-report", args.pilot_board_report])
+        if args.pilot_github_sync_report:
+            command.extend(["--pilot-github-sync-report", args.pilot_github_sync_report])
+        if args.pilot_next_action_report:
+            command.extend(["--pilot-next-action-report", args.pilot_next_action_report])
+        if args.followup_dir:
+            command.extend(["--followup-dir", args.followup_dir])
+        if args.repo:
+            command.extend(["--repo", args.repo])
+        if args.gh_bin:
+            command.extend(["--gh-bin", args.gh_bin])
+        if args.generated:
+            command.extend(["--generated", args.generated])
+        if args.reminder_after_hours is not None:
+            command.extend(["--reminder-after-hours", str(args.reminder_after_hours)])
+        for status in args.status or []:
+            command.extend(["--status", status])
+        for slug in args.slug or []:
+            command.extend(["--slug", slug])
+        if args.report:
+            command.extend(["--report", args.report])
+        if args.min_records is not None:
+            command.extend(["--min-records", str(args.min_records)])
+        if args.min_external_or_multi_project is not None:
+            command.extend(["--min-external-or-multi-project", str(args.min_external_or_multi_project)])
+        if args.min_domains is not None:
+            command.extend(["--min-domains", str(args.min_domains)])
+        if args.min_installed_init_brief is not None:
+            command.extend(["--min-installed-init-brief", str(args.min_installed_init_brief)])
+        if args.no_write:
+            command.append("--no-write")
+        if args.json:
+            command.append("--json")
+        return python_script("beta_status.py", command)
+
     if args.command == "usage-from-issue":
         command = [args.issue_body]
         if args.slug:
@@ -1664,6 +1708,28 @@ def make_parser() -> argparse.ArgumentParser:
     beta_exit_audit.add_argument("--report", help="Beta-exit audit Markdown path")
     beta_exit_audit.add_argument("--no-write", action="store_true", help="Do not write the Markdown audit")
     beta_exit_audit.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    beta_status = subparsers.add_parser("beta-status", help="Summarize beta evidence gaps, pilot queue, and next action")
+    beta_status.add_argument("--record-dir", help="Directory where usage record JSON files are read")
+    beta_status.add_argument("--pilot-record-dir", help="Directory where prepared pilot JSON records are read")
+    beta_status.add_argument("--usage-report", help="Usage records Markdown path")
+    beta_status.add_argument("--pilot-board-report", help="Pilot board Markdown path")
+    beta_status.add_argument("--pilot-github-sync-report", help="Pilot GitHub issue sync report path")
+    beta_status.add_argument("--pilot-next-action-report", help="Pilot next-action Markdown path")
+    beta_status.add_argument("--followup-dir", help="Pilot GitHub issue follow-up output directory")
+    beta_status.add_argument("--repo", help="Optional GitHub repository in owner/name form")
+    beta_status.add_argument("--gh-bin", help="GitHub CLI executable")
+    beta_status.add_argument("--generated", help="UTC timestamp override")
+    beta_status.add_argument("--reminder-after-hours", type=float, help="Hours before a waiting follow-up is reminder due")
+    beta_status.add_argument("--status", choices=["completed", "converted", "dropped", "invited", "prepared"], action="append", help="Pilot status to include; repeatable")
+    beta_status.add_argument("--slug", action="append", help="Pilot slug to include; repeatable")
+    beta_status.add_argument("--report", help="Beta-status Markdown path")
+    beta_status.add_argument("--min-records", type=int, help="Target valid usage records")
+    beta_status.add_argument("--min-external-or-multi-project", type=int, help="Target external or multi-project records")
+    beta_status.add_argument("--min-domains", type=int, help="Target distinct domains")
+    beta_status.add_argument("--min-installed-init-brief", type=int, help="Target records generated via installed brief-based generation")
+    beta_status.add_argument("--no-write", action="store_true", help="Do not write the Markdown status report")
+    beta_status.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     usage_from_issue = subparsers.add_parser("usage-from-issue", help="Create usage evidence from a GitHub issue-form body")
     usage_from_issue.add_argument("issue_body", help="Markdown issue body path, or '-' for stdin")

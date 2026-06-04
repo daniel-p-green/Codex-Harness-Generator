@@ -104,6 +104,7 @@ def build_payload() -> dict:
         pilot_github_sync_report = temp_root / "PILOT_GITHUB_SYNC.md"
         pilot_next_action_report = temp_root / "PILOT_NEXT_ACTION.md"
         beta_exit_audit_report = temp_root / "BETA_EXIT_AUDIT.md"
+        beta_status_report = temp_root / "BETA_STATUS.md"
         usage_records = temp_root / "usage-records"
         usage_report = temp_root / "USAGE_RECORDS.md"
         usage_gaps_report = temp_root / "USAGE_GAPS.md"
@@ -830,6 +831,32 @@ def build_payload() -> dict:
                     usage_records.as_posix(),
                     "--report",
                     beta_exit_audit_report.as_posix(),
+                    "--json",
+                ],
+            ),
+            (
+                "beta_status",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "beta-status",
+                    "--record-dir",
+                    usage_records.as_posix(),
+                    "--pilot-record-dir",
+                    pilot_records.as_posix(),
+                    "--usage-report",
+                    usage_report.as_posix(),
+                    "--pilot-board-report",
+                    pilot_board_report.as_posix(),
+                    "--pilot-github-sync-report",
+                    pilot_github_sync_report.as_posix(),
+                    "--pilot-next-action-report",
+                    pilot_next_action_report.as_posix(),
+                    "--followup-dir",
+                    (temp_root / "pilot-github-followups").as_posix(),
+                    "--gh-bin",
+                    fake_gh.as_posix(),
+                    "--report",
+                    beta_status_report.as_posix(),
                     "--json",
                 ],
             ),

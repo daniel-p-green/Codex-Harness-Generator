@@ -34,6 +34,10 @@ class CodexEquivalenceTests(unittest.TestCase):
         self.assertIn("codex-harness pilot-handoff-audit", usage["commands"])
         self.assertIn("codex-harness pilot-github-issues", usage["commands"])
         self.assertIn("codex-harness pilot-reporter-replies", usage["commands"])
+        release = next(capability for capability in payload["capabilities"] if capability["name"] == "Release proof")
+        self.assertIn("Docs/Environment/BETA_STATUS.md", release["evidence_paths"])
+        self.assertIn("scripts/beta_status.py", release["evidence_paths"])
+        self.assertIn("codex-harness beta-status", release["commands"])
 
     def test_missing_evidence_path_fails_capability(self):
         original = check_codex_equivalence.CAPABILITIES
