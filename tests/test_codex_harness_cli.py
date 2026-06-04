@@ -389,6 +389,39 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_refresh_examples_delegates_to_refresh_script(self):
+        command, _ = self.run_cli(
+            [
+                "refresh-examples",
+                "--surface",
+                "fixtures",
+                "--fixture-root",
+                "/tmp/fixtures",
+                "--generated-date",
+                "2026-06-04",
+                "--created",
+                "2026-06-04T12:00:00Z",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/refresh_generated_surfaces.py",
+                "--surface",
+                "fixtures",
+                "--fixture-root",
+                "/tmp/fixtures",
+                "--generated-date",
+                "2026-06-04",
+                "--created",
+                "2026-06-04T12:00:00Z",
+                "--json",
+            ],
+            command,
+        )
+
     def test_inspect_delegates_to_project_inspector(self):
         command, _ = self.run_cli(["inspect", "/tmp/project", "--max-files", "25", "--limit", "2", "--json"])
 

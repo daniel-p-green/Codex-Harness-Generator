@@ -100,9 +100,14 @@ CAPABILITIES = [
     {
         "name": "Release proof",
         "original_need": "A single readiness view before public claims.",
-        "codex_surface": "Proof status, proof matrix, eval trends, source freshness, and semantic alignment.",
-        "evidence_paths": ["Docs/Environment/PROOF_STATUS.md", "Docs/Environment/PROOF_MATRIX.md", "scripts/proof_status.py"],
-        "commands": ["codex-harness proof-status", "codex-harness gate"],
+        "codex_surface": "Proof status, proof matrix, generated-surface refresh, eval trends, source freshness, and semantic alignment.",
+        "evidence_paths": [
+            "Docs/Environment/PROOF_STATUS.md",
+            "Docs/Environment/PROOF_MATRIX.md",
+            "scripts/proof_status.py",
+            "scripts/refresh_generated_surfaces.py",
+        ],
+        "commands": ["codex-harness refresh-examples", "codex-harness proof-status", "codex-harness gate"],
     },
 ]
 

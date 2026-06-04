@@ -534,6 +534,26 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("proof_status.py", command)
 
+    if args.command == "refresh-examples":
+        command = []
+        for surface in args.surface or []:
+            command.extend(["--surface", surface])
+        if args.fixture_root:
+            command.extend(["--fixture-root", args.fixture_root])
+        if args.deterministic_root:
+            command.extend(["--deterministic-root", args.deterministic_root])
+        if args.create_acceptance_root:
+            command.extend(["--create-acceptance-root", args.create_acceptance_root])
+        if args.brief_acceptance_root:
+            command.extend(["--brief-acceptance-root", args.brief_acceptance_root])
+        if args.generated_date:
+            command.extend(["--generated-date", args.generated_date])
+        if args.created:
+            command.extend(["--created", args.created])
+        if args.json:
+            command.append("--json")
+        return python_script("refresh_generated_surfaces.py", command)
+
     if args.command == "doctor":
         command = []
         if args.record_dir:
@@ -879,6 +899,21 @@ def make_parser() -> argparse.ArgumentParser:
     proof_status.add_argument("--report", help="Proof-status Markdown report path")
     proof_status.add_argument("--no-write", action="store_true", help="Do not rewrite PROOF_STATUS.md")
     proof_status.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    refresh_examples = subparsers.add_parser("refresh-examples", help="Refresh checked-in generated examples and fixtures")
+    refresh_examples.add_argument(
+        "--surface",
+        action="append",
+        choices=["fixtures", "deterministic", "create-acceptance", "brief-acceptance"],
+        help="Surface to refresh; repeatable. Defaults to all.",
+    )
+    refresh_examples.add_argument("--fixture-root", help="Generated fixture root")
+    refresh_examples.add_argument("--deterministic-root", help="Deterministic example root")
+    refresh_examples.add_argument("--create-acceptance-root", help="Create-acceptance example root")
+    refresh_examples.add_argument("--brief-acceptance-root", help="Brief-acceptance example root")
+    refresh_examples.add_argument("--generated-date", help="Stable generated date")
+    refresh_examples.add_argument("--created", help="Stable creation timestamp for acceptance examples")
+    refresh_examples.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     doctor = subparsers.add_parser("doctor", help="Run a fast local readiness check")
     doctor.add_argument("--record-dir", help="Directory where usage record JSON files are read")

@@ -52,6 +52,10 @@ replacement. What is proven today:
 - `examples/create-acceptance/` contains checked-in snapshots of that
   deterministic preset `/create` acceptance flow for every supported profile and
   bundled domain preset.
+- `scripts/refresh_generated_surfaces.py` and `codex-harness refresh-examples`
+  refresh checked-in generated fixtures and example families from the current
+  generator, then run the example inventory contract check so public examples
+  do not drift behind generated behavior.
 - `examples/demo-capture/` contains a checked-in public-safe walkthrough of the
   brief-driven demo path.
 - Generated harnesses are required to include architecture, assumptions, source
@@ -585,6 +589,7 @@ Common subcommands:
 | `local-eval <path>` | generated `scripts/run-harness-evals.py` | Runs the copied harness's embedded eval report without depending on this generator repo. |
 | `migration-audit <paths...>` | `migration_audit.py` | Audits legacy harness artifacts and lists the Codex-native migration work. |
 | `gate` | `run_evals.py` | Runs the repo release gate. |
+| `refresh-examples` | `refresh_generated_surfaces.py` | Refreshes checked-in generated fixtures and example families from the current generator, then runs the example inventory contract check. |
 | `live-trials` | `run_live_example_task_trials.py` | Runs authenticated Codex tasks against checked-in live examples. |
 | `source-freshness` | `check_source_freshness.py` | Confirms official OpenAI source URLs are reachable. |
 | `semantic-alignment` | `check_semantic_alignment.py` | Checks local guidance against official Codex doc concepts. |
