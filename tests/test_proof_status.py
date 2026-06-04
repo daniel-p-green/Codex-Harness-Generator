@@ -48,6 +48,7 @@ class ProofStatusTests(unittest.TestCase):
                 {"name": "prepare_pilot_batch_dry_run", "status": "pass"},
                 {"name": "pilot_board", "status": "pass"},
                 {"name": "pilot_update", "status": "pass"},
+                {"name": "pilot_outreach", "status": "pass"},
                 {"name": "usage_from_issue_pilot_conversion", "status": "pass"},
                 {"name": "usage_gaps", "status": "pass"},
                 {"name": "beta_exit_audit", "status": "pass"},
@@ -114,6 +115,7 @@ Status: PASS
         self.assertIn("prepare_pilot_batch=pass", install_check["detail"])
         self.assertIn("pilot_board=pass", install_check["detail"])
         self.assertIn("pilot_update=pass", install_check["detail"])
+        self.assertIn("pilot_outreach=pass", install_check["detail"])
         self.assertIn("usage_from_issue_pilot_conversion=pass", install_check["detail"])
         self.assertIn("usage_gaps=pass", install_check["detail"])
         self.assertIn("beta_exit_audit=pass", install_check["detail"])
@@ -124,6 +126,7 @@ Status: PASS
         self.assertIn("source_freshness_report", [check["name"] for check in payload["checks"]])
         self.assertIn("semantic_alignment_report", [check["name"] for check in payload["checks"]])
         self.assertIn("pilot_board_report", [check["name"] for check in payload["checks"]])
+        self.assertIn("pilot_outreach_report", [check["name"] for check in payload["checks"]])
         self.assertIn("proof_next_report", [check["name"] for check in payload["checks"]])
         self.assertIn("beta_exit_audit_report", [check["name"] for check in payload["checks"]])
         self.assertIn("upstream_drift_report", [check["name"] for check in payload["checks"]])
@@ -213,6 +216,7 @@ Status: PASS
         self.assertIn("source_freshness_report", text)
         self.assertIn("semantic_alignment_report", text)
         self.assertIn("pilot_board_report", text)
+        self.assertIn("pilot_outreach_report", text)
         self.assertIn("beta_exit_audit_report", text)
         self.assertIn("What This Does Not Prove", text)
 

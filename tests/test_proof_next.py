@@ -122,6 +122,7 @@ class ProofNextTests(unittest.TestCase):
         self.assertEqual("llm-app-pilot", payload["active_pilot"]["slug"])
         commands = [item["command"] for item in payload["command_sequence"]]
         self.assertFalse(any("prepare-next-pilot" in command for command in commands))
+        self.assertTrue(any("codex-harness pilot-outreach" in command for command in commands))
         self.assertTrue(any("pilot-update llm-app-pilot --status invited" in command for command in commands))
         self.assertTrue(any("pilot-update llm-app-pilot --status completed" in command for command in commands))
         self.assertTrue(any("usage-from-harness <generated-harness> --slug llm-app-pilot" in command for command in commands))
@@ -201,6 +202,7 @@ class ProofNextTests(unittest.TestCase):
 
         self.assertIn("## Active Pilot", text)
         self.assertIn("Continue this pilot instead of preparing a duplicate.", text)
+        self.assertIn("codex-harness pilot-outreach", text)
 
     def test_ready_payload_has_no_next_pilot(self):
         records = []

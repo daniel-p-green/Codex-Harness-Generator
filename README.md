@@ -153,6 +153,10 @@ replacement. What is proven today:
   outreach state as usage proof. Use `codex-harness pilot-update <slug>` to
   move a pilot through that funnel and refresh the board without hand-editing
   JSON; converted pilots are cross-checked against the referenced usage record.
+- `scripts/export_pilot_outreach.py` and `codex-harness pilot-outreach` write
+  `Docs/Environment/PILOT_OUTREACH.md`, a reporter-ready outreach packet from
+  active pilot-board records with invite tracking and evidence-conversion
+  commands.
 - `scripts/prepare_pilot.py` and `codex-harness prepare-pilot` combine
   brief-based quickstart generation with an external pilot pack and issue-body
   draft, so the next beta-exit pilot can be prepared with one command before a
@@ -580,7 +584,7 @@ python scripts/codex_harness.py proof-next
 
 `proof-next` writes `Docs/Environment/PROOF_NEXT.md`. It packages the next
 pilot target, candidate coverage projection, `prepare-next-pilot`,
-`prepare-pilot-batch`, `pilot-board`, preview-first `usage-from-harness` and `usage-from-issue` conversion commands,
+`prepare-pilot-batch`, `pilot-board`, `pilot-outreach`, preview-first `usage-from-harness` and `usage-from-issue` conversion commands,
 `beta-exit-audit`, and final `proof-status --beta-exit` commands while keeping
 the claim boundary explicit: the packet is a plan, not usage proof. Use the
 copied-harness route when the generated harness directory is available; use the
@@ -696,6 +700,7 @@ Common subcommands:
 | `prepare-pilot-batch` | `prepare_pilot_batch.py` | Dry-runs or prepares the suggested beta-exit pilot batch under one target root, with optional pilot-board records. |
 | `pilot-board` | `pilot_board.py` | Summarizes prepared pilot records and cross-checks converted pilots against usage records without counting outreach as proof. |
 | `pilot-update <slug>` | `pilot_board.py` | Updates one prepared pilot's status, validates converted usage-record references, and refreshes the pilot board. |
+| `pilot-outreach` | `export_pilot_outreach.py` | Writes reporter-ready outreach copy, tracking commands, and conversion commands from active pilot-board records. |
 | `beta-exit-audit` | `beta_exit_audit.py` | Writes a non-gating audit of beta-exit readiness and remaining evidence gaps. |
 | `proof-next` | `proof_next.py` | Writes the next beta-exit proof actions and candidate coverage projection from current usage gaps without counting the plan as evidence. |
 | `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record; infers the slug from the issue body when present, and supports `--lint-only`, `--no-write`, or `--pilot-record-dir` for linked pilot conversion. |

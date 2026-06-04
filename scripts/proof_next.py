@@ -182,6 +182,19 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
                 "purpose": "continue the already prepared pilot instead of preparing a duplicate",
             }
         )
+        commands.append(
+            {
+                "name": "export pilot outreach",
+                "command": (
+                    "codex-harness pilot-outreach "
+                    f"--record-dir {args.pilot_record_dir} "
+                    f"--usage-record-dir {args.record_dir} "
+                    f"--usage-report {args.usage_report} "
+                    f"--pilot-board-report {args.pilot_board_report}"
+                ),
+                "purpose": "write reporter-ready outreach copy and maintainer tracking commands for active pilots",
+            }
+        )
         if active_pilot["status"] == "prepared":
             commands.append(
                 {

@@ -76,6 +76,7 @@ def build_payload() -> dict:
         pilot_batch_out = temp_root / "pilot-batch-packs"
         pilot_records = temp_root / "pilot-records"
         pilot_board_report = temp_root / "PILOT_BOARD.md"
+        pilot_outreach_report = temp_root / "PILOT_OUTREACH.md"
         beta_exit_audit_report = temp_root / "BETA_EXIT_AUDIT.md"
         usage_records = temp_root / "usage-records"
         usage_report = temp_root / "USAGE_RECORDS.md"
@@ -580,6 +581,24 @@ def build_payload() -> dict:
                 ],
             ),
             (
+                "pilot_outreach",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "pilot-outreach",
+                    "--record-dir",
+                    pilot_records.as_posix(),
+                    "--usage-record-dir",
+                    usage_records.as_posix(),
+                    "--usage-report",
+                    usage_report.as_posix(),
+                    "--pilot-board-report",
+                    pilot_board_report.as_posix(),
+                    "--out",
+                    pilot_outreach_report.as_posix(),
+                    "--json",
+                ],
+            ),
+            (
                 "usage_from_issue_pilot_conversion",
                 [
                     (venv / "bin" / "codex-harness").as_posix(),
@@ -713,6 +732,16 @@ def build_payload() -> dict:
                         step["status"] = "fail"
                         step["returncode"] = 1
                         step["stderr"] += "\nPilot batch dry-run did not return a passing planned batch."
+                if name == "pilot_outreach" and completed.returncode == 0:
+                    outreach_payload = json.loads(completed.stdout)
+                    if (
+                        outreach_payload.get("status") != "pass"
+                        or outreach_payload.get("readiness") != "outreach-ready"
+                        or outreach_payload.get("outreach_count", 0) < 1
+                    ):
+                        step["status"] = "fail"
+                        step["returncode"] = 1
+                        step["stderr"] += "\nPilot outreach did not return a passing outreach-ready packet."
                 if name == "usage_from_issue_pilot_conversion" and completed.returncode == 0:
                     conversion_payload = json.loads(completed.stdout)
                     pilot_update = conversion_payload.get("pilot_update") or {}
