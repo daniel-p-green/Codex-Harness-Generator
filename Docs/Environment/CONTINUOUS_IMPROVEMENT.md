@@ -23,6 +23,9 @@ Before release or public claims:
 python scripts/run_evals.py
 ```
 
+Use `Docs/Environment/PROOF_MATRIX.md` to check which claim each gate supports
+and what remains outside the proven scope.
+
 The GitHub Actions workflow `.github/workflows/evals.yml` runs the same gate on pull requests, pushes to `main`, manual dispatch, and a weekly schedule.
 
 For a local live smoke check against the Codex CLI, run:

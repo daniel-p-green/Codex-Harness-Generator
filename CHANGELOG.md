@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Added `scripts/run_create_acceptance.py` for a deterministic preset `/create` acceptance flow that preserves trigger context, generates a harness, evaluates it, smokes it, and writes an acceptance report.
 - Added `scripts/refresh_create_acceptance_examples.py` and a checked-in deterministic preset `/create` acceptance example.
 - Added optional `python scripts/run_evals.py --codex-live` support for authenticated local Codex CLI live smoke checks.
+- Added `Docs/Environment/PROOF_MATRIX.md` to map public claims to evidence artifacts, commands, proven scope, and remaining product-proof gaps.
 
 ### Changed
 

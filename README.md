@@ -51,6 +51,9 @@ What still needs product proof:
 Until those live examples exist, treat the eval suite and golden fixtures as
 structural proof, not end-to-end product proof.
 
+For a claim-by-claim evidence map, see
+`Docs/Environment/PROOF_MATRIX.md`.
+
 ## Why this exists
 
 OpenAI's Codex customization has several layers: project instructions, config,
@@ -255,6 +258,9 @@ The evals prove structural and contract quality against golden fixtures and the
 deterministic profile generator, including checked-in examples. They do not
 prove that every live `/create` run will be perfect, so meaningful changes should
 still be reviewed against generated artifacts.
+
+The proof matrix in `Docs/Environment/PROOF_MATRIX.md` maps each major claim to
+the artifact and command that verifies it.
 
 For an authenticated local Codex CLI check against a generated harness, run:
 

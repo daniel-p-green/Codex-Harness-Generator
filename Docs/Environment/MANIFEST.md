@@ -22,6 +22,7 @@ Harness Generator version: see `Docs/Environment/VERSION.md`.
 | Agent playbooks | 6 (+INDEX) | `Docs/AgentPlaybooks/` |
 | Base starter profiles | 4 (+INDEX, PROFILE_FORMAT, DOMAIN_REFERENCE) | `Docs/StarterProfiles/` |
 | Bundled domain presets | 16 (+INDEX) | `Docs/DomainLibrary/` |
+| Environment records | 5 (+MANIFEST) | `Docs/Environment/` |
 | Template files | 52 | `Docs/Templates/` (incl. README) |
 
 ## Agents (5)
