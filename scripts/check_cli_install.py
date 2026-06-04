@@ -253,7 +253,7 @@ def build_payload() -> dict:
                 install_source,
             ),
             ("profiles", [(venv / "bin" / "codex-harness").as_posix(), "profiles", "--json"], None),
-            ("doctor", [(venv / "bin" / "codex-harness").as_posix(), "doctor", "--json"], None),
+            ("doctor", [(venv / "bin" / "codex-harness").as_posix(), "doctor", "--json"], install_source),
             (
                 "init",
                 [
@@ -354,6 +354,7 @@ def build_payload() -> dict:
                     equivalence_report.as_posix(),
                     "--json",
                 ],
+                install_source,
             ),
             (
                 "upstream_drift",
@@ -367,6 +368,7 @@ def build_payload() -> dict:
                     "--no-write",
                     "--json",
                 ],
+                REPO_ROOT,
             ),
             (
                 "init_from_project",
@@ -898,7 +900,7 @@ def build_payload() -> dict:
             for item in commands:
                 name = item[0]
                 command = item[1]
-                cwd = item[2] if len(item) > 2 else None
+                cwd = item[2] if len(item) > 2 and item[2] is not None else temp_root
                 completed = run(command, cwd=cwd)
                 step = {
                     "name": name,

@@ -199,18 +199,42 @@ def build_next_action(sync_payload: dict, args: argparse.Namespace) -> dict:
     }
 
 
+def operator_queue(records: list[dict]) -> dict:
+    waiting = [record for record in records if record.get("readiness") == "waiting-for-reporter"]
+    next_reviews = sorted(
+        review_at
+        for review_at in (record.get("next_reminder_at", "") for record in waiting)
+        if review_at
+    )
+    missing_field_counts: dict[str, int] = {}
+    for record in waiting:
+        for field in record.get("missing_fields", []):
+            missing_field_counts[field] = missing_field_counts.get(field, 0) + 1
+    return {
+        "waiting_count": len(waiting),
+        "next_review_at": next_reviews[0] if next_reviews else "",
+        "missing_field_counts": dict(sorted(missing_field_counts.items())),
+        "reporter_reply_count": sum(record.get("reporter_replies", {}).get("count", 0) for record in waiting),
+        "reminders_due": sum(1 for record in waiting if record.get("reminder_due")),
+        "stale_followups": sum(1 for record in waiting if record.get("maintainer_followup_stale")),
+        "claim_boundary": "Waiting issues are not usage evidence; only converted, validated usage records count.",
+    }
+
+
 def build_payload(
     args: argparse.Namespace,
     fetch_issue=sync_pilot_github_issues.usage_from_github_issue.fetch_github_issue,
 ) -> dict:
     sync_payload = sync_pilot_github_issues.build_payload(args, fetch_issue=fetch_issue)
     action = build_next_action(sync_payload, args)
+    queue = operator_queue(sync_payload["records"])
     return {
         "generated": sync_payload["generated"],
         "status": sync_payload["status"],
         "readiness": sync_payload["readiness"],
         "summary": sync_payload["summary"],
         "next_action": action,
+        "operator_queue": queue,
         "waiting_followups": [
             {
                 "slug": record["slug"],
@@ -284,30 +308,53 @@ def write_report(path: Path, payload: dict) -> None:
         f"- Needs attention: {payload['summary']['needs_attention']}",
         f"- Missing live issue URL: {payload['summary']['missing_issue_url']}",
         "",
-        "## Next Action",
+        "## Operator Queue",
         "",
-        f"- Type: `{action['type']}`",
-        f"- Priority: `{action['priority']}`",
-        f"- Pilot: `{action.get('slug') or 'none'}`",
-        f"- Issue: {action.get('issue_url') or 'none'}",
-        f"- Maintainer follow-up: {action.get('maintainer_followup_comment', {}).get('url') or 'none'}",
-        f"- Maintainer follow-up stale: `{str(action.get('maintainer_followup_stale', False)).lower()}`",
-        f"- Maintainer follow-up posted at: `{action.get('maintainer_followup_comment', {}).get('created_at') or 'none'}`",
-        f"- Maintainer follow-up age: `{action.get('maintainer_followup_age_hours') if action.get('maintainer_followup_age_hours') is not None else 'unknown'}` hours",
-        f"- Reminder threshold: `{action.get('reminder_after_hours') or payload.get('summary', {}).get('reminder_after_hours', sync_pilot_github_issues.DEFAULT_REMINDER_AFTER_HOURS)}` hours",
-        f"- Reminder due: `{str(action.get('reminder_due', False)).lower()}`",
-        f"- Next reminder review at: `{action.get('next_reminder_at') or 'none'}`",
-        f"- Latest reporter reply: {action.get('reporter_replies', {}).get('latest', {}).get('url') or 'none'}",
-        f"- Reporter replied after latest maintainer follow-up: `{str(action.get('reporter_replies', {}).get('after_latest_maintainer_followup', False)).lower()}`",
-        f"- Reason: {action['reason']}",
+        f"- Waiting issues: {payload['operator_queue']['waiting_count']}",
+        f"- Next reminder review: `{payload['operator_queue']['next_review_at'] or 'none'}`",
+        f"- Reporter replies so far: {payload['operator_queue']['reporter_reply_count']}",
+        f"- Reminders due now: {payload['operator_queue']['reminders_due']}",
+        f"- Stale follow-ups: {payload['operator_queue']['stale_followups']}",
+        f"- Claim boundary: {payload['operator_queue']['claim_boundary']}",
         "",
-        "```bash",
-        action["command"],
-        "```",
-        "",
-        "## Waiting Follow-Ups",
+        "Missing fields across waiting issues:",
         "",
     ]
+    if payload["operator_queue"]["missing_field_counts"]:
+        lines.extend(
+            f"- `{field}`: {count}"
+            for field, count in payload["operator_queue"]["missing_field_counts"].items()
+        )
+    else:
+        lines.append("- none")
+    lines.extend(
+        [
+            "",
+            "## Next Action",
+            "",
+            f"- Type: `{action['type']}`",
+            f"- Priority: `{action['priority']}`",
+            f"- Pilot: `{action.get('slug') or 'none'}`",
+            f"- Issue: {action.get('issue_url') or 'none'}",
+            f"- Maintainer follow-up: {action.get('maintainer_followup_comment', {}).get('url') or 'none'}",
+            f"- Maintainer follow-up stale: `{str(action.get('maintainer_followup_stale', False)).lower()}`",
+            f"- Maintainer follow-up posted at: `{action.get('maintainer_followup_comment', {}).get('created_at') or 'none'}`",
+            f"- Maintainer follow-up age: `{action.get('maintainer_followup_age_hours') if action.get('maintainer_followup_age_hours') is not None else 'unknown'}` hours",
+            f"- Reminder threshold: `{action.get('reminder_after_hours') or payload.get('summary', {}).get('reminder_after_hours', sync_pilot_github_issues.DEFAULT_REMINDER_AFTER_HOURS)}` hours",
+            f"- Reminder due: `{str(action.get('reminder_due', False)).lower()}`",
+            f"- Next reminder review at: `{action.get('next_reminder_at') or 'none'}`",
+            f"- Latest reporter reply: {action.get('reporter_replies', {}).get('latest', {}).get('url') or 'none'}",
+            f"- Reporter replied after latest maintainer follow-up: `{str(action.get('reporter_replies', {}).get('after_latest_maintainer_followup', False)).lower()}`",
+            f"- Reason: {action['reason']}",
+            "",
+            "```bash",
+            action["command"],
+            "```",
+            "",
+            "## Waiting Follow-Ups",
+            "",
+        ]
+    )
     if payload["waiting_followups"]:
         for item in payload["waiting_followups"]:
             lines.extend(
