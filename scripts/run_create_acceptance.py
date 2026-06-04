@@ -64,6 +64,7 @@ def run_acceptance(
     force: bool,
     generated_date: str,
     created: str,
+    target_label: str | None = None,
 ) -> dict:
     target = target.resolve()
     if profile not in PROFILES:
@@ -74,7 +75,7 @@ def run_acceptance(
             raise SystemExit(f"Target is not empty. Re-run with --force to replace it: {target}")
         shutil.rmtree(target)
 
-    trigger = simulate_trigger(target, project_type=project_type, notes=notes, created=created)
+    trigger = simulate_trigger(target, project_type=project_type, notes=notes, created=created, target_label=target_label)
     generate(
         target,
         project_name=project_name,
@@ -111,6 +112,7 @@ def main() -> int:
     parser.add_argument("--notes", default="none", help="Additional notes for CREATION_CONTEXT.md")
     parser.add_argument("--generated-date", default=DEFAULT_GENERATED_DATE, help="Stable generated date for generated docs")
     parser.add_argument("--created", default=DEFAULT_CREATED, help="Stable created timestamp for CREATION_CONTEXT.md")
+    parser.add_argument("--target-label", help="Override the target path written inside CREATION_CONTEXT.md")
     parser.add_argument("--force", action="store_true", help="Replace target if it already contains files")
     parser.add_argument("--json", action="store_true", help="Emit JSON")
     args = parser.parse_args()
@@ -124,6 +126,7 @@ def main() -> int:
         force=args.force,
         generated_date=args.generated_date,
         created=args.created,
+        target_label=args.target_label,
     )
     if args.json:
         print(json.dumps(payload, indent=2))

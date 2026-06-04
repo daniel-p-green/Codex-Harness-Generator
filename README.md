@@ -36,6 +36,8 @@ replacement. What is proven today:
 - `scripts/run_create_acceptance.py` stitches the trigger and preset generator
   together in one target, preserving `CREATION_CONTEXT.md`, writing a complete
   harness, and adding `CREATE_ACCEPTANCE_REPORT.md`.
+- `examples/create-acceptance/` contains a checked-in snapshot of that
+  deterministic preset `/create` acceptance flow.
 - Generated harnesses are required to include architecture, assumptions, source
   mapping, manifests, and validation reports.
 
@@ -152,6 +154,14 @@ This writes the trigger context, generates the preset harness into the same
 target, evaluates it, smoke-checks it, and records
 `Docs/Environment/CREATE_ACCEPTANCE_REPORT.md`.
 
+Checked-in create-acceptance examples are available under
+`examples/create-acceptance/`. Refresh them with:
+
+```bash
+python scripts/refresh_create_acceptance_examples.py
+python scripts/run_evals.py
+```
+
 ## Commands
 
 | Command | What it does |
@@ -237,6 +247,7 @@ This runs:
 - Checked-in deterministic example evaluation and smoke checks.
 - `/create` trigger contract tests for CREATION_CONTEXT.md handoff scenarios.
 - Deterministic preset `/create` acceptance flow with final eval and smoke.
+- Checked-in create-acceptance example evaluation and smoke checks.
 - Contract and mutation tests.
 - Python compile checks.
 

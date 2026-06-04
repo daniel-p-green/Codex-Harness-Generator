@@ -156,6 +156,7 @@ def parse_resume(progress_path: Path) -> tuple[str, str | None]:
 
 def context_markdown(
     target: Path,
+    target_label: str | None,
     created: str,
     directory_status: str,
     existing_files: tuple[str, ...],
@@ -190,7 +191,7 @@ def context_markdown(
 Created: {created}
 
 ## Target
-- Path: {target}
+- Path: {target_label or target}
 - Platform: {codex_platform()}
 
 ## Directory Status
@@ -220,6 +221,7 @@ def simulate_trigger(
     project_type: str = "not specified",
     notes: str = "none",
     created: str | None = None,
+    target_label: str | None = None,
 ) -> TriggerResult:
     target = target.resolve()
     directory_status = ensure_target(target)
@@ -238,6 +240,7 @@ def simulate_trigger(
     created_value = created or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     context = context_markdown(
         target=target,
+        target_label=target_label,
         created=created_value,
         directory_status=directory_status,
         existing_files=existing_files,
@@ -273,10 +276,11 @@ def main() -> int:
     parser.add_argument("--project-type", default="not specified", help="Stated project type for the context file")
     parser.add_argument("--notes", default="none", help="Additional user notes for the context file")
     parser.add_argument("--created", help="Override Created timestamp for reproducible tests")
+    parser.add_argument("--target-label", help="Override the target path written inside CREATION_CONTEXT.md")
     parser.add_argument("--json", action="store_true", help="Emit JSON summary")
     args = parser.parse_args()
 
-    result = simulate_trigger(Path(args.target), args.project_type, args.notes, args.created)
+    result = simulate_trigger(Path(args.target), args.project_type, args.notes, args.created, args.target_label)
     if args.json:
         print(json.dumps(result.to_dict(), indent=2))
     else:

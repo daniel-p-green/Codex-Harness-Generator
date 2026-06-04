@@ -41,6 +41,8 @@ class CreateAcceptanceTests(unittest.TestCase):
                 "Data analysis",
                 "--notes",
                 "weekly metric review",
+                "--target-label",
+                "examples/create-acceptance/data-analysis",
             )
 
             self.assertEqual("pass", payload["status"])
@@ -56,7 +58,47 @@ class CreateAcceptanceTests(unittest.TestCase):
             self.assertTrue(report.is_file())
             self.assertIn("- Docs/Environment/CREATION_CONTEXT.md", manifest)
             self.assertIn("- Docs/Environment/CREATE_ACCEPTANCE_REPORT.md", manifest)
+            self.assertIn(
+                "- Path: examples/create-acceptance/data-analysis",
+                context.read_text(encoding="utf-8"),
+            )
             self.assertIn("Metric Review Workspace", (target / "AGENTS.md").read_text(encoding="utf-8"))
+
+    def test_refresh_create_acceptance_examples_outputs_valid_harnesses(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            example_root = Path(temp_dir) / "create-acceptance"
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "scripts/refresh_create_acceptance_examples.py",
+                    "--example-root",
+                    example_root.as_posix(),
+                    "--profile",
+                    "software-development",
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            if completed.returncode != 0:
+                raise AssertionError(completed.stdout + completed.stderr)
+
+            target = example_root / "software-development"
+            self.assertTrue((example_root / "README.md").is_file())
+            self.assertTrue((target / "Docs/Environment/CREATION_CONTEXT.md").is_file())
+            eval_completed = subprocess.run(
+                [
+                    sys.executable,
+                    "scripts/eval_generated_harness.py",
+                    target.as_posix(),
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(0, eval_completed.returncode, eval_completed.stdout + eval_completed.stderr)
 
     def test_create_acceptance_rejects_non_empty_target_without_force(self):
         with tempfile.TemporaryDirectory() as temp_dir:

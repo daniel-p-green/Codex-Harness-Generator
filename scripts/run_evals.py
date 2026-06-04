@@ -14,6 +14,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 FIXTURE_ROOT = REPO_ROOT / "tests" / "fixtures" / "generated_harnesses"
 DETERMINISTIC_EXAMPLE_ROOT = REPO_ROOT / "examples" / "deterministic"
+CREATE_ACCEPTANCE_EXAMPLE_ROOT = REPO_ROOT / "examples" / "create-acceptance"
 
 
 def run_step(name: str, command: list[str]) -> dict:
@@ -48,6 +49,16 @@ def deterministic_example_paths() -> list[str]:
     return [
         path.as_posix()
         for path in sorted(DETERMINISTIC_EXAMPLE_ROOT.iterdir())
+        if path.is_dir()
+    ]
+
+
+def create_acceptance_example_paths() -> list[str]:
+    if not CREATE_ACCEPTANCE_EXAMPLE_ROOT.exists():
+        return []
+    return [
+        path.as_posix()
+        for path in sorted(CREATE_ACCEPTANCE_EXAMPLE_ROOT.iterdir())
         if path.is_dir()
     ]
 
@@ -101,6 +112,14 @@ def main() -> int:
                 ],
             ),
             run_step(
+                "create_acceptance_example_eval",
+                [python, "scripts/eval_generated_harness.py", "--json", *create_acceptance_example_paths()],
+            ),
+            run_step(
+                "create_acceptance_example_smoke",
+                [python, "scripts/smoke_generated_harness.py", "--json", *create_acceptance_example_paths()],
+            ),
+            run_step(
                 "unit_and_mutation_tests",
                 [python, "-m", "unittest", "discover", "-s", "tests", "-q"],
             ),
@@ -114,6 +133,7 @@ def main() -> int:
                     "scripts/eval_deterministic_profiles.py",
                     "scripts/eval_generated_harness.py",
                     "scripts/generate_minimal_harness.py",
+                    "scripts/refresh_create_acceptance_examples.py",
                     "scripts/refresh_deterministic_examples.py",
                     "scripts/run_create_acceptance.py",
                     "scripts/run_evals.py",
