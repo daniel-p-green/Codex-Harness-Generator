@@ -284,6 +284,35 @@ Add at least two public-safe bullets about what the generated harness helped you
         self.assertIn("outcome", payload["missing_fields"])
         self.assertTrue(payload["github_issue"]["comments_included"])
 
+    def test_include_comments_ignores_automated_usage_lint_comments(self):
+        lint_comment = """<!-- codex-harness-usage-lint -->
+
+## Codex Harness usage-evidence lint
+
+Status: `fail`
+Readiness: `needs-input`
+Reporter comment count: `1`
+
+### Missing fields
+
+- outcome
+"""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_matching_pilot_record(root)
+
+            payload = usage_from_github_issue.build_payload(
+                self.args(root, include_comments=True, lint_only=True),
+                github_payload=self.github_payload(
+                    comments=[{"body": lint_comment, "url": "https://github.com/example/repo/issues/12#issuecomment-2"}],
+                ),
+            )
+
+        self.assertEqual("pass", payload["status"], payload)
+        self.assertEqual("conversion-ready", payload["readiness"])
+        self.assertEqual(0, payload["github_issue"]["comment_count"])
+        self.assertTrue(payload["github_issue"]["comments_included"])
+
     def test_sensitive_comment_fails_lint(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)

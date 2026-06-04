@@ -26,6 +26,7 @@ from record_usage_case import (
 
 
 MAINTAINER_FOLLOWUP_MARKER = "<!-- codex-harness-maintainer-followup -->"
+USAGE_LINT_MARKER = "<!-- codex-harness-usage-lint -->"
 
 
 def fetch_github_issue(issue: str, repo: str = "", gh_bin: str = "gh", *, include_comments: bool = False) -> dict:
@@ -55,7 +56,7 @@ def comment_bodies(payload: dict) -> list[str]:
     bodies = []
     for comment in payload.get("comments") or []:
         body = str(comment.get("body", "")).strip()
-        if MAINTAINER_FOLLOWUP_MARKER in body:
+        if MAINTAINER_FOLLOWUP_MARKER in body or USAGE_LINT_MARKER in body:
             continue
         if body:
             bodies.append(body)
