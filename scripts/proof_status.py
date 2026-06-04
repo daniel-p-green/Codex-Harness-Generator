@@ -14,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from validate_usage_records import DEFAULT_RECORD_DIR, validate_record_dir
 from check_example_inventory import check_inventory
+from check_cli_install import build_payload as build_cli_install_payload
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -64,9 +65,34 @@ def check_file_exists(name: str, path: Path) -> dict:
     }
 
 
+def check_installable_cli() -> tuple[dict, dict]:
+    payload = build_cli_install_payload()
+    failed = next((step for step in payload["steps"] if step["status"] != "pass"), None)
+    profile_step = next((step for step in payload["steps"] if step["name"] == "profiles"), {})
+    init_step = next((step for step in payload["steps"] if step["name"] == "init"), {})
+    eval_step = next((step for step in payload["steps"] if step["name"] == "eval"), {})
+    if failed:
+        detail = f"failed at {failed['name']}"
+    else:
+        detail = "profiles={profiles} init={init_status} eval={eval_status}".format(
+            profiles=profile_step.get("profile_count", "unknown"),
+            init_status=init_step.get("status", "unknown"),
+            eval_status=eval_step.get("status", "unknown"),
+        )
+    return (
+        {
+            "name": "installable_cli",
+            "status": payload["status"],
+            "detail": detail,
+        },
+        payload,
+    )
+
+
 def build_payload(min_live_trials: int, min_usage_records: int, record_dir: Path) -> dict:
     task_trials = parse_task_trials(TASK_TRIALS_REPORT)
     inventory = check_inventory()
+    install_check, install_payload = check_installable_cli()
     usage = validate_record_dir(
         record_dir,
         min_records=min_usage_records,
@@ -82,6 +108,7 @@ def build_payload(min_live_trials: int, min_usage_records: int, record_dir: Path
             "status": inventory["status"],
             "detail": "profiles={profile_count} brief_examples={brief_example_count} failures={failure_count}".format(**inventory),
         },
+        install_check,
         {
             "name": "live_task_trials",
             "status": (
@@ -111,6 +138,7 @@ def build_payload(min_live_trials: int, min_usage_records: int, record_dir: Path
         ),
         "checks": checks,
         "example_inventory": inventory,
+        "installable_cli": install_payload,
         "task_trials": task_trials,
         "usage_summary": usage["summary"],
         "does_not_prove": [
@@ -163,7 +191,7 @@ def write_report(path: Path, payload: dict) -> None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--min-live-trials", type=int, default=8, help="Minimum passing live task trials required")
-    parser.add_argument("--min-usage-records", type=int, default=1, help="Minimum valid usage records required")
+    parser.add_argument("--min-usage-records", type=int, default=2, help="Minimum valid usage records required")
     parser.add_argument("--record-dir", default=DEFAULT_RECORD_DIR.as_posix())
     parser.add_argument("--report", default=DEFAULT_REPORT.as_posix())
     parser.add_argument("--no-write", action="store_true", help="Do not write PROOF_STATUS.md")

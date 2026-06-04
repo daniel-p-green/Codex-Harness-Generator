@@ -168,14 +168,15 @@ Before making public claims about readiness or usage, run:
 ```bash
 python scripts/proof_status.py
 python scripts/validate_usage_records.py \
-  --min-records 1 \
+  --min-records 2 \
   --require-non-synthetic \
   --require-success
 ```
 
 The proof status report is conservative. It summarizes checked-in examples,
-live task trials, and sanitized usage evidence; it does not prove broad external
-adoption or that every future live `/create` run will be ideal.
+the installable CLI smoke, live task trials, and sanitized usage evidence; it
+does not prove broad external adoption or that every future live `/create` run
+will be ideal.
 
 ### Validation Checklist
 

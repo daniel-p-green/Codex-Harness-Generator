@@ -76,8 +76,8 @@ replacement. What is proven today:
   records from this public repo's Codex work. They are useful evidence, but not
   yet external or longitudinal adoption proof.
 - `scripts/proof_status.py` writes `Docs/Environment/PROOF_STATUS.md`, a
-  one-command readiness summary tying the proof matrix, live task trials, and
-  usage records together without overclaiming.
+  one-command readiness summary tying the proof matrix, installable CLI smoke,
+  live task trials, and usage records together without overclaiming.
 
 What still needs product proof:
 
