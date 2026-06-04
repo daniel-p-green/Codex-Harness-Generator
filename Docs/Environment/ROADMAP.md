@@ -131,7 +131,7 @@ The project can stop calling itself a beta only when all of these are true:
    reporter still owes public-safe evidence fields. Use the `Usage Evidence
    Lint` workflow with `issue=all-open-pilots` when the public queue needs one
    marker-managed readiness refresh and GitHub readiness label across every open
-   pilot issue. After the reporter updates the issue, rerun `codex-harness
+   pilot or usage-evidence issue. After the reporter updates the issue, rerun `codex-harness
    pilot-github-sync` and preview conversion with
    `codex-harness usage-from-github-issue --include-comments`
    before writing the checked-in usage record. Run

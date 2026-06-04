@@ -688,8 +688,9 @@ comment plus a `usage-evidence:needs-input` or
 evidence counts. Conversion-ready comments include exact maintainer preview and
 conversion commands. It never writes a usage record and does not make the issue
 adoption proof.
-To refresh every open public pilot issue in one pass, manually dispatch the
-workflow with `issue=all-open-pilots`; it still upserts one marker-managed
+To refresh every open public usage-evidence issue in one pass, manually dispatch
+the workflow with `issue=all-open-pilots`; it covers `External usage pilot:`,
+`[usage]`, and `usage-evidence` issues while still upserting one marker-managed
 comment per issue rather than creating duplicate comments.
 Post follow-ups only when the selected action is still missing public-safe
 evidence, verification, privacy, or limitation fields. Maintainer follow-ups

@@ -36,8 +36,8 @@ comment and applies either `usage-evidence:needs-input` or
 also prints exact maintainer preview and conversion commands when an issue is
 conversion-ready. It does not write usage records or count as adoption proof.
 Maintainers can also manually dispatch it with `issue=all-open-pilots` to
-refresh readiness comments and labels across every open `External usage pilot:`
-issue in one run.
+refresh readiness comments and labels across every open `External usage pilot:`,
+`[usage]`, or `usage-evidence` issue in one run.
 
 For a local live smoke check against the Codex CLI, run:
 

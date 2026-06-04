@@ -68,8 +68,8 @@ jobs:
             gh issue list \
               --repo "$GITHUB_REPOSITORY" \
               --state open \
-              --json number,title \
-              --jq '.[] | select(.title | startswith("External usage pilot:")) | .number' \
+              --json number,title,labels \
+              --jq '.[] | select((.title | startswith("External usage pilot:")) or (.title | startswith("[usage]")) or any(.labels[]?.name; . == "usage-evidence")) | .number' \
               > usage-lint-results/open-pilot-issues.txt
             while IFS= read -r ISSUE_NUMBER; do
               [ -n "$ISSUE_NUMBER" ] || continue

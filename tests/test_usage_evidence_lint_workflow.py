@@ -45,7 +45,10 @@ class UsageEvidenceLintWorkflowTests(unittest.TestCase):
         self.assertIn('if [ "$ISSUE_SELECTOR" = "all-open-pilots" ]; then', text)
         self.assertIn("gh issue list", text)
         self.assertIn('--state open', text)
+        self.assertIn('--json number,title,labels', text)
         self.assertIn('startswith("External usage pilot:")', text)
+        self.assertIn('startswith("[usage]")', text)
+        self.assertIn('any(.labels[]?.name; . == "usage-evidence")', text)
         self.assertIn("usage-lint-results/open-pilot-issues.txt", text)
         self.assertIn("while IFS=$'\\t' read -r ISSUE_NUMBER ISSUE_SELECTOR", text)
 
