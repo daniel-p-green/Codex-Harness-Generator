@@ -119,10 +119,41 @@ class ProofNextTests(unittest.TestCase):
         commands = [item["command"] for item in payload["command_sequence"]]
         self.assertFalse(any("prepare-next-pilot" in command for command in commands))
         self.assertTrue(any("pilot-update llm-app-pilot --status invited" in command for command in commands))
+        self.assertTrue(any("pilot-update llm-app-pilot --status completed" in command for command in commands))
         self.assertTrue(any("usage-from-issue <completed-issue.md> --slug llm-app-pilot" in command for command in commands))
         self.assertTrue(any("usage-from-harness <generated-harness> --slug llm-app-pilot" in command for command in commands))
         self.assertTrue(any("usage-from-issue <completed-issue.md>" in command and "--no-write --json" in command for command in commands))
         self.assertTrue(any("usage-from-harness <generated-harness>" in command and "--no-write --json" in command for command in commands))
+
+    def test_build_payload_marks_invited_pilot_completed_before_conversion(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            record_dir = root / "records"
+            pilot_record_dir = root / "pilot-records"
+            record_dir.mkdir()
+            self.write_payload(record_dir, self.valid_payload())
+            self.write_pilot_record(pilot_record_dir, status="invited")
+
+            payload = proof_next.build_payload(self.args(record_dir, pilot_record_dir=pilot_record_dir))
+
+        commands = [item["command"] for item in payload["command_sequence"]]
+        self.assertFalse(any("--status invited" in command for command in commands))
+        self.assertTrue(any("pilot-update llm-app-pilot --status completed" in command for command in commands))
+
+    def test_build_payload_does_not_recomplete_completed_pilot(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            record_dir = root / "records"
+            pilot_record_dir = root / "pilot-records"
+            record_dir.mkdir()
+            self.write_payload(record_dir, self.valid_payload())
+            self.write_pilot_record(pilot_record_dir, status="completed")
+
+            payload = proof_next.build_payload(self.args(record_dir, pilot_record_dir=pilot_record_dir))
+
+        commands = [item["command"] for item in payload["command_sequence"]]
+        self.assertFalse(any("pilot-update llm-app-pilot --status completed" in command for command in commands))
+        self.assertTrue(any("usage-from-harness <generated-harness> --slug llm-app-pilot" in command for command in commands))
 
     def test_write_report_includes_next_pilot_and_claim_boundary(self):
         with tempfile.TemporaryDirectory() as temp_dir:

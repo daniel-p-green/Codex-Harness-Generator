@@ -180,6 +180,21 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
                     "purpose": "record outreach after the pilot pack is sent to a reporter",
                 }
             )
+        if active_pilot["status"] in {"prepared", "invited"}:
+            commands.append(
+                {
+                    "name": "mark pilot completed",
+                    "command": (
+                        f"codex-harness pilot-update {active_pilot['slug']} "
+                        "--status completed "
+                        f"--record-dir {args.pilot_record_dir} "
+                        f"--usage-record-dir {args.record_dir} "
+                        f"--report {args.pilot_board_report} "
+                        "--notes \"reporter completed task and shared public-safe evidence\""
+                    ),
+                    "purpose": "record reporter completion before converting the evidence into a usage record",
+                }
+            )
         commands.extend(build_conversion_commands(active_pilot, args))
     elif pilots:
         pilot = pilots[0]
