@@ -49,6 +49,8 @@ replacement. What is proven today:
   output files.
 - `scripts/record_eval_snapshot.py` records eval-gate snapshots under
   `Docs/Environment/eval-history/` and updates `Docs/Environment/EVAL_TRENDS.md`.
+- `scripts/check_source_freshness.py` verifies official OpenAI documentation
+  citations are still reachable and writes `Docs/Environment/SOURCE_FRESHNESS.md`.
 
 What still needs product proof:
 
@@ -204,6 +206,12 @@ To record an eval trend snapshot:
 python scripts/record_eval_snapshot.py
 ```
 
+To check official OpenAI source freshness:
+
+```bash
+python scripts/check_source_freshness.py
+```
+
 ## Commands
 
 | Command | What it does |
@@ -296,6 +304,8 @@ This runs:
 - Live-create task-trial helper tests. Authenticated maintainers can run the
   full task trials separately with `python scripts/run_live_example_task_trials.py`.
 - Eval trend snapshot helper tests.
+- Source freshness helper tests. Maintainers can run the live source check with
+  `python scripts/check_source_freshness.py`.
 - Contract and mutation tests.
 - Python compile checks.
 

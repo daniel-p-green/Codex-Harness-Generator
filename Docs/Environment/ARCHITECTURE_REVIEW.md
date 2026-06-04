@@ -59,12 +59,12 @@ transcript.
 
 ## Remaining Opportunities
 
-- Add a live sample-generation eval that runs `/create` in a temporary repo and
-  scores the output with the same evaluator.
+- Expand live sample-generation examples into higher-risk domains once safe
+  synthetic briefs are available.
 - Add per-domain fixture mutations for high-stakes domains such as security,
   legal, finance, hiring, and support.
-- Track eval score trends over time so regressions are visible before release.
-- Add a source freshness check that flags old official-doc citations.
+- Add semantic-drift checks that compare local guidance against official docs,
+  beyond the current official-source reachability check.
 - Add a minimal deterministic bootstrap script for users who expect a CLI entry
   point before entering Codex.
 

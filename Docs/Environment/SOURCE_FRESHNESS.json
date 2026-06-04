@@ -1,0 +1,55 @@
+{
+  "generated": "2026-06-04T04:24:25Z",
+  "status": "pass",
+  "sources": [
+    {
+      "url": "https://developers.openai.com/codex/concepts/customization",
+      "status": "pass",
+      "http_status": 200,
+      "final_url": "https://developers.openai.com/codex/concepts/customization",
+      "error": null
+    },
+    {
+      "url": "https://developers.openai.com/codex/guides/agents-md",
+      "status": "pass",
+      "http_status": 200,
+      "final_url": "https://developers.openai.com/codex/guides/agents-md",
+      "error": null
+    },
+    {
+      "url": "https://developers.openai.com/codex/config-reference",
+      "status": "pass",
+      "http_status": 200,
+      "final_url": "https://developers.openai.com/codex/config-reference",
+      "error": null
+    },
+    {
+      "url": "https://developers.openai.com/codex/subagents",
+      "status": "pass",
+      "http_status": 200,
+      "final_url": "https://developers.openai.com/codex/subagents",
+      "error": null
+    },
+    {
+      "url": "https://developers.openai.com/codex/permissions",
+      "status": "pass",
+      "http_status": 200,
+      "final_url": "https://developers.openai.com/codex/permissions",
+      "error": null
+    },
+    {
+      "url": "https://developers.openai.com/codex/skills",
+      "status": "pass",
+      "http_status": 200,
+      "final_url": "https://developers.openai.com/codex/skills",
+      "error": null
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/reasoning",
+      "status": "pass",
+      "http_status": 200,
+      "final_url": "https://developers.openai.com/api/docs/guides/reasoning",
+      "error": null
+    }
+  ]
+}

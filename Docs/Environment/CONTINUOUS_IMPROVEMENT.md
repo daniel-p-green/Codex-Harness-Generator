@@ -77,6 +77,16 @@ python scripts/record_eval_snapshot.py
 This writes a compact JSON snapshot under `Docs/Environment/eval-history/` and
 updates `Docs/Environment/EVAL_TRENDS.md`.
 
+For official OpenAI source freshness:
+
+```bash
+python scripts/check_source_freshness.py
+```
+
+This verifies cited `developers.openai.com` URLs are reachable and updates
+`Docs/Environment/SOURCE_FRESHNESS.md` plus its JSON payload. Treat failures as
+a semantic review trigger before changing generator behavior.
+
 ## Fixture Coverage
 
 The current golden fixtures cover:

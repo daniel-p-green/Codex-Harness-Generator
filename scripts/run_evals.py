@@ -186,6 +186,7 @@ def main() -> int:
                     python,
                     "-m",
                     "py_compile",
+                    "scripts/check_source_freshness.py",
                     "scripts/capture_live_create_example.py",
                     "scripts/eval_codex_port.py",
                     "scripts/eval_deterministic_profiles.py",
@@ -206,6 +207,7 @@ def main() -> int:
                     "tests/test_live_example_task_trials.py",
                     "tests/test_record_eval_snapshot.py",
                     "tests/test_run_evals.py",
+                    "tests/test_source_freshness.py",
                 ],
             ),
         ]

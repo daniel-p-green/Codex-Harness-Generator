@@ -22,6 +22,7 @@ the stated scope, not more.
 | Checked-in live `/create` examples cover multiple synthetic project shapes. | `examples/live-create/INDEX.md`, `examples/live-create/synthetic-*` | `python scripts/eval_generated_harness.py examples/live-create/synthetic-* && python scripts/smoke_generated_harness.py examples/live-create/synthetic-*` | Knowledge-work, Python CLI, and data-analysis live captures each include trigger context, capture report, source map, assumptions, eval pass, and smoke pass. |
 | Generated harnesses can steer Codex through representative tasks. | `scripts/run_live_example_task_trials.py`, `examples/live-create/TASK_TRIALS.md`, `tests/test_live_example_task_trials.py` | `python scripts/run_live_example_task_trials.py` | Authenticated Codex runs against temporary copies of checked-in live examples seed synthetic inputs and verify concrete output files for notes, Python CLI TODO audit, and data review workflows. |
 | Eval scores and gates can be tracked over time. | `scripts/record_eval_snapshot.py`, `Docs/Environment/EVAL_TRENDS.md`, `Docs/Environment/eval-history/` | `python scripts/record_eval_snapshot.py` | Maintainers can archive compact eval snapshots and review pass/fail trends without depending on CI log retention. |
+| Official OpenAI source citations have a freshness check. | `scripts/check_source_freshness.py`, `Docs/Environment/SOURCE_FRESHNESS.md`, `Docs/Environment/SOURCE_FRESHNESS.json` | `python scripts/check_source_freshness.py` | Maintainers can verify cited `developers.openai.com` docs are reachable and trigger semantic review when official sources move or disappear. |
 | The standard release gate is CI-safe and offline. | `scripts/run_evals.py`, `.github/workflows/evals.yml` | `python scripts/run_evals.py` | Static port checks, fixture evals, offline smokes, deterministic generation, checked-in deterministic/create-acceptance/live-create examples, unit/mutation tests, and compile checks pass without authenticated live services. |
 | Authenticated local live smoke works through Codex CLI. | `scripts/smoke_generated_harness.py`, `scripts/run_evals.py --codex-live` | `python scripts/run_evals.py --codex-live` | On a machine with authenticated Codex CLI, checked-in create-acceptance examples can be loaded through non-interactive `codex exec`. |
 
@@ -61,4 +62,4 @@ python scripts/run_evals.py --codex-live --codex-live-profile all
 - Add more live examples for specialized or higher-risk domains such as
   security, legal, finance, hiring, and support.
 - Add non-synthetic real-world usage records once safe to publish or summarize.
-- Add source freshness checks for official OpenAI documentation citations.
+- Add more semantic drift checks for official OpenAI documentation changes.
