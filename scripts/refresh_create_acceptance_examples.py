@@ -7,12 +7,13 @@ import argparse
 import shutil
 from pathlib import Path
 
+from generate_minimal_harness import PROFILES
 from run_create_acceptance import DEFAULT_CREATED, DEFAULT_GENERATED_DATE, run_acceptance
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_EXAMPLE_ROOT = REPO_ROOT / "examples" / "create-acceptance"
-DEFAULT_PROFILES = ("software-development",)
+DEFAULT_PROFILES = tuple(sorted(PROFILES))
 
 
 def write_index(example_root: Path, generated_date: str, created: str, profiles: tuple[str, ...]) -> None:

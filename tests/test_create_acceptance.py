@@ -7,6 +7,12 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+CREATE_ACCEPTANCE_PROFILES = [
+    "data-analysis",
+    "devops-infrastructure",
+    "knowledge-work",
+    "software-development",
+]
 
 
 class CreateAcceptanceTests(unittest.TestCase):
@@ -73,8 +79,6 @@ class CreateAcceptanceTests(unittest.TestCase):
                     "scripts/refresh_create_acceptance_examples.py",
                     "--example-root",
                     example_root.as_posix(),
-                    "--profile",
-                    "software-development",
                 ],
                 cwd=REPO_ROOT,
                 text=True,
@@ -84,15 +88,15 @@ class CreateAcceptanceTests(unittest.TestCase):
             if completed.returncode != 0:
                 raise AssertionError(completed.stdout + completed.stderr)
 
-            target = example_root / "software-development"
             self.assertTrue((example_root / "README.md").is_file())
-            self.assertTrue((target / "Docs/Environment/CREATION_CONTEXT.md").is_file())
+            generated = sorted(path for path in example_root.iterdir() if path.is_dir())
+            self.assertEqual(CREATE_ACCEPTANCE_PROFILES, [path.name for path in generated])
+            for target in generated:
+                self.assertTrue((target / "Docs/Environment/CREATION_CONTEXT.md").is_file())
+                self.assertTrue((target / "Docs/Environment/CREATE_ACCEPTANCE_REPORT.md").is_file())
+
             eval_completed = subprocess.run(
-                [
-                    sys.executable,
-                    "scripts/eval_generated_harness.py",
-                    target.as_posix(),
-                ],
+                [sys.executable, "scripts/eval_generated_harness.py", *[target.as_posix() for target in generated]],
                 cwd=REPO_ROOT,
                 text=True,
                 capture_output=True,

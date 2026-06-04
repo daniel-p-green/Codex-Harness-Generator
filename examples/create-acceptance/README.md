@@ -13,6 +13,9 @@ Generated date: `2026-06-04`
 
 Profiles:
 
+- `data-analysis`
+- `devops-infrastructure`
+- `knowledge-work`
 - `software-development`
 
 Refresh:

@@ -36,8 +36,8 @@ replacement. What is proven today:
 - `scripts/run_create_acceptance.py` stitches the trigger and preset generator
   together in one target, preserving `CREATION_CONTEXT.md`, writing a complete
   harness, and adding `CREATE_ACCEPTANCE_REPORT.md`.
-- `examples/create-acceptance/` contains a checked-in snapshot of that
-  deterministic preset `/create` acceptance flow.
+- `examples/create-acceptance/` contains checked-in snapshots of that
+  deterministic preset `/create` acceptance flow for every supported profile.
 - Generated harnesses are required to include architecture, assumptions, source
   mapping, manifests, and validation reports.
 
