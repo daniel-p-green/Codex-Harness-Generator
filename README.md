@@ -83,7 +83,8 @@ replacement. What is proven today:
 - Generated harnesses include `scripts/export-public-usage-report.py`, a
   copied-harness-local exporter that turns the latest complete successful task
   trial plus local eval status into the same public-safe issue-body format that
-  maintainers can convert with `codex-harness usage-from-issue`.
+  maintainers can review directly with `codex-harness usage-from-harness` or
+  convert from a submitted issue with `codex-harness usage-from-issue`.
 - Generated harnesses include `scripts/check-harness.py`, a local smoke check
   that can run without this generator repo and catches missing paths, stale
   manifest references, broken agent/skill config, and weak eval/improvement
@@ -554,9 +555,12 @@ python scripts/codex_harness.py proof-next
 ```
 
 `proof-next` writes `Docs/Environment/PROOF_NEXT.md`. It packages the next
-pilot target, `prepare-next-pilot`, `pilot-board`, `usage-from-issue`,
+pilot target, `prepare-next-pilot`, `pilot-board`, preview-first
+`usage-from-harness` and `usage-from-issue` conversion commands,
 `beta-exit-audit`, and final `proof-status --beta-exit` commands while keeping
-the claim boundary explicit: the packet is a plan, not usage proof.
+the claim boundary explicit: the packet is a plan, not usage proof. Use the
+copied-harness route when the generated harness directory is available; use the
+issue route when the reporter only shared the sanitized issue body.
 
 To collect privacy-safe evidence from outside this repository, use the
 **External usage report** GitHub issue template and
@@ -660,7 +664,7 @@ Common subcommands:
 | `semantic-alignment` | `check_semantic_alignment.py` | Checks local guidance against official Codex doc concepts. |
 | `equivalence` | `check_codex_equivalence.py` | Checks and writes the Codex-native equivalence matrix. |
 | `usage-record` | `record_usage_case.py` | Records sanitized generated-harness usage evidence. |
-| `usage-from-harness` | `usage_from_harness.py` | Converts copied-harness task trials and eval reports into a privacy-checked usage record; add `--pilot-record-dir` to prevalidate and convert a matching prepared pilot. |
+| `usage-from-harness` | `usage_from_harness.py` | Converts copied-harness task trials and eval reports into a privacy-checked usage record; add `--no-write` to preview first or `--pilot-record-dir` to prevalidate and convert a matching prepared pilot. |
 | `evidence-packet <path>` | `export_evidence_packet.py` | Exports a public-safe Markdown evidence packet from copied-harness local eval and task trials. |
 | `pilot-pack <path>` | `export_pilot_pack.py` | Writes an external pilot guide and optional GitHub issue-body draft for one privacy-safe generated-harness trial. |
 | `pilot-campaign` | `export_pilot_campaign.py` | Writes a shareable external-pilot campaign plan from current usage evidence gaps. |

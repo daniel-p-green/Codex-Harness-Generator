@@ -56,11 +56,14 @@ class ExternalUsageEvidenceTests(unittest.TestCase):
 
         self.assertIn("# External Usage Evidence", text)
         self.assertIn("python scripts/codex_harness.py pilot-pack", text)
+        self.assertIn("python scripts/codex_harness.py usage-from-harness", text)
         self.assertIn("python scripts/codex_harness.py usage-from-issue", text)
         self.assertIn("python scripts/codex_harness.py usage-record", text)
         self.assertIn("--evidence-type private-summary", text)
         self.assertIn("--source-type external", text)
         self.assertIn("--generation-path installed-quickstart", text)
+        self.assertIn("--pilot-record-dir Docs/Environment/pilot-records", text)
+        self.assertIn("--no-write", text)
         self.assertIn("python scripts/codex_harness.py usage-validate", text)
         self.assertIn("Do not claim broad adoption", text)
 

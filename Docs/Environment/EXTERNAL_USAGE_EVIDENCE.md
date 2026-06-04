@@ -90,6 +90,31 @@ python scripts/codex_harness.py evidence-packet /path/to/generated-harness \
 Review the packet for concrete evidence, verification, privacy boundaries, and
 limitations before turning it into a checked-in usage record.
 
+When the generated harness directory is available to the maintainer, prefer the
+copied-harness converter. It reads the local eval report and task-trial records,
+previews the normalized usage record, and can link the record back to a prepared
+pilot without writing anything during review:
+
+```bash
+python scripts/codex_harness.py usage-from-harness /path/to/generated-harness \
+  --slug external-example \
+  --title "External example" \
+  --domain "LLM app" \
+  --harness-label "private-summary: external reporter" \
+  --evidence-type private-summary \
+  --source-type external \
+  --generation-path installed-quickstart \
+  --privacy-review "Reporter confirmed public-safe private-summary evidence only." \
+  --pilot-record-dir Docs/Environment/pilot-records \
+  --pilot-board-report Docs/Environment/PILOT_BOARD.md \
+  --no-write \
+  --json
+```
+
+If the preview is complete and public-safe, rerun without `--no-write` to write
+the usage-record JSON file, update `Docs/Environment/USAGE_RECORDS.md`, mark the
+matching pilot `converted`, and refresh `Docs/Environment/PILOT_BOARD.md`.
+
 Maintainers can convert a usable public issue into a checked-in usage record by
 saving the issue body to a local Markdown file. Preview and privacy-check the
 normalized record before writing files:
