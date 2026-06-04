@@ -20,6 +20,7 @@ sys.modules[spec.name] = export_pilot_github_issues
 spec.loader.exec_module(export_pilot_github_issues)
 
 import pilot_board
+import usage_from_issue
 
 
 class PilotGithubIssuesTests(unittest.TestCase):
@@ -93,9 +94,30 @@ class PilotGithubIssuesTests(unittest.TestCase):
         self.assertIn("--label pilot", record["gh_issue_create"])
         self.assertIn("pilot-update llm-app-pilot --status invited", record["mark_invited"])
         self.assertIn("usage-from-github-issue <issue-number-or-url>", record["convert_github_issue"])
+        self.assertIn("--include-comments", record["convert_github_issue"])
         self.assertIn("### Pilot or usage-record slug", record["body"])
         self.assertIn("llm-app-pilot", record["body"])
+        self.assertIn("## Reporter Completion Reply Template", record["body"])
+        self.assertIn("reply to this issue with the completion template", record["body"])
+        self.assertIn("reporter_reply_template", record)
         self.assertIn("GitHub issue drafts help open public pilot intake issues", payload["claim_boundary"])
+
+    def test_reporter_reply_template_matches_importer_headings(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_pilot_record(root)
+
+            payload = export_pilot_github_issues.build_payload(self.args(root))
+
+        record = payload["records"][0]
+        sections = usage_from_issue.parse_issue_sections(record["reporter_reply_template"])
+
+        for field in ("outcome", "task_summary", "evidence", "verification", "privacy_review", "limitations"):
+            self.assertIn(field, sections)
+            self.assertTrue(sections[field].strip())
+        self.assertGreaterEqual(len(usage_from_issue.parse_items(sections["evidence"])), 2)
+        self.assertGreaterEqual(len(usage_from_issue.parse_items(sections["verification"])), 2)
+        self.assertGreaterEqual(len(usage_from_issue.parse_items(sections["limitations"])), 1)
 
     def test_build_payload_uses_live_issue_url_from_pilot_notes(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -130,10 +152,13 @@ class PilotGithubIssuesTests(unittest.TestCase):
         self.assertIn("# External Usage Pilot", body_text)
         self.assertIn("### Outcome", body_text)
         self.assertIn("_no response_", body_text)
+        self.assertIn("Reporter Completion Reply Template", body_text)
         self.assertIn("# Pilot GitHub Issue Queue", report_text)
         self.assertIn("Create public issue:", report_text)
         self.assertIn("After the reporter completes the public issue", report_text)
         self.assertIn("usage-from-github-issue <issue-number-or-url>", report_text)
+        self.assertIn("--include-comments", report_text)
+        self.assertIn("Reporter completion reply template:", report_text)
         self.assertIn("Opening an issue or marking a pilot invited is not adoption evidence", report_text)
 
     def test_report_with_live_issue_warns_not_to_duplicate(self):

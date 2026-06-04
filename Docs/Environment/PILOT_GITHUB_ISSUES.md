@@ -1,6 +1,6 @@
 # Pilot GitHub Issue Queue
 
-Generated: 2026-06-04T18:33:09Z
+Generated: 2026-06-04T20:21:21Z
 Status: PASS
 Readiness: github-issue-ready
 
@@ -40,6 +40,36 @@ codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Ha
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
 ```
 
+Reporter completion reply template:
+
+```markdown
+### Outcome
+
+success
+
+### Public-safe task summary
+
+Describe one real task you completed with this generated harness. Keep it public-safe.
+
+### Evidence
+
+- Evidence item 1: what the harness helped produce, organize, catch, or verify.
+- Evidence item 2: another public-safe artifact, workflow improvement, or observed behavior.
+
+### Verification performed
+
+- Check 1: command, generated script, review step, or artifact inspection you actually performed.
+- Check 2: second check or review that supports the outcome.
+
+### Privacy review
+
+This report excludes secrets, personal data, private repository names, local machine paths, proprietary source, raw logs, and raw private transcripts.
+
+### Limitations
+
+- This reports one generated harness on one task; it does not prove broad adoption or production readiness.
+```
+
 ### 2. External usage pilot: security audit pilot (`security-audit-pilot`)
 
 - Status: `invited`
@@ -66,6 +96,36 @@ codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Ha
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
 ```
 
+Reporter completion reply template:
+
+```markdown
+### Outcome
+
+success
+
+### Public-safe task summary
+
+Describe one real task you completed with this generated harness. Keep it public-safe.
+
+### Evidence
+
+- Evidence item 1: what the harness helped produce, organize, catch, or verify.
+- Evidence item 2: another public-safe artifact, workflow improvement, or observed behavior.
+
+### Verification performed
+
+- Check 1: command, generated script, review step, or artifact inspection you actually performed.
+- Check 2: second check or review that supports the outcome.
+
+### Privacy review
+
+This report excludes secrets, personal data, private repository names, local machine paths, proprietary source, raw logs, and raw private transcripts.
+
+### Limitations
+
+- This reports one generated harness on one task; it does not prove broad adoption or production readiness.
+```
+
 ### 3. External usage pilot: customer support pilot (`customer-support-pilot`)
 
 - Status: `invited`
@@ -90,6 +150,36 @@ After the reporter completes the public issue, lint, preview, and convert from G
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+```
+
+Reporter completion reply template:
+
+```markdown
+### Outcome
+
+success
+
+### Public-safe task summary
+
+Describe one real task you completed with this generated harness. Keep it public-safe.
+
+### Evidence
+
+- Evidence item 1: what the harness helped produce, organize, catch, or verify.
+- Evidence item 2: another public-safe artifact, workflow improvement, or observed behavior.
+
+### Verification performed
+
+- Check 1: command, generated script, review step, or artifact inspection you actually performed.
+- Check 2: second check or review that supports the outcome.
+
+### Privacy review
+
+This report excludes secrets, personal data, private repository names, local machine paths, proprietary source, raw logs, and raw private transcripts.
+
+### Limitations
+
+- This reports one generated harness on one task; it does not prove broad adoption or production readiness.
 ```
 
 ## Claim Boundary
