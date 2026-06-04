@@ -140,6 +140,23 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_inspect_delegates_to_project_inspector(self):
+        command, _ = self.run_cli(["inspect", "/tmp/project", "--max-files", "25", "--limit", "2", "--json"])
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/inspect_project.py",
+                "/tmp/project",
+                "--max-files",
+                "25",
+                "--limit",
+                "2",
+                "--json",
+            ],
+            command,
+        )
+
     def test_generate_delegates_with_project_options(self):
         command, _ = self.run_cli(
             [

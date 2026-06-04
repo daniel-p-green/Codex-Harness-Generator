@@ -72,6 +72,16 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("profile_catalog.py", command)
 
+    if args.command == "inspect":
+        command = [args.path]
+        if args.max_files is not None:
+            command.extend(["--max-files", str(args.max_files)])
+        if args.limit is not None:
+            command.extend(["--limit", str(args.limit)])
+        if args.json:
+            command.append("--json")
+        return python_script("inspect_project.py", command)
+
     if args.command == "generate":
         command = [args.target, "--profile", args.profile]
         if args.project_name:
@@ -382,6 +392,12 @@ def make_parser() -> argparse.ArgumentParser:
     recommend.add_argument("brief", help="Short project brief")
     recommend.add_argument("--limit", type=int, default=3, help="Number of recommendations to show")
     recommend.add_argument("--json", action="store_true", help="Emit recommendation JSON")
+
+    inspect = subparsers.add_parser("inspect", help="Inspect a local project and recommend starter profiles")
+    inspect.add_argument("path", help="Project directory to inspect")
+    inspect.add_argument("--max-files", type=int, default=800, help="Maximum files to scan before truncating")
+    inspect.add_argument("--limit", type=int, default=3, help="Number of recommendations to show")
+    inspect.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     generate = subparsers.add_parser("generate", help="Generate a minimal deterministic harness")
     add_common_generation_args(generate)

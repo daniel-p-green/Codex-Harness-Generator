@@ -152,6 +152,7 @@ def build_payload() -> dict:
                 ],
             ),
             ("validate", [(venv / "bin" / "codex-harness").as_posix(), "validate", generated.as_posix(), "--json"]),
+            ("inspect", [(venv / "bin" / "codex-harness").as_posix(), "inspect", generated.as_posix(), "--json"]),
             (
                 "record_task_trial",
                 [

@@ -33,11 +33,13 @@ REQUIRED_FILES = (
     "Docs/Environment/USAGE_RECORDS.md",
     "scripts/codex_harness.py",
     "scripts/generate_minimal_harness.py",
+    "scripts/inspect_project.py",
     "scripts/run_evals.py",
 )
 
 NEXT_COMMANDS = (
     "codex-harness profiles",
+    "codex-harness inspect .",
     'codex-harness init /tmp/codex-rag-harness --brief "RAG app with prompts, evals, and retrieval checks" --force',
     "codex-harness validate /tmp/codex-rag-harness",
     "codex-harness gate",
@@ -125,6 +127,7 @@ def check_installable_cli() -> tuple[dict, dict]:
     profile_step = next((step for step in payload["steps"] if step["name"] == "profiles"), {})
     doctor_step = next((step for step in payload["steps"] if step["name"] == "doctor"), {})
     validate_step = next((step for step in payload["steps"] if step["name"] == "validate"), {})
+    inspect_step = next((step for step in payload["steps"] if step["name"] == "inspect"), {})
     local_eval_step = next((step for step in payload["steps"] if step["name"] == "local_eval"), {})
     usage_from_harness_step = next((step for step in payload["steps"] if step["name"] == "usage_from_harness"), {})
     usage_from_issue_step = next((step for step in payload["steps"] if step["name"] == "usage_from_issue"), {})
@@ -132,10 +135,11 @@ def check_installable_cli() -> tuple[dict, dict]:
     if failed:
         detail = f"failed at {failed['name']}"
     else:
-        detail = "profiles={profiles} doctor={doctor_status} init=pass validate={validate_status} local_eval={local_eval_status} usage_from_harness={usage_from_harness_status} usage_from_issue={usage_from_issue_status} migration_audit={migration_status} eval=pass".format(
+        detail = "profiles={profiles} doctor={doctor_status} init=pass validate={validate_status} inspect={inspect_status} local_eval={local_eval_status} usage_from_harness={usage_from_harness_status} usage_from_issue={usage_from_issue_status} migration_audit={migration_status} eval=pass".format(
             profiles=profile_step.get("profile_count", "unknown"),
             doctor_status=doctor_step.get("status", "unknown"),
             validate_status=validate_step.get("status", "unknown"),
+            inspect_status=inspect_step.get("status", "unknown"),
             local_eval_status=local_eval_step.get("status", "unknown"),
             usage_from_harness_status=usage_from_harness_step.get("status", "unknown"),
             usage_from_issue_status=usage_from_issue_step.get("status", "unknown"),
