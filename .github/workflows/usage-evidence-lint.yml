@@ -24,9 +24,18 @@ jobs:
   lint:
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      startsWith(github.event.issue.title, 'External usage pilot:') ||
-      startsWith(github.event.issue.title, '[usage]') ||
-      contains(github.event.issue.labels.*.name, 'usage-evidence')
+      (
+        github.event.issue.pull_request == null &&
+        (
+          github.event_name == 'issues' ||
+          (github.event_name == 'issue_comment' && !contains(github.event.comment.body, '<!-- codex-harness-usage-lint -->'))
+        ) &&
+        (
+          startsWith(github.event.issue.title, 'External usage pilot:') ||
+          startsWith(github.event.issue.title, '[usage]') ||
+          contains(github.event.issue.labels.*.name, 'usage-evidence')
+        )
+      )
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
