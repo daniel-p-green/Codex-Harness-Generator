@@ -425,6 +425,24 @@ def build_payload() -> dict:
                 ],
             ),
             (
+                "usage_from_issue_lint",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "usage-from-issue",
+                    issue_body.as_posix(),
+                    "--slug",
+                    "install-smoke-issue-lint",
+                    "--title",
+                    "Install smoke issue lint",
+                    "--source-type",
+                    "self-dogfood",
+                    "--generation-path",
+                    "installed-quickstart",
+                    "--lint-only",
+                    "--json",
+                ],
+            ),
+            (
                 "usage_from_issue_preview",
                 [
                     (venv / "bin" / "codex-harness").as_posix(),
@@ -635,6 +653,12 @@ def build_payload() -> dict:
                         step["status"] = "fail"
                         step["returncode"] = 1
                         step["stderr"] += "\nExpected 20 profiles from installed CLI."
+                if name == "usage_from_issue_lint" and completed.returncode == 0:
+                    lint_payload = json.loads(completed.stdout)
+                    if lint_payload.get("status") != "pass" or lint_payload.get("readiness") != "conversion-ready":
+                        step["status"] = "fail"
+                        step["returncode"] = 1
+                        step["stderr"] += "\nIssue lint payload did not prove a conversion-ready issue body."
                 if name == "usage_from_issue_pilot_conversion" and completed.returncode == 0:
                     conversion_payload = json.loads(completed.stdout)
                     pilot_update = conversion_payload.get("pilot_update") or {}
