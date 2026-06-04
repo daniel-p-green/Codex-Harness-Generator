@@ -159,7 +159,13 @@ def numbered_list(items: tuple[str, ...], start: int = 1) -> str:
     return "\n".join(f"{index}. {item}" for index, item in enumerate(items, start))
 
 
-def generate(target: Path, project_name: str | None, profile_slug: str, force: bool) -> None:
+def generate(
+    target: Path,
+    project_name: str | None,
+    profile_slug: str,
+    force: bool,
+    generated_date: str | None = None,
+) -> None:
     profile = PROFILES.get(profile_slug)
     if not profile:
         supported = ", ".join(sorted(PROFILES))
@@ -167,7 +173,7 @@ def generate(target: Path, project_name: str | None, profile_slug: str, force: b
 
     resolved_project_name = project_name or profile.default_project_name
     ensure_target(target, force)
-    generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    generated_at = generated_date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     write(
         target / "AGENTS.md",
@@ -417,6 +423,7 @@ def main() -> int:
     parser.add_argument("target", nargs="?", help="Directory where the minimal harness should be written")
     parser.add_argument("--profile", default="software-development", help="Deterministic profile to generate")
     parser.add_argument("--project-name", help="Human-readable project name")
+    parser.add_argument("--generated-date", help="Override generated date for reproducible examples")
     parser.add_argument("--force", action="store_true", help="Replace target if it already contains files")
     parser.add_argument("--list-profiles", action="store_true", help="List deterministic profiles and exit")
     args = parser.parse_args()
@@ -427,7 +434,7 @@ def main() -> int:
     if not args.target:
         parser.error("target is required unless --list-profiles is used")
 
-    generate(Path(args.target).resolve(), args.project_name, args.profile, args.force)
+    generate(Path(args.target).resolve(), args.project_name, args.profile, args.force, args.generated_date)
     print(f"Generated minimal Codex harness at {Path(args.target).resolve()}")
     return 0
 

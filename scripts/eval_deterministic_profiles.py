@@ -13,13 +13,16 @@ from generate_minimal_harness import PROFILES, generate
 from smoke_generated_harness import smoke_offline
 
 
+EXAMPLE_GENERATED_DATE = "2026-06-04"
+
+
 def evaluate_profiles() -> dict:
     results = []
     with tempfile.TemporaryDirectory() as temp_dir:
         root = Path(temp_dir)
         for profile in sorted(PROFILES):
             target = root / profile
-            generate(target, None, profile, force=False)
+            generate(target, None, profile, force=False, generated_date=EXAMPLE_GENERATED_DATE)
             eval_result = evaluate(target)
             smoke_result = smoke_offline(target)
             status = "pass" if eval_result["status"] == "pass" and smoke_result["status"] == "pass" else "fail"

@@ -1,0 +1,42 @@
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+model_verbosity = "medium"
+approval_policy = "on-request"
+default_permissions = "knowledge-work"
+
+[agents]
+max_threads = 4
+max_depth = 1
+
+[agents.reviewer]
+description = "Reviews research, planning, and operations outputs for source fidelity, missing context, and privacy risks."
+config_file = "agents/reviewer.toml"
+
+[[skills.config]]
+path = "../.agents/skills/health-check"
+enabled = true
+
+[permissions.knowledge-work]
+description = "Workspace write access with sensitive files denied."
+extends = ":workspace"
+
+[permissions.knowledge-work.filesystem]
+glob_scan_max_depth = 4
+
+[permissions.knowledge-work.filesystem.":workspace_roots"]
+"." = "write"
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"**/*secret*" = "deny"
+"**/*token*" = "deny"
+"**/*credential*" = "deny"
+"**/*.pem" = "deny"
+"**/*.key" = "deny"
+
+[permissions.knowledge-work.network]
+enabled = true
+mode = "limited"
+
+[permissions.knowledge-work.network.domains]
+"developers.openai.com" = "allow"
+"docs.github.com" = "allow"

@@ -1,0 +1,42 @@
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+model_verbosity = "medium"
+approval_policy = "on-request"
+default_permissions = "data-analysis"
+
+[agents]
+max_threads = 4
+max_depth = 1
+
+[agents.reviewer]
+description = "Reviews analysis changes for reproducibility, data handling, metric definitions, and unsupported conclusions."
+config_file = "agents/reviewer.toml"
+
+[[skills.config]]
+path = "../.agents/skills/health-check"
+enabled = true
+
+[permissions.data-analysis]
+description = "Workspace write access with sensitive files denied."
+extends = ":workspace"
+
+[permissions.data-analysis.filesystem]
+glob_scan_max_depth = 4
+
+[permissions.data-analysis.filesystem.":workspace_roots"]
+"." = "write"
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"**/*secret*" = "deny"
+"**/*token*" = "deny"
+"**/*credential*" = "deny"
+"**/*.pem" = "deny"
+"**/*.key" = "deny"
+
+[permissions.data-analysis.network]
+enabled = true
+mode = "limited"
+
+[permissions.data-analysis.network.domains]
+"developers.openai.com" = "allow"
+"docs.github.com" = "allow"

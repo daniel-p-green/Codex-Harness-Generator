@@ -12,6 +12,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 FIXTURE_ROOT = REPO_ROOT / "tests" / "fixtures" / "generated_harnesses"
+DETERMINISTIC_EXAMPLE_ROOT = REPO_ROOT / "examples" / "deterministic"
 
 
 def run_step(name: str, command: list[str]) -> dict:
@@ -40,6 +41,16 @@ def fixture_paths() -> list[str]:
     ]
 
 
+def deterministic_example_paths() -> list[str]:
+    if not DETERMINISTIC_EXAMPLE_ROOT.exists():
+        return []
+    return [
+        path.as_posix()
+        for path in sorted(DETERMINISTIC_EXAMPLE_ROOT.iterdir())
+        if path.is_dir()
+    ]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--json", action="store_true", help="Emit JSON")
@@ -64,6 +75,14 @@ def main() -> int:
             [python, "scripts/eval_deterministic_profiles.py", "--json"],
         ),
         run_step(
+            "deterministic_example_eval",
+            [python, "scripts/eval_generated_harness.py", "--json", *deterministic_example_paths()],
+        ),
+        run_step(
+            "deterministic_example_smoke",
+            [python, "scripts/smoke_generated_harness.py", "--json", *deterministic_example_paths()],
+        ),
+        run_step(
             "unit_and_mutation_tests",
             [python, "-m", "unittest", "discover", "-s", "tests", "-q"],
         ),
@@ -77,6 +96,7 @@ def main() -> int:
                 "scripts/eval_deterministic_profiles.py",
                 "scripts/eval_generated_harness.py",
                 "scripts/generate_minimal_harness.py",
+                "scripts/refresh_deterministic_examples.py",
                 "scripts/run_evals.py",
                 "scripts/smoke_generated_harness.py",
                 "tests/test_eval_codex_port.py",

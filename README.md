@@ -28,13 +28,15 @@ replacement. What is proven today:
 - `scripts/generate_minimal_harness.py` provides a deterministic acceptance path
   for software development, knowledge work, data analysis, and infrastructure
   profiles without waiting on a live model run.
+- `examples/deterministic/` contains checked-in generated harness snapshots for
+  those profiles, and the release gate evaluates and smokes them.
 - Generated harnesses are required to include architecture, assumptions, source
   mapping, manifests, and validation reports.
 
 What still needs product proof:
 
 - Several fresh live `/create` runs in temporary projects.
-- Public example harnesses from the full `/create` flow, not just deterministic
+- Public example harnesses from the full `/create` flow, beyond deterministic
   profile scaffolds.
 - Real use of generated harnesses on real Codex tasks.
 
@@ -110,6 +112,14 @@ The deterministic generator currently supports:
 This proves the repo can write valid Codex harnesses to disk across the core
 starter profiles and that the same evaluator used for fixtures accepts them. The
 full `/create` flow remains the richer custom path.
+
+Checked-in examples are available under `examples/deterministic/`. Refresh them
+with:
+
+```bash
+python scripts/refresh_deterministic_examples.py
+python scripts/run_evals.py
+```
 
 ## Commands
 
@@ -193,13 +203,14 @@ This runs:
 - Generated-harness fixture evaluation.
 - Offline smoke checks for generated harnesses.
 - Deterministic profile generation, evaluation, and smoke checks.
+- Checked-in deterministic example evaluation and smoke checks.
 - Contract and mutation tests.
 - Python compile checks.
 
 The evals prove structural and contract quality against golden fixtures and the
-deterministic profile generator. They do not prove that every live `/create` run
-will be perfect, so meaningful changes should still be reviewed against generated
-artifacts.
+deterministic profile generator, including checked-in examples. They do not
+prove that every live `/create` run will be perfect, so meaningful changes should
+still be reviewed against generated artifacts.
 
 ## Project Structure
 

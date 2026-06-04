@@ -126,6 +126,52 @@ class GeneratedHarnessContractTests(unittest.TestCase):
             self.assertEqual(0, smoke.returncode, smoke.stdout + smoke.stderr)
             self.assertIn('"status": "pass"', smoke.stdout)
 
+    def test_minimal_generator_supports_fixed_generated_date(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            target = Path(temp_dir) / "generated"
+            generate = subprocess.run(
+                [
+                    sys.executable,
+                    "scripts/generate_minimal_harness.py",
+                    target.as_posix(),
+                    "--generated-date",
+                    "2026-06-04",
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(0, generate.returncode, generate.stdout + generate.stderr)
+            getting_started = (target / "Docs/GETTING_STARTED.md").read_text(encoding="utf-8")
+            self.assertIn("Generated: 2026-06-04", getting_started)
+
+    def test_refresh_deterministic_examples_outputs_valid_harnesses(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            example_root = Path(temp_dir) / "examples"
+            refresh = subprocess.run(
+                [
+                    sys.executable,
+                    "scripts/refresh_deterministic_examples.py",
+                    "--example-root",
+                    example_root.as_posix(),
+                    "--generated-date",
+                    "2026-06-04",
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(0, refresh.returncode, refresh.stdout + refresh.stderr)
+
+            generated = sorted(path for path in example_root.iterdir() if path.is_dir())
+            self.assertEqual(DETERMINISTIC_PROFILES, [path.name for path in generated])
+            for target in generated:
+                result = eval_generated_harness.evaluate(target)
+                self.assertEqual("pass", result["status"], result)
+                self.assertEqual(100, result["score"], result)
+
     def test_minimal_generator_rejects_non_empty_target_without_force(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             target = Path(temp_dir) / "generated"
