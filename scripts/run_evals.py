@@ -127,6 +127,10 @@ def main() -> int:
                 [python, "scripts/eval_codex_port.py", "--json", "--max-failures", "120"],
             ),
             run_step(
+                "codex_equivalence_matrix",
+                [python, "scripts/check_codex_equivalence.py", "--no-write", "--json"],
+            ),
+            run_step(
                 "generated_harness_fixture_eval",
                 [python, "scripts/eval_generated_harness.py", "--json", *fixture_paths()],
             ),
@@ -281,6 +285,7 @@ def main() -> int:
                     "scripts/capture_live_create_example.py",
                     "scripts/check_example_inventory.py",
                     "scripts/check_cli_install.py",
+                    "scripts/check_codex_equivalence.py",
                     "scripts/doctor.py",
                     "scripts/eval_codex_port.py",
                     "scripts/eval_deterministic_profiles.py",
@@ -310,6 +315,7 @@ def main() -> int:
                     "scripts/validate_generated_harness.py",
                     "scripts/validate_usage_records.py",
                     "tests/test_cli_install.py",
+                    "tests/test_codex_equivalence.py",
                     "tests/test_create_acceptance.py",
                     "tests/test_brief_acceptance.py",
                     "tests/test_brief_acceptance_examples.py",

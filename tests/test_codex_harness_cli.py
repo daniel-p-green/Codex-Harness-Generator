@@ -622,6 +622,27 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_equivalence_delegates_to_checker(self):
+        command, _ = self.run_cli(["equivalence", "--report", "/tmp/CODEX_EQUIVALENCE_MATRIX.md", "--no-write", "--json"])
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/check_codex_equivalence.py",
+                "--report",
+                "/tmp/CODEX_EQUIVALENCE_MATRIX.md",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
+    def test_equivalence_uses_current_checkout_when_available(self):
+        parser = codex_harness.make_parser()
+        args = parser.parse_args(["equivalence"])
+
+        self.assertEqual(Path.cwd(), codex_harness.command_cwd(args))
+
     def test_usage_record_delegates_to_recorder(self):
         command, _ = self.run_cli(
             [

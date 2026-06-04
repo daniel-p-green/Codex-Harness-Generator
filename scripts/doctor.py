@@ -30,6 +30,7 @@ REQUIRED_FILES = (
     ".github/ISSUE_TEMPLATE/feature-request.yml",
     "Docs/Environment/PROOF_MATRIX.md",
     "Docs/Environment/ROADMAP.md",
+    "Docs/Environment/CODEX_EQUIVALENCE_MATRIX.md",
     "Docs/Environment/USAGE_GAPS.md",
     "Docs/Environment/USAGE_RECORDS.md",
     "Docs/Environment/PILOT_CAMPAIGN.md",
@@ -140,6 +141,7 @@ def check_installable_cli() -> tuple[dict, dict]:
     validate_step = next((step for step in payload["steps"] if step["name"] == "validate"), {})
     inspect_step = next((step for step in payload["steps"] if step["name"] == "inspect"), {})
     adoption_step = next((step for step in payload["steps"] if step["name"] == "adoption_plan"), {})
+    equivalence_step = next((step for step in payload["steps"] if step["name"] == "equivalence"), {})
     local_eval_step = next((step for step in payload["steps"] if step["name"] == "local_eval"), {})
     evidence_packet_step = next((step for step in payload["steps"] if step["name"] == "evidence_packet"), {})
     pilot_pack_step = next((step for step in payload["steps"] if step["name"] == "pilot_pack"), {})
@@ -151,13 +153,14 @@ def check_installable_cli() -> tuple[dict, dict]:
     if failed:
         detail = f"failed at {failed['name']}"
     else:
-        detail = "profiles={profiles} doctor={doctor_status} init=pass init_from_project={init_from_project_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} local_eval={local_eval_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue={usage_from_issue_status} usage_gaps={usage_gaps_status} pilot_campaign={pilot_campaign_status} migration_audit={migration_status} eval=pass".format(
+        detail = "profiles={profiles} doctor={doctor_status} init=pass init_from_project={init_from_project_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} equivalence={equivalence_status} local_eval={local_eval_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue={usage_from_issue_status} usage_gaps={usage_gaps_status} pilot_campaign={pilot_campaign_status} migration_audit={migration_status} eval=pass".format(
             profiles=profile_step.get("profile_count", "unknown"),
             doctor_status=doctor_step.get("status", "unknown"),
             init_from_project_status=init_from_project_step.get("status", "unknown"),
             validate_status=validate_step.get("status", "unknown"),
             inspect_status=inspect_step.get("status", "unknown"),
             adoption_status=adoption_step.get("status", "unknown"),
+            equivalence_status=equivalence_step.get("status", "unknown"),
             local_eval_status=local_eval_step.get("status", "unknown"),
             evidence_packet_status=evidence_packet_step.get("status", "unknown"),
             pilot_pack_status=pilot_pack_step.get("status", "unknown"),

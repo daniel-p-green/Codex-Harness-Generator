@@ -261,6 +261,16 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("check_semantic_alignment.py", command)
 
+    if args.command == "equivalence":
+        command = []
+        if args.report:
+            command.extend(["--report", args.report])
+        if args.no_write:
+            command.append("--no-write")
+        if args.json:
+            command.append("--json")
+        return python_script("check_codex_equivalence.py", command)
+
     if args.command == "usage-record":
         command = [
             "--slug",
@@ -513,7 +523,12 @@ def build_command(args: argparse.Namespace) -> list[str]:
 
 
 def command_cwd(args: argparse.Namespace) -> Path:
-    if args.command == "doctor" and (Path.cwd() / "scripts" / "doctor.py").is_file():
+    checkout_audit_commands = {
+        "doctor": "doctor.py",
+        "equivalence": "check_codex_equivalence.py",
+    }
+    script_name = checkout_audit_commands.get(args.command)
+    if script_name and (Path.cwd() / "scripts" / script_name).is_file():
         return Path.cwd()
     return REPO_ROOT
 
@@ -644,6 +659,11 @@ def make_parser() -> argparse.ArgumentParser:
     semantic_alignment.add_argument("--timeout", type=int, help="HTTP timeout in seconds")
     semantic_alignment.add_argument("--no-write", action="store_true", help="Do not write JSON/report files")
     semantic_alignment.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    equivalence = subparsers.add_parser("equivalence", help="Check the Codex-native equivalence matrix")
+    equivalence.add_argument("--report", help="Equivalence matrix Markdown report path")
+    equivalence.add_argument("--no-write", action="store_true", help="Do not write the Markdown report")
+    equivalence.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     usage = subparsers.add_parser("usage-record", help="Record sanitized generated-harness usage evidence")
     usage.add_argument("--slug", required=True, help="Stable record slug")

@@ -19,6 +19,7 @@ from check_cli_install import build_payload as build_cli_install_payload
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PROOF_MATRIX = REPO_ROOT / "Docs" / "Environment" / "PROOF_MATRIX.md"
+EQUIVALENCE_MATRIX = REPO_ROOT / "Docs" / "Environment" / "CODEX_EQUIVALENCE_MATRIX.md"
 USAGE_REPORT = REPO_ROOT / "Docs" / "Environment" / "USAGE_RECORDS.md"
 USAGE_GAPS_REPORT = REPO_ROOT / "Docs" / "Environment" / "USAGE_GAPS.md"
 PILOT_CAMPAIGN_REPORT = REPO_ROOT / "Docs" / "Environment" / "PILOT_CAMPAIGN.md"
@@ -78,6 +79,7 @@ def check_installable_cli() -> tuple[dict, dict]:
     validate_step = next((step for step in payload["steps"] if step["name"] == "validate"), {})
     inspect_step = next((step for step in payload["steps"] if step["name"] == "inspect"), {})
     adoption_step = next((step for step in payload["steps"] if step["name"] == "adoption_plan"), {})
+    equivalence_step = next((step for step in payload["steps"] if step["name"] == "equivalence"), {})
     local_eval_step = next((step for step in payload["steps"] if step["name"] == "local_eval"), {})
     evidence_packet_step = next((step for step in payload["steps"] if step["name"] == "evidence_packet"), {})
     pilot_pack_step = next((step for step in payload["steps"] if step["name"] == "pilot_pack"), {})
@@ -90,7 +92,7 @@ def check_installable_cli() -> tuple[dict, dict]:
     if failed:
         detail = f"failed at {failed['name']}"
     else:
-        detail = "profiles={profiles} doctor={doctor_status} init={init_status} init_from_project={init_from_project_status} demo_capture={demo_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} local_eval={local_eval_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue={usage_from_issue_status} usage_gaps={usage_gaps_status} pilot_campaign={pilot_campaign_status} migration_audit={migration_status} eval={eval_status}".format(
+        detail = "profiles={profiles} doctor={doctor_status} init={init_status} init_from_project={init_from_project_status} demo_capture={demo_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} equivalence={equivalence_status} local_eval={local_eval_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue={usage_from_issue_status} usage_gaps={usage_gaps_status} pilot_campaign={pilot_campaign_status} migration_audit={migration_status} eval={eval_status}".format(
             profiles=profile_step.get("profile_count", "unknown"),
             doctor_status=doctor_step.get("status", "unknown"),
             init_status=init_step.get("status", "unknown"),
@@ -99,6 +101,7 @@ def check_installable_cli() -> tuple[dict, dict]:
             validate_status=validate_step.get("status", "unknown"),
             inspect_status=inspect_step.get("status", "unknown"),
             adoption_status=adoption_step.get("status", "unknown"),
+            equivalence_status=equivalence_step.get("status", "unknown"),
             local_eval_status=local_eval_step.get("status", "unknown"),
             evidence_packet_status=evidence_packet_step.get("status", "unknown"),
             pilot_pack_status=pilot_pack_step.get("status", "unknown"),
@@ -141,6 +144,7 @@ def build_payload(
     )
     checks = [
         check_file_exists("proof_matrix", PROOF_MATRIX),
+        check_file_exists("equivalence_matrix", EQUIVALENCE_MATRIX),
         check_file_exists("usage_report", USAGE_REPORT),
         check_file_exists("usage_gaps_report", USAGE_GAPS_REPORT),
         check_file_exists("pilot_campaign_report", PILOT_CAMPAIGN_REPORT),

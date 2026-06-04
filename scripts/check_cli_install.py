@@ -60,6 +60,7 @@ def build_payload() -> dict:
         adoption_report = temp_root / "ADOPTION_PLAN.md"
         adoption_blueprint = temp_root / "adoption-blueprint"
         adoption_copy_script = temp_root / "copy-adds.sh"
+        equivalence_report = temp_root / "CODEX_EQUIVALENCE_MATRIX.md"
         evidence_packet = temp_root / "HARNESS_EVIDENCE_PACKET.md"
         pilot_pack = temp_root / "EXTERNAL_PILOT_PACK.md"
         pilot_issue = temp_root / "EXTERNAL_USAGE_ISSUE_DRAFT.md"
@@ -184,6 +185,16 @@ def build_payload() -> dict:
                     adoption_blueprint.as_posix(),
                     "--copy-script",
                     adoption_copy_script.as_posix(),
+                    "--json",
+                ],
+            ),
+            (
+                "equivalence",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "equivalence",
+                    "--report",
+                    equivalence_report.as_posix(),
                     "--json",
                 ],
             ),

@@ -31,6 +31,8 @@ Already proven:
   generator repo.
 - Generated harness onboarding guides with a first useful task loop,
   verification menu, evidence commands, and privacy-safe reporting guidance.
+- Checked-in Codex equivalence matrix covering command, artifact, and proof
+  surfaces.
 - Public-safe evidence packets that summarize copied-harness local eval and
   task-trial evidence before converting it into checked-in usage records.
 - External pilot packs that give prospective reporters a one-task checklist,

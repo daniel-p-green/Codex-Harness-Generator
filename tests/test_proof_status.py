@@ -32,6 +32,7 @@ class ProofStatusTests(unittest.TestCase):
                 {"name": "validate", "status": "pass"},
                 {"name": "inspect", "status": "pass"},
                 {"name": "adoption_plan", "status": "pass"},
+                {"name": "equivalence", "status": "pass"},
                 {"name": "local_eval", "status": "pass"},
                 {"name": "evidence_packet", "status": "pass"},
                 {"name": "pilot_pack", "status": "pass"},
@@ -84,6 +85,7 @@ Status: PASS
         self.assertIn("init_from_project=pass", install_check["detail"])
         self.assertIn("inspect=pass", install_check["detail"])
         self.assertIn("adoption_plan=pass", install_check["detail"])
+        self.assertIn("equivalence=pass", install_check["detail"])
         self.assertIn("local_eval=pass", install_check["detail"])
         self.assertIn("evidence_packet=pass", install_check["detail"])
         self.assertIn("pilot_pack=pass", install_check["detail"])
