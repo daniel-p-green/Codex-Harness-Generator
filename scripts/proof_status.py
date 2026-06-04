@@ -23,6 +23,10 @@ EQUIVALENCE_MATRIX = REPO_ROOT / "Docs" / "Environment" / "CODEX_EQUIVALENCE_MAT
 USAGE_REPORT = REPO_ROOT / "Docs" / "Environment" / "USAGE_RECORDS.md"
 USAGE_GAPS_REPORT = REPO_ROOT / "Docs" / "Environment" / "USAGE_GAPS.md"
 PILOT_CAMPAIGN_REPORT = REPO_ROOT / "Docs" / "Environment" / "PILOT_CAMPAIGN.md"
+SOURCE_FRESHNESS_REPORT = REPO_ROOT / "Docs" / "Environment" / "SOURCE_FRESHNESS.md"
+SOURCE_FRESHNESS_JSON = REPO_ROOT / "Docs" / "Environment" / "SOURCE_FRESHNESS.json"
+SEMANTIC_ALIGNMENT_REPORT = REPO_ROOT / "Docs" / "Environment" / "SEMANTIC_ALIGNMENT.md"
+SEMANTIC_ALIGNMENT_JSON = REPO_ROOT / "Docs" / "Environment" / "SEMANTIC_ALIGNMENT.json"
 TASK_TRIALS_REPORT = REPO_ROOT / "examples" / "live-create" / "TASK_TRIALS.md"
 DEFAULT_REPORT = REPO_ROOT / "Docs" / "Environment" / "PROOF_STATUS.md"
 TASK_TRIAL_ROW_RE = re.compile(r"^\| `(?P<trial>[^`]+)` \| `(?P<example>[^`]+)` \| (?P<status>[A-Z]+) \| `(?P<output>[^`]+)` \|$")
@@ -32,6 +36,13 @@ def parse_status_line(text: str) -> str | None:
     for line in text.splitlines():
         if line.startswith("Status:"):
             return line.split(":", 1)[1].strip().lower()
+    return None
+
+
+def parse_generated_line(text: str) -> str | None:
+    for line in text.splitlines():
+        if line.startswith("Generated:"):
+            return line.split(":", 1)[1].strip()
     return None
 
 
@@ -60,11 +71,49 @@ def parse_task_trials(path: Path) -> dict:
     }
 
 
+def display_path(path: Path) -> str:
+    try:
+        return path.relative_to(REPO_ROOT).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
 def check_file_exists(name: str, path: Path) -> dict:
     return {
         "name": name,
         "status": "pass" if path.exists() else "fail",
-        "detail": path.relative_to(REPO_ROOT).as_posix() if path.exists() else f"missing: {path.relative_to(REPO_ROOT).as_posix()}",
+        "detail": display_path(path) if path.exists() else f"missing: {display_path(path)}",
+    }
+
+
+def check_status_report(name: str, report_path: Path, json_path: Path) -> dict:
+    missing = [path for path in (report_path, json_path) if not path.exists()]
+    if missing:
+        missing_detail = ", ".join(display_path(path) for path in missing)
+        return {
+            "name": name,
+            "status": "fail",
+            "detail": f"missing: {missing_detail}",
+        }
+
+    report_text = report_path.read_text(encoding="utf-8")
+    report_status = parse_status_line(report_text) or "unknown"
+    generated = parse_generated_line(report_text) or "unknown"
+    try:
+        json_payload = json.loads(json_path.read_text(encoding="utf-8"))
+        json_status = str(json_payload.get("status", "unknown")).lower()
+    except json.JSONDecodeError as exc:
+        json_status = "invalid-json"
+        generated = generated if generated != "unknown" else f"json error: {exc}"
+
+    status = "pass" if report_status == "pass" and json_status == "pass" else "fail"
+    return {
+        "name": name,
+        "status": status,
+        "detail": (
+            f"report={display_path(report_path)} "
+            f"status={report_status} json_status={json_status} generated={generated}"
+        ),
     }
 
 
@@ -150,6 +199,8 @@ def build_payload(
         check_file_exists("usage_report", USAGE_REPORT),
         check_file_exists("usage_gaps_report", USAGE_GAPS_REPORT),
         check_file_exists("pilot_campaign_report", PILOT_CAMPAIGN_REPORT),
+        check_status_report("source_freshness_report", SOURCE_FRESHNESS_REPORT, SOURCE_FRESHNESS_JSON),
+        check_status_report("semantic_alignment_report", SEMANTIC_ALIGNMENT_REPORT, SEMANTIC_ALIGNMENT_JSON),
         check_file_exists("task_trials_report", TASK_TRIALS_REPORT),
         {
             "name": "checked_in_example_inventory",

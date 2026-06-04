@@ -97,8 +97,42 @@ Status: PASS
         self.assertIn("pilot_campaign=pass", install_check["detail"])
         self.assertIn("migration_audit=pass", install_check["detail"])
         self.assertIn("installable_cli", [check["name"] for check in payload["checks"]])
+        self.assertIn("source_freshness_report", [check["name"] for check in payload["checks"]])
+        self.assertIn("semantic_alignment_report", [check["name"] for check in payload["checks"]])
         self.assertEqual(4, payload["example_inventory"]["brief_example_count"])
         self.assertGreaterEqual(payload["usage_summary"]["non_synthetic"], 1)
+
+    def test_status_report_check_requires_markdown_and_json_pass(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            report = root / "REPORT.md"
+            json_report = root / "REPORT.json"
+            report.write_text(
+                "# Report\n\nGenerated: 2026-06-04T00:00:00Z\nStatus: PASS\n",
+                encoding="utf-8",
+            )
+            json_report.write_text('{"status": "pass"}\n', encoding="utf-8")
+
+            payload = proof_status.check_status_report("report", report, json_report)
+
+            self.assertEqual("pass", payload["status"])
+            self.assertIn("generated=2026-06-04T00:00:00Z", payload["detail"])
+
+    def test_status_report_check_fails_when_json_status_fails(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            report = root / "REPORT.md"
+            json_report = root / "REPORT.json"
+            report.write_text(
+                "# Report\n\nGenerated: 2026-06-04T00:00:00Z\nStatus: PASS\n",
+                encoding="utf-8",
+            )
+            json_report.write_text('{"status": "fail"}\n', encoding="utf-8")
+
+            payload = proof_status.check_status_report("report", report, json_report)
+
+            self.assertEqual("fail", payload["status"])
+            self.assertIn("json_status=fail", payload["detail"])
 
     def test_build_payload_fails_when_threshold_is_too_high(self):
         with patch.object(proof_status, "build_cli_install_payload", return_value=self.fake_install_payload()):
@@ -144,6 +178,8 @@ Status: PASS
         self.assertIn("Readiness:", text)
         self.assertIn("checked_in_example_inventory", text)
         self.assertIn("installable_cli", text)
+        self.assertIn("source_freshness_report", text)
+        self.assertIn("semantic_alignment_report", text)
         self.assertIn("What This Does Not Prove", text)
 
     def test_main_writes_report_and_returns_success(self):

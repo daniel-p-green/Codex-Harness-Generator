@@ -1,6 +1,6 @@
 # Proof Status
 
-Generated: 2026-06-04T11:44:17Z
+Generated: 2026-06-04T11:51:33Z
 Status: PASS
 Readiness: Codex-equivalent beta with checked-in self-dogfood proof
 
@@ -16,6 +16,8 @@ conservative and should be read with `PROOF_MATRIX.md`.
 | `usage_report` | PASS | Docs/Environment/USAGE_RECORDS.md |
 | `usage_gaps_report` | PASS | Docs/Environment/USAGE_GAPS.md |
 | `pilot_campaign_report` | PASS | Docs/Environment/PILOT_CAMPAIGN.md |
+| `source_freshness_report` | PASS | report=Docs/Environment/SOURCE_FRESHNESS.md status=pass json_status=pass generated=2026-06-04T11:50:18Z |
+| `semantic_alignment_report` | PASS | report=Docs/Environment/SEMANTIC_ALIGNMENT.md status=pass json_status=pass generated=2026-06-04T11:50:18Z |
 | `task_trials_report` | PASS | examples/live-create/TASK_TRIALS.md |
 | `checked_in_example_inventory` | PASS | profiles=20 brief_examples=4 failures=0 |
 | `installable_cli` | PASS | profiles=20 doctor=pass init=pass quickstart=pass init_from_project=pass demo_capture=pass validate=pass inspect=pass adoption_plan=pass equivalence=pass local_eval=pass evidence_packet=pass pilot_pack=pass usage_from_harness=pass usage_from_issue=pass usage_gaps=pass pilot_campaign=pass migration_audit=pass eval=pass |
