@@ -8,9 +8,25 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CREATE_ACCEPTANCE_PROFILES = [
+    "api-design",
+    "book-publishing",
+    "course-design",
+    "customer-support",
     "data-analysis",
+    "data-engineering",
+    "data-science",
     "devops-infrastructure",
+    "financial-modeling",
+    "game-development",
+    "grant-writing",
+    "hiring-pipeline",
     "knowledge-work",
+    "legal-research",
+    "llm-app",
+    "market-research",
+    "product-management",
+    "security-audit",
+    "social-media",
     "software-development",
 ]
 

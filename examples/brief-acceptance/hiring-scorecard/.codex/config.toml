@@ -1,0 +1,42 @@
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+model_verbosity = "medium"
+approval_policy = "on-request"
+default_permissions = "hiring-pipeline"
+
+[agents]
+max_threads = 4
+max_depth = 1
+
+[agents.reviewer]
+description = "Reviews hiring pipeline outputs for source fidelity, correctness, privacy, safety, and missing verification."
+config_file = "agents/reviewer.toml"
+
+[[skills.config]]
+path = "../.agents/skills/health-check"
+enabled = true
+
+[permissions.hiring-pipeline]
+description = "Workspace write access with sensitive files denied."
+extends = ":workspace"
+
+[permissions.hiring-pipeline.filesystem]
+glob_scan_max_depth = 4
+
+[permissions.hiring-pipeline.filesystem.":workspace_roots"]
+"." = "write"
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"**/*secret*" = "deny"
+"**/*token*" = "deny"
+"**/*credential*" = "deny"
+"**/*.pem" = "deny"
+"**/*.key" = "deny"
+
+[permissions.hiring-pipeline.network]
+enabled = true
+mode = "limited"
+
+[permissions.hiring-pipeline.network.domains]
+"developers.openai.com" = "allow"
+"docs.github.com" = "allow"

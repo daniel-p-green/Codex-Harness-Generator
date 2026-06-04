@@ -53,7 +53,9 @@ Status: PASS
 
         self.assertEqual("pass", payload["status"], payload)
         self.assertEqual(8, payload["task_trials"]["trial_count"])
-        self.assertEqual(1, payload["usage_summary"]["non_synthetic"])
+        self.assertEqual("pass", payload["example_inventory"]["status"])
+        self.assertEqual(4, payload["example_inventory"]["brief_example_count"])
+        self.assertGreaterEqual(payload["usage_summary"]["non_synthetic"], 1)
 
     def test_build_payload_fails_when_threshold_is_too_high(self):
         payload = proof_status.build_payload(
@@ -79,6 +81,7 @@ Status: PASS
 
         self.assertIn("# Proof Status", text)
         self.assertIn("Readiness:", text)
+        self.assertIn("checked_in_example_inventory", text)
         self.assertIn("What This Does Not Prove", text)
 
     def test_main_writes_report_and_returns_success(self):

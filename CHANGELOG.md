@@ -17,12 +17,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Added assumptions ledgers to generated-harness fixtures and evaluator coverage for missing or weak assumption records.
 - Added manifest-reference validation so generated harness metadata fails when it points at files that are not on disk.
 - Added `Docs/Environment/ARCHITECTURE_REVIEW.md` with a stress test of the project's assumptions, architecture, blind spots, and utility.
-- Added `scripts/generate_minimal_harness.py` as a deterministic acceptance path that writes minimal valid Codex harnesses for software development, knowledge work, data analysis, and infrastructure profiles without requiring a live model run.
+- Added `scripts/generate_minimal_harness.py` as a deterministic acceptance path that writes minimal valid Codex harnesses for the four base starter profiles and 16 bundled domain presets without requiring a live model run.
 - Added `scripts/eval_deterministic_profiles.py` so the release gate explicitly generates, evaluates, and smokes every deterministic profile.
 - Added `scripts/refresh_deterministic_examples.py` and checked-in deterministic example harnesses for each supported profile.
 - Added `scripts/simulate_create_trigger.py` and contract tests for the deterministic `/create` preflight handoff artifact.
 - Added `scripts/run_create_acceptance.py` for a deterministic preset `/create` acceptance flow that preserves trigger context, generates a harness, evaluates it, smokes it, and writes an acceptance report.
-- Added `scripts/refresh_create_acceptance_examples.py` and a checked-in deterministic preset `/create` acceptance example.
+- Added `scripts/refresh_create_acceptance_examples.py` and checked-in deterministic preset `/create` acceptance examples for every supported profile.
+- Added `scripts/profile_catalog.py` and `codex_harness.py profile`, `profiles --details`, and `recommend` commands for profile discovery, explainable recommendation, confidence labels, and low-confidence guidance.
+- Added `scripts/run_brief_acceptance.py`, `scripts/refresh_brief_acceptance_examples.py`, and checked-in brief-acceptance examples for RAG, security audit, customer support, and hiring scorecard briefs.
+- Added `scripts/check_example_inventory.py` so checked-in deterministic, create-acceptance, and brief-acceptance examples cannot silently drift, duplicate, or go partial.
 - Added optional `python scripts/run_evals.py --codex-live` support for authenticated local Codex CLI live smoke checks.
 - Added `Docs/Environment/PROOF_MATRIX.md` to map public claims to evidence artifacts, commands, proven scope, and remaining product-proof gaps.
 - Added `scripts/capture_live_create_example.py` and `examples/live-create/README.md` for sanitized live `/create` capture packaging.
@@ -31,6 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Added authenticated live example task trials to verify generated harnesses can steer Codex through representative work.
 - Added eval trend snapshots to preserve release-gate history over time.
 - Added official OpenAI source freshness checks for cited documentation URLs.
+- Added `scripts/proof_status.py` and `Docs/Environment/PROOF_STATUS.md` to summarize checked-in proof readiness, live task trials, usage records, and example inventory.
 
 ### Changed
 
@@ -39,6 +43,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Updated README to clarify when the project is useful, when it is not, and what the eval gate actually proves.
 - Updated generator and validation guidance to require ASSUMPTIONS, SOURCE_MAP, MANIFEST, and VALIDATION_REPORT records in generated harnesses.
 - Updated live generated-harness smoke checks to use non-interactive `codex exec` instead of the interactive TUI path.
+- Updated README, user guide, examples, and contributing docs to document the deterministic fast path, brief acceptance, profile confidence, checked-in example refreshes, and proof-status workflows.
 
 ## [1.0.0] - 2026-06-01
 

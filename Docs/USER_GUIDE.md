@@ -12,6 +12,7 @@ Reading time: about 15-20 minutes.
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
+- [Fast Deterministic Path](#fast-deterministic-path)
 - [Getting Started: Creating Your First Environment](#getting-started-creating-your-first-environment)
 - [Starter Profiles](#starter-profiles)
 - [The Deep Interview (No Profile Fits)](#the-deep-interview-no-profile-fits)
@@ -61,6 +62,34 @@ Before you begin, make sure you have the following:
 
 You do not need to install Python or Pandoc right now. The Harness Generator will tell
 you during setup if your project needs them.
+
+---
+
+## Fast Deterministic Path
+
+If you want to try the generator without a full model-mediated `/create`
+interview, use the deterministic CLI path first. It is the quickest way to see
+what a Codex harness looks like on disk and to verify the local evaluator.
+
+```bash
+cd /path/to/Codex-Harness-Generator
+python scripts/codex_harness.py profiles --details
+python scripts/codex_harness.py recommend "RAG app with prompts, evals, and retrieval checks"
+python scripts/codex_harness.py brief-acceptance /tmp/codex-rag-harness \
+  --brief "RAG app with prompts, evals, and retrieval checks" \
+  --project-name "RAG Quality Harness" \
+  --force
+python scripts/codex_harness.py eval /tmp/codex-rag-harness
+python scripts/codex_harness.py smoke /tmp/codex-rag-harness
+```
+
+This path writes the same core Codex-facing files as the generated examples:
+`AGENTS.md`, `.codex/config.toml`, `.codex/agents/`, `.agents/skills/`,
+environment docs, `CREATION_CONTEXT.md`, `CREATE_ACCEPTANCE_REPORT.md`, and
+`PROFILE_SELECTION.md`. The profile recommendation is deterministic and
+explainable. Recommendation output includes a confidence label; if confidence
+is low or the selected profile does not fit your project, use the full
+`/create` flow below.
 
 ---
 

@@ -13,11 +13,59 @@ EVAL_PATH = REPO_ROOT / "scripts" / "eval_generated_harness.py"
 SMOKE_PATH = REPO_ROOT / "scripts" / "smoke_generated_harness.py"
 FIXTURES_ROOT = REPO_ROOT / "tests" / "fixtures" / "generated_harnesses"
 DETERMINISTIC_PROFILES = [
+    "api-design",
+    "book-publishing",
+    "course-design",
+    "customer-support",
     "data-analysis",
+    "data-engineering",
+    "data-science",
     "devops-infrastructure",
+    "financial-modeling",
+    "game-development",
+    "grant-writing",
+    "hiring-pipeline",
     "knowledge-work",
+    "legal-research",
+    "llm-app",
+    "market-research",
+    "product-management",
+    "security-audit",
+    "social-media",
     "software-development",
 ]
+HIGH_RISK_PROFILE_GUIDANCE = {
+    "customer-support": (
+        "protect customer privacy",
+        "pii",
+        "human review",
+        "do not promise",
+    ),
+    "financial-modeling": (
+        "not financial advice",
+        "investment advice",
+        "scenario",
+        "risk",
+    ),
+    "hiring-pipeline": (
+        "bias",
+        "protected class",
+        "scorecards",
+        "human review",
+    ),
+    "legal-research": (
+        "jurisdiction",
+        "not legal advice",
+        "cite sources",
+        "attorney",
+    ),
+    "security-audit": (
+        "secrets",
+        "authorization",
+        "active testing",
+        "destructive work",
+    ),
+}
 
 spec = importlib.util.spec_from_file_location("eval_generated_harness", EVAL_PATH)
 eval_generated_harness = importlib.util.module_from_spec(spec)
@@ -149,6 +197,33 @@ class GeneratedHarnessContractTests(unittest.TestCase):
             )
             self.assertEqual(0, smoke.returncode, smoke.stdout + smoke.stderr)
             self.assertIn('"status": "pass"', smoke.stdout)
+
+    def test_high_risk_profiles_include_domain_guardrail_guidance(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            for profile, snippets in HIGH_RISK_PROFILE_GUIDANCE.items():
+                with self.subTest(profile=profile):
+                    target = Path(temp_dir) / profile
+                    generate = subprocess.run(
+                        [
+                            sys.executable,
+                            "scripts/generate_minimal_harness.py",
+                            target.as_posix(),
+                            "--profile",
+                            profile,
+                            "--generated-date",
+                            "2026-06-04",
+                        ],
+                        cwd=REPO_ROOT,
+                        text=True,
+                        capture_output=True,
+                        check=False,
+                    )
+                    self.assertEqual(0, generate.returncode, generate.stdout + generate.stderr)
+
+                    agents_md = (target / "AGENTS.md").read_text(encoding="utf-8").lower()
+                    self.assertIn("## domain guidance", agents_md)
+                    for snippet in snippets:
+                        self.assertIn(snippet, agents_md)
 
     def test_minimal_generator_supports_fixed_generated_date(self):
         with tempfile.TemporaryDirectory() as temp_dir:

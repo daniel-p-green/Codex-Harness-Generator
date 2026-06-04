@@ -26,10 +26,11 @@ replacement. What is proven today:
 - The repo is structurally Codex-native and passes the local eval gate.
 - Golden generated-harness fixtures pass contract, smoke, and mutation tests.
 - `scripts/generate_minimal_harness.py` provides a deterministic acceptance path
-  for software development, knowledge work, data analysis, and infrastructure
-  profiles without waiting on a live model run.
+  for the four base starter profiles and 16 bundled domain presets without
+  waiting on a live model run.
 - `examples/deterministic/` contains checked-in generated harness snapshots for
-  those profiles, and the release gate evaluates and smokes them.
+  all 20 first-class starting points, and the release gate evaluates and smokes
+  them.
 - `scripts/simulate_create_trigger.py` proves the deterministic `/create`
   preflight handoff by writing `Docs/Environment/CREATION_CONTEXT.md` for fresh,
   existing, hub, and resume scenarios.
@@ -37,7 +38,8 @@ replacement. What is proven today:
   together in one target, preserving `CREATION_CONTEXT.md`, writing a complete
   harness, and adding `CREATE_ACCEPTANCE_REPORT.md`.
 - `examples/create-acceptance/` contains checked-in snapshots of that
-  deterministic preset `/create` acceptance flow for every supported profile.
+  deterministic preset `/create` acceptance flow for every supported profile and
+  bundled domain preset.
 - Generated harnesses are required to include architecture, assumptions, source
   mapping, manifests, and validation reports.
 - `scripts/capture_live_create_example.py` provides a repeatable packaging path
@@ -54,8 +56,8 @@ replacement. What is proven today:
   for security audit, legal research, financial analysis, hiring, and customer
   support scenarios.
 - `scripts/codex_harness.py` gives users one thin local entry point for
-  profile listing, generation, acceptance, eval, smoke, gate, live-trial,
-  source-freshness, and snapshot workflows.
+  profile listing, profile descriptions, generation, acceptance, eval, smoke,
+  gate, live-trial, source-freshness, and snapshot workflows.
 - `scripts/record_eval_snapshot.py` records eval-gate snapshots under
   `Docs/Environment/eval-history/` and updates `Docs/Environment/EVAL_TRENDS.md`.
 - `scripts/check_source_freshness.py` verifies official OpenAI documentation
@@ -68,9 +70,9 @@ replacement. What is proven today:
   `Docs/Environment/usage-records/`, and `scripts/validate_usage_records.py`
   can enforce stricter non-synthetic proof thresholds when making real-world
   usage claims.
-- `Docs/Environment/usage-records/` includes a first sanitized self-dogfood
-  usage record from this public repo's Codex work. It is useful evidence, but
-  not yet external or longitudinal adoption proof.
+- `Docs/Environment/usage-records/` includes sanitized self-dogfood usage
+  records from this public repo's Codex work. They are useful evidence, but not
+  yet external or longitudinal adoption proof.
 - `scripts/proof_status.py` writes `Docs/Environment/PROOF_STATUS.md`, a
   one-command readiness summary tying the proof matrix, live task trials, and
   usage records together without overclaiming.
@@ -145,21 +147,28 @@ harness deterministically:
 
 ```bash
 python scripts/codex_harness.py profiles
+python scripts/codex_harness.py profiles --details
+python scripts/codex_harness.py recommend "RAG app with prompts, evals, and retrieval checks"
+python scripts/codex_harness.py profile security-audit
+python scripts/codex_harness.py brief-acceptance /tmp/codex-rag-harness \
+  --brief "RAG app with prompts, evals, and retrieval checks" \
+  --project-name "RAG Quality Harness" \
+  --force
 python scripts/codex_harness.py generate /tmp/codex-harness-example --force
 python scripts/codex_harness.py eval /tmp/codex-harness-example
 python scripts/codex_harness.py smoke /tmp/codex-harness-example
 ```
 
-The deterministic generator currently supports:
+The deterministic generator currently supports the four base starter profiles
+and 16 bundled domain presets listed by:
 
-- `software-development`
-- `knowledge-work`
-- `data-analysis`
-- `devops-infrastructure`
+```bash
+python scripts/codex_harness.py profiles
+```
 
-This proves the repo can write valid Codex harnesses to disk across the core
-starter profiles and that the same evaluator used for fixtures accepts them. The
-full `/create` flow remains the richer custom path.
+This proves the repo can write valid Codex harnesses to disk across 20
+first-class starting points and that the same evaluator used for fixtures
+accepts them. The full `/create` flow remains the richer custom path.
 
 Checked-in examples are available under `examples/deterministic/`. Refresh them
 with:
@@ -199,6 +208,14 @@ Checked-in create-acceptance examples are available under
 
 ```bash
 python scripts/refresh_create_acceptance_examples.py
+python scripts/codex_harness.py gate
+```
+
+Checked-in brief-acceptance examples are available under
+`examples/brief-acceptance/`. Refresh them with:
+
+```bash
+python scripts/refresh_brief_acceptance_examples.py
 python scripts/codex_harness.py gate
 ```
 
@@ -314,9 +331,12 @@ Common subcommands:
 
 | Subcommand | Delegates to | What it proves |
 |---|---|---|
-| `profiles` | `generate_minimal_harness.py --list-profiles` | Shows supported deterministic starters. |
+| `profiles` | `generate_minimal_harness.py --list-profiles` or `profile_catalog.py` | Shows supported deterministic starters; add `--details` or `--json` for a chooser-friendly catalog. |
+| `profile <slug>` | `profile_catalog.py` | Describes one deterministic starter, including first tasks and domain guardrails. |
+| `recommend <brief>` | `profile_catalog.py` | Recommends deterministic starters from a short project brief using explainable keyword matches, confidence labels, and low-confidence guidance. |
 | `generate <target>` | `generate_minimal_harness.py` | Writes a minimal valid Codex harness. |
 | `acceptance <target>` | `run_create_acceptance.py` | Runs trigger handoff, generation, eval, smoke, and report writing. |
+| `brief-acceptance <target>` | `run_brief_acceptance.py` | Recommends a profile from a brief, runs deterministic acceptance, and records `PROFILE_SELECTION.md`. |
 | `eval <paths...>` | `eval_generated_harness.py` | Checks generated harness contract quality. |
 | `smoke <paths...>` | `smoke_generated_harness.py` | Parses config, resolves agents and skills, optionally runs Codex live smoke. |
 | `gate` | `run_evals.py` | Runs the repo release gate. |
@@ -401,10 +421,14 @@ This runs:
 - Generated-harness fixture evaluation.
 - Offline smoke checks for generated harnesses.
 - Deterministic profile generation, evaluation, and smoke checks.
+- Brief-based deterministic acceptance tests.
+- Checked-in deterministic, create-acceptance, and brief-acceptance example
+  inventory checks.
 - Checked-in deterministic example evaluation and smoke checks.
 - `/create` trigger contract tests for CREATION_CONTEXT.md handoff scenarios.
 - Deterministic preset `/create` acceptance flow with final eval and smoke.
 - Checked-in create-acceptance example evaluation and smoke checks.
+- Checked-in brief-acceptance example evaluation and smoke checks.
 - Checked-in live-create example evaluation and smoke checks when live captures
   exist.
 - Live-create capture helper tests.

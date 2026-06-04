@@ -15,6 +15,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 FIXTURE_ROOT = REPO_ROOT / "tests" / "fixtures" / "generated_harnesses"
 DETERMINISTIC_EXAMPLE_ROOT = REPO_ROOT / "examples" / "deterministic"
 CREATE_ACCEPTANCE_EXAMPLE_ROOT = REPO_ROOT / "examples" / "create-acceptance"
+BRIEF_ACCEPTANCE_EXAMPLE_ROOT = REPO_ROOT / "examples" / "brief-acceptance"
 LIVE_CREATE_EXAMPLE_ROOT = REPO_ROOT / "examples" / "live-create"
 
 
@@ -64,6 +65,16 @@ def create_acceptance_example_paths() -> list[str]:
     ]
 
 
+def brief_acceptance_example_paths() -> list[str]:
+    if not BRIEF_ACCEPTANCE_EXAMPLE_ROOT.exists():
+        return []
+    return [
+        path.as_posix()
+        for path in sorted(BRIEF_ACCEPTANCE_EXAMPLE_ROOT.iterdir())
+        if path.is_dir()
+    ]
+
+
 def live_create_example_paths() -> list[str]:
     if not LIVE_CREATE_EXAMPLE_ROOT.exists():
         return []
@@ -92,6 +103,7 @@ def main() -> int:
     python = sys.executable
     with tempfile.TemporaryDirectory() as temp_dir:
         create_acceptance_target = Path(temp_dir) / "create-acceptance"
+        brief_acceptance_target = Path(temp_dir) / "brief-acceptance"
         live_paths = create_acceptance_live_paths(args.codex_live_profile)
         live_create_paths = live_create_example_paths()
         if args.codex_live and not live_paths:
@@ -112,6 +124,10 @@ def main() -> int:
             run_step(
                 "deterministic_profile_generation",
                 [python, "scripts/eval_deterministic_profiles.py", "--json"],
+            ),
+            run_step(
+                "checked_in_example_inventory",
+                [python, "scripts/check_example_inventory.py", "--json"],
             ),
             run_step(
                 "deterministic_example_eval",
@@ -137,12 +153,33 @@ def main() -> int:
                 ],
             ),
             run_step(
+                "deterministic_brief_acceptance",
+                [
+                    python,
+                    "scripts/run_brief_acceptance.py",
+                    brief_acceptance_target.as_posix(),
+                    "--brief",
+                    "RAG app with prompts, evals, and retrieval checks",
+                    "--project-name",
+                    "Release Gate RAG Harness",
+                    "--json",
+                ],
+            ),
+            run_step(
                 "create_acceptance_example_eval",
                 [python, "scripts/eval_generated_harness.py", "--json", *create_acceptance_example_paths()],
             ),
             run_step(
                 "create_acceptance_example_smoke",
                 [python, "scripts/smoke_generated_harness.py", "--json", *create_acceptance_example_paths()],
+            ),
+            run_step(
+                "brief_acceptance_example_eval",
+                [python, "scripts/eval_generated_harness.py", "--json", *brief_acceptance_example_paths()],
+            ),
+            run_step(
+                "brief_acceptance_example_smoke",
+                [python, "scripts/smoke_generated_harness.py", "--json", *brief_acceptance_example_paths()],
             ),
             *(
                 [
@@ -198,15 +235,19 @@ def main() -> int:
                     "scripts/check_source_freshness.py",
                     "scripts/codex_harness.py",
                     "scripts/capture_live_create_example.py",
+                    "scripts/check_example_inventory.py",
                     "scripts/eval_codex_port.py",
                     "scripts/eval_deterministic_profiles.py",
                     "scripts/eval_generated_harness.py",
                     "scripts/generate_minimal_harness.py",
+                    "scripts/profile_catalog.py",
                     "scripts/proof_status.py",
                     "scripts/refresh_create_acceptance_examples.py",
+                    "scripts/refresh_brief_acceptance_examples.py",
                     "scripts/refresh_deterministic_examples.py",
                     "scripts/record_eval_snapshot.py",
                     "scripts/record_usage_case.py",
+                    "scripts/run_brief_acceptance.py",
                     "scripts/run_create_acceptance.py",
                     "scripts/run_evals.py",
                     "scripts/run_live_example_task_trials.py",
@@ -214,12 +255,16 @@ def main() -> int:
                     "scripts/smoke_generated_harness.py",
                     "scripts/validate_usage_records.py",
                     "tests/test_create_acceptance.py",
+                    "tests/test_brief_acceptance.py",
+                    "tests/test_brief_acceptance_examples.py",
                     "tests/test_create_trigger_contract.py",
                     "tests/test_codex_harness_cli.py",
                     "tests/test_eval_codex_port.py",
+                    "tests/test_example_inventory.py",
                     "tests/test_generated_harness_contract.py",
                     "tests/test_live_example_task_trials.py",
                     "tests/test_proof_status.py",
+                    "tests/test_profile_catalog.py",
                     "tests/test_record_eval_snapshot.py",
                     "tests/test_record_usage_case.py",
                     "tests/test_run_evals.py",

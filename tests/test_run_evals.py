@@ -39,6 +39,13 @@ class RunEvalsTests(unittest.TestCase):
         self.assertTrue(any(path.endswith("examples/live-create/synthetic-python-cli") for path in paths))
         self.assertTrue(any(path.endswith("examples/live-create/synthetic-data-review") for path in paths))
 
+    def test_brief_acceptance_example_paths_include_checked_in_examples(self):
+        paths = run_evals.brief_acceptance_example_paths()
+
+        self.assertEqual(4, len(paths))
+        self.assertTrue(any(path.endswith("examples/brief-acceptance/rag-quality") for path in paths))
+        self.assertTrue(any(path.endswith("examples/brief-acceptance/security-review") for path in paths))
+
 
 if __name__ == "__main__":
     unittest.main()

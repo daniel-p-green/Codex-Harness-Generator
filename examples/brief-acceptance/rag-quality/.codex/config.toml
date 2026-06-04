@@ -1,0 +1,42 @@
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+model_verbosity = "medium"
+approval_policy = "on-request"
+default_permissions = "llm-app"
+
+[agents]
+max_threads = 4
+max_depth = 1
+
+[agents.reviewer]
+description = "Reviews LLM app outputs for source fidelity, correctness, privacy, safety, and missing verification."
+config_file = "agents/reviewer.toml"
+
+[[skills.config]]
+path = "../.agents/skills/health-check"
+enabled = true
+
+[permissions.llm-app]
+description = "Workspace write access with sensitive files denied."
+extends = ":workspace"
+
+[permissions.llm-app.filesystem]
+glob_scan_max_depth = 4
+
+[permissions.llm-app.filesystem.":workspace_roots"]
+"." = "write"
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"**/*secret*" = "deny"
+"**/*token*" = "deny"
+"**/*credential*" = "deny"
+"**/*.pem" = "deny"
+"**/*.key" = "deny"
+
+[permissions.llm-app.network]
+enabled = true
+mode = "limited"
+
+[permissions.llm-app.network.domains]
+"developers.openai.com" = "allow"
+"docs.github.com" = "allow"

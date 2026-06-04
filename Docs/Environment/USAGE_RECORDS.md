@@ -9,7 +9,7 @@ secrets, personal data, proprietary source, or local machine paths.
 
 | Total | Synthetic | Sanitized | Private Summary | Non-Synthetic | Success | Partial | Failed | Inconclusive |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 1 | 0 | 1 | 0 | 1 | 1 | 0 | 0 | 0 |
+| 2 | 0 | 2 | 0 | 2 | 2 | 0 | 0 | 0 |
 
 Product-proof status: non-synthetic usage evidence present
 
@@ -17,6 +17,7 @@ Product-proof status: non-synthetic usage evidence present
 
 | Generated | Slug | Domain | Outcome | Evidence Type | Verification Count |
 |---|---|---|---|---|---:|
+| 2026-06-04T07:00:16Z | `dogfood-brief-fast-path` | Codex harness generation | success | sanitized | 2 |
 | 2026-06-04T06:12:20Z | `dogfood-high-risk-proof-suite` | Codex harness generation | success | sanitized | 2 |
 
 ## Scope

@@ -9,9 +9,25 @@ Generated date: `2026-06-04`
 
 Profiles:
 
+- `api-design`
+- `book-publishing`
+- `course-design`
+- `customer-support`
 - `data-analysis`
+- `data-engineering`
+- `data-science`
 - `devops-infrastructure`
+- `financial-modeling`
+- `game-development`
+- `grant-writing`
+- `hiring-pipeline`
 - `knowledge-work`
+- `legal-research`
+- `llm-app`
+- `market-research`
+- `product-management`
+- `security-audit`
+- `social-media`
 - `software-development`
 
 Refresh:

@@ -13,6 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from validate_usage_records import DEFAULT_RECORD_DIR, validate_record_dir
+from check_example_inventory import check_inventory
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -65,6 +66,7 @@ def check_file_exists(name: str, path: Path) -> dict:
 
 def build_payload(min_live_trials: int, min_usage_records: int, record_dir: Path) -> dict:
     task_trials = parse_task_trials(TASK_TRIALS_REPORT)
+    inventory = check_inventory()
     usage = validate_record_dir(
         record_dir,
         min_records=min_usage_records,
@@ -75,6 +77,11 @@ def build_payload(min_live_trials: int, min_usage_records: int, record_dir: Path
         check_file_exists("proof_matrix", PROOF_MATRIX),
         check_file_exists("usage_report", USAGE_REPORT),
         check_file_exists("task_trials_report", TASK_TRIALS_REPORT),
+        {
+            "name": "checked_in_example_inventory",
+            "status": inventory["status"],
+            "detail": "profiles={profile_count} brief_examples={brief_example_count} failures={failure_count}".format(**inventory),
+        },
         {
             "name": "live_task_trials",
             "status": (
@@ -103,6 +110,7 @@ def build_payload(min_live_trials: int, min_usage_records: int, record_dir: Path
             else "Incomplete proof package"
         ),
         "checks": checks,
+        "example_inventory": inventory,
         "task_trials": task_trials,
         "usage_summary": usage["summary"],
         "does_not_prove": [

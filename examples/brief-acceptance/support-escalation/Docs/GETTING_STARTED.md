@@ -1,0 +1,17 @@
+# Getting Started
+
+Open Codex in this project and ask for a small verified task. This
+harness expects the assistant to inspect files before editing, avoid secrets, and
+verify work with the narrowest meaningful check.
+
+## First Checks
+
+1. Run `/health-check` to verify the harness structure.
+2. Ask Codex to map support sources and ticket categories.
+3. Ask for one grounded FAQ or escalation note.
+4. Ask the reviewer to inspect privacy, escalation, and overpromised claims.
+
+The permission profile allows workspace edits while denying secrets, tokens,
+credentials, private keys, and `.env` files.
+
+Generated: 2026-06-04

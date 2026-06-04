@@ -25,7 +25,26 @@ def add_common_generation_args(parser: argparse.ArgumentParser) -> None:
 
 def build_command(args: argparse.Namespace) -> list[str]:
     if args.command == "profiles":
+        if args.details or args.json:
+            command = []
+            if args.json:
+                command.append("--json")
+            return python_script("profile_catalog.py", command)
         return python_script("generate_minimal_harness.py", ["--list-profiles"])
+
+    if args.command == "profile":
+        command = ["--profile", args.profile]
+        if args.json:
+            command.append("--json")
+        return python_script("profile_catalog.py", command)
+
+    if args.command == "recommend":
+        command = ["--recommend", args.brief]
+        if args.limit is not None:
+            command.extend(["--limit", str(args.limit)])
+        if args.json:
+            command.append("--json")
+        return python_script("profile_catalog.py", command)
 
     if args.command == "generate":
         command = [args.target, "--profile", args.profile]
@@ -46,6 +65,24 @@ def build_command(args: argparse.Namespace) -> list[str]:
         if args.force:
             command.append("--force")
         return python_script("run_create_acceptance.py", command)
+
+    if args.command == "brief-acceptance":
+        command = [args.target, "--brief", args.brief]
+        if args.project_name:
+            command.extend(["--project-name", args.project_name])
+        if args.notes:
+            command.extend(["--notes", args.notes])
+        if args.limit is not None:
+            command.extend(["--limit", str(args.limit)])
+        if args.allow_low_confidence:
+            command.append("--allow-low-confidence")
+        if args.target_label:
+            command.extend(["--target-label", args.target_label])
+        if args.force:
+            command.append("--force")
+        if args.json:
+            command.append("--json")
+        return python_script("run_brief_acceptance.py", command)
 
     if args.command == "eval":
         return python_script("eval_generated_harness.py", args.paths)
@@ -171,7 +208,18 @@ def make_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    subparsers.add_parser("profiles", help="List deterministic starter profiles")
+    profiles = subparsers.add_parser("profiles", help="List deterministic starter profiles")
+    profiles.add_argument("--details", action="store_true", help="Show profile descriptions, first tasks, and guardrails")
+    profiles.add_argument("--json", action="store_true", help="Emit profile catalog JSON")
+
+    profile = subparsers.add_parser("profile", help="Describe one deterministic starter profile")
+    profile.add_argument("profile", help="Profile slug")
+    profile.add_argument("--json", action="store_true", help="Emit profile JSON")
+
+    recommend = subparsers.add_parser("recommend", help="Recommend deterministic starter profiles from a project brief")
+    recommend.add_argument("brief", help="Short project brief")
+    recommend.add_argument("--limit", type=int, default=3, help="Number of recommendations to show")
+    recommend.add_argument("--json", action="store_true", help="Emit recommendation JSON")
 
     generate = subparsers.add_parser("generate", help="Generate a minimal deterministic harness")
     add_common_generation_args(generate)
@@ -180,6 +228,17 @@ def make_parser() -> argparse.ArgumentParser:
     add_common_generation_args(acceptance)
     acceptance.add_argument("--project-type", default="not specified", help="Project type for creation context")
     acceptance.add_argument("--notes", default="none", help="Notes for creation context")
+
+    brief_acceptance = subparsers.add_parser("brief-acceptance", help="Recommend a profile from a brief, then run deterministic acceptance")
+    brief_acceptance.add_argument("target", help="Target project directory")
+    brief_acceptance.add_argument("--brief", required=True, help="Short project brief")
+    brief_acceptance.add_argument("--project-name", help="Human-readable project name")
+    brief_acceptance.add_argument("--notes", default="brief-based deterministic acceptance", help="Notes for creation context")
+    brief_acceptance.add_argument("--limit", type=int, default=3, help="Number of profile recommendations to record")
+    brief_acceptance.add_argument("--allow-low-confidence", action="store_true", help="Allow generation when no profile scores above zero")
+    brief_acceptance.add_argument("--target-label", help="Override the target path written inside CREATION_CONTEXT.md")
+    brief_acceptance.add_argument("--force", action="store_true", help="Replace target if it already contains files")
+    brief_acceptance.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     evaluate = subparsers.add_parser("eval", help="Evaluate generated harness directories")
     evaluate.add_argument("paths", nargs="+", help="Generated harness directory paths")

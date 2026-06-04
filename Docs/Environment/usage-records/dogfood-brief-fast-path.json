@@ -1,0 +1,23 @@
+{
+  "slug": "dogfood-brief-fast-path",
+  "title": "Dogfood deterministic brief fast path",
+  "generated": "2026-06-04T07:00:16Z",
+  "domain": "Codex harness generation",
+  "harness_path": "repo-root Codex harness",
+  "task_summary": "Used this repo's Codex harness to design, implement, document, and verify the deterministic profile recommendation and brief-acceptance fast path.",
+  "outcome": "success",
+  "evidence_type": "sanitized",
+  "evidence": [
+    "Added profile catalog, recommendation confidence, brief-acceptance, checked-in brief examples, inventory validation, and proof-status integration as public repository artifacts.",
+    "The workflow produced inspectable PROFILE_SELECTION.md artifacts for RAG, security-audit, customer-support, and hiring-pipeline briefs."
+  ],
+  "verification": [
+    "pytest -q passed with 130 tests after the confidence and brief-example work.",
+    "python scripts/codex_harness.py gate returned PASS with deterministic_brief_acceptance, brief_acceptance_example_eval, brief_acceptance_example_smoke, and proof_status checks."
+  ],
+  "privacy_review": "Public repository evidence only; no secrets, personal data, proprietary source, private client context, email addresses, or local machine paths included.",
+  "limitations": [
+    "Self-dogfood record from this public repository, not an external customer or team deployment.",
+    "Raw chat transcript and private local execution logs are not checked in; public evidence is limited to sanitized files, reports, and command summaries."
+  ]
+}

@@ -1,0 +1,42 @@
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+model_verbosity = "medium"
+approval_policy = "on-request"
+default_permissions = "game-development"
+
+[agents]
+max_threads = 4
+max_depth = 1
+
+[agents.reviewer]
+description = "Reviews game development outputs for source fidelity, correctness, privacy, safety, and missing verification."
+config_file = "agents/reviewer.toml"
+
+[[skills.config]]
+path = "../.agents/skills/health-check"
+enabled = true
+
+[permissions.game-development]
+description = "Workspace write access with sensitive files denied."
+extends = ":workspace"
+
+[permissions.game-development.filesystem]
+glob_scan_max_depth = 4
+
+[permissions.game-development.filesystem.":workspace_roots"]
+"." = "write"
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"**/*secret*" = "deny"
+"**/*token*" = "deny"
+"**/*credential*" = "deny"
+"**/*.pem" = "deny"
+"**/*.key" = "deny"
+
+[permissions.game-development.network]
+enabled = true
+mode = "limited"
+
+[permissions.game-development.network.domains]
+"developers.openai.com" = "allow"
+"docs.github.com" = "allow"

@@ -28,6 +28,40 @@ class CodexHarnessCliTests(unittest.TestCase):
         self.assertEqual(["/usr/bin/python3", "scripts/generate_minimal_harness.py", "--list-profiles"], command)
         self.assertEqual(codex_harness.REPO_ROOT, kwargs["cwd"])
 
+    def test_profiles_details_delegates_to_profile_catalog(self):
+        command, _ = self.run_cli(["profiles", "--details"])
+
+        self.assertEqual(["/usr/bin/python3", "scripts/profile_catalog.py"], command)
+
+    def test_profiles_json_delegates_to_profile_catalog(self):
+        command, _ = self.run_cli(["profiles", "--json"])
+
+        self.assertEqual(["/usr/bin/python3", "scripts/profile_catalog.py", "--json"], command)
+
+    def test_profile_delegates_to_profile_catalog(self):
+        command, _ = self.run_cli(["profile", "security-audit", "--json"])
+
+        self.assertEqual(
+            ["/usr/bin/python3", "scripts/profile_catalog.py", "--profile", "security-audit", "--json"],
+            command,
+        )
+
+    def test_recommend_delegates_to_profile_catalog(self):
+        command, _ = self.run_cli(["recommend", "RAG app with evals", "--limit", "2", "--json"])
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/profile_catalog.py",
+                "--recommend",
+                "RAG app with evals",
+                "--limit",
+                "2",
+                "--json",
+            ],
+            command,
+        )
+
     def test_generate_delegates_with_project_options(self):
         command, _ = self.run_cli(
             [
@@ -82,6 +116,49 @@ class CodexHarnessCliTests(unittest.TestCase):
                 "--notes",
                 "trial",
                 "--force",
+            ],
+            command,
+        )
+
+    def test_brief_acceptance_delegates_to_brief_acceptance_script(self):
+        command, _ = self.run_cli(
+            [
+                "brief-acceptance",
+                "/tmp/example",
+                "--brief",
+                "RAG app with evals",
+                "--project-name",
+                "RAG Harness",
+                "--notes",
+                "trial",
+                "--limit",
+                "2",
+                "--allow-low-confidence",
+                "--target-label",
+                "examples/brief",
+                "--force",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/run_brief_acceptance.py",
+                "/tmp/example",
+                "--brief",
+                "RAG app with evals",
+                "--project-name",
+                "RAG Harness",
+                "--notes",
+                "trial",
+                "--limit",
+                "2",
+                "--allow-low-confidence",
+                "--target-label",
+                "examples/brief",
+                "--force",
+                "--json",
             ],
             command,
         )

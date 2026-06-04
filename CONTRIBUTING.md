@@ -123,20 +123,34 @@ Include: what you expected, what happened, which profile you used, and the gener
 
 ### Quick Test
 
-Generate an environment from each affected profile and verify:
+Run the deterministic gate first. It is fast, CI-safe, and does not require a
+live model-mediated `/create` run:
 
 ```bash
 cd Codex-Harness-Generator
-codex
-
-# Generate from the profile you changed
-/create
-# Select your profile, use a temp directory as target
-
-# Then validate the output
-/validate-environment
-# Point it at the generated environment
+python scripts/codex_harness.py profiles --details
+python scripts/codex_harness.py recommend "RAG app with prompts, evals, and retrieval checks"
+python scripts/codex_harness.py brief-acceptance /tmp/codex-brief-check \
+  --brief "RAG app with prompts, evals, and retrieval checks" \
+  --force
+python scripts/codex_harness.py gate
 ```
+
+If you changed generated example content, refresh the relevant checked-in
+snapshots before running the gate:
+
+```bash
+python scripts/refresh_deterministic_examples.py
+python scripts/refresh_create_acceptance_examples.py
+python scripts/refresh_brief_acceptance_examples.py
+python scripts/check_example_inventory.py
+python scripts/codex_harness.py gate
+```
+
+For the richer live path, you can still run Codex in this repository, trigger
+`/create`, select your profile, use a temporary target directory, and then run
+`/validate-environment`. Treat that as additional live evidence, not a
+substitute for the deterministic gate.
 
 ### What to Check
 
@@ -146,6 +160,22 @@ codex
 4. **Skills**: Descriptions have 3+ trigger phrases and negative triggers
 5. **Permissions**: .codex/config.toml covers all operations agents/skills will attempt
 6. **First run**: The generated environment's first-run greeting works
+
+### Proof And Evidence Checks
+
+Before making public claims about readiness or usage, run:
+
+```bash
+python scripts/proof_status.py
+python scripts/validate_usage_records.py \
+  --min-records 1 \
+  --require-non-synthetic \
+  --require-success
+```
+
+The proof status report is conservative. It summarizes checked-in examples,
+live task trials, and sanitized usage evidence; it does not prove broad external
+adoption or that every future live `/create` run will be ideal.
 
 ### Validation Checklist
 
