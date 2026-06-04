@@ -134,7 +134,9 @@ replacement. What is proven today:
 - `scripts/pilot_board.py` and `codex-harness pilot-board` write
   `Docs/Environment/PILOT_BOARD.md`, a prepared-pilot funnel report that tracks
   prepared, invited, completed, converted, and dropped pilots without treating
-  outreach state as usage proof.
+  outreach state as usage proof. Use `codex-harness pilot-update <slug>` to
+  move a pilot through that funnel and refresh the board without hand-editing
+  JSON.
 - `scripts/prepare_pilot.py` and `codex-harness prepare-pilot` combine
   brief-based quickstart generation with an external pilot pack and issue-body
   draft, so the next beta-exit pilot can be prepared with one command before a
@@ -620,6 +622,7 @@ Common subcommands:
 | `pilot-pack <path>` | `export_pilot_pack.py` | Writes an external pilot guide and optional GitHub issue-body draft for one privacy-safe generated-harness trial. |
 | `pilot-campaign` | `export_pilot_campaign.py` | Writes a shareable external-pilot campaign plan from current usage evidence gaps. |
 | `pilot-board` | `pilot_board.py` | Summarizes prepared pilot records and their conversion state without counting them as usage proof. |
+| `pilot-update <slug>` | `pilot_board.py` | Updates one prepared pilot's status and refreshes the pilot board. |
 | `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record; add `--no-write` to preview first. |
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
 | `usage-gaps` | `usage_gaps.py` | Reports remaining beta-exit usage evidence gaps and writes `Docs/Environment/USAGE_GAPS.md`. |

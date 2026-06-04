@@ -1,6 +1,6 @@
 # Usage Evidence Gaps
 
-Generated: 2026-06-04T13:02:38Z
+Generated: 2026-06-04T13:09:42Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 
@@ -73,4 +73,4 @@ codex-harness prepare-pilot /tmp/codex-customer-support-pilot --brief "customer-
 - Make at least 2 of the next record(s) use installed brief-based generation (`codex-harness prepare-next-pilot`, `codex-harness prepare-pilot`, `codex-harness quickstart`, or `codex-harness init --brief`).
 - Cover 3 more distinct usage domain(s) instead of adding more same-domain proof.
 - Add 3 more valid non-synthetic usage record(s).
-- For the next suggested pilot, run `codex-harness prepare-next-pilot <target> --pilot-record-dir Docs/Environment/pilot-records` or copy the `codex-harness prepare-pilot <target>` command, review the generated pack, track it with `codex-harness pilot-board`, then convert completed evidence with `usage-from-harness` or `usage-from-issue`.
+- For the next suggested pilot, run `codex-harness prepare-next-pilot <target> --pilot-record-dir Docs/Environment/pilot-records` or copy the `codex-harness prepare-pilot <target>` command, review the generated pack, track it with `codex-harness pilot-board`, update status with `codex-harness pilot-update`, then convert completed evidence with `usage-from-harness` or `usage-from-issue`.

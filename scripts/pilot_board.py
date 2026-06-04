@@ -23,6 +23,10 @@ def default_record_path(record_dir: Path, slug: str) -> Path:
     return record_dir / f"{slug}.json"
 
 
+def utc_now() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
 def build_record(payload: dict, status: str = "prepared", notes: str = "") -> dict:
     selected = payload["selected_pilot"]
     prepared = payload["prepared_pilot"]
@@ -57,6 +61,61 @@ def write_record(path: Path, record: dict, force: bool = False) -> dict:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return {"status": "pass", "path": path.as_posix()}
+
+
+def read_record(path: Path) -> dict:
+    if not path.exists():
+        raise SystemExit(f"Pilot record does not exist: {path.as_posix()}")
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SystemExit(f"Pilot record is invalid JSON: {path.as_posix()}: {exc}") from exc
+
+
+def update_record(record: dict, status: str, notes: str = "", usage_record: str = "", updated: str | None = None) -> dict:
+    if status not in ALLOWED_STATUSES:
+        raise SystemExit(f"Unsupported pilot status: {status}")
+    if status == "converted" and not usage_record and not record.get("usage_record"):
+        raise SystemExit("Converted pilots must include --usage-record.")
+    previous_status = record.get("status", "unknown")
+    timestamp = updated or utc_now()
+    history = record.get("status_history", [])
+    if not isinstance(history, list):
+        history = []
+    history.append(
+        {
+            "at": timestamp,
+            "from": previous_status,
+            "to": status,
+            "notes": notes,
+            "usage_record": usage_record or record.get("usage_record", ""),
+        }
+    )
+    record["status"] = status
+    record["updated"] = timestamp
+    if notes:
+        record["notes"] = notes
+    if usage_record:
+        record["usage_record"] = usage_record
+    record["status_history"] = history
+    return record
+
+
+def update_record_file(
+    record_dir: Path,
+    slug: str,
+    status: str,
+    notes: str = "",
+    usage_record: str = "",
+    updated: str | None = None,
+) -> dict:
+    path = default_record_path(record_dir, slug)
+    record = update_record(read_record(path), status, notes=notes, usage_record=usage_record, updated=updated)
+    errors = validate_record(record, path)
+    if errors:
+        raise SystemExit("Updated pilot record is invalid: " + "; ".join(errors))
+    path.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return {"status": "pass", "path": path.as_posix(), "record": record}
 
 
 def validate_record(record: dict, path: Path) -> list[str]:
@@ -141,7 +200,7 @@ def build_payload(record_dir: Path) -> dict:
     else:
         readiness = "pilot-funnel-clear"
     return {
-        "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "generated": utc_now(),
         "status": status,
         "readiness": readiness,
         "record_dir": record_dir.as_posix(),
@@ -204,11 +263,32 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--record-dir", default=DEFAULT_RECORD_DIR.as_posix())
     parser.add_argument("--report", default=DEFAULT_REPORT.as_posix())
+    parser.add_argument("--update", help="Pilot slug to update before writing the board")
+    parser.add_argument("--status", choices=sorted(ALLOWED_STATUSES), help="New status for --update")
+    parser.add_argument("--notes", default="", help="Public-safe note for --update")
+    parser.add_argument("--usage-record", default="", help="Usage record slug or path required when --status converted")
+    parser.add_argument("--updated", help="UTC timestamp override for --update")
     parser.add_argument("--no-write", action="store_true", help="Do not write the Markdown board")
     parser.add_argument("--json", action="store_true", help="Emit JSON payload")
     args = parser.parse_args()
 
-    payload = build_payload(Path(args.record_dir))
+    update_payload = None
+    record_dir = Path(args.record_dir)
+    if args.update:
+        if not args.status:
+            raise SystemExit("--status is required with --update.")
+        update_payload = update_record_file(
+            record_dir,
+            args.update,
+            args.status,
+            notes=args.notes,
+            usage_record=args.usage_record,
+            updated=args.updated,
+        )
+
+    payload = build_payload(record_dir)
+    if update_payload:
+        payload["update"] = update_payload
     if not args.no_write:
         write_report(Path(args.report), payload)
     if args.json:
@@ -219,6 +299,8 @@ def main() -> int:
         print(f"- records: {payload['summary']['total']}")
         print(f"- pending: {payload['summary']['pending']}")
         print(f"- completed_not_converted: {payload['summary']['completed_not_converted']}")
+        if update_payload:
+            print(f"- updated: {update_payload['path']}")
         print(f"- boundary: {payload['claim_boundary']}")
     return 0 if payload["status"] == "pass" else 1
 

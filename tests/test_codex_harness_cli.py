@@ -463,6 +463,52 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_pilot_update_delegates_to_board_updater(self):
+        command, _ = self.run_cli(
+            [
+                "pilot-update",
+                "llm-app-pilot",
+                "--status",
+                "converted",
+                "--record-dir",
+                "/tmp/pilot-records",
+                "--report",
+                "/tmp/PILOT_BOARD.md",
+                "--notes",
+                "converted after issue review",
+                "--usage-record",
+                "Docs/Environment/usage-records/llm-app-pilot.json",
+                "--updated",
+                "2026-06-04T14:00:00Z",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/pilot_board.py",
+                "--update",
+                "llm-app-pilot",
+                "--status",
+                "converted",
+                "--record-dir",
+                "/tmp/pilot-records",
+                "--report",
+                "/tmp/PILOT_BOARD.md",
+                "--notes",
+                "converted after issue review",
+                "--usage-record",
+                "Docs/Environment/usage-records/llm-app-pilot.json",
+                "--updated",
+                "2026-06-04T14:00:00Z",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
     def test_adoption_plan_delegates_to_planner(self):
         command, _ = self.run_cli(
             [

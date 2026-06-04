@@ -80,6 +80,67 @@ class PilotBoardTests(unittest.TestCase):
         self.assertEqual("fail", payload["status"])
         self.assertTrue(any("usage_record" in error for error in payload["errors"]))
 
+    def test_update_record_file_moves_pilot_through_funnel(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            record_dir = Path(temp_dir)
+            record = pilot_board.build_record(self.pilot_payload())
+            (record_dir / "llm-app-pilot.json").write_text(json.dumps(record) + "\n", encoding="utf-8")
+
+            update = pilot_board.update_record_file(
+                record_dir,
+                "llm-app-pilot",
+                "invited",
+                notes="sent to reporter",
+                updated="2026-06-04T13:30:00Z",
+            )
+            payload = pilot_board.build_payload(record_dir)
+            updated_record = payload["records"][0]
+
+        self.assertEqual("pass", update["status"])
+        self.assertEqual("invited", updated_record["status"])
+        self.assertEqual("sent to reporter", updated_record["notes"])
+        self.assertEqual("pilot-funnel-active", payload["readiness"])
+        self.assertEqual(
+            {
+                "at": "2026-06-04T13:30:00Z",
+                "from": "prepared",
+                "to": "invited",
+                "notes": "sent to reporter",
+                "usage_record": "",
+            },
+            updated_record["status_history"][0],
+        )
+
+    def test_update_record_file_requires_usage_record_when_converted(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            record_dir = Path(temp_dir)
+            record = pilot_board.build_record(self.pilot_payload())
+            (record_dir / "llm-app-pilot.json").write_text(json.dumps(record) + "\n", encoding="utf-8")
+
+            with self.assertRaises(SystemExit):
+                pilot_board.update_record_file(record_dir, "llm-app-pilot", "converted")
+
+    def test_update_record_file_allows_converted_with_usage_record(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            record_dir = Path(temp_dir)
+            record = pilot_board.build_record(self.pilot_payload(), status="completed")
+            (record_dir / "llm-app-pilot.json").write_text(json.dumps(record) + "\n", encoding="utf-8")
+
+            pilot_board.update_record_file(
+                record_dir,
+                "llm-app-pilot",
+                "converted",
+                usage_record="Docs/Environment/usage-records/llm-app-pilot.json",
+                updated="2026-06-04T14:00:00Z",
+            )
+            payload = pilot_board.build_payload(record_dir)
+            updated_record = payload["records"][0]
+
+        self.assertEqual("pass", payload["status"])
+        self.assertEqual("pilot-funnel-clear", payload["readiness"])
+        self.assertEqual("converted", updated_record["status"])
+        self.assertEqual("Docs/Environment/usage-records/llm-app-pilot.json", updated_record["usage_record"])
+
     def test_write_report_outputs_board_boundary(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)

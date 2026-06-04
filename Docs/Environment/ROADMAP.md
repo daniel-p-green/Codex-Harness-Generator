@@ -47,7 +47,8 @@ Already proven:
   generated pilot harness and evidence kit without copying generated commands.
 - Prepared-pilot tracking through `codex-harness pilot-board`, so maintainers
   can see pending, completed, converted, and dropped pilots without counting
-  outreach state as usage proof.
+  outreach state as usage proof; `codex-harness pilot-update` moves pilots
+  through that funnel without hand-editing JSON.
 - Checked-in deterministic, create-acceptance, brief-acceptance, and live-create
   examples.
 - Privacy-checked usage-record validation.
@@ -104,8 +105,9 @@ The project can stop calling itself a beta only when all of these are true:
    pick the next pilot profile, source type, and generation path by the largest
    remaining beta-exit gap. Use `codex-harness prepare-next-pilot` to prepare
    that next suggested pilot directly, then run `codex-harness pilot-board` to
-   inspect in-flight pilots or `codex-harness pilot-campaign` when a shareable
-   outreach packet is useful.
+   inspect in-flight pilots, `codex-harness pilot-update` after outreach or
+   conversion steps, or `codex-harness pilot-campaign` when a shareable outreach
+   packet is useful.
 
 2. Add more public-safe live examples.
    Prioritize domains where the generated harness has high-risk boundaries:

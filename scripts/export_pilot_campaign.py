@@ -111,7 +111,7 @@ def write_report(path: Path, payload: dict) -> None:
             "",
             "1. Review the pilot pack and issue draft for privacy-sensitive text.",
             "2. Convert acceptable evidence with `codex-harness usage-from-harness` or `codex-harness usage-from-issue`.",
-            "3. Update or review `codex-harness pilot-board` so completed pilots do not stay stuck as outreach.",
+            "3. Update status with `codex-harness pilot-update`, then review `codex-harness pilot-board` so completed pilots do not stay stuck as outreach.",
             "4. Re-run `codex-harness usage-gaps` and refresh this campaign only if gaps remain.",
             "5. Do not drop the beta label until `codex-harness proof-status` passes with the beta-exit thresholds.",
             "",

@@ -565,6 +565,24 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("pilot_board.py", command)
 
+    if args.command == "pilot-update":
+        command = ["--update", args.slug, "--status", args.status]
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.report:
+            command.extend(["--report", args.report])
+        if args.notes:
+            command.extend(["--notes", args.notes])
+        if args.usage_record:
+            command.extend(["--usage-record", args.usage_record])
+        if args.updated:
+            command.extend(["--updated", args.updated])
+        if args.no_write:
+            command.append("--no-write")
+        if args.json:
+            command.append("--json")
+        return python_script("pilot_board.py", command)
+
     if args.command == "usage-from-issue":
         command = [
             args.issue_body,
@@ -1057,6 +1075,17 @@ def make_parser() -> argparse.ArgumentParser:
     pilot_board.add_argument("--report", help="Pilot board Markdown path")
     pilot_board.add_argument("--no-write", action="store_true", help="Do not write the Markdown board")
     pilot_board.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    pilot_update = subparsers.add_parser("pilot-update", help="Update one prepared pilot record and refresh the pilot board")
+    pilot_update.add_argument("slug", help="Pilot record slug")
+    pilot_update.add_argument("--status", choices=["completed", "converted", "dropped", "invited", "prepared"], required=True)
+    pilot_update.add_argument("--record-dir", help="Directory where prepared pilot JSON records are read")
+    pilot_update.add_argument("--report", help="Pilot board Markdown path")
+    pilot_update.add_argument("--notes", help="Public-safe status update note")
+    pilot_update.add_argument("--usage-record", help="Usage record slug or path required when --status converted")
+    pilot_update.add_argument("--updated", help="UTC timestamp override")
+    pilot_update.add_argument("--no-write", action="store_true", help="Do not write the Markdown board")
+    pilot_update.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     usage_from_issue = subparsers.add_parser("usage-from-issue", help="Create usage evidence from a GitHub issue-form body")
     usage_from_issue.add_argument("issue_body", help="Markdown issue body path, or '-' for stdin")

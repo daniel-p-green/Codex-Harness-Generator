@@ -442,6 +442,23 @@ def build_payload() -> dict:
                 ],
             ),
             (
+                "pilot_update",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "pilot-update",
+                    "llm-app-pilot",
+                    "--status",
+                    "invited",
+                    "--record-dir",
+                    pilot_records.as_posix(),
+                    "--report",
+                    pilot_board_report.as_posix(),
+                    "--notes",
+                    "install smoke update",
+                    "--json",
+                ],
+            ),
+            (
                 "usage_gaps",
                 [
                     (venv / "bin" / "codex-harness").as_posix(),
