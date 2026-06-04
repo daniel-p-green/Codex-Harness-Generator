@@ -10,6 +10,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+import pilot_board
 from record_usage_case import (
     ALLOWED_EVIDENCE_TYPES,
     ALLOWED_GENERATION_PATHS,
@@ -143,6 +144,12 @@ def main() -> int:
     parser.add_argument("--generated", default=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
     parser.add_argument("--record-dir", default=DEFAULT_RECORD_DIR.as_posix())
     parser.add_argument("--report", default=DEFAULT_REPORT.as_posix())
+    parser.add_argument(
+        "--pilot-record-dir",
+        help="Optional pilot-board record directory; matching pilot slug is marked converted after the usage record is written",
+    )
+    parser.add_argument("--pilot-board-report", default=pilot_board.DEFAULT_REPORT.as_posix())
+    parser.add_argument("--pilot-notes", default="converted from external usage issue")
     parser.add_argument("--force", action="store_true", help="Replace existing record with same slug")
     parser.add_argument("--no-write", action="store_true", help="Validate and preview the record without writing files")
     parser.add_argument("--json", action="store_true", help="Emit JSON payload")
@@ -150,6 +157,7 @@ def main() -> int:
 
     record = build_record(args)
     path = None
+    pilot_update = None
     if args.no_write:
         validate_record(record)
     else:
@@ -157,12 +165,29 @@ def main() -> int:
         path = write_record(record_dir, record, force=args.force)
         records = load_records(record_dir)
         write_report(Path(args.report), records)
+        if args.pilot_record_dir:
+            pilot_update = pilot_board.update_record_file(
+                Path(args.pilot_record_dir),
+                record.slug,
+                "converted",
+                notes=args.pilot_notes,
+                usage_record=record.slug,
+                usage_record_dir=record_dir,
+            )
+            board_payload = pilot_board.build_payload(Path(args.pilot_record_dir), usage_record_dir=record_dir)
+            pilot_board.write_report(Path(args.pilot_board_report), board_payload)
+            pilot_update["board_report"] = display_path(Path(args.pilot_board_report))
+            pilot_update["board_status"] = board_payload["status"]
+            pilot_update["board_readiness"] = board_payload["readiness"]
+            if board_payload["status"] != "pass":
+                raise SystemExit("Pilot board validation failed: " + "; ".join(board_payload["errors"]))
     if args.json:
         payload = {
             "status": "pass",
             "written": not args.no_write,
             "path": display_path(path) if path is not None else None,
             "record": record.to_dict(),
+            "pilot_update": pilot_update,
         }
         print(json.dumps(payload, indent=2))
     else:
@@ -170,6 +195,8 @@ def main() -> int:
             print(f"Validated usage evidence from issue without writing: {record.slug}")
         else:
             print(f"Recorded usage evidence from issue: {display_path(path)}")
+            if pilot_update:
+                print(f"Converted pilot board record: {display_path(Path(pilot_update['path']))}")
     return 0
 
 

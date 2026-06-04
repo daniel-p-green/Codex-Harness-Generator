@@ -104,8 +104,22 @@ python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
 
 If the preview is complete and public-safe, rerun without `--no-write` to write
 the usage-record JSON file and update `Docs/Environment/USAGE_RECORDS.md`.
+When the issue corresponds to a prepared pilot with the same slug, add the
+pilot-board directory so the importer also marks that pilot `converted`,
+validates the usage-record reference, and refreshes the pilot board:
+
+```bash
+python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
+  --slug external-example \
+  --title "External example" \
+  --pilot-record-dir Docs/Environment/pilot-records \
+  --pilot-board-report Docs/Environment/PILOT_BOARD.md \
+  --json
+```
+
 The importer reads the GitHub issue-form headings and applies the same
-required-field and sensitive-text checks as `usage-record` in both modes.
+required-field and sensitive-text checks as `usage-record` in both preview and
+write modes.
 
 For manual conversion or cleanup, use:
 

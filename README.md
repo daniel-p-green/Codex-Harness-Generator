@@ -164,7 +164,9 @@ replacement. What is proven today:
   know which commands to run, what evidence to record, and what not to share.
 - `scripts/usage_from_issue.py` and `codex-harness usage-from-issue` convert a
   sanitized GitHub external-usage issue body into a privacy-checked usage
-  record; add `--no-write --json` to preview before writing files.
+  record; add `--no-write --json` to preview before writing files, or
+  `--pilot-record-dir Docs/Environment/pilot-records` to convert the matching
+  prepared pilot after the record is written.
 - `Docs/Environment/usage-records/` includes sanitized self-dogfood usage
   records from this public repo's Codex work. They are useful evidence, but not
   yet external or longitudinal adoption proof.
@@ -494,7 +496,11 @@ python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
 
 After reviewing the preview for concrete evidence, verification, privacy
 boundaries, and limitations, rerun without `--no-write` to write the checked-in
-record and refresh `Docs/Environment/USAGE_RECORDS.md`.
+record and refresh `Docs/Environment/USAGE_RECORDS.md`. If the report came
+from a prepared pilot with the same slug, add
+`--pilot-record-dir Docs/Environment/pilot-records` to mark that pilot
+`converted`, validate the usage-record reference, and refresh
+`Docs/Environment/PILOT_BOARD.md` in the same run.
 
 Validate checked-in usage records before release:
 
@@ -628,7 +634,7 @@ Common subcommands:
 | `pilot-board` | `pilot_board.py` | Summarizes prepared pilot records and cross-checks converted pilots against usage records without counting outreach as proof. |
 | `pilot-update <slug>` | `pilot_board.py` | Updates one prepared pilot's status, validates converted usage-record references, and refreshes the pilot board. |
 | `beta-exit-audit` | `beta_exit_audit.py` | Writes a non-gating audit of beta-exit readiness and remaining evidence gaps. |
-| `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record; add `--no-write` to preview first. |
+| `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record; add `--no-write` to preview first or `--pilot-record-dir` to convert a matching prepared pilot after write. |
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
 | `usage-gaps` | `usage_gaps.py` | Reports remaining beta-exit usage evidence gaps and writes `Docs/Environment/USAGE_GAPS.md`. |
 | `proof-status` | `proof_status.py` | Summarizes checked-in proof readiness, live task-trial coverage, and usage evidence; add `--beta-exit` to apply the roadmap exit thresholds. |

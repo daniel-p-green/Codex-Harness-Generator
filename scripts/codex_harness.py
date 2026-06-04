@@ -623,6 +623,12 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.extend(["--record-dir", args.record_dir])
         if args.report:
             command.extend(["--report", args.report])
+        if args.pilot_record_dir:
+            command.extend(["--pilot-record-dir", args.pilot_record_dir])
+        if args.pilot_board_report:
+            command.extend(["--pilot-board-report", args.pilot_board_report])
+        if args.pilot_notes:
+            command.extend(["--pilot-notes", args.pilot_notes])
         if args.force:
             command.append("--force")
         if args.no_write:
@@ -1140,6 +1146,12 @@ def make_parser() -> argparse.ArgumentParser:
     usage_from_issue.add_argument("--generated", help="UTC timestamp override")
     usage_from_issue.add_argument("--record-dir", help="Directory where usage record JSON files are written")
     usage_from_issue.add_argument("--report", help="Usage-record Markdown report path")
+    usage_from_issue.add_argument(
+        "--pilot-record-dir",
+        help="Optional pilot-board record directory; matching pilot slug is marked converted after write",
+    )
+    usage_from_issue.add_argument("--pilot-board-report", help="Pilot-board Markdown report path for linked conversion")
+    usage_from_issue.add_argument("--pilot-notes", help="Public-safe note for linked pilot-board conversion")
     usage_from_issue.add_argument("--force", action="store_true", help="Replace existing record with same slug")
     usage_from_issue.add_argument("--no-write", action="store_true", help="Validate and preview without writing files")
     usage_from_issue.add_argument("--json", action="store_true", help="Emit JSON payload")
