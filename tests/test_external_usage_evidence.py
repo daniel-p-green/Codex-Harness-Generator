@@ -13,6 +13,7 @@ class ExternalUsageEvidenceTests(unittest.TestCase):
 
         self.assertIn("name: External usage report", text)
         for field_id in (
+            "pilot_slug",
             "domain",
             "harness_label",
             "evidence_type",
@@ -58,6 +59,7 @@ class ExternalUsageEvidenceTests(unittest.TestCase):
         self.assertIn("python scripts/codex_harness.py pilot-pack", text)
         self.assertIn("python scripts/codex_harness.py usage-from-harness", text)
         self.assertIn("python scripts/codex_harness.py usage-from-issue", text)
+        self.assertIn("Pilot or usage-record slug", text)
         self.assertIn("python scripts/codex_harness.py usage-record", text)
         self.assertIn("--evidence-type private-summary", text)
         self.assertIn("--source-type external", text)

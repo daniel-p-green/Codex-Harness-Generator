@@ -1,3 +1,7 @@
+### Pilot or usage-record slug
+
+llm-app-pilot
+
 ### Domain or project type
 
 LLM app

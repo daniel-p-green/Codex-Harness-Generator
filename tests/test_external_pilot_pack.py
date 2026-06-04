@@ -69,6 +69,8 @@ class ExternalPilotPackTests(unittest.TestCase):
         self.assertIn("Fill out `EXTERNAL_USAGE_ISSUE_DRAFT.md`", pack)
         self.assertIn("Do not claim broad", pack)
         self.assertIn("adoption, production readiness", pack)
+        self.assertIn("### Pilot or usage-record slug", issue)
+        self.assertIn("external-software-dev-pilot", issue)
         self.assertIn("### Domain or project type", issue)
         self.assertIn("software development", issue)
         self.assertIn("private-summary", issue)
@@ -129,6 +131,7 @@ class ExternalPilotPackTests(unittest.TestCase):
 
         self.assertIn("prefilled from the latest complete task-trial record", pack)
         self.assertIn("success", issue)
+        self.assertIn("external-software-dev-pilot", issue)
         self.assertIn("summarize retry behavior", issue)
         self.assertIn("public-safe retry summary artifact", issue)
         self.assertIn("Generated harness local eval report status: PASS.", issue)

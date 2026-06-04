@@ -82,8 +82,6 @@ def build_usage_from_issue_command(pilot: dict, args: argparse.Namespace, *, lin
         "codex-harness",
         "usage-from-issue",
         "<completed-issue.md>",
-        "--slug",
-        pilot_value(pilot, "slug"),
         "--record-dir",
         args.record_dir,
         "--report",

@@ -184,7 +184,9 @@ replacement. What is proven today:
   sanitized GitHub external-usage issue body into a privacy-checked usage
   record; add `--no-write --json` to preview before writing files, or
   `--pilot-record-dir Docs/Environment/pilot-records` to convert the matching
-  prepared pilot after the record is written.
+  prepared pilot after the record is written. New issue drafts include the
+  pilot or usage-record slug so maintainers can omit `--slug` when the issue
+  body is complete.
 - `Docs/Environment/usage-records/` includes sanitized self-dogfood usage
   records from this public repo's Codex work. They are useful evidence, but not
   yet external or longitudinal adoption proof.
@@ -515,22 +517,21 @@ python scripts/codex_harness.py usage-from-harness /tmp/codex-rag-harness \
 Use `--no-write --json` to preview copied-harness evidence before committing it.
 When `--pilot-record-dir` points at a matching prepared pilot, copied-harness
 conversion can infer title, domain, harness label, source type, and generation
-path from the pilot record. Issue-body conversion can infer title plus fallback
-harness label, source type, and generation path from the same pilot record.
-Provide those flags directly for standalone conversions.
+path from the pilot record. Issue-body conversion can infer the slug from the
+issue body and title plus fallback harness label, source type, and generation
+path from the same pilot record. Provide those flags directly for standalone
+conversions when the issue body or pilot record does not include them.
 When an external usage report arrives through the GitHub issue template, save
 the issue body and lint it before previewing the normalized record or writing
 files:
 
 ```bash
 python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
-  --slug external-rag-trial \
   --title "External RAG harness trial" \
   --lint-only \
   --json
 
 python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
-  --slug external-rag-trial \
   --title "External RAG harness trial" \
   --no-write \
   --json
@@ -697,7 +698,7 @@ Common subcommands:
 | `pilot-update <slug>` | `pilot_board.py` | Updates one prepared pilot's status, validates converted usage-record references, and refreshes the pilot board. |
 | `beta-exit-audit` | `beta_exit_audit.py` | Writes a non-gating audit of beta-exit readiness and remaining evidence gaps. |
 | `proof-next` | `proof_next.py` | Writes the next beta-exit proof actions and candidate coverage projection from current usage gaps without counting the plan as evidence. |
-| `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record; add `--lint-only` to find incomplete issue bodies, `--no-write` to preview first, or `--pilot-record-dir` to prevalidate and convert a matching prepared pilot. |
+| `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record; infers the slug from the issue body when present, and supports `--lint-only`, `--no-write`, or `--pilot-record-dir` for linked pilot conversion. |
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
 | `usage-gaps` | `usage_gaps.py` | Reports remaining beta-exit usage evidence gaps and writes `Docs/Environment/USAGE_GAPS.md`. |
 | `proof-status` | `proof_status.py` | Summarizes checked-in proof readiness, live task-trial coverage, and usage evidence; add `--beta-exit` to apply the roadmap exit thresholds. |

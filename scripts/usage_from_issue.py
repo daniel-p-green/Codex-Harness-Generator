@@ -31,6 +31,9 @@ from record_usage_case import (
 
 
 LABEL_MAP = {
+    "pilot slug": "pilot_slug",
+    "pilot or usage-record slug": "pilot_slug",
+    "pilot or usage record slug": "pilot_slug",
     "domain or project type": "domain",
     "generated harness profile or label": "harness_label",
     "evidence type": "evidence_type",
@@ -51,6 +54,7 @@ PILOT_DEFAULT_FIELDS = {
     "generation_path": "generation_path",
 }
 ISSUE_REQUIRED_FIELDS = (
+    "pilot_slug",
     "domain",
     "evidence_type",
     "outcome",
@@ -75,6 +79,12 @@ def read_issue_body(path: str) -> str:
     if path == "-":
         return sys.stdin.read()
     return Path(path).read_text(encoding="utf-8")
+
+
+def issue_body_text(args: argparse.Namespace) -> str:
+    if not hasattr(args, "_issue_body_text"):
+        args._issue_body_text = read_issue_body(args.issue_body)
+    return args._issue_body_text
 
 
 def parse_issue_sections(text: str) -> dict[str, str]:
@@ -116,9 +126,26 @@ def require_field(sections: dict[str, str], key: str) -> str:
     return value
 
 
+def resolve_slug(args: argparse.Namespace, *, required: bool = True) -> bool:
+    sections = parse_issue_sections(issue_body_text(args))
+    issue_slug = clean_value(sections.get("pilot_slug", ""))
+    if args.slug:
+        args.slug = safe_slug(args.slug)
+        return True
+    if issue_slug:
+        args.slug = safe_slug(issue_slug)
+        return True
+    args.slug = ""
+    if required:
+        raise SystemExit("Missing required metadata: --slug or issue field 'Pilot or usage-record slug'.")
+    return False
+
+
 def apply_pilot_defaults(args: argparse.Namespace) -> dict | None:
     args.pilot_defaults_applied = []
     if not args.pilot_record_dir:
+        return None
+    if not args.slug:
         return None
     slug = safe_slug(args.slug)
     path = pilot_board.default_record_path(Path(args.pilot_record_dir), slug)
@@ -154,10 +181,12 @@ def require_metadata(args: argparse.Namespace) -> None:
 
 
 def lint_issue_payload(args: argparse.Namespace) -> dict:
-    sections = parse_issue_sections(read_issue_body(args.issue_body))
+    sections = parse_issue_sections(issue_body_text(args))
     errors = []
     warnings = []
     missing_fields = [field for field in ISSUE_REQUIRED_FIELDS if not clean_value(sections.get(field, ""))]
+    if args.slug and "pilot_slug" in missing_fields:
+        missing_fields.remove("pilot_slug")
 
     evidence_type = clean_value(sections.get("evidence_type", ""))
     outcome = clean_value(sections.get("outcome", ""))
@@ -209,7 +238,7 @@ def lint_issue_payload(args: argparse.Namespace) -> dict:
     return {
         "status": "pass" if not errors else "fail",
         "readiness": "conversion-ready" if not errors else "needs-input",
-        "slug": safe_slug(args.slug),
+        "slug": safe_slug(args.slug) if args.slug else "",
         "title": args.title or "",
         "missing_fields": missing_fields,
         "errors": errors,
@@ -220,6 +249,7 @@ def lint_issue_payload(args: argparse.Namespace) -> dict:
             "limitations": len(limitations),
         },
         "values": {
+            "pilot_slug": args.slug,
             "domain": clean_value(sections.get("domain", "")),
             "evidence_type": evidence_type,
             "outcome": outcome,
@@ -234,7 +264,7 @@ def lint_issue_payload(args: argparse.Namespace) -> dict:
 
 
 def build_record(args: argparse.Namespace) -> UsageRecord:
-    sections = parse_issue_sections(read_issue_body(args.issue_body))
+    sections = parse_issue_sections(issue_body_text(args))
     evidence_type = require_field(sections, "evidence_type")
     outcome = require_field(sections, "outcome")
     if evidence_type not in ALLOWED_EVIDENCE_TYPES:
@@ -275,7 +305,7 @@ def build_record(args: argparse.Namespace) -> UsageRecord:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("issue_body", help="Markdown issue body path, or '-' for stdin")
-    parser.add_argument("--slug", required=True, help="Stable usage-record slug")
+    parser.add_argument("--slug", help="Stable usage-record slug; inferred from issue body when omitted")
     parser.add_argument("--title", help="Short usage-record title; inferred from matching pilot record when available")
     parser.add_argument("--harness-label", help="Public-safe harness label override; inferred from matching pilot record when available")
     parser.add_argument("--source-type", choices=sorted(ALLOWED_SOURCE_TYPES), help="Fallback source type; inferred from matching pilot record when available")
@@ -295,6 +325,7 @@ def main() -> int:
     parser.add_argument("--json", action="store_true", help="Emit JSON payload")
     args = parser.parse_args()
 
+    resolve_slug(args, required=not args.lint_only)
     apply_pilot_defaults(args)
     apply_standalone_defaults(args)
     if args.lint_only:

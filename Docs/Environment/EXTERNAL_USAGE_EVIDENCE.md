@@ -11,6 +11,8 @@ harness on a real or public-safe task.
 
 Good reports include:
 
+- The pilot or usage-record slug from the pilot pack, or a short lowercase slug
+  if the report is standalone.
 - The domain or project type.
 - The generated harness profile or public-safe label, if known.
 - The source type: `external`, `multi-project`, or `self-dogfood`.
@@ -115,11 +117,11 @@ matching pilot `converted`, and refresh `Docs/Environment/PILOT_BOARD.md`.
 Maintainers can convert a usable public issue into a checked-in usage record by
 saving the issue body to a local Markdown file. Preview and privacy-check the
 normalized record before writing files. For standalone issue conversion, provide
-`--title` directly:
+`--title` directly. If the issue body includes the **Pilot or usage-record slug**
+field, `usage-from-issue` can infer the slug without a separate flag:
 
 ```bash
 python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
-  --slug external-example \
   --title "External example" \
   --no-write \
   --json
@@ -135,7 +137,6 @@ pilot board:
 
 ```bash
 python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
-  --slug external-example \
   --pilot-record-dir Docs/Environment/pilot-records \
   --pilot-board-report Docs/Environment/PILOT_BOARD.md \
   --json

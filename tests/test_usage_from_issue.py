@@ -69,6 +69,12 @@ Removed private repo names, local paths, customer details, credentials, and raw 
 - One project and one task.
 """
 
+ISSUE_BODY_WITH_SLUG = """### Pilot or usage-record slug
+
+external-llm-app
+
+""" + ISSUE_BODY
+
 
 class UsageFromIssueTests(unittest.TestCase):
     def write_matching_pilot_record(self, pilot_record_dir: Path) -> Path:
@@ -100,8 +106,9 @@ class UsageFromIssueTests(unittest.TestCase):
         return record_path
 
     def test_parse_issue_sections_maps_github_issue_form_labels(self):
-        sections = usage_from_issue.parse_issue_sections(ISSUE_BODY)
+        sections = usage_from_issue.parse_issue_sections(ISSUE_BODY_WITH_SLUG)
 
+        self.assertEqual("external-llm-app", sections["pilot_slug"])
         self.assertEqual("LLM app", sections["domain"])
         self.assertEqual("llm-app profile", sections["harness_label"])
         self.assertEqual("private-summary", sections["evidence_type"])
@@ -164,7 +171,7 @@ class UsageFromIssueTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
             issue = temp_path / "issue.md"
-            issue.write_text(ISSUE_BODY, encoding="utf-8")
+            issue.write_text(ISSUE_BODY_WITH_SLUG, encoding="utf-8")
             record_dir = temp_path / "records"
             report = temp_path / "USAGE_RECORDS.md"
             pilot_record_dir = temp_path / "pilot-records"
@@ -176,10 +183,6 @@ class UsageFromIssueTests(unittest.TestCase):
                     sys.executable,
                     SCRIPT.as_posix(),
                     issue.as_posix(),
-                    "--slug",
-                    "external-llm-app",
-                    "--title",
-                    "External LLM app report",
                     "--record-dir",
                     record_dir.as_posix(),
                     "--report",
@@ -213,11 +216,44 @@ class UsageFromIssueTests(unittest.TestCase):
                 board_report.read_text(encoding="utf-8"),
             )
 
+    def test_usage_from_issue_can_infer_slug_from_stdin_once(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            record_dir = temp_path / "records"
+            pilot_record_dir = temp_path / "pilot-records"
+            self.write_matching_pilot_record(pilot_record_dir)
+
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    SCRIPT.as_posix(),
+                    "-",
+                    "--record-dir",
+                    record_dir.as_posix(),
+                    "--pilot-record-dir",
+                    pilot_record_dir.as_posix(),
+                    "--no-write",
+                    "--json",
+                ],
+                input=ISSUE_BODY_WITH_SLUG,
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+            payload = json.loads(completed.stdout)
+            self.assertEqual("pass", payload["status"])
+            self.assertFalse(payload["written"])
+            self.assertEqual("external-llm-app", payload["record"]["slug"])
+            self.assertEqual("External LLM app report", payload["record"]["title"])
+
     def test_usage_from_issue_infers_title_from_pilot_record(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
             issue = temp_path / "issue.md"
-            issue.write_text(ISSUE_BODY, encoding="utf-8")
+            issue.write_text(ISSUE_BODY_WITH_SLUG, encoding="utf-8")
             record_dir = temp_path / "records"
             pilot_record_dir = temp_path / "pilot-records"
             self.write_matching_pilot_record(pilot_record_dir)
@@ -227,8 +263,6 @@ class UsageFromIssueTests(unittest.TestCase):
                     sys.executable,
                     SCRIPT.as_posix(),
                     issue.as_posix(),
-                    "--slug",
-                    "external-llm-app",
                     "--record-dir",
                     record_dir.as_posix(),
                     "--pilot-record-dir",
@@ -255,7 +289,7 @@ class UsageFromIssueTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
             issue = temp_path / "issue.md"
-            issue.write_text(ISSUE_BODY, encoding="utf-8")
+            issue.write_text(ISSUE_BODY_WITH_SLUG, encoding="utf-8")
             pilot_record_dir = temp_path / "pilot-records"
             self.write_matching_pilot_record(pilot_record_dir)
 
@@ -264,8 +298,6 @@ class UsageFromIssueTests(unittest.TestCase):
                     sys.executable,
                     SCRIPT.as_posix(),
                     issue.as_posix(),
-                    "--slug",
-                    "external-llm-app",
                     "--pilot-record-dir",
                     pilot_record_dir.as_posix(),
                     "--lint-only",
@@ -281,8 +313,38 @@ class UsageFromIssueTests(unittest.TestCase):
             payload = json.loads(completed.stdout)
             self.assertEqual("pass", payload["status"])
             self.assertEqual("conversion-ready", payload["readiness"])
+            self.assertEqual("external-llm-app", payload["slug"])
+            self.assertEqual("external-llm-app", payload["values"]["pilot_slug"])
             self.assertEqual({"evidence": 2, "verification": 2, "limitations": 1}, payload["counts"])
             self.assertIn("title", payload["inferred_fields"])
+
+    def test_usage_from_issue_requires_slug_without_issue_slug(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            issue = temp_path / "issue.md"
+            issue.write_text(ISSUE_BODY, encoding="utf-8")
+
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    SCRIPT.as_posix(),
+                    issue.as_posix(),
+                    "--title",
+                    "Missing slug report",
+                    "--lint-only",
+                    "--json",
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertNotEqual(0, completed.returncode)
+            payload = json.loads(completed.stdout)
+            self.assertEqual("fail", payload["status"])
+            self.assertEqual("needs-input", payload["readiness"])
+            self.assertIn("pilot_slug", payload["missing_fields"])
 
     def test_usage_from_issue_lint_only_reports_incomplete_issue(self):
         with tempfile.TemporaryDirectory() as temp_dir:

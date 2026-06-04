@@ -88,6 +88,10 @@ def build_payload() -> dict:
         issue_body.write_text(
             "\n".join(
                 [
+                    "### Pilot or usage-record slug",
+                    "",
+                    "install-smoke-issue",
+                    "",
                     "### Domain or project type",
                     "",
                     "install smoke",
@@ -141,6 +145,10 @@ def build_payload() -> dict:
         linked_pilot_issue_body.write_text(
             "\n".join(
                 [
+                    "### Pilot or usage-record slug",
+                    "",
+                    "llm-app-pilot",
+                    "",
                     "### Domain or project type",
                     "",
                     "LLM app",
@@ -577,10 +585,6 @@ def build_payload() -> dict:
                     (venv / "bin" / "codex-harness").as_posix(),
                     "usage-from-issue",
                     linked_pilot_issue_body.as_posix(),
-                    "--slug",
-                    "llm-app-pilot",
-                    "--title",
-                    "LLM app pilot",
                     "--record-dir",
                     usage_records.as_posix(),
                     "--report",

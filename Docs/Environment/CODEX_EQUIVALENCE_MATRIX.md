@@ -1,6 +1,6 @@
 # Codex Equivalence Matrix
 
-Generated: 2026-06-04T16:04:46Z
+Generated: 2026-06-04T16:18:04Z
 Status: PASS
 
 This matrix maps the earlier harness-generator responsibilities to the

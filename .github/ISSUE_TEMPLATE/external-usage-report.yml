@@ -10,6 +10,14 @@ body:
 
         Do not include secrets, customer data, candidate data, proprietary source, private repository paths, local machine paths, email addresses, access tokens, logs with credentials, or raw private transcripts. Summaries are welcome.
   - type: input
+    id: pilot_slug
+    attributes:
+      label: Pilot or usage-record slug
+      description: Use the slug from the pilot pack if you have one; otherwise create a short lowercase slug.
+      placeholder: llm-app-pilot
+    validations:
+      required: true
+  - type: input
     id: domain
     attributes:
       label: Domain or project type

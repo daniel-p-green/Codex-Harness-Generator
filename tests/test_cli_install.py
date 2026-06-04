@@ -76,6 +76,14 @@ class CheckCliInstallTests(unittest.TestCase):
         self.assertTrue(any("codex-harness" in command[0] and "pilot-board" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "pilot-update" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "usage-from-issue" in command and "--pilot-record-dir" in command for command in calls))
+        linked_issue_calls = [
+            command
+            for command in calls
+            if "codex-harness" in command[0]
+            and "usage-from-issue" in command
+            and "--pilot-record-dir" in command
+        ]
+        self.assertTrue(any("--slug" not in command for command in linked_issue_calls))
         self.assertTrue(any("codex-harness" in command[0] and "usage-gaps" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "beta-exit-audit" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "pilot-campaign" in command for command in calls))

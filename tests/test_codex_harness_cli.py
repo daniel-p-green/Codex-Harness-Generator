@@ -1559,6 +1559,35 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_usage_from_issue_can_infer_slug_from_issue_body(self):
+        command, _ = self.run_cli(
+            [
+                "usage-from-issue",
+                "/tmp/issue.md",
+                "--record-dir",
+                "/tmp/records",
+                "--pilot-record-dir",
+                "/tmp/pilot-records",
+                "--no-write",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/usage_from_issue.py",
+                "/tmp/issue.md",
+                "--record-dir",
+                "/tmp/records",
+                "--pilot-record-dir",
+                "/tmp/pilot-records",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
     def test_usage_from_issue_forwards_lint_only(self):
         command, _ = self.run_cli(
             [

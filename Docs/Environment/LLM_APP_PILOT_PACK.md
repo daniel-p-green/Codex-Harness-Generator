@@ -63,8 +63,8 @@ the matching pilot-board record.
 Or convert the GitHub issue body after review:
 
 ```bash
-python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md --slug "llm-app-pilot" --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
-python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md --slug "llm-app-pilot" --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md
+python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
+python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md
 ```
 
 ## Issue Draft

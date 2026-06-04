@@ -1,6 +1,6 @@
 # Proof Next Actions
 
-Generated: 2026-06-04T16:04:46Z
+Generated: 2026-06-04T16:18:04Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 
@@ -112,7 +112,7 @@ codex-harness usage-from-harness <generated-harness> --slug llm-app-pilot --evid
 Purpose: show missing fields, weak evidence counts, and privacy problems before attempting conversion
 
 ```bash
-codex-harness usage-from-issue <completed-issue.md> --slug llm-app-pilot --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
+codex-harness usage-from-issue <completed-issue.md> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
 ```
 
 9. preview issue evidence
@@ -120,7 +120,7 @@ codex-harness usage-from-issue <completed-issue.md> --slug llm-app-pilot --recor
 Purpose: validate a completed reporter issue body without writing a usage record or mutating the pilot board
 
 ```bash
-codex-harness usage-from-issue <completed-issue.md> --slug llm-app-pilot --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
+codex-harness usage-from-issue <completed-issue.md> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
 ```
 
 10. convert issue evidence
@@ -128,7 +128,7 @@ codex-harness usage-from-issue <completed-issue.md> --slug llm-app-pilot --recor
 Purpose: write the checked usage record and convert the matching pilot after preview output is reviewed
 
 ```bash
-codex-harness usage-from-issue <completed-issue.md> --slug llm-app-pilot --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+codex-harness usage-from-issue <completed-issue.md> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
 ```
 
 11. audit beta exit

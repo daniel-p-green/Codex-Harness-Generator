@@ -686,11 +686,9 @@ def build_command(args: argparse.Namespace) -> list[str]:
         return python_script("beta_exit_audit.py", command)
 
     if args.command == "usage-from-issue":
-        command = [
-            args.issue_body,
-            "--slug",
-            args.slug,
-        ]
+        command = [args.issue_body]
+        if args.slug:
+            command.extend(["--slug", args.slug])
         if args.title:
             command.extend(["--title", args.title])
         if args.harness_label:
@@ -1290,7 +1288,7 @@ def make_parser() -> argparse.ArgumentParser:
 
     usage_from_issue = subparsers.add_parser("usage-from-issue", help="Create usage evidence from a GitHub issue-form body")
     usage_from_issue.add_argument("issue_body", help="Markdown issue body path, or '-' for stdin")
-    usage_from_issue.add_argument("--slug", required=True, help="Stable record slug")
+    usage_from_issue.add_argument("--slug", help="Stable record slug; inferred from issue body when omitted")
     usage_from_issue.add_argument("--title", help="Short usage-record title; inferred from matching pilot record when available")
     usage_from_issue.add_argument("--harness-label", help="Public-safe harness label override; inferred from matching pilot record when available")
     usage_from_issue.add_argument("--source-type", choices=["external", "multi-project", "self-dogfood"], help="Fallback source type; inferred from matching pilot record when available")
