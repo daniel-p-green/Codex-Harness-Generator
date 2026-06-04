@@ -174,8 +174,9 @@ replacement. What is proven today:
   privacy-safe reporter fields without counting opened issues as usage proof.
 - `scripts/usage_from_github_issue.py` and `codex-harness
   usage-from-github-issue <issue-number-or-url>` fetch a completed public issue
-  with `gh`, then reuse the same lint, preview, conversion, privacy, and
-  pilot-board validation path as `usage-from-issue`.
+  with `gh`, optionally include reporter comments, then reuse the same lint,
+  preview, conversion, privacy, and pilot-board validation path as
+  `usage-from-issue`.
 - `scripts/prepare_pilot.py` and `codex-harness prepare-pilot` combine
   brief-based quickstart generation with an external pilot pack and issue-body
   draft, so the next beta-exit pilot can be prepared with one command before a
@@ -576,6 +577,7 @@ python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
   --json
 
 python scripts/codex_harness.py usage-from-github-issue <issue-number-or-url> \
+  --include-comments \
   --pilot-record-dir Docs/Environment/pilot-records \
   --pilot-board-report Docs/Environment/PILOT_BOARD.md \
   --lint-only \
@@ -749,7 +751,7 @@ Common subcommands:
 | `pilot-handoff` | `export_pilot_handoff.py` | Writes shareable per-pilot handoff folders with a single reporter handoff, pilot pack, copied issue draft, prefilled usage-report draft, and maintainer commands. |
 | `pilot-handoff-audit` | `audit_pilot_handoffs.py` | Checks handoff folders for required reporter files, claim boundaries, and importer-shaped usage-report drafts before sending. |
 | `pilot-github-issues` | `export_pilot_github_issues.py` | Writes GitHub-ready issue bodies and `gh issue create` commands from active pilot-board records without treating opened issues as usage proof. |
-| `usage-from-github-issue` | `usage_from_github_issue.py` | Fetches a completed public GitHub issue with `gh`, then lints, previews, or converts it through the same privacy-checked usage-record importer. |
+| `usage-from-github-issue` | `usage_from_github_issue.py` | Fetches a completed public GitHub issue with `gh`, optionally includes reporter comments, then lints, previews, or converts it through the same privacy-checked usage-record importer. |
 | `beta-exit-audit` | `beta_exit_audit.py` | Writes a non-gating audit of beta-exit readiness and remaining evidence gaps. |
 | `proof-next` | `proof_next.py` | Writes the next beta-exit proof actions and candidate coverage projection from current usage gaps without counting the plan as evidence. |
 | `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record; infers the slug from the issue body when present, and supports `--lint-only`, `--no-write`, or `--pilot-record-dir` for linked pilot conversion. |

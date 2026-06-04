@@ -80,6 +80,7 @@ class UsageFromGithubIssueTests(unittest.TestCase):
             "issue": "12",
             "repo": "daniel-p-green/Codex-Harness-Generator",
             "gh_bin": "gh",
+            "include_comments": False,
             "slug": None,
             "title": None,
             "harness_label": None,
@@ -99,13 +100,14 @@ class UsageFromGithubIssueTests(unittest.TestCase):
         values.update(overrides)
         return argparse.Namespace(**values)
 
-    def github_payload(self, body: str = ISSUE_BODY) -> dict:
+    def github_payload(self, body: str = ISSUE_BODY, comments: list[dict] | None = None) -> dict:
         return {
             "number": 12,
             "title": "External usage pilot: LLM app pilot",
             "url": "https://github.com/example/repo/issues/12",
             "state": "OPEN",
             "body": body,
+            "comments": comments or [],
         }
 
     def write_matching_pilot_record(self, root: Path) -> None:
@@ -168,6 +170,87 @@ class UsageFromGithubIssueTests(unittest.TestCase):
         self.assertFalse(payload["written"])
         self.assertEqual("external-llm-app", payload["record"]["slug"])
         self.assertEqual("https://github.com/example/repo/issues/12", payload["github_issue"]["url"])
+
+    def test_include_comments_can_complete_placeholder_issue_body(self):
+        incomplete_body = ISSUE_BODY.replace("success", "_no response_")
+        incomplete_body = incomplete_body.replace(
+            "The generated harness helped organize prompts, evals, and source-grounded review steps.",
+            "_no response_",
+        )
+        incomplete_body = incomplete_body.replace(
+            "- Generated AGENTS.md matched the project shape.\n- The harness made verification steps explicit.",
+            "_no response_",
+        )
+        incomplete_body = incomplete_body.replace(
+            "- Ran the generated smoke check successfully.\n- Completed one real task using the generated reviewer guidance.",
+            "_no response_",
+        )
+        incomplete_body = incomplete_body.replace(
+            "Removed private repo names, local paths, customer details, credentials, and raw logs.",
+            "_no response_",
+        )
+        incomplete_body = incomplete_body.replace("- One project and one task.", "_no response_")
+        completion_comment = """### Outcome
+
+success
+
+### Public-safe task summary
+
+The reporter finished one privacy-safe LLM app task with the generated harness.
+
+### Evidence
+
+- The generated reviewer instructions matched the task.
+- The harness checklist caught one missing verification step.
+
+### Verification performed
+
+- Ran the generated smoke check.
+- Reviewed the final task output against the generated AGENTS.md.
+
+### Privacy review
+
+Only public-safe summary evidence was shared; no private names, local paths, credentials, or raw logs.
+
+### Limitations
+
+- One reporter comment and one task.
+"""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_matching_pilot_record(root)
+
+            payload = usage_from_github_issue.build_payload(
+                self.args(root, include_comments=True, no_write=True),
+                github_payload=self.github_payload(
+                    body=incomplete_body,
+                    comments=[{"body": completion_comment, "url": "https://github.com/example/repo/issues/12#issuecomment-1"}],
+                ),
+            )
+
+        self.assertEqual("pass", payload["status"], payload)
+        self.assertFalse(payload["written"])
+        self.assertEqual(
+            "The reporter finished one privacy-safe LLM app task with the generated harness.",
+            payload["record"]["task_summary"],
+        )
+        self.assertEqual(1, payload["github_issue"]["comment_count"])
+        self.assertTrue(payload["github_issue"]["comments_included"])
+
+    def test_sensitive_comment_fails_lint(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_matching_pilot_record(root)
+
+            payload = usage_from_github_issue.build_payload(
+                self.args(root, include_comments=True, lint_only=True),
+                github_payload=self.github_payload(
+                    comments=[{"body": "### Evidence\n\n- Reporter email: reporter@example.com"}],
+                ),
+            )
+
+        self.assertEqual("fail", payload["status"], payload)
+        self.assertTrue(any("Sensitive text detected" in error for error in payload["errors"]))
 
     def test_write_converts_matching_pilot(self):
         with tempfile.TemporaryDirectory() as temp_dir:

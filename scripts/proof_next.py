@@ -138,6 +138,7 @@ def build_conversion_commands(pilot: dict, args: argparse.Namespace) -> list[dic
             "name": "lint GitHub issue evidence",
             "command": (
                 "codex-harness usage-from-github-issue <issue-number-or-url> "
+                "--include-comments "
                 f"--record-dir {args.record_dir} "
                 f"--report {args.usage_report} "
                 f"--pilot-record-dir {args.pilot_record_dir} "
@@ -150,6 +151,7 @@ def build_conversion_commands(pilot: dict, args: argparse.Namespace) -> list[dic
             "name": "convert GitHub issue evidence",
             "command": (
                 "codex-harness usage-from-github-issue <issue-number-or-url> "
+                "--include-comments "
                 f"--record-dir {args.record_dir} "
                 f"--report {args.usage_report} "
                 f"--pilot-record-dir {args.pilot_record_dir} "

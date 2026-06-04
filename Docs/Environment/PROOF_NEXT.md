@@ -1,6 +1,6 @@
 # Proof Next Actions
 
-Generated: 2026-06-04T18:17:14Z
+Generated: 2026-06-04T18:25:00Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 
@@ -168,7 +168,7 @@ codex-harness usage-from-issue <completed-issue.md> --record-dir Docs/Environmen
 Purpose: lint a completed public GitHub pilot issue without copying its body into a local file first
 
 ```bash
-codex-harness usage-from-github-issue <issue-number-or-url> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
+codex-harness usage-from-github-issue <issue-number-or-url> --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
 ```
 
 16. convert GitHub issue evidence
@@ -176,7 +176,7 @@ codex-harness usage-from-github-issue <issue-number-or-url> --record-dir Docs/En
 Purpose: fetch a completed public GitHub pilot issue, write the checked usage record, and convert the matching pilot
 
 ```bash
-codex-harness usage-from-github-issue <issue-number-or-url> --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+codex-harness usage-from-github-issue <issue-number-or-url> --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
 ```
 
 17. audit beta exit

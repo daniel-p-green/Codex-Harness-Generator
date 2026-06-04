@@ -25,8 +25,11 @@ from record_usage_case import (
 )
 
 
-def fetch_github_issue(issue: str, repo: str = "", gh_bin: str = "gh") -> dict:
-    command = [gh_bin, "issue", "view", issue, "--json", "body,title,url,number,state"]
+def fetch_github_issue(issue: str, repo: str = "", gh_bin: str = "gh", *, include_comments: bool = False) -> dict:
+    fields = "body,title,url,number,state"
+    if include_comments:
+        fields += ",comments"
+    command = [gh_bin, "issue", "view", issue, "--json", fields]
     if repo:
         command.extend(["--repo", repo])
     try:
@@ -40,9 +43,25 @@ def fetch_github_issue(issue: str, repo: str = "", gh_bin: str = "gh") -> dict:
         payload = json.loads(result.stdout)
     except json.JSONDecodeError as exc:
         raise SystemExit(f"gh issue view returned invalid JSON: {exc}") from exc
-    if not str(payload.get("body", "")).strip():
+    if not combined_issue_body(payload, include_comments=include_comments).strip():
         raise SystemExit("GitHub issue body is empty.")
     return payload
+
+
+def comment_bodies(payload: dict) -> list[str]:
+    bodies = []
+    for comment in payload.get("comments") or []:
+        body = str(comment.get("body", "")).strip()
+        if body:
+            bodies.append(body)
+    return bodies
+
+
+def combined_issue_body(payload: dict, *, include_comments: bool) -> str:
+    parts = [str(payload.get("body", "")).strip()]
+    if include_comments:
+        parts.extend(comment_bodies(payload))
+    return "\n\n".join(part for part in parts if part)
 
 
 def importer_args(args: argparse.Namespace, body: str) -> argparse.Namespace:
@@ -67,25 +86,32 @@ def importer_args(args: argparse.Namespace, body: str) -> argparse.Namespace:
     )
 
 
-def issue_metadata(payload: dict) -> dict:
+def issue_metadata(payload: dict, *, include_comments: bool) -> dict:
     return {
         "number": payload.get("number"),
         "title": payload.get("title", ""),
         "url": payload.get("url", ""),
         "state": payload.get("state", ""),
+        "comments_included": include_comments,
+        "comment_count": len(comment_bodies(payload)) if include_comments else 0,
     }
 
 
 def build_payload(args: argparse.Namespace, github_payload: dict | None = None) -> dict:
-    github_payload = github_payload or fetch_github_issue(args.issue, repo=args.repo or "", gh_bin=args.gh_bin)
-    body = str(github_payload.get("body", ""))
+    github_payload = github_payload or fetch_github_issue(
+        args.issue,
+        repo=args.repo or "",
+        gh_bin=args.gh_bin,
+        include_comments=args.include_comments,
+    )
+    body = combined_issue_body(github_payload, include_comments=args.include_comments)
     sensitive_findings = find_sensitive_text(body)
     converted_args = importer_args(args, body)
     usage_from_issue.resolve_slug(converted_args, required=not args.lint_only)
     usage_from_issue.apply_pilot_defaults(converted_args)
     usage_from_issue.apply_standalone_defaults(converted_args)
 
-    github = issue_metadata(github_payload)
+    github = issue_metadata(github_payload, include_comments=args.include_comments)
     if args.lint_only:
         lint_payload = usage_from_issue.lint_issue_payload(converted_args)
         if sensitive_findings:
@@ -148,6 +174,11 @@ def main() -> int:
     parser.add_argument("issue", help="GitHub issue number, URL, or branch-style issue selector accepted by gh")
     parser.add_argument("--repo", help="Optional GitHub repository in owner/name form")
     parser.add_argument("--gh-bin", default="gh", help="GitHub CLI executable")
+    parser.add_argument(
+        "--include-comments",
+        action="store_true",
+        help="Include issue comments when linting or converting; later repeated fields override the issue body",
+    )
     parser.add_argument("--slug", help="Stable usage-record slug; inferred from issue body when omitted")
     parser.add_argument("--title", help="Short usage-record title; inferred from matching pilot record when available")
     parser.add_argument("--harness-label", help="Public-safe harness label override; inferred from matching pilot record when available")

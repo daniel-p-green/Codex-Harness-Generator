@@ -708,6 +708,7 @@ def build_payload() -> dict:
                     "example/repo",
                     "--gh-bin",
                     fake_gh.as_posix(),
+                    "--include-comments",
                     "--record-dir",
                     usage_records.as_posix(),
                     "--report",

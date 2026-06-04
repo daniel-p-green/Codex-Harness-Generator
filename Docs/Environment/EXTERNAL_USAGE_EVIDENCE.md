@@ -173,16 +173,21 @@ python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
 
 If the issue is already public on GitHub, maintainers can skip the local body
 file and fetch it with `gh` while still using the same lint, preview, conversion,
-privacy, and pilot-board checks:
+privacy, and pilot-board checks. Use `--include-comments` when a reporter leaves
+the completed usage report in a comment instead of editing the original issue
+body; repeated form fields in later comments override `_no response_` fields in
+the issue body.
 
 ```bash
 python scripts/codex_harness.py usage-from-github-issue <issue-number-or-url> \
+  --include-comments \
   --pilot-record-dir Docs/Environment/pilot-records \
   --pilot-board-report Docs/Environment/PILOT_BOARD.md \
   --lint-only \
   --json
 
 python scripts/codex_harness.py usage-from-github-issue <issue-number-or-url> \
+  --include-comments \
   --pilot-record-dir Docs/Environment/pilot-records \
   --pilot-board-report Docs/Environment/PILOT_BOARD.md \
   --no-write \

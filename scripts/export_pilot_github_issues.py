@@ -147,18 +147,21 @@ def build_payload(args: argparse.Namespace) -> dict:
                 "preview_issue": record["commands"]["preview_issue"].replace("<completed-issue.md>", display_path(body_path)),
                 "lint_github_issue": (
                     "codex-harness usage-from-github-issue <issue-number-or-url> "
+                    "--include-comments "
                     f"--record-dir {args.usage_record_dir} --report {args.usage_report} "
                     f"--pilot-record-dir {args.record_dir} --pilot-board-report {args.pilot_board_report} "
                     "--lint-only --json"
                 ),
                 "preview_github_issue": (
                     "codex-harness usage-from-github-issue <issue-number-or-url> "
+                    "--include-comments "
                     f"--record-dir {args.usage_record_dir} --report {args.usage_report} "
                     f"--pilot-record-dir {args.record_dir} --pilot-board-report {args.pilot_board_report} "
                     "--no-write --json"
                 ),
                 "convert_github_issue": (
                     "codex-harness usage-from-github-issue <issue-number-or-url> "
+                    "--include-comments "
                     f"--record-dir {args.usage_record_dir} --report {args.usage_report} "
                     f"--pilot-record-dir {args.record_dir} --pilot-board-report {args.pilot_board_report} "
                     "--json"

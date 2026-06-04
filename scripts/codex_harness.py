@@ -851,6 +851,8 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.extend(["--repo", args.repo])
         if args.gh_bin:
             command.extend(["--gh-bin", args.gh_bin])
+        if args.include_comments:
+            command.append("--include-comments")
         if args.slug:
             command.extend(["--slug", args.slug])
         if args.title:
@@ -1562,6 +1564,7 @@ def make_parser() -> argparse.ArgumentParser:
     usage_from_github_issue.add_argument("issue", help="GitHub issue number, URL, or selector accepted by gh")
     usage_from_github_issue.add_argument("--repo", help="Optional GitHub repository in owner/name form")
     usage_from_github_issue.add_argument("--gh-bin", help="GitHub CLI executable")
+    usage_from_github_issue.add_argument("--include-comments", action="store_true", help="Include issue comments when linting or converting")
     usage_from_github_issue.add_argument("--slug", help="Stable record slug; inferred from issue body when omitted")
     usage_from_github_issue.add_argument("--title", help="Short usage-record title; inferred from matching pilot record when available")
     usage_from_github_issue.add_argument("--harness-label", help="Public-safe harness label override; inferred from matching pilot record when available")

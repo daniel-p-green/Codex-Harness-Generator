@@ -95,7 +95,7 @@ def parse_issue_sections(text: str) -> dict[str, str]:
         if heading:
             key = LABEL_MAP.get(normalize_label(heading.group(1)))
             current_key = key
-            if key and key not in sections:
+            if key:
                 sections[key] = []
             continue
         if current_key:
