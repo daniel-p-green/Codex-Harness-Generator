@@ -15,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from validate_usage_records import DEFAULT_RECORD_DIR, validate_record_dir
 from check_example_inventory import check_inventory
 from check_cli_install import build_payload as build_cli_install_payload
+from record_usage_case import find_sensitive_text
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -39,6 +40,8 @@ SEMANTIC_ALIGNMENT_JSON = REPO_ROOT / "Docs" / "Environment" / "SEMANTIC_ALIGNME
 TASK_TRIALS_REPORT = REPO_ROOT / "examples" / "live-create" / "TASK_TRIALS.md"
 DEFAULT_REPORT = REPO_ROOT / "Docs" / "Environment" / "PROOF_STATUS.md"
 TASK_TRIAL_ROW_RE = re.compile(r"^\| `(?P<trial>[^`]+)` \| `(?P<example>[^`]+)` \| (?P<status>[A-Z]+) \| `(?P<output>[^`]+)` \|$")
+FOLLOWUP_FILE_RE = re.compile(r"^- Follow-up file: `(?P<path>[^`]+)`$")
+FOLLOWUP_COMMAND_RE = re.compile(r"^gh issue comment .+ --body-file (?P<path>\S+)$")
 DEFAULT_MIN_LIVE_TRIALS = 8
 DEFAULT_MIN_USAGE_RECORDS = 2
 BETA_EXIT_MIN_USAGE_RECORDS = 5
@@ -98,6 +101,57 @@ def check_file_exists(name: str, path: Path) -> dict:
         "name": name,
         "status": "pass" if path.exists() else "fail",
         "detail": display_path(path) if path.exists() else f"missing: {display_path(path)}",
+    }
+
+
+def resolve_repo_path(path_text: str) -> Path:
+    path = Path(path_text)
+    if path.is_absolute():
+        return path
+    return REPO_ROOT / path
+
+
+def check_pilot_github_followups(report_path: Path = PILOT_GITHUB_SYNC_REPORT) -> dict:
+    if not report_path.exists():
+        return {
+            "name": "pilot_github_followups",
+            "status": "fail",
+            "detail": f"missing sync report: {display_path(report_path)}",
+        }
+
+    text = report_path.read_text(encoding="utf-8")
+    followup_refs = []
+    comment_refs = []
+    errors = []
+    for line in text.splitlines():
+        followup_match = FOLLOWUP_FILE_RE.match(line)
+        if followup_match:
+            followup_refs.append(followup_match.group("path"))
+        command_match = FOLLOWUP_COMMAND_RE.match(line)
+        if command_match:
+            comment_refs.append(command_match.group("path"))
+
+    for ref in followup_refs:
+        path = resolve_repo_path(ref)
+        if not path.exists():
+            errors.append(f"missing follow-up file: {ref}")
+            continue
+        findings = find_sensitive_text(path.read_text(encoding="utf-8"))
+        if findings:
+            errors.append(f"sensitive text in {ref}: {', '.join(findings)}")
+
+    missing_comment_commands = sorted(set(followup_refs) - set(comment_refs))
+    for ref in missing_comment_commands:
+        errors.append(f"missing gh issue comment command for: {ref}")
+
+    status = "pass" if not errors else "fail"
+    detail = f"followups={len(followup_refs)} comment_commands={len(comment_refs)}"
+    if errors:
+        detail += "; " + "; ".join(errors)
+    return {
+        "name": "pilot_github_followups",
+        "status": status,
+        "detail": detail,
     }
 
 
@@ -263,6 +317,7 @@ def build_payload(
         check_file_exists("pilot_handoff_audit_report", PILOT_HANDOFF_AUDIT_REPORT),
         check_file_exists("pilot_github_issues_report", PILOT_GITHUB_ISSUES_REPORT),
         check_file_exists("pilot_github_sync_report", PILOT_GITHUB_SYNC_REPORT),
+        check_pilot_github_followups(PILOT_GITHUB_SYNC_REPORT),
         check_file_exists("proof_next_report", PROOF_NEXT_REPORT),
         check_file_exists("beta_exit_audit_report", BETA_EXIT_AUDIT_REPORT),
         check_file_exists("upstream_drift_report", UPSTREAM_DRIFT_REPORT),

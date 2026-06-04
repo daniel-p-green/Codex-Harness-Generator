@@ -1,6 +1,6 @@
 # Proof Status
 
-Generated: 2026-06-04T18:57:02Z
+Generated: 2026-06-04T19:00:58Z
 Status: PASS
 Mode: self-dogfood-proof
 Readiness: Codex-equivalent beta with checked-in self-dogfood proof
@@ -23,6 +23,7 @@ conservative and should be read with `PROOF_MATRIX.md`.
 | `pilot_handoff_audit_report` | PASS | Docs/Environment/PILOT_HANDOFF_AUDIT.md |
 | `pilot_github_issues_report` | PASS | Docs/Environment/PILOT_GITHUB_ISSUES.md |
 | `pilot_github_sync_report` | PASS | Docs/Environment/PILOT_GITHUB_SYNC.md |
+| `pilot_github_followups` | PASS | followups=3 comment_commands=3 |
 | `proof_next_report` | PASS | Docs/Environment/PROOF_NEXT.md |
 | `beta_exit_audit_report` | PASS | Docs/Environment/BETA_EXIT_AUDIT.md |
 | `upstream_drift_report` | PASS | Docs/Environment/UPSTREAM_DRIFT.md |

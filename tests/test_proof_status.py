@@ -135,6 +135,7 @@ Status: PASS
         self.assertIn("pilot_board_report", [check["name"] for check in payload["checks"]])
         self.assertIn("pilot_outreach_report", [check["name"] for check in payload["checks"]])
         self.assertIn("pilot_handoff_audit_report", [check["name"] for check in payload["checks"]])
+        self.assertIn("pilot_github_followups", [check["name"] for check in payload["checks"]])
         self.assertIn("proof_next_report", [check["name"] for check in payload["checks"]])
         self.assertIn("beta_exit_audit_report", [check["name"] for check in payload["checks"]])
         self.assertIn("upstream_drift_report", [check["name"] for check in payload["checks"]])
@@ -170,8 +171,69 @@ Status: PASS
 
             payload = proof_status.check_status_report("report", report, json_report)
 
-            self.assertEqual("fail", payload["status"])
-            self.assertIn("json_status=fail", payload["detail"])
+        self.assertEqual("fail", payload["status"])
+        self.assertIn("json_status=fail", payload["detail"])
+
+    def test_pilot_github_followup_check_passes_for_reported_files_and_commands(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            followup = root / "Docs" / "Environment" / "pilot-github-followups" / "llm-app-pilot-followup.md"
+            followup.parent.mkdir(parents=True, exist_ok=True)
+            followup.write_text("Please reply with public-safe evidence.\n", encoding="utf-8")
+            report = root / "Docs" / "Environment" / "PILOT_GITHUB_SYNC.md"
+            report.write_text(
+                "\n".join(
+                    [
+                        "# Pilot GitHub Issue Sync",
+                        "",
+                        "- Follow-up file: `Docs/Environment/pilot-github-followups/llm-app-pilot-followup.md`",
+                        "gh issue comment https://github.com/example/repo/issues/42 --body-file Docs/Environment/pilot-github-followups/llm-app-pilot-followup.md",
+                        "",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            with patch.object(proof_status, "REPO_ROOT", root):
+                payload = proof_status.check_pilot_github_followups(report)
+
+        self.assertEqual("pass", payload["status"], payload)
+        self.assertIn("followups=1", payload["detail"])
+        self.assertIn("comment_commands=1", payload["detail"])
+
+    def test_pilot_github_followup_check_fails_for_missing_file(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            report = root / "PILOT_GITHUB_SYNC.md"
+            report.write_text(
+                "- Follow-up file: `Docs/Environment/pilot-github-followups/missing.md`\n"
+                "gh issue comment https://github.com/example/repo/issues/42 --body-file Docs/Environment/pilot-github-followups/missing.md\n",
+                encoding="utf-8",
+            )
+
+            with patch.object(proof_status, "REPO_ROOT", root):
+                payload = proof_status.check_pilot_github_followups(report)
+
+        self.assertEqual("fail", payload["status"])
+        self.assertIn("missing follow-up file", payload["detail"])
+
+    def test_pilot_github_followup_check_fails_for_missing_comment_command(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            followup = root / "Docs" / "Environment" / "pilot-github-followups" / "llm-app-pilot-followup.md"
+            followup.parent.mkdir(parents=True, exist_ok=True)
+            followup.write_text("Please reply with public-safe evidence.\n", encoding="utf-8")
+            report = root / "PILOT_GITHUB_SYNC.md"
+            report.write_text(
+                "- Follow-up file: `Docs/Environment/pilot-github-followups/llm-app-pilot-followup.md`\n",
+                encoding="utf-8",
+            )
+
+            with patch.object(proof_status, "REPO_ROOT", root):
+                payload = proof_status.check_pilot_github_followups(report)
+
+        self.assertEqual("fail", payload["status"])
+        self.assertIn("missing gh issue comment command", payload["detail"])
 
     def test_build_payload_fails_when_threshold_is_too_high(self):
         with patch.object(proof_status, "build_cli_install_payload", return_value=self.fake_install_payload()):
@@ -227,6 +289,7 @@ Status: PASS
         self.assertIn("pilot_board_report", text)
         self.assertIn("pilot_outreach_report", text)
         self.assertIn("pilot_handoff_audit_report", text)
+        self.assertIn("pilot_github_followups", text)
         self.assertIn("beta_exit_audit_report", text)
         self.assertIn("What This Does Not Prove", text)
 
