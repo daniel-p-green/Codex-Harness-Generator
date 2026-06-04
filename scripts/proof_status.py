@@ -30,6 +30,12 @@ SEMANTIC_ALIGNMENT_JSON = REPO_ROOT / "Docs" / "Environment" / "SEMANTIC_ALIGNME
 TASK_TRIALS_REPORT = REPO_ROOT / "examples" / "live-create" / "TASK_TRIALS.md"
 DEFAULT_REPORT = REPO_ROOT / "Docs" / "Environment" / "PROOF_STATUS.md"
 TASK_TRIAL_ROW_RE = re.compile(r"^\| `(?P<trial>[^`]+)` \| `(?P<example>[^`]+)` \| (?P<status>[A-Z]+) \| `(?P<output>[^`]+)` \|$")
+DEFAULT_MIN_LIVE_TRIALS = 8
+DEFAULT_MIN_USAGE_RECORDS = 2
+BETA_EXIT_MIN_USAGE_RECORDS = 5
+BETA_EXIT_MIN_EXTERNAL_OR_MULTI_PROJECT = 3
+BETA_EXIT_MIN_DOMAINS = 4
+BETA_EXIT_MIN_INSTALLED_INIT_BRIEF = 2
 
 
 def parse_status_line(text: str) -> str | None:
@@ -180,6 +186,7 @@ def build_payload(
     min_external_or_multi_project: int = 0,
     min_domains: int = 0,
     min_installed_init_brief: int = 0,
+    proof_mode: str = "self-dogfood-proof",
 ) -> dict:
     task_trials = parse_task_trials(TASK_TRIALS_REPORT)
     inventory = check_inventory()
@@ -230,14 +237,19 @@ def build_payload(
         },
     ]
     status = "pass" if all(check["status"] == "pass" for check in checks) else "fail"
-    return {
-        "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "status": status,
-        "readiness": (
+    if proof_mode == "beta-exit":
+        readiness = "Beta exit proof complete" if status == "pass" else "Missing beta-exit evidence"
+    else:
+        readiness = (
             "Codex-equivalent beta with checked-in self-dogfood proof"
             if status == "pass"
             else "Incomplete proof package"
-        ),
+        )
+    return {
+        "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "status": status,
+        "mode": proof_mode,
+        "readiness": readiness,
         "checks": checks,
         "example_inventory": inventory,
         "installable_cli": install_payload,
@@ -258,6 +270,7 @@ def write_report(path: Path, payload: dict) -> None:
         "",
         f"Generated: {payload['generated']}",
         f"Status: {payload['status'].upper()}",
+        f"Mode: {payload['mode']}",
         f"Readiness: {payload['readiness']}",
         "",
         "This report summarizes checked-in evidence. It is intentionally",
@@ -270,6 +283,15 @@ def write_report(path: Path, payload: dict) -> None:
     ]
     for check in payload["checks"]:
         lines.append(f"| `{check['name']}` | {check['status'].upper()} | {check['detail']} |")
+    requirement_errors = [
+        (check["name"], error)
+        for check in payload["checks"]
+        for error in check.get("requirement_errors", [])
+    ]
+    if requirement_errors:
+        lines.extend(["", "## Requirements Not Met", ""])
+        for check_name, error in requirement_errors:
+            lines.append(f"- `{check_name}`: {error}")
     usage = payload["usage_summary"]
     lines.extend(
         [
@@ -295,24 +317,59 @@ def write_report(path: Path, payload: dict) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--min-live-trials", type=int, default=8, help="Minimum passing live task trials required")
-    parser.add_argument("--min-usage-records", type=int, default=2, help="Minimum valid usage records required")
-    parser.add_argument("--min-external-or-multi-project", type=int, default=0, help="Minimum external or multi-project usage records")
-    parser.add_argument("--min-domains", type=int, default=0, help="Minimum distinct usage domains")
-    parser.add_argument("--min-installed-init-brief", type=int, default=0, help="Minimum usage records generated via installed init --brief or quickstart")
+    parser.add_argument("--beta-exit", action="store_true", help="Apply roadmap beta-exit thresholds")
+    parser.add_argument("--min-live-trials", type=int, help="Minimum passing live task trials required")
+    parser.add_argument("--min-usage-records", type=int, help="Minimum valid usage records required")
+    parser.add_argument("--min-external-or-multi-project", type=int, help="Minimum external or multi-project usage records")
+    parser.add_argument("--min-domains", type=int, help="Minimum distinct usage domains")
+    parser.add_argument("--min-installed-init-brief", type=int, help="Minimum usage records generated via installed init --brief or quickstart")
     parser.add_argument("--record-dir", default=DEFAULT_RECORD_DIR.as_posix())
     parser.add_argument("--report", default=DEFAULT_REPORT.as_posix())
     parser.add_argument("--no-write", action="store_true", help="Do not write PROOF_STATUS.md")
     parser.add_argument("--json", action="store_true", help="Emit JSON")
     args = parser.parse_args(argv)
 
+    proof_mode = "beta-exit" if args.beta_exit else "self-dogfood-proof"
+    min_live_trials = args.min_live_trials if args.min_live_trials is not None else DEFAULT_MIN_LIVE_TRIALS
+    if args.beta_exit:
+        min_usage_records = (
+            args.min_usage_records
+            if args.min_usage_records is not None
+            else BETA_EXIT_MIN_USAGE_RECORDS
+        )
+        min_external_or_multi_project = (
+            args.min_external_or_multi_project
+            if args.min_external_or_multi_project is not None
+            else BETA_EXIT_MIN_EXTERNAL_OR_MULTI_PROJECT
+        )
+        min_domains = args.min_domains if args.min_domains is not None else BETA_EXIT_MIN_DOMAINS
+        min_installed_init_brief = (
+            args.min_installed_init_brief
+            if args.min_installed_init_brief is not None
+            else BETA_EXIT_MIN_INSTALLED_INIT_BRIEF
+        )
+    else:
+        min_usage_records = args.min_usage_records if args.min_usage_records is not None else DEFAULT_MIN_USAGE_RECORDS
+        min_external_or_multi_project = (
+            args.min_external_or_multi_project
+            if args.min_external_or_multi_project is not None
+            else 0
+        )
+        min_domains = args.min_domains if args.min_domains is not None else 0
+        min_installed_init_brief = (
+            args.min_installed_init_brief
+            if args.min_installed_init_brief is not None
+            else 0
+        )
+
     payload = build_payload(
-        min_live_trials=args.min_live_trials,
-        min_usage_records=args.min_usage_records,
+        min_live_trials=min_live_trials,
+        min_usage_records=min_usage_records,
         record_dir=Path(args.record_dir),
-        min_external_or_multi_project=args.min_external_or_multi_project,
-        min_domains=args.min_domains,
-        min_installed_init_brief=args.min_installed_init_brief,
+        min_external_or_multi_project=min_external_or_multi_project,
+        min_domains=min_domains,
+        min_installed_init_brief=min_installed_init_brief,
+        proof_mode=proof_mode,
     )
     if not args.no_write:
         write_report(Path(args.report), payload)
@@ -320,6 +377,7 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(payload, indent=2))
     else:
         print(f"Proof status: {payload['status'].upper()}")
+        print(f"- mode: {payload['mode']}")
         print(f"- readiness: {payload['readiness']}")
         for check in payload["checks"]:
             print(f"- {check['name']}: {check['status'].upper()} - {check['detail']}")

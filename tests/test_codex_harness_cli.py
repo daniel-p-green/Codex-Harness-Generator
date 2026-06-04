@@ -675,6 +675,20 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_proof_status_passes_beta_exit_flag(self):
+        command, _ = self.run_cli(["proof-status", "--beta-exit", "--no-write", "--json"])
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/proof_status.py",
+                "--beta-exit",
+                "--no-write",
+                "--json",
+            ],
+            command,
+        )
+
     def test_equivalence_delegates_to_checker(self):
         command, _ = self.run_cli(["equivalence", "--report", "/tmp/CODEX_EQUIVALENCE_MATRIX.md", "--no-write", "--json"])
 

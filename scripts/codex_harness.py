@@ -510,6 +510,8 @@ def build_command(args: argparse.Namespace) -> list[str]:
 
     if args.command == "proof-status":
         command = []
+        if args.beta_exit:
+            command.append("--beta-exit")
         if args.min_live_trials is not None:
             command.extend(["--min-live-trials", str(args.min_live_trials)])
         if args.min_usage_records is not None:
@@ -864,6 +866,7 @@ def make_parser() -> argparse.ArgumentParser:
     usage_gaps.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     proof_status = subparsers.add_parser("proof-status", help="Summarize checked-in product-proof readiness")
+    proof_status.add_argument("--beta-exit", action="store_true", help="Apply roadmap beta-exit thresholds")
     proof_status.add_argument("--min-live-trials", type=int, help="Minimum passing live task trials required")
     proof_status.add_argument("--min-usage-records", type=int, help="Minimum valid usage records required")
     proof_status.add_argument("--min-external-or-multi-project", type=int, help="Minimum external or multi-project usage records")

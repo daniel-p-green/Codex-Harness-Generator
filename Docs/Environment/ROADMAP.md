@@ -65,7 +65,7 @@ The project can stop calling itself a beta only when all of these are true:
 - At least 4 different domains are represented across those records.
 - At least 2 records used installed brief-based generation:
   `codex-harness quickstart` or `codex-harness init --brief`.
-- `python scripts/codex_harness.py proof-status --min-usage-records 5 --min-external-or-multi-project 3 --min-domains 4 --min-installed-init-brief 2` passes.
+- `python scripts/codex_harness.py proof-status --beta-exit` passes.
 - `python scripts/codex_harness.py gate` passes on CI and locally.
 - `python scripts/codex_harness.py source-freshness` and
   `python scripts/codex_harness.py semantic-alignment` have current PASS reports

@@ -154,9 +154,12 @@ Status: PASS
                 min_external_or_multi_project=3,
                 min_domains=4,
                 min_installed_init_brief=2,
+                proof_mode="beta-exit",
             )
 
         self.assertEqual("fail", payload["status"])
+        self.assertEqual("beta-exit", payload["mode"])
+        self.assertEqual("Missing beta-exit evidence", payload["readiness"])
         usage_check = next(check for check in payload["checks"] if check["name"] == "non_synthetic_usage")
         self.assertEqual("fail", usage_check["status"])
         self.assertTrue(usage_check["requirement_errors"])
@@ -176,6 +179,7 @@ Status: PASS
 
         self.assertIn("# Proof Status", text)
         self.assertIn("Readiness:", text)
+        self.assertIn("Mode:", text)
         self.assertIn("checked_in_example_inventory", text)
         self.assertIn("installable_cli", text)
         self.assertIn("source_freshness_report", text)
@@ -191,6 +195,20 @@ Status: PASS
 
             self.assertEqual(0, status)
             self.assertTrue(report.is_file())
+
+    def test_main_beta_exit_applies_roadmap_thresholds(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            report = Path(temp_dir) / "PROOF_STATUS.md"
+            with patch.object(proof_status, "build_cli_install_payload", return_value=self.fake_install_payload()):
+                with redirect_stdout(io.StringIO()):
+                    status = proof_status.main(["--beta-exit", "--report", report.as_posix()])
+
+            text = report.read_text(encoding="utf-8")
+
+        self.assertEqual(1, status)
+        self.assertIn("Mode: beta-exit", text)
+        self.assertIn("Readiness: Missing beta-exit evidence", text)
+        self.assertIn("requires at least 5", text)
 
 
 if __name__ == "__main__":

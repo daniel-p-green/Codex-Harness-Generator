@@ -1,7 +1,8 @@
 # Proof Status
 
-Generated: 2026-06-04T11:51:33Z
+Generated: 2026-06-04T11:56:29Z
 Status: PASS
+Mode: self-dogfood-proof
 Readiness: Codex-equivalent beta with checked-in self-dogfood proof
 
 This report summarizes checked-in evidence. It is intentionally

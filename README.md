@@ -522,11 +522,7 @@ Summarize the checked-in product-proof package:
 ```bash
 python scripts/codex_harness.py doctor
 python scripts/codex_harness.py proof-status
-python scripts/codex_harness.py proof-status \
-  --min-usage-records 5 \
-  --min-external-or-multi-project 3 \
-  --min-domains 4 \
-  --min-installed-init-brief 2
+python scripts/codex_harness.py proof-status --beta-exit
 ```
 
 `doctor` is the fast first check for a local checkout. It verifies Python,
@@ -596,7 +592,7 @@ Common subcommands:
 | `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record. |
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
 | `usage-gaps` | `usage_gaps.py` | Reports remaining beta-exit usage evidence gaps and writes `Docs/Environment/USAGE_GAPS.md`. |
-| `proof-status` | `proof_status.py` | Summarizes checked-in proof readiness, live task-trial coverage, and usage evidence. |
+| `proof-status` | `proof_status.py` | Summarizes checked-in proof readiness, live task-trial coverage, and usage evidence; add `--beta-exit` to apply the roadmap exit thresholds. |
 | `doctor` | `doctor.py` | Runs a fast local readiness check and prints the next useful commands. |
 | `snapshot` | `record_eval_snapshot.py` | Records an eval trend snapshot. |
 
