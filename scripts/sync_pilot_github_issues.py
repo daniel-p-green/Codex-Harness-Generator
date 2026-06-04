@@ -25,6 +25,7 @@ DEFAULT_FOLLOWUP_DIR = REPO_ROOT / "Docs" / "Environment" / "pilot-github-follow
 DEFAULT_PILOT_BOARD_REPORT = pilot_board.DEFAULT_REPORT
 DEFAULT_REMINDER_AFTER_HOURS = 72
 MAINTAINER_FOLLOWUP_MARKER = "<!-- codex-harness-maintainer-followup -->"
+USAGE_LINT_MARKER = usage_from_github_issue.USAGE_LINT_MARKER
 
 
 def utc_now() -> str:
@@ -159,7 +160,8 @@ def maintainer_followup_comment(github_payload: dict) -> dict:
 def reporter_reply_summary(github_payload: dict, maintainer_comment: dict) -> dict:
     replies = []
     for comment in github_payload.get("comments") or []:
-        if MAINTAINER_FOLLOWUP_MARKER in str(comment.get("body", "")):
+        body = str(comment.get("body", ""))
+        if MAINTAINER_FOLLOWUP_MARKER in body or USAGE_LINT_MARKER in body:
             continue
         replies.append(comment_metadata(comment))
     latest = max(replies, key=lambda item: item.get("created_at", ""), default={})
