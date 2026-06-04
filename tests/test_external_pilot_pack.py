@@ -60,6 +60,7 @@ class ExternalPilotPackTests(unittest.TestCase):
         self.assertIn("python scripts/codex_harness.py usage-from-harness <generated-harness>", pack)
         self.assertIn("--pilot-record-dir Docs/Environment/pilot-records", pack)
         self.assertIn("--pilot-board-report Docs/Environment/PILOT_BOARD.md", pack)
+        self.assertIn("--lint-only --json", pack)
         self.assertIn("--no-write --json", pack)
         self.assertNotIn("--title \"External software-dev pilot\"", pack)
         self.assertNotIn("--domain \"software development\"", pack)

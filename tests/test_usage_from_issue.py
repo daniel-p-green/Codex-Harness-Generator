@@ -251,6 +251,114 @@ class UsageFromIssueTests(unittest.TestCase):
             self.assertEqual("external", record["source_type"])
             self.assertEqual("installed-init-brief", record["generation_path"])
 
+    def test_usage_from_issue_lint_only_reports_ready_issue(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            issue = temp_path / "issue.md"
+            issue.write_text(ISSUE_BODY, encoding="utf-8")
+            pilot_record_dir = temp_path / "pilot-records"
+            self.write_matching_pilot_record(pilot_record_dir)
+
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    SCRIPT.as_posix(),
+                    issue.as_posix(),
+                    "--slug",
+                    "external-llm-app",
+                    "--pilot-record-dir",
+                    pilot_record_dir.as_posix(),
+                    "--lint-only",
+                    "--json",
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+            payload = json.loads(completed.stdout)
+            self.assertEqual("pass", payload["status"])
+            self.assertEqual("conversion-ready", payload["readiness"])
+            self.assertEqual({"evidence": 2, "verification": 2, "limitations": 1}, payload["counts"])
+            self.assertIn("title", payload["inferred_fields"])
+
+    def test_usage_from_issue_lint_only_reports_incomplete_issue(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            issue = temp_path / "issue.md"
+            issue.write_text(
+                ISSUE_BODY.replace(
+                    "- Generated AGENTS.md matched the project shape.\n- The harness made verification steps explicit.",
+                    "- _No response_",
+                ).replace(
+                    "- Ran the generated smoke check successfully.\n- Completed one real task using the generated reviewer guidance.",
+                    "- Ran the generated smoke check successfully.",
+                ),
+                encoding="utf-8",
+            )
+
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    SCRIPT.as_posix(),
+                    issue.as_posix(),
+                    "--slug",
+                    "external-llm-app",
+                    "--title",
+                    "External LLM app report",
+                    "--lint-only",
+                    "--json",
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertNotEqual(0, completed.returncode)
+            payload = json.loads(completed.stdout)
+            self.assertEqual("fail", payload["status"])
+            self.assertEqual("needs-input", payload["readiness"])
+            self.assertIn("evidence", payload["missing_fields"])
+            self.assertIn("Non-synthetic usage requires at least two verification bullets", payload["errors"])
+
+    def test_usage_from_issue_lint_only_requires_explicit_source_metadata(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            issue = temp_path / "issue.md"
+            issue.write_text(
+                ISSUE_BODY.replace("### Source type\n\nexternal", "### Source type\n\n_No response_").replace(
+                    "### Generation path\n\ninstalled-init-brief",
+                    "### Generation path\n\n_No response_",
+                ),
+                encoding="utf-8",
+            )
+
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    SCRIPT.as_posix(),
+                    issue.as_posix(),
+                    "--slug",
+                    "external-llm-app",
+                    "--title",
+                    "External LLM app report",
+                    "--lint-only",
+                    "--json",
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertNotEqual(0, completed.returncode)
+            payload = json.loads(completed.stdout)
+            self.assertIn("Missing source type", "\n".join(payload["errors"]))
+            self.assertIn("Missing generation path", "\n".join(payload["errors"]))
+
     def test_usage_from_issue_no_write_validates_without_writing_record(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)

@@ -643,6 +643,8 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.extend(["--pilot-notes", args.pilot_notes])
         if args.force:
             command.append("--force")
+        if args.lint_only:
+            command.append("--lint-only")
         if args.no_write:
             command.append("--no-write")
         if args.json:
@@ -1206,6 +1208,7 @@ def make_parser() -> argparse.ArgumentParser:
     usage_from_issue.add_argument("--pilot-board-report", help="Pilot-board Markdown report path for linked conversion")
     usage_from_issue.add_argument("--pilot-notes", help="Public-safe note for linked pilot-board conversion")
     usage_from_issue.add_argument("--force", action="store_true", help="Replace existing record with same slug")
+    usage_from_issue.add_argument("--lint-only", action="store_true", help="Check issue-body readiness without writing files")
     usage_from_issue.add_argument("--no-write", action="store_true", help="Validate and preview without writing files")
     usage_from_issue.add_argument("--json", action="store_true", help="Emit JSON payload")
 

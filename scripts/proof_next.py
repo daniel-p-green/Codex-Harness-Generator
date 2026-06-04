@@ -77,7 +77,7 @@ def build_usage_from_harness_command(pilot: dict, args: argparse.Namespace, *, n
     return " ".join(parts)
 
 
-def build_usage_from_issue_command(pilot: dict, args: argparse.Namespace, *, no_write: bool) -> str:
+def build_usage_from_issue_command(pilot: dict, args: argparse.Namespace, *, lint_only: bool = False, no_write: bool = False) -> str:
     parts = [
         "codex-harness",
         "usage-from-issue",
@@ -93,6 +93,8 @@ def build_usage_from_issue_command(pilot: dict, args: argparse.Namespace, *, no_
         "--pilot-board-report",
         args.pilot_board_report,
     ]
+    if lint_only:
+        parts.append("--lint-only")
     if no_write:
         parts.append("--no-write")
     parts.append("--json")
@@ -113,6 +115,11 @@ def build_conversion_commands(pilot: dict, args: argparse.Namespace) -> list[dic
             "name": "convert copied-harness evidence",
             "command": build_usage_from_harness_command(pilot, args, no_write=False),
             "purpose": "write the checked usage record and convert the matching pilot after preview output is reviewed",
+        },
+        {
+            "name": "lint issue evidence",
+            "command": build_usage_from_issue_command(pilot, args, lint_only=True),
+            "purpose": "show missing fields, weak evidence counts, and privacy problems before attempting conversion",
         },
         {
             "name": "preview issue evidence",

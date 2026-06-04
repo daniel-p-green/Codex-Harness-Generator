@@ -1415,6 +1415,23 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_usage_from_issue_forwards_lint_only(self):
+        command, _ = self.run_cli(
+            [
+                "usage-from-issue",
+                "/tmp/issue.md",
+                "--slug",
+                "external-demo",
+                "--title",
+                "External demo",
+                "--lint-only",
+                "--json",
+            ]
+        )
+
+        self.assertIn("--lint-only", command)
+        self.assertIn("--json", command)
+
     def test_pilot_campaign_delegates_to_campaign_script(self):
         command, _ = self.run_cli(
             [

@@ -1,6 +1,6 @@
 # Proof Next Actions
 
-Generated: 2026-06-04T15:12:18Z
+Generated: 2026-06-04T15:21:55Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 
@@ -81,7 +81,15 @@ Purpose: write the checked usage record and convert the matching pilot after pre
 codex-harness usage-from-harness <generated-harness> --slug llm-app-pilot --evidence-type private-summary --privacy-review "Reporter confirmed public-safe private-summary evidence only." --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
 ```
 
-7. preview issue evidence
+7. lint issue evidence
+
+Purpose: show missing fields, weak evidence counts, and privacy problems before attempting conversion
+
+```bash
+codex-harness usage-from-issue <completed-issue.md> --slug llm-app-pilot --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
+```
+
+8. preview issue evidence
 
 Purpose: validate a completed reporter issue body without writing a usage record or mutating the pilot board
 
@@ -89,7 +97,7 @@ Purpose: validate a completed reporter issue body without writing a usage record
 codex-harness usage-from-issue <completed-issue.md> --slug llm-app-pilot --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
 ```
 
-8. convert issue evidence
+9. convert issue evidence
 
 Purpose: write the checked usage record and convert the matching pilot after preview output is reviewed
 
@@ -97,7 +105,7 @@ Purpose: write the checked usage record and convert the matching pilot after pre
 codex-harness usage-from-issue <completed-issue.md> --slug llm-app-pilot --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
 ```
 
-9. audit beta exit
+10. audit beta exit
 
 Purpose: refresh the non-gating readiness audit after each converted usage record
 
@@ -105,7 +113,7 @@ Purpose: refresh the non-gating readiness audit after each converted usage recor
 codex-harness beta-exit-audit --record-dir Docs/Environment/usage-records --pilot-record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records
 ```
 
-10. run final proof status
+11. run final proof status
 
 Purpose: only use this as a beta-exit gate after usage thresholds are satisfied
 

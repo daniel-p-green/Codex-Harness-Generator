@@ -509,10 +509,16 @@ path from the pilot record. Issue-body conversion can infer title plus fallback
 harness label, source type, and generation path from the same pilot record.
 Provide those flags directly for standalone conversions.
 When an external usage report arrives through the GitHub issue template, save
-the issue body and preview the normalized record the same way before writing
+the issue body and lint it before previewing the normalized record or writing
 files:
 
 ```bash
+python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
+  --slug external-rag-trial \
+  --title "External RAG harness trial" \
+  --lint-only \
+  --json
+
 python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md \
   --slug external-rag-trial \
   --title "External RAG harness trial" \
@@ -677,7 +683,7 @@ Common subcommands:
 | `pilot-update <slug>` | `pilot_board.py` | Updates one prepared pilot's status, validates converted usage-record references, and refreshes the pilot board. |
 | `beta-exit-audit` | `beta_exit_audit.py` | Writes a non-gating audit of beta-exit readiness and remaining evidence gaps. |
 | `proof-next` | `proof_next.py` | Writes the next beta-exit proof actions from current usage gaps without counting the plan as evidence. |
-| `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record; add `--no-write` to preview first or `--pilot-record-dir` to prevalidate and convert a matching prepared pilot. |
+| `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record; add `--lint-only` to find incomplete issue bodies, `--no-write` to preview first, or `--pilot-record-dir` to prevalidate and convert a matching prepared pilot. |
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
 | `usage-gaps` | `usage_gaps.py` | Reports remaining beta-exit usage evidence gaps and writes `Docs/Environment/USAGE_GAPS.md`. |
 | `proof-status` | `proof_status.py` | Summarizes checked-in proof readiness, live task-trial coverage, and usage evidence; add `--beta-exit` to apply the roadmap exit thresholds. |

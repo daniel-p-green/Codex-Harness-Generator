@@ -18,8 +18,10 @@ from record_usage_case import (
     ALLOWED_SOURCE_TYPES,
     DEFAULT_RECORD_DIR,
     DEFAULT_REPORT,
+    NON_SYNTHETIC_EVIDENCE_TYPES,
     UsageRecord,
     display_path,
+    find_sensitive_text,
     load_records,
     validate_record,
     safe_slug,
@@ -48,6 +50,16 @@ PILOT_DEFAULT_FIELDS = {
     "source_type": "source_type",
     "generation_path": "generation_path",
 }
+ISSUE_REQUIRED_FIELDS = (
+    "domain",
+    "evidence_type",
+    "outcome",
+    "task_summary",
+    "evidence",
+    "verification",
+    "privacy_review",
+    "limitations",
+)
 
 
 def normalize_label(value: str) -> str:
@@ -105,6 +117,7 @@ def require_field(sections: dict[str, str], key: str) -> str:
 
 
 def apply_pilot_defaults(args: argparse.Namespace) -> dict | None:
+    args.pilot_defaults_applied = []
     if not args.pilot_record_dir:
         return None
     slug = safe_slug(args.slug)
@@ -115,16 +128,22 @@ def apply_pilot_defaults(args: argparse.Namespace) -> dict | None:
         raise SystemExit("Pilot record is invalid: " + "; ".join(errors))
     for arg_name, pilot_field in PILOT_DEFAULT_FIELDS.items():
         if getattr(args, arg_name, None) is None:
-            setattr(args, arg_name, record.get(pilot_field))
+            value = record.get(pilot_field)
+            setattr(args, arg_name, value)
+            if value:
+                args.pilot_defaults_applied.append(arg_name)
     args.pilot_harness_label = record.get("harness_label")
     return record
 
 
 def apply_standalone_defaults(args: argparse.Namespace) -> None:
+    args.standalone_defaults_applied = []
     if args.source_type is None:
         args.source_type = "external"
+        args.standalone_defaults_applied.append("source_type")
     if args.generation_path is None:
         args.generation_path = "unknown"
+        args.standalone_defaults_applied.append("generation_path")
 
 
 def require_metadata(args: argparse.Namespace) -> None:
@@ -132,6 +151,86 @@ def require_metadata(args: argparse.Namespace) -> None:
         raise SystemExit(
             "Missing required metadata: --title. Provide it directly or use --pilot-record-dir with a matching prepared pilot."
         )
+
+
+def lint_issue_payload(args: argparse.Namespace) -> dict:
+    sections = parse_issue_sections(read_issue_body(args.issue_body))
+    errors = []
+    warnings = []
+    missing_fields = [field for field in ISSUE_REQUIRED_FIELDS if not clean_value(sections.get(field, ""))]
+
+    evidence_type = clean_value(sections.get("evidence_type", ""))
+    outcome = clean_value(sections.get("outcome", ""))
+    source_type = clean_value(sections.get("source_type", "")) or args.source_type
+    generation_path = clean_value(sections.get("generation_path", "")) or args.generation_path
+    evidence = parse_items(sections.get("evidence", ""))
+    verification = parse_items(sections.get("verification", ""))
+    limitations = parse_items(sections.get("limitations", ""))
+    for field, items in (("evidence", evidence), ("verification", verification), ("limitations", limitations)):
+        if not items and field not in missing_fields:
+            missing_fields.append(field)
+
+    if missing_fields:
+        errors.append("Missing required issue field(s): " + ", ".join(missing_fields))
+    if not args.title:
+        errors.append("Missing required metadata: --title or matching --pilot-record-dir")
+    if "source_type" in getattr(args, "standalone_defaults_applied", []) and not clean_value(sections.get("source_type", "")):
+        errors.append("Missing source type: fill the issue field, pass --source-type, or use a matching --pilot-record-dir")
+    if "generation_path" in getattr(args, "standalone_defaults_applied", []) and not clean_value(sections.get("generation_path", "")):
+        errors.append(
+            "Missing generation path: fill the issue field, pass --generation-path, or use a matching --pilot-record-dir"
+        )
+    if evidence_type and evidence_type not in ALLOWED_EVIDENCE_TYPES:
+        errors.append(f"Unsupported evidence type: {evidence_type}")
+    if outcome and outcome not in ALLOWED_OUTCOMES:
+        errors.append(f"Unsupported outcome: {outcome}")
+    if source_type not in ALLOWED_SOURCE_TYPES:
+        errors.append(f"Unsupported source type: {source_type}")
+    if generation_path not in ALLOWED_GENERATION_PATHS:
+        errors.append(f"Unsupported generation path: {generation_path}")
+    if evidence_type in NON_SYNTHETIC_EVIDENCE_TYPES:
+        if len(evidence) < 2:
+            errors.append("Non-synthetic usage requires at least two evidence bullets")
+        if len(verification) < 2:
+            errors.append("Non-synthetic usage requires at least two verification bullets")
+        if not limitations:
+            errors.append("Non-synthetic usage requires at least one limitation")
+    if evidence_type == "synthetic":
+        warnings.append("Synthetic usage can validate tooling but does not count as external beta-exit proof")
+
+    sensitive_findings = find_sensitive_text(json.dumps(sections, sort_keys=True))
+    if sensitive_findings:
+        errors.append("Sensitive text detected: " + ", ".join(sensitive_findings))
+
+    inferred_fields = list(getattr(args, "pilot_defaults_applied", []))
+    if clean_value(sections.get("harness_label", "")) == "" and getattr(args, "pilot_harness_label", ""):
+        inferred_fields.append("harness_label")
+
+    return {
+        "status": "pass" if not errors else "fail",
+        "readiness": "conversion-ready" if not errors else "needs-input",
+        "slug": safe_slug(args.slug),
+        "title": args.title or "",
+        "missing_fields": missing_fields,
+        "errors": errors,
+        "warnings": warnings,
+        "counts": {
+            "evidence": len(evidence),
+            "verification": len(verification),
+            "limitations": len(limitations),
+        },
+        "values": {
+            "domain": clean_value(sections.get("domain", "")),
+            "evidence_type": evidence_type,
+            "outcome": outcome,
+            "source_type": source_type,
+            "generation_path": generation_path,
+            "harness_label": clean_value(sections.get("harness_label", ""))
+            or getattr(args, "pilot_harness_label", "")
+            or "external usage report",
+        },
+        "inferred_fields": inferred_fields,
+    }
 
 
 def build_record(args: argparse.Namespace) -> UsageRecord:
@@ -191,12 +290,24 @@ def main() -> int:
     parser.add_argument("--pilot-board-report", default=pilot_board.DEFAULT_REPORT.as_posix())
     parser.add_argument("--pilot-notes", default="converted from external usage issue")
     parser.add_argument("--force", action="store_true", help="Replace existing record with same slug")
+    parser.add_argument("--lint-only", action="store_true", help="Check issue-body readiness without building or writing a usage record")
     parser.add_argument("--no-write", action="store_true", help="Validate and preview the record without writing files")
     parser.add_argument("--json", action="store_true", help="Emit JSON payload")
     args = parser.parse_args()
 
     apply_pilot_defaults(args)
     apply_standalone_defaults(args)
+    if args.lint_only:
+        payload = lint_issue_payload(args)
+        if args.json:
+            print(json.dumps(payload, indent=2))
+        else:
+            print(f"Issue evidence lint: {payload['readiness']}")
+            for error in payload["errors"]:
+                print(f"- error: {error}")
+            for warning in payload["warnings"]:
+                print(f"- warning: {warning}")
+        return 0 if payload["status"] == "pass" else 1
     require_metadata(args)
     record = build_record(args)
     validate_record(record)
