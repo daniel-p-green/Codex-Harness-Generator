@@ -1,6 +1,6 @@
 # Pilot Next Action
 
-Generated: 2026-06-04T19:38:27Z
+Generated: 2026-06-04T19:41:34Z
 Status: PASS
 Readiness: waiting-for-reporters
 
@@ -21,6 +21,8 @@ This chooses the next public pilot action; it does not prove adoption. Count onl
 - Priority: `medium`
 - Pilot: `llm-app-pilot`
 - Issue: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3
+- Maintainer follow-up: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3#issuecomment-4625495059
+- Maintainer follow-up posted at: `2026-06-04T19:38:17Z`
 - Reason: A maintainer follow-up is already posted; wait for reporter evidence, then rerun sync.
 
 ```bash
@@ -32,16 +34,22 @@ codex-harness pilot-github-sync --record-dir Docs/Environment/pilot-records --us
 - `llm-app-pilot`: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3
   - Follow-up file: `already posted`
   - Maintainer follow-up already posted: `true`
+  - Maintainer follow-up URL: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3#issuecomment-4625495059
+  - Maintainer follow-up posted at: `2026-06-04T19:38:17Z`
   - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
   - Command: `wait for reporter reply, then rerun sync`
 - `security-audit-pilot`: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1
   - Follow-up file: `already posted`
   - Maintainer follow-up already posted: `true`
+  - Maintainer follow-up URL: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1#issuecomment-4625495203
+  - Maintainer follow-up posted at: `2026-06-04T19:38:18Z`
   - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
   - Command: `wait for reporter reply, then rerun sync`
 - `customer-support-pilot`: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2
   - Follow-up file: `already posted`
   - Maintainer follow-up already posted: `true`
+  - Maintainer follow-up URL: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2#issuecomment-4625495326
+  - Maintainer follow-up posted at: `2026-06-04T19:38:19Z`
   - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
   - Command: `wait for reporter reply, then rerun sync`
 

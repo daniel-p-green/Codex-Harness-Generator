@@ -181,13 +181,19 @@ class PilotGithubSyncTests(unittest.TestCase):
 
     def test_posted_maintainer_followup_does_not_recommend_duplicate_comment(self):
         maintainer_comment = f"{sync_pilot_github_issues.MAINTAINER_FOLLOWUP_MARKER}\n\nPlease add the missing fields."
+        comment_payload = {
+            "author": {"login": "maintainer"},
+            "body": maintainer_comment,
+            "createdAt": "2026-06-04T19:38:17Z",
+            "url": "https://github.com/example/repo/issues/42#issuecomment-1",
+        }
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
             self.write_pilot_record(root)
 
             payload = sync_pilot_github_issues.build_payload(
                 self.args(root),
-                fetch_issue=lambda *args, **kwargs: self.github_payload(comments=[{"body": maintainer_comment}]),
+                fetch_issue=lambda *args, **kwargs: self.github_payload(comments=[comment_payload]),
             )
 
         self.assertEqual("pass", payload["status"], payload)
@@ -197,6 +203,9 @@ class PilotGithubSyncTests(unittest.TestCase):
         record = payload["records"][0]
         self.assertEqual("waiting-for-reporter", record["readiness"])
         self.assertTrue(record["maintainer_followup_posted"])
+        self.assertEqual("https://github.com/example/repo/issues/42#issuecomment-1", record["maintainer_followup_comment"]["url"])
+        self.assertEqual("2026-06-04T19:38:17Z", record["maintainer_followup_comment"]["created_at"])
+        self.assertEqual("maintainer", record["maintainer_followup_comment"]["author"])
         self.assertEqual(0, record["github_issue"]["comment_count"])
         self.assertEqual("", record["followup_file"])
         self.assertNotIn("comment_followup", record["commands"])

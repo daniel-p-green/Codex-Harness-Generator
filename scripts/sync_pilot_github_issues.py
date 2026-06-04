@@ -114,11 +114,17 @@ def followup_path(args: argparse.Namespace, record: dict) -> Path:
     return Path(args.followup_dir) / f"{record['slug']}-followup.md"
 
 
-def maintainer_followup_posted(github_payload: dict) -> bool:
+def maintainer_followup_comment(github_payload: dict) -> dict:
     for comment in github_payload.get("comments") or []:
-        if MAINTAINER_FOLLOWUP_MARKER in str(comment.get("body", "")):
-            return True
-    return False
+        if MAINTAINER_FOLLOWUP_MARKER not in str(comment.get("body", "")):
+            continue
+        author = comment.get("author") or {}
+        return {
+            "url": str(comment.get("url", "")),
+            "created_at": str(comment.get("createdAt", "")),
+            "author": str(author.get("login", "")),
+        }
+    return {}
 
 
 FIELD_LABELS = {
@@ -199,6 +205,7 @@ def issue_sync_record(
         "followup_file": "",
         "display_followup_file": "",
         "maintainer_followup_posted": False,
+        "maintainer_followup_comment": {},
     }
     if not issue_url:
         base["errors"] = ["Pilot record has no live GitHub issue URL in notes or status history."]
@@ -212,7 +219,8 @@ def issue_sync_record(
     }
     try:
         github_payload = fetch_issue(issue_url, repo=args.repo or "", gh_bin=args.gh_bin, include_comments=True)
-        base["maintainer_followup_posted"] = maintainer_followup_posted(github_payload)
+        base["maintainer_followup_comment"] = maintainer_followup_comment(github_payload)
+        base["maintainer_followup_posted"] = bool(base["maintainer_followup_comment"])
         lint_payload = usage_from_github_issue.build_payload(
             lint_args(args, record, issue_url),
             github_payload=github_payload,
@@ -353,6 +361,8 @@ def write_report(path: Path, payload: dict) -> None:
                 f"- GitHub state: `{record.get('github_issue', {}).get('state', 'unknown')}`",
                 f"- Comments included: {record.get('github_issue', {}).get('comment_count', 0)}",
                 f"- Maintainer follow-up already posted: `{str(record.get('maintainer_followup_posted', False)).lower()}`",
+                f"- Maintainer follow-up URL: {record.get('maintainer_followup_comment', {}).get('url') or 'none'}",
+                f"- Maintainer follow-up posted at: `{record.get('maintainer_followup_comment', {}).get('created_at') or 'none'}`",
                 f"- Missing fields: {', '.join(record['missing_fields']) if record['missing_fields'] else 'none'}",
                 f"- Follow-up file: `{record['display_followup_file']}`" if record.get("display_followup_file") else "- Follow-up file: not needed",
             ]

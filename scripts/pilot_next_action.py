@@ -104,6 +104,7 @@ def build_next_action(sync_payload: dict, args: argparse.Namespace) -> dict:
             "slug": record["slug"],
             "issue_url": record["issue_url"],
             "followup_file": "",
+            "maintainer_followup_comment": record.get("maintainer_followup_comment", {}),
             "missing_fields": record["missing_fields"],
             "command": sync_command(args),
             "reason": "A maintainer follow-up is already posted; wait for reporter evidence, then rerun sync.",
@@ -150,6 +151,7 @@ def build_payload(
                 "missing_fields": record["missing_fields"],
                 "command": record["commands"].get("comment_followup", ""),
                 "maintainer_followup_posted": record.get("maintainer_followup_posted", False),
+                "maintainer_followup_comment": record.get("maintainer_followup_comment", {}),
             }
             for record in sync_payload["records"]
             if record.get("readiness") == "waiting-for-reporter"
@@ -197,6 +199,8 @@ def write_report(path: Path, payload: dict) -> None:
         f"- Priority: `{action['priority']}`",
         f"- Pilot: `{action.get('slug') or 'none'}`",
         f"- Issue: {action.get('issue_url') or 'none'}",
+        f"- Maintainer follow-up: {action.get('maintainer_followup_comment', {}).get('url') or 'none'}",
+        f"- Maintainer follow-up posted at: `{action.get('maintainer_followup_comment', {}).get('created_at') or 'none'}`",
         f"- Reason: {action['reason']}",
         "",
         "```bash",
@@ -213,6 +217,8 @@ def write_report(path: Path, payload: dict) -> None:
                     f"- `{item['slug']}`: {item['issue_url']}",
                     f"  - Follow-up file: `{item['followup_file'] or 'already posted'}`",
                     f"  - Maintainer follow-up already posted: `{str(item.get('maintainer_followup_posted', False)).lower()}`",
+                    f"  - Maintainer follow-up URL: {item.get('maintainer_followup_comment', {}).get('url') or 'none'}",
+                    f"  - Maintainer follow-up posted at: `{item.get('maintainer_followup_comment', {}).get('created_at') or 'none'}`",
                     f"  - Missing fields: {', '.join(item['missing_fields']) if item['missing_fields'] else 'none'}",
                     f"  - Command: `{item['command'] or 'wait for reporter reply, then rerun sync'}`",
                 ]
