@@ -1,6 +1,7 @@
 import importlib.util
 import json
 import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -18,9 +19,11 @@ spec.loader.exec_module(check_cli_install)
 class CheckCliInstallTests(unittest.TestCase):
     def test_build_payload_smokes_install_init_and_eval(self):
         calls = []
+        run_cwds = []
 
         def fake_run(command, cwd=None):
             calls.append(command)
+            run_cwds.append((command, cwd))
             stdout = ""
             if command[-2:] == ["profiles", "--json"]:
                 stdout = json.dumps({"status": "pass", "profile_count": 20})
@@ -90,6 +93,12 @@ class CheckCliInstallTests(unittest.TestCase):
         names = [step["name"] for step in payload["steps"]]
         self.assertEqual(["create_venv", "install_package", "profiles", "doctor", "init", "quickstart", "demo_capture", "prepare_pilot", "validate", "inspect", "adoption_plan", "equivalence", "upstream_drift", "init_from_project", "record_task_trial", "local_eval", "public_usage_report", "evidence_packet", "pilot_pack", "usage_from_harness", "usage_from_issue_lint", "usage_from_issue_preview", "usage_from_issue", "prepare_next_pilot", "prepare_pilot_batch_dry_run", "pilot_board", "pilot_update", "pilot_outreach", "pilot_handoff", "pilot_handoff_audit", "pilot_github_issues", "pilot_github_sync", "pilot_next_action", "usage_from_issue_pilot_conversion", "usage_from_github_issue_lint", "usage_gaps", "beta_exit_audit", "pilot_campaign", "proof_next", "migration_audit", "prepare_migration", "eval"], names)
         self.assertTrue(any("pip" in command and "install" in command for command in calls))
+        install_cwds = [cwd for command, cwd in run_cwds if "pip" in command and "install" in command]
+        self.assertEqual(1, len(install_cwds))
+        self.assertIsNotNone(install_cwds[0])
+        self.assertNotEqual(REPO_ROOT, install_cwds[0])
+        install_step = next(step for step in payload["steps"] if step["name"] == "install_package")
+        self.assertEqual(install_cwds[0].as_posix(), install_step["cwd"])
         self.assertTrue(any("codex-harness" in command[0] and "doctor" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "init" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "quickstart" in command for command in calls))
@@ -151,6 +160,18 @@ class CheckCliInstallTests(unittest.TestCase):
 
         self.assertEqual("fail", payload["status"])
         self.assertEqual("profiles", payload["steps"][-1]["name"])
+
+    def test_copy_install_source_uses_public_package_files_without_repo_artifacts(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            destination = Path(temp_dir) / "source"
+
+            check_cli_install.copy_install_source(destination)
+
+            self.assertTrue((destination / "pyproject.toml").exists())
+            self.assertTrue((destination / "scripts" / "codex_harness.py").exists())
+            self.assertFalse((destination / ".git").exists())
+            self.assertFalse((destination / "build").exists())
+            self.assertFalse((destination / "dist").exists())
 
 
 if __name__ == "__main__":

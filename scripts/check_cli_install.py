@@ -19,6 +19,18 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_LIMIT = 1200
+SOURCE_COPY_IGNORE = shutil.ignore_patterns(
+    ".git",
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".venv",
+    "venv",
+    "build",
+    "dist",
+    "*.egg-info",
+)
 
 
 def run(command: list[str], cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
@@ -41,6 +53,11 @@ def cleanup_build_artifacts() -> None:
             shutil.rmtree(path)
         else:
             path.unlink()
+
+
+def copy_install_source(destination: Path) -> None:
+    """Copy the repo to an isolated source tree before package installation."""
+    shutil.copytree(REPO_ROOT, destination, ignore=SOURCE_COPY_IGNORE)
 
 
 def excerpt(text: str) -> str:
@@ -94,6 +111,8 @@ def build_payload() -> dict:
         migration_packet = temp_root / "migration-packet"
         issue_body = temp_root / "external-usage-issue.md"
         linked_pilot_issue_body = temp_root / "linked-pilot-usage-issue.md"
+        install_source = temp_root / "source"
+        copy_install_source(install_source)
         issue_body.write_text(
             "\n".join(
                 [
@@ -225,7 +244,7 @@ def build_payload() -> dict:
         fake_gh.chmod(0o755)
 
         commands = [
-            ("create_venv", [sys.executable, "-m", "venv", "--system-site-packages", venv.as_posix()]),
+            ("create_venv", [sys.executable, "-m", "venv", "--system-site-packages", venv.as_posix()], None),
             (
                 "install_package",
                 [
@@ -237,9 +256,10 @@ def build_payload() -> dict:
                     "--no-deps",
                     ".",
                 ],
+                install_source,
             ),
-            ("profiles", [(venv / "bin" / "codex-harness").as_posix(), "profiles", "--json"]),
-            ("doctor", [(venv / "bin" / "codex-harness").as_posix(), "doctor", "--json"]),
+            ("profiles", [(venv / "bin" / "codex-harness").as_posix(), "profiles", "--json"], None),
+            ("doctor", [(venv / "bin" / "codex-harness").as_posix(), "doctor", "--json"], None),
             (
                 "init",
                 [
@@ -861,11 +881,15 @@ def build_payload() -> dict:
         ]
 
         try:
-            for name, command in commands:
-                completed = run(command)
+            for item in commands:
+                name = item[0]
+                command = item[1]
+                cwd = item[2] if len(item) > 2 else None
+                completed = run(command, cwd=cwd)
                 step = {
                     "name": name,
                     "command": command,
+                    "cwd": cwd.as_posix() if cwd else ".",
                     "returncode": completed.returncode,
                     "status": "pass" if completed.returncode == 0 else "fail",
                     "stdout": excerpt(completed.stdout),
