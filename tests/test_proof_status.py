@@ -190,7 +190,7 @@ Status: PASS
                         "        run: |",
                         "          set -o pipefail",
                         "          python scripts/run_evals.py --json | tee eval-gate-${{ matrix.python-version }}.json",
-                        "      - uses: actions/upload-artifact@v5",
+                        "      - uses: actions/upload-artifact@v7",
                     ]
                 ),
                 encoding="utf-8",
