@@ -10,6 +10,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MIGRATION_AUDIT_PATH = REPO_ROOT / "scripts" / "migration_audit.py"
+LEGACY_FIXTURE = REPO_ROOT / "tests" / "fixtures" / "legacy_harnesses" / "legacy-basic"
 
 spec = importlib.util.spec_from_file_location("migration_audit", MIGRATION_AUDIT_PATH)
 migration_audit = importlib.util.module_from_spec(spec)
@@ -45,17 +46,13 @@ class MigrationAuditTests(unittest.TestCase):
         self.assertTrue(any("codex-harness validate" in command for command in payload["results"][0]["migration_plan"]["commands"]))
 
     def test_legacy_harness_reports_migration_findings(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            root = Path(temp_dir)
-            write(root / "CLAUDE.md", "# Legacy instructions\n")
-            write(root / ".claude/settings.json", '{"allowed-tools": ["WebSearch"]}\n')
-            write(root / ".claude/agents/reviewer.md", "---\nmaxTurns: 5\n---\n")
-
-            payload = migration_audit.build_payload([root.as_posix()])
+        payload = migration_audit.build_payload([LEGACY_FIXTURE.as_posix()])
 
         self.assertEqual("needs_migration", payload["status"])
         result = payload["results"][0]
         self.assertEqual("needs_migration", result["status"])
+        self.assertGreaterEqual(result["failure_count"], 7)
+        self.assertGreaterEqual(result["warning_count"], 4)
         kinds = {finding["kind"] for finding in result["findings"]}
         self.assertIn("legacy_path", kinds)
         self.assertIn("missing_codex_path", kinds)
@@ -68,6 +65,9 @@ class MigrationAuditTests(unittest.TestCase):
         self.assertIn("codex-harness init", commands)
         self.assertIn("codex-harness adoption-plan", commands)
         self.assertIn("codex-harness validate", commands)
+        self.assertIn("CLAUDE.md", result["migration_plan"]["legacy_paths"])
+        self.assertIn(".claude/settings.json", result["migration_plan"]["legacy_paths"])
+        self.assertTrue(any(path.endswith("settings.json") for path in result["migration_plan"]["legacy_text_paths"]))
         self.assertIn("CLAUDE.md", "\n".join(result["migration_plan"]["manual_steps"]))
 
     def test_main_json_returns_nonzero_for_legacy_harness(self):

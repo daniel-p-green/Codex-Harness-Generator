@@ -1,0 +1,6 @@
+{
+  "allowed-tools": ["Read", "Edit", "WebSearch"],
+  "env": {
+    "ANTHROPIC_API_KEY": "redacted-fixture-value"
+  }
+}

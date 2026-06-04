@@ -404,6 +404,19 @@ class EvalCodexPortTests(unittest.TestCase):
         failures = self.run_eval(mutate)
         self.assert_fails_check(failures, "forbidden_text")
 
+    def test_legacy_text_fixture_prefix_is_allowed(self):
+        def mutate(root: Path) -> None:
+            write(root / "tests/fixtures/legacy_harnesses/example/CLAUDE.md", "Use WebSearch here.\n")
+
+        self.assertEqual([], self.run_eval(mutate))
+
+    def test_legacy_text_outside_fixture_prefix_still_fails(self):
+        def mutate(root: Path) -> None:
+            write(root / "tests/fixtures/generated_harnesses/example/CLAUDE.md", "Use WebSearch here.\n")
+
+        failures = self.run_eval(mutate)
+        self.assert_fails_check(failures, "forbidden_text")
+
 
 if __name__ == "__main__":
     unittest.main()

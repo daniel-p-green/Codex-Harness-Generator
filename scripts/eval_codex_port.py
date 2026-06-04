@@ -51,6 +51,9 @@ SKIP_FORBIDDEN_TEXT_PATHS = {
     "tests/test_generated_harness_contract.py",
     "tests/test_migration_audit.py",
 }
+SKIP_FORBIDDEN_TEXT_PREFIXES = {
+    "tests/fixtures/legacy_harnesses/",
+}
 REASONING_EFFORT_VALUES = {"minimal", "low", "medium", "high", "xhigh"}
 MODEL_VERBOSITY_VALUES = {"low", "medium", "high"}
 APPROVAL_POLICY_VALUES = {"untrusted", "on-request", "never"}
@@ -249,7 +252,9 @@ def check_forbidden_text(root: Path) -> list[dict]:
     compiled = [(re.compile(pattern), message) for pattern, message in FORBIDDEN_PATTERNS]
     for path in iter_text_files(root):
         relative = rel(path, root)
-        if relative in SKIP_FORBIDDEN_TEXT_PATHS:
+        if relative in SKIP_FORBIDDEN_TEXT_PATHS or any(
+            relative.startswith(prefix) for prefix in SKIP_FORBIDDEN_TEXT_PREFIXES
+        ):
             continue
         text = read_text(path)
         for line_no, line in enumerate(text.splitlines(), 1):
