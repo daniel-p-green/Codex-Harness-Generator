@@ -10,6 +10,12 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EVAL_PATH = REPO_ROOT / "scripts" / "eval_generated_harness.py"
 FIXTURES_ROOT = REPO_ROOT / "tests" / "fixtures" / "generated_harnesses"
+DETERMINISTIC_PROFILES = [
+    "data-analysis",
+    "devops-infrastructure",
+    "knowledge-work",
+    "software-development",
+]
 
 spec = importlib.util.spec_from_file_location("eval_generated_harness", EVAL_PATH)
 eval_generated_harness = importlib.util.module_from_spec(spec)
@@ -68,6 +74,76 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         completed = subprocess.run(command, cwd=REPO_ROOT, text=True, capture_output=True, check=False)
         self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
         self.assertIn('"status": "pass"', completed.stdout)
+
+    def test_minimal_generator_lists_supported_profiles(self):
+        completed = subprocess.run(
+            [sys.executable, "scripts/generate_minimal_harness.py", "--list-profiles"],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+        self.assertEqual(DETERMINISTIC_PROFILES, completed.stdout.strip().splitlines())
+
+    def test_minimal_generator_outputs_pass_eval_and_smoke_for_each_profile(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            targets = []
+            for profile in DETERMINISTIC_PROFILES:
+                target = Path(temp_dir) / profile
+                targets.append(target)
+                generate = subprocess.run(
+                    [
+                        sys.executable,
+                        "scripts/generate_minimal_harness.py",
+                        target.as_posix(),
+                        "--profile",
+                        profile,
+                    ],
+                    cwd=REPO_ROOT,
+                    text=True,
+                    capture_output=True,
+                    check=False,
+                )
+                self.assertEqual(0, generate.returncode, generate.stdout + generate.stderr)
+
+                result = eval_generated_harness.evaluate(target)
+                self.assertEqual("pass", result["status"], result)
+                self.assertGreaterEqual(result["score"], 90, result)
+
+            smoke = subprocess.run(
+                [
+                    sys.executable,
+                    "scripts/smoke_generated_harness.py",
+                    "--json",
+                    *[target.as_posix() for target in targets],
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(0, smoke.returncode, smoke.stdout + smoke.stderr)
+            self.assertIn('"status": "pass"', smoke.stdout)
+
+    def test_minimal_generator_rejects_non_empty_target_without_force(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            target = Path(temp_dir) / "generated"
+            target.mkdir()
+            write(target / "existing.txt", "keep me\n")
+            generate = subprocess.run(
+                [
+                    sys.executable,
+                    "scripts/generate_minimal_harness.py",
+                    target.as_posix(),
+                ],
+                cwd=REPO_ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(0, generate.returncode, generate.stdout + generate.stderr)
+            self.assertIn("Target is not empty", generate.stderr)
 
     def test_smoke_cli_catches_missing_skill_file(self):
         temp_dir, target = self.copy_fixture()

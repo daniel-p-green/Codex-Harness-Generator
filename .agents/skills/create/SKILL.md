@@ -7,6 +7,15 @@ description: Starts creating a new Codex environment for any project -- intervie
 
 This skill is a TRIGGER. It prepares the creation context and returns control to the orchestrator. It does NOT run the full creation pipeline, spawn agents, or generate environment files. The orchestrator coordinates everything after this skill completes.
 
+Exception: if the user explicitly asks for an acceptance test, smoke test,
+minimal valid harness, deterministic harness, or non-interactive proof path, use
+`scripts/generate_minimal_harness.py <target>` instead of the full model-mediated
+pipeline. Use `--list-profiles` and `--profile <name>` when the user wants a
+specific deterministic profile. Then run
+`scripts/eval_generated_harness.py <target>` and
+`scripts/smoke_generated_harness.py <target>`. This proves the writer/evaluator
+contract quickly without pretending it is the full custom `/create` experience.
+
 ## What this skill does
 
 1. Get the target directory path from the user

@@ -60,6 +60,10 @@ def main() -> int:
             [python, "scripts/smoke_generated_harness.py", "--json", *fixture_paths()],
         ),
         run_step(
+            "deterministic_profile_generation",
+            [python, "scripts/eval_deterministic_profiles.py", "--json"],
+        ),
+        run_step(
             "unit_and_mutation_tests",
             [python, "-m", "unittest", "discover", "-s", "tests", "-q"],
         ),
@@ -70,7 +74,9 @@ def main() -> int:
                 "-m",
                 "py_compile",
                 "scripts/eval_codex_port.py",
+                "scripts/eval_deterministic_profiles.py",
                 "scripts/eval_generated_harness.py",
+                "scripts/generate_minimal_harness.py",
                 "scripts/run_evals.py",
                 "scripts/smoke_generated_harness.py",
                 "tests/test_eval_codex_port.py",

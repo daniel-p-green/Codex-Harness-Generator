@@ -1,6 +1,6 @@
 # Codex Harness Generator
 
-**v1.0.0** | Built for Codex GPT-5.5 (`gpt-5.5`) | MIT
+**v1.0.0** | Codex-equivalent beta | Built for Codex GPT-5.5 (`gpt-5.5`) | MIT
 
 Codex Harness Generator helps you create and validate a project-specific Codex
 harness: `AGENTS.md`, `.codex/config.toml`, `.codex/agents/`, `.agents/skills/`,
@@ -12,6 +12,34 @@ project is, which files matter, which subagents and skills exist, what can be
 changed safely, how to save state, and how to verify the setup over time.
 
 [![Tutorial Video](https://img.youtube.com/vi/0R3JPNTEljU/0.jpg)](https://www.youtube.com/watch?v=0R3JPNTEljU)
+
+## Current Status
+
+This repo is the **Codex-native equivalent in structure and intent** of the
+earlier harness-generator architecture. It has been ported to Codex concepts:
+`AGENTS.md`, `.codex/config.toml`, TOML subagents, `.agents/skills/`, Codex
+permission profiles, artifact-first docs, and a local eval gate.
+
+It should still be treated as a **beta**, not a fully battle-tested public
+replacement. What is proven today:
+
+- The repo is structurally Codex-native and passes the local eval gate.
+- Golden generated-harness fixtures pass contract, smoke, and mutation tests.
+- `scripts/generate_minimal_harness.py` provides a deterministic acceptance path
+  for software development, knowledge work, data analysis, and infrastructure
+  profiles without waiting on a live model run.
+- Generated harnesses are required to include architecture, assumptions, source
+  mapping, manifests, and validation reports.
+
+What still needs product proof:
+
+- Several fresh live `/create` runs in temporary projects.
+- Public example harnesses from the full `/create` flow, not just deterministic
+  profile scaffolds.
+- Real use of generated harnesses on real Codex tasks.
+
+Until those live examples exist, treat the eval suite and golden fixtures as
+structural proof, not end-to-end product proof.
 
 ## Why this exists
 
@@ -36,8 +64,8 @@ runs validation so the output is reviewable on disk.
 ## When it is not useful
 
 - A small one-off project only needs a short `AGENTS.md`.
-- You want a deterministic scaffold CLI. This project is primarily a Codex-driven
-  generation workflow with deterministic eval scripts around it.
+- You only want a full-featured deterministic scaffold CLI. This project now has
+  a small deterministic proof path, but the richer path is still Codex-driven.
 - You need a compliance or policy engine. The harness can document and reinforce
   boundaries, but it is not a substitute for organization-level controls.
 - You are not willing to run and maintain evals as Codex docs and APIs evolve.
@@ -59,6 +87,29 @@ codex
 The create flow asks about your domain, tools, team shape, existing files, risk
 tolerance, and how much autonomy Codex should have. It then writes a harness to
 the path you choose.
+
+## Fast Acceptance Test
+
+Before trying the full model-mediated `/create` flow, generate a minimal valid
+harness deterministically:
+
+```bash
+python scripts/generate_minimal_harness.py --list-profiles
+python scripts/generate_minimal_harness.py /tmp/codex-harness-example --force
+python scripts/eval_generated_harness.py /tmp/codex-harness-example
+python scripts/smoke_generated_harness.py /tmp/codex-harness-example
+```
+
+The deterministic generator currently supports:
+
+- `software-development`
+- `knowledge-work`
+- `data-analysis`
+- `devops-infrastructure`
+
+This proves the repo can write valid Codex harnesses to disk across the core
+starter profiles and that the same evaluator used for fixtures accepts them. The
+full `/create` flow remains the richer custom path.
 
 ## Commands
 
@@ -141,12 +192,14 @@ This runs:
 - Static Codex port checks.
 - Generated-harness fixture evaluation.
 - Offline smoke checks for generated harnesses.
+- Deterministic profile generation, evaluation, and smoke checks.
 - Contract and mutation tests.
 - Python compile checks.
 
-The evals prove structural and contract quality against golden fixtures. They do
-not prove that every live `/create` run will be perfect, so meaningful changes
-should still be reviewed against generated artifacts.
+The evals prove structural and contract quality against golden fixtures and the
+deterministic profile generator. They do not prove that every live `/create` run
+will be perfect, so meaningful changes should still be reviewed against generated
+artifacts.
 
 ## Project Structure
 
@@ -172,14 +225,16 @@ Codex-Harness-Generator/
 
 ## Value Assessment
 
-The project is valuable when the user cares about repeatable Codex setup,
-reviewable local artifacts, and validation discipline. Its strongest utility is
-compressing a lot of Codex configuration knowledge into a guided workflow while
-leaving enough files on disk for inspection and improvement.
+The project is valuable for serious Codex users, workshop/demo contexts, and
+teams that care about repeatable setup, reviewable local artifacts, and
+validation discipline. Its strongest utility is compressing a lot of Codex
+configuration knowledge into a guided workflow while leaving enough files on disk
+for inspection and improvement.
 
-The main limitation is that generation is model-mediated. The repo should be
-judged by its output contracts, eval coverage, and maintenance loop, not by an
-assumption that the first generated harness is always ideal.
+It is not yet a mainstream public product. The main limitation is that generation
+is model-mediated and the current evidence is mostly structural. The repo should
+be judged by generated examples, output contracts, eval coverage, and maintenance
+loop, not by an assumption that the first generated harness is always ideal.
 
 ## Contributing
 

@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Added assumptions ledgers to generated-harness fixtures and evaluator coverage for missing or weak assumption records.
 - Added manifest-reference validation so generated harness metadata fails when it points at files that are not on disk.
 - Added `Docs/Environment/ARCHITECTURE_REVIEW.md` with a stress test of the project's assumptions, architecture, blind spots, and utility.
+- Added `scripts/generate_minimal_harness.py` as a deterministic acceptance path that writes minimal valid Codex harnesses for software development, knowledge work, data analysis, and infrastructure profiles without requiring a live model run.
+- Added `scripts/eval_deterministic_profiles.py` so the release gate explicitly generates, evaluates, and smokes every deterministic profile.
 
 ### Changed
 
