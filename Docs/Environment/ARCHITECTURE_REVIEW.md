@@ -54,6 +54,9 @@ transcript.
   `Docs/Environment/MANIFEST.md` lists files that do not exist.
 - Fixture coverage: golden fixtures now include assumptions ledgers, and tests
   cover missing ledgers, weak ledgers, and broken manifest references.
+- High-risk domain coverage: generated-harness mutation tests now fail missing
+  guardrails for security audit, legal research, financial analysis, hiring, and
+  customer support scenarios.
 - Claim calibration: README language now describes utility and limits without
   implying deterministic perfection.
 
@@ -61,8 +64,8 @@ transcript.
 
 - Expand live sample-generation examples into higher-risk domains once safe
   synthetic briefs are available.
-- Add per-domain fixture mutations for high-stakes domains such as security,
-  legal, finance, hiring, and support.
+- Extend high-risk domain guardrail mutations as new bundled domains are added
+  or official Codex safety guidance changes.
 - Add semantic-drift checks that compare local guidance against official docs,
   beyond the current official-source reachability check.
 - Keep the thin `scripts/codex_harness.py` wrapper aligned with the underlying

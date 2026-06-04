@@ -47,6 +47,12 @@ replacement. What is proven today:
 - `scripts/run_live_example_task_trials.py` runs authenticated Codex task trials
   against temporary copies of those generated harnesses and verifies concrete
   output files.
+- The generated-harness evaluator includes high-risk domain guardrail mutations
+  for security audit, legal research, financial analysis, hiring, and customer
+  support scenarios.
+- `scripts/codex_harness.py` gives users one thin local entry point for
+  profile listing, generation, acceptance, eval, smoke, gate, live-trial,
+  source-freshness, and snapshot workflows.
 - `scripts/record_eval_snapshot.py` records eval-gate snapshots under
   `Docs/Environment/eval-history/` and updates `Docs/Environment/EVAL_TRENDS.md`.
 - `scripts/check_source_freshness.py` verifies official OpenAI documentation

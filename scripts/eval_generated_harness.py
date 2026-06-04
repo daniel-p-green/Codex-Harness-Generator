@@ -84,6 +84,54 @@ CATEGORY_WEIGHTS = {
     "source_alignment": 10,
 }
 
+HIGH_RISK_DOMAIN_REQUIREMENTS = [
+    {
+        "domain": "security audit",
+        "triggers": ["security audit", "vulnerability", "exploit", "penetration test", "threat model"],
+        "requirements": [
+            ("secret handling", ["secret", "token", "credential", "private key"]),
+            ("authorization boundary", ["authorization", "permission", "approval", "active testing"]),
+            ("destructive action boundary", ["destructive", "exploit", "active testing"]),
+        ],
+    },
+    {
+        "domain": "legal research",
+        "triggers": ["legal research", "legal review", "contract review", "jurisdiction"],
+        "requirements": [
+            ("jurisdiction and limits", ["jurisdiction", "not legal advice", "attorney", "lawyer"]),
+            ("source citation", ["source", "citation", "cite", "statute", "case"]),
+            ("uncertainty handling", ["uncertain", "assumption", "limit", "verify"]),
+        ],
+    },
+    {
+        "domain": "financial analysis",
+        "triggers": ["financial modeling", "investment", "valuation", "financial forecast", "portfolio analysis"],
+        "requirements": [
+            ("advice boundary", ["not financial advice", "not investment advice", "decision support"]),
+            ("assumption disclosure", ["assumption", "scenario", "sensitivity", "limit"]),
+            ("risk disclosure", ["risk", "uncertainty", "downside", "caveat"]),
+        ],
+    },
+    {
+        "domain": "hiring",
+        "triggers": ["hiring pipeline", "candidate evaluation", "interview process", "recruiting", "applicant tracking"],
+        "requirements": [
+            ("bias mitigation", ["bias", "discrimination", "fairness", "protected class"]),
+            ("structured criteria", ["criteria", "rubric", "scorecard", "job-related"]),
+            ("candidate privacy", ["privacy", "candidate data", "personal data", "pii"]),
+        ],
+    },
+    {
+        "domain": "customer support",
+        "triggers": ["customer support", "support ticket", "user complaint"],
+        "requirements": [
+            ("customer privacy", ["privacy", "personal data", "pii", "do not expose"]),
+            ("escalation path", ["escalate", "escalation", "handoff", "human review"]),
+            ("claim discipline", ["source", "verify", "do not promise", "do not overpromise"]),
+        ],
+    },
+]
+
 
 @dataclass(frozen=True)
 class Finding:
@@ -469,6 +517,31 @@ def check_manifest(root: Path, findings: list[Finding]) -> None:
             )
 
 
+def check_high_risk_domain_guardrails(root: Path, findings: list[Finding]) -> None:
+    text_by_path = {
+        rel(path, root): read_text(path).lower()
+        for path in iter_text_files(root)
+    }
+    combined_text = "\n".join(text_by_path.values())
+    if not combined_text:
+        return
+
+    for domain in HIGH_RISK_DOMAIN_REQUIREMENTS:
+        if not any(trigger in combined_text for trigger in domain["triggers"]):
+            continue
+        for label, accepted_phrases in domain["requirements"]:
+            if any(phrase in combined_text for phrase in accepted_phrases):
+                continue
+            add(
+                findings,
+                "domain_guardrails",
+                "safety_privacy",
+                "fail",
+                "AGENTS.md",
+                f"High-risk {domain['domain']} harness is missing explicit {label} guardrail.",
+            )
+
+
 def score_findings(findings: list[Finding]) -> tuple[int, dict[str, int]]:
     category_scores = dict(CATEGORY_WEIGHTS)
     for finding in findings:
@@ -490,6 +563,7 @@ def evaluate(root: Path) -> dict:
     check_rules(root, findings)
     check_docs(root, findings)
     check_manifest(root, findings)
+    check_high_risk_domain_guardrails(root, findings)
     score, category_scores = score_findings(findings)
     fail_count = sum(1 for finding in findings if finding.severity == "fail")
     warn_count = sum(1 for finding in findings if finding.severity == "warn")

@@ -430,6 +430,83 @@ class GeneratedHarnessContractTests(unittest.TestCase):
         self.assertEqual("fail", result["status"])
         self.assert_has_check(result, "agents_md_size")
 
+    def test_security_audit_fixture_satisfies_high_risk_guardrails(self):
+        result = eval_generated_harness.evaluate(FIXTURES_ROOT / "security-audit-basic")
+
+        checks = {finding["check"] for finding in result["findings"]}
+        self.assertEqual("pass", result["status"], result)
+        self.assertNotIn("domain_guardrails", checks)
+
+    def test_security_audit_without_active_testing_boundary_fails(self):
+        temp_dir, target = self.copy_fixture("security-audit-basic")
+        self.addCleanup(temp_dir.cleanup)
+        agents = target / "AGENTS.md"
+        agents.write_text(
+            agents.read_text(encoding="utf-8")
+            .replace("exploitable", "important")
+            .replace("- Ask for clarification before active testing or destructive work.\n", ""),
+            encoding="utf-8",
+        )
+        for path in target.rglob("*"):
+            if path.is_file() and path.suffix in {".md", ".toml"}:
+                text = path.read_text(encoding="utf-8")
+                text = text.replace("active testing", "extra work")
+                text = text.replace("destructive", "broad")
+                text = text.replace("exploit", "issue")
+                path.write_text(text, encoding="utf-8")
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"], result)
+        self.assert_has_check(result, "domain_guardrails")
+
+    def test_legal_research_without_jurisdiction_boundary_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        write(
+            target / "AGENTS.md",
+            "# Legal Research Harness\n\nVerify sources, run tests when available, do not read secrets, and treat security seriously.\n",
+        )
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"], result)
+        self.assert_has_check(result, "domain_guardrails")
+
+    def test_financial_modeling_without_advice_boundary_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        write(
+            target / "AGENTS.md",
+            "# Financial Modeling Harness\n\nVerify assumptions, run tests when available, do not read secrets, and treat security seriously.\n",
+        )
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"], result)
+        self.assert_has_check(result, "domain_guardrails")
+
+    def test_hiring_pipeline_without_bias_guardrail_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        write(
+            target / "AGENTS.md",
+            "# Hiring Pipeline Harness\n\nVerify criteria, run tests when available, do not read secrets, and treat security seriously.\n",
+        )
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"], result)
+        self.assert_has_check(result, "domain_guardrails")
+
+    def test_customer_support_without_escalation_path_fails(self):
+        temp_dir, target = self.copy_fixture()
+        self.addCleanup(temp_dir.cleanup)
+        write(
+            target / "AGENTS.md",
+            "# Customer Support Harness\n\nVerify source notes, run tests when available, do not read secrets, and treat security and privacy seriously.\n",
+        )
+
+        result = eval_generated_harness.evaluate(target)
+        self.assertEqual("fail", result["status"], result)
+        self.assert_has_check(result, "domain_guardrails")
+
 
 if __name__ == "__main__":
     unittest.main()
