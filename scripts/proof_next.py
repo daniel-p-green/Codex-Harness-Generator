@@ -157,6 +157,20 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
             "purpose": "confirm the beta-exit usage gap before preparing more outreach",
         }
     ]
+    if len(pilots) > 1:
+        commands.append(
+            {
+                "name": "preview pilot batch",
+                "command": (
+                    "codex-harness prepare-pilot-batch "
+                    f"--record-dir {args.record_dir} "
+                    "--target-root /tmp/codex-beta-exit-pilots "
+                    f"--pilot-record-dir {args.pilot_record_dir} "
+                    "--dry-run"
+                ),
+                "purpose": "preview the full suggested pilot batch before deciding whether to prepare every candidate",
+            }
+        )
     if active_pilot:
         commands.append(
             {

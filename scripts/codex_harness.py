@@ -217,6 +217,58 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("prepare_next_pilot.py", command)
 
+    if args.command == "prepare-pilot-batch":
+        command = []
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.target_root:
+            command.extend(["--target-root", args.target_root])
+        if args.use_suggested_targets:
+            command.append("--use-suggested-targets")
+        if args.out_dir:
+            command.extend(["--out-dir", args.out_dir])
+        if args.max_pilots is not None:
+            command.extend(["--max-pilots", str(args.max_pilots)])
+        if args.notes:
+            command.extend(["--notes", args.notes])
+        if args.min_successes is not None:
+            command.extend(["--min-successes", str(args.min_successes)])
+        if args.min_score is not None:
+            command.extend(["--min-score", str(args.min_score)])
+        if args.target_label:
+            command.extend(["--target-label", args.target_label])
+        if args.limit is not None:
+            command.extend(["--limit", str(args.limit)])
+        if args.allow_low_confidence:
+            command.append("--allow-low-confidence")
+        if args.generated_date:
+            command.extend(["--generated-date", args.generated_date])
+        if args.created:
+            command.extend(["--created", args.created])
+        if args.generated:
+            command.extend(["--generated", args.generated])
+        if args.min_records is not None:
+            command.extend(["--min-records", str(args.min_records)])
+        if args.min_external_or_multi_project is not None:
+            command.extend(["--min-external-or-multi-project", str(args.min_external_or_multi_project)])
+        if args.min_domains is not None:
+            command.extend(["--min-domains", str(args.min_domains)])
+        if args.min_installed_init_brief is not None:
+            command.extend(["--min-installed-init-brief", str(args.min_installed_init_brief)])
+        if args.pilot_record_dir:
+            command.extend(["--pilot-record-dir", args.pilot_record_dir])
+        if args.pilot_status:
+            command.extend(["--pilot-status", args.pilot_status])
+        if args.pilot_notes:
+            command.extend(["--pilot-notes", args.pilot_notes])
+        if args.dry_run:
+            command.append("--dry-run")
+        if args.force:
+            command.append("--force")
+        if args.json:
+            command.append("--json")
+        return python_script("prepare_pilot_batch.py", command)
+
     if args.command == "profile":
         command = ["--profile", args.profile]
         if args.json:
@@ -941,6 +993,36 @@ def make_parser() -> argparse.ArgumentParser:
     prepare_next_pilot.add_argument("--pilot-notes", help="Optional public-safe note for the pilot-board record")
     prepare_next_pilot.add_argument("--force", action="store_true", help="Replace target if it already contains files")
     prepare_next_pilot.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    prepare_pilot_batch = subparsers.add_parser("prepare-pilot-batch", help="Prepare suggested beta-exit pilots as a batch")
+    prepare_pilot_batch.add_argument("--record-dir", help="Directory where usage record JSON files are read")
+    prepare_pilot_batch.add_argument("--target-root", help="Directory where generated pilot harnesses are prepared")
+    prepare_pilot_batch.add_argument("--use-suggested-targets", action="store_true", help="Use each suggested pilot's target path instead of --target-root")
+    prepare_pilot_batch.add_argument("--out-dir", help="Optional directory for pilot packs and issue drafts")
+    prepare_pilot_batch.add_argument("--max-pilots", type=int, help="Maximum suggested pilots to prepare; 0 means all")
+    prepare_pilot_batch.add_argument("--notes", help="Notes for creation context")
+    prepare_pilot_batch.add_argument("--min-successes", type=int, help="Minimum passing success task trials expected for later pilots")
+    prepare_pilot_batch.add_argument("--min-score", type=int, help="Minimum generated harness validation score")
+    prepare_pilot_batch.add_argument("--target-label", help="Override target label written inside generated creation contexts")
+    prepare_pilot_batch.add_argument("--limit", type=int, help="Number of profile recommendations to record")
+    prepare_pilot_batch.add_argument("--allow-low-confidence", action="store_true", help="Allow generation when no profile scores above zero")
+    prepare_pilot_batch.add_argument("--generated-date", help="Stable generated date for generated docs")
+    prepare_pilot_batch.add_argument("--created", help="Stable created timestamp for CREATION_CONTEXT.md")
+    prepare_pilot_batch.add_argument("--generated", help="UTC timestamp for batch metadata")
+    prepare_pilot_batch.add_argument("--min-records", type=int, help="Target valid usage records")
+    prepare_pilot_batch.add_argument("--min-external-or-multi-project", type=int, help="Target external or multi-project records")
+    prepare_pilot_batch.add_argument("--min-domains", type=int, help="Target distinct domains")
+    prepare_pilot_batch.add_argument("--min-installed-init-brief", type=int, help="Target records generated via installed brief-based generation")
+    prepare_pilot_batch.add_argument("--pilot-record-dir", help="Optional directory where prepared-pilot tracking records are written")
+    prepare_pilot_batch.add_argument(
+        "--pilot-status",
+        choices=["completed", "converted", "dropped", "invited", "prepared"],
+        help="Status for optional pilot-board records",
+    )
+    prepare_pilot_batch.add_argument("--pilot-notes", help="Optional public-safe note for pilot-board records")
+    prepare_pilot_batch.add_argument("--dry-run", action="store_true", help="Only print the batch plan")
+    prepare_pilot_batch.add_argument("--force", action="store_true", help="Replace generated targets and pilot records when they already exist")
+    prepare_pilot_batch.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     profile = subparsers.add_parser("profile", help="Describe one deterministic starter profile")
     profile.add_argument("profile", help="Profile slug")

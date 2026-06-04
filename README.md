@@ -162,6 +162,10 @@ replacement. What is proven today:
   generated harness, pack, and issue draft without copy-pasting a long command;
   add `--pilot-record-dir` when the prepared pilot should appear on the pilot
   board.
+- `scripts/prepare_pilot_batch.py` and `codex-harness prepare-pilot-batch`
+  dry-run or prepare the full suggested pilot batch under one target root so
+  maintainers can turn the beta-exit coverage projection into concrete pilot
+  materials without running each slot by hand.
 - `scripts/usage_from_harness.py` and `codex-harness usage-from-harness`
   convert a generated harness's local eval report and task trials into a
   privacy-checked usage record; add
@@ -575,7 +579,7 @@ python scripts/codex_harness.py proof-next
 
 `proof-next` writes `Docs/Environment/PROOF_NEXT.md`. It packages the next
 pilot target, candidate coverage projection, `prepare-next-pilot`,
-`pilot-board`, preview-first `usage-from-harness` and `usage-from-issue` conversion commands,
+`prepare-pilot-batch`, `pilot-board`, preview-first `usage-from-harness` and `usage-from-issue` conversion commands,
 `beta-exit-audit`, and final `proof-status --beta-exit` commands while keeping
 the claim boundary explicit: the packet is a plan, not usage proof. Use the
 copied-harness route when the generated harness directory is available; use the
@@ -688,6 +692,7 @@ Common subcommands:
 | `evidence-packet <path>` | `export_evidence_packet.py` | Exports a public-safe Markdown evidence packet from copied-harness local eval and task trials. |
 | `pilot-pack <path>` | `export_pilot_pack.py` | Writes an external pilot guide and optional GitHub issue-body draft for one privacy-safe generated-harness trial. |
 | `pilot-campaign` | `export_pilot_campaign.py` | Writes a shareable external-pilot campaign plan and listed-pilot coverage projection from current usage evidence gaps. |
+| `prepare-pilot-batch` | `prepare_pilot_batch.py` | Dry-runs or prepares the suggested beta-exit pilot batch under one target root, with optional pilot-board records. |
 | `pilot-board` | `pilot_board.py` | Summarizes prepared pilot records and cross-checks converted pilots against usage records without counting outreach as proof. |
 | `pilot-update <slug>` | `pilot_board.py` | Updates one prepared pilot's status, validates converted usage-record references, and refreshes the pilot board. |
 | `beta-exit-audit` | `beta_exit_audit.py` | Writes a non-gating audit of beta-exit readiness and remaining evidence gaps. |

@@ -72,6 +72,8 @@ def build_payload() -> dict:
         prepared_pilot_issue = temp_root / "PREPARED_EXTERNAL_USAGE_ISSUE_DRAFT.md"
         next_pilot_pack = temp_root / "NEXT_EXTERNAL_PILOT_PACK.md"
         next_pilot_issue = temp_root / "NEXT_EXTERNAL_USAGE_ISSUE_DRAFT.md"
+        pilot_batch_root = temp_root / "pilot-batch"
+        pilot_batch_out = temp_root / "pilot-batch-packs"
         pilot_records = temp_root / "pilot-records"
         pilot_board_report = temp_root / "PILOT_BOARD.md"
         beta_exit_audit_report = temp_root / "BETA_EXIT_AUDIT.md"
@@ -518,6 +520,25 @@ def build_payload() -> dict:
                 ],
             ),
             (
+                "prepare_pilot_batch_dry_run",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "prepare-pilot-batch",
+                    "--record-dir",
+                    usage_records.as_posix(),
+                    "--target-root",
+                    pilot_batch_root.as_posix(),
+                    "--out-dir",
+                    pilot_batch_out.as_posix(),
+                    "--pilot-record-dir",
+                    pilot_records.as_posix(),
+                    "--max-pilots",
+                    "2",
+                    "--dry-run",
+                    "--json",
+                ],
+            ),
+            (
                 "pilot_board",
                 [
                     (venv / "bin" / "codex-harness").as_posix(),
@@ -678,6 +699,16 @@ def build_payload() -> dict:
                         step["status"] = "fail"
                         step["returncode"] = 1
                         step["stderr"] += "\nUpstream drift smoke did not prove a clean self-compare."
+                if name == "prepare_pilot_batch_dry_run" and completed.returncode == 0:
+                    batch_payload = json.loads(completed.stdout)
+                    if (
+                        batch_payload.get("status") != "pass"
+                        or batch_payload.get("mode") != "dry-run"
+                        or batch_payload.get("selected_count", 0) < 1
+                    ):
+                        step["status"] = "fail"
+                        step["returncode"] = 1
+                        step["stderr"] += "\nPilot batch dry-run did not return a passing planned batch."
                 if name == "usage_from_issue_pilot_conversion" and completed.returncode == 0:
                     conversion_payload = json.loads(completed.stdout)
                     pilot_update = conversion_payload.get("pilot_update") or {}

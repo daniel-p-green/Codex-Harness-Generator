@@ -95,6 +95,7 @@ class ProofNextTests(unittest.TestCase):
         self.assertTrue(payload["coverage_projection"]["would_satisfy_beta_exit_usage_thresholds"])
         self.assertEqual(4, payload["coverage_projection"]["candidate_pilot_count"])
         commands = [item["command"] for item in payload["command_sequence"]]
+        self.assertTrue(any("codex-harness prepare-pilot-batch" in command and "--dry-run" in command for command in commands))
         self.assertTrue(any("codex-harness prepare-next-pilot /tmp/next-pilot" in command for command in commands))
         self.assertTrue(any("codex-harness pilot-board" in command for command in commands))
         self.assertTrue(any("codex-harness usage-from-issue" in command for command in commands))
@@ -175,6 +176,7 @@ class ProofNextTests(unittest.TestCase):
         self.assertIn("## Suggested Pilot Coverage Projection", text)
         self.assertIn("Would satisfy beta-exit usage thresholds: true", text)
         self.assertIn("Projection assumes every suggested pilot", text)
+        self.assertIn("codex-harness prepare-pilot-batch", text)
         self.assertIn("## Next Pilot", text)
         self.assertIn("codex-harness prepare-next-pilot", text)
         self.assertIn("codex-harness usage-from-harness", text)

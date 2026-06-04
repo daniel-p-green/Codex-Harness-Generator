@@ -47,6 +47,7 @@ class DoctorTests(unittest.TestCase):
                 {"name": "usage_from_issue_preview", "status": "pass"},
                 {"name": "usage_from_issue", "status": "pass"},
                 {"name": "prepare_next_pilot", "status": "pass"},
+                {"name": "prepare_pilot_batch_dry_run", "status": "pass"},
                 {"name": "pilot_board", "status": "pass"},
                 {"name": "pilot_update", "status": "pass"},
                 {"name": "usage_from_issue_pilot_conversion", "status": "pass"},
@@ -113,6 +114,7 @@ class DoctorTests(unittest.TestCase):
         self.assertIn("usage_from_issue_preview=pass", install_check["detail"])
         self.assertIn("usage_from_issue=pass", install_check["detail"])
         self.assertIn("prepare_next_pilot=pass", install_check["detail"])
+        self.assertIn("prepare_pilot_batch=pass", install_check["detail"])
         self.assertIn("pilot_board=pass", install_check["detail"])
         self.assertIn("pilot_update=pass", install_check["detail"])
         self.assertIn("usage_from_issue_pilot_conversion=pass", install_check["detail"])

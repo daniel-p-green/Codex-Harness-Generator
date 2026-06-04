@@ -100,10 +100,11 @@ CAPABILITIES = [
             "Docs/Environment/PILOT_BOARD.md",
             "scripts/prepare_pilot.py",
             "scripts/prepare_next_pilot.py",
+            "scripts/prepare_pilot_batch.py",
             "scripts/pilot_board.py",
             "scripts/record_usage_case.py",
         ],
-        "commands": ["codex-harness prepare-pilot <target>", "codex-harness prepare-next-pilot [target]", "codex-harness pilot-board", "codex-harness pilot-update <slug>", "codex-harness usage-validate", "codex-harness usage-gaps", "codex-harness pilot-campaign"],
+        "commands": ["codex-harness prepare-pilot <target>", "codex-harness prepare-next-pilot [target]", "codex-harness prepare-pilot-batch", "codex-harness pilot-board", "codex-harness pilot-update <slug>", "codex-harness usage-validate", "codex-harness usage-gaps", "codex-harness pilot-campaign"],
     },
     {
         "name": "Release proof",
