@@ -58,6 +58,8 @@ class ExternalPilotPackTests(unittest.TestCase):
         self.assertIn("python scripts/run-harness-evals.py --min-successes 1", pack)
         self.assertIn("python scripts/codex_harness.py evidence-packet <generated-harness>", pack)
         self.assertIn("python scripts/codex_harness.py usage-from-harness <generated-harness>", pack)
+        self.assertIn("--pilot-record-dir Docs/Environment/pilot-records", pack)
+        self.assertIn("--pilot-board-report Docs/Environment/PILOT_BOARD.md", pack)
         self.assertIn("Fill out `EXTERNAL_USAGE_ISSUE_DRAFT.md`", pack)
         self.assertIn("Do not claim broad", pack)
         self.assertIn("adoption, production readiness", pack)

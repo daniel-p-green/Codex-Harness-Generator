@@ -1,7 +1,7 @@
 {
   "claim_boundary": "Preparing the next pilot is not usage proof until the reporter completes a real task trial and the evidence is converted into a checked usage record.",
   "domain": "LLM app",
-  "generated": "2026-06-04T14:23:54Z",
+  "generated": "2026-06-04T14:32:00Z",
   "generation_path": "installed-quickstart",
   "harness_label": "LLM App Workspace Pilot",
   "issue_draft": "Docs/Environment/LLM_APP_USAGE_ISSUE_DRAFT.md",

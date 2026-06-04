@@ -1,6 +1,6 @@
 # External Pilot Pack
 
-Generated: 2026-06-04T14:23:54Z
+Generated: 2026-06-04T14:32:00Z
 Harness label: LLM App Workspace Pilot
 Domain: LLM app
 Source type: external
@@ -60,7 +60,7 @@ python scripts/codex_harness.py usage-from-harness <generated-harness> --slug "l
 Or convert the GitHub issue body after review:
 
 ```bash
-python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md --slug "llm-app-pilot" --title "LLM app pilot" --source-type external --generation-path installed-quickstart
+python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md --slug "llm-app-pilot" --title "LLM app pilot" --source-type external --generation-path installed-quickstart --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md
 ```
 
 ## Issue Draft

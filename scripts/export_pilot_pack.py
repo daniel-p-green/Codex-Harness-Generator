@@ -213,7 +213,7 @@ python scripts/codex_harness.py usage-from-harness <generated-harness> --slug "{
 Or convert the GitHub issue body after review:
 
 ```bash
-python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md --slug "{payload["slug"]}" --title "{payload["title"]}" --source-type {payload["source_type"]} --generation-path {payload["generation_path"]}
+python scripts/codex_harness.py usage-from-issue /tmp/external-usage-issue.md --slug "{payload["slug"]}" --title "{payload["title"]}" --source-type {payload["source_type"]} --generation-path {payload["generation_path"]} --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md
 ```
 
 ## Issue Draft
