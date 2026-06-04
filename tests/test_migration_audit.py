@@ -68,6 +68,8 @@ class MigrationAuditTests(unittest.TestCase):
         self.assertIn("CLAUDE.md", result["migration_plan"]["legacy_paths"])
         self.assertIn(".claude/settings.json", result["migration_plan"]["legacy_paths"])
         self.assertTrue(any(path.endswith("settings.json") for path in result["migration_plan"]["legacy_text_paths"]))
+        self.assertIn("CLAUDE.md", result["migration_plan"]["cleanup_paths"])
+        self.assertIn(".claudeignore", result["migration_plan"]["cleanup_paths"])
         self.assertIn("CLAUDE.md", "\n".join(result["migration_plan"]["manual_steps"]))
 
     def test_main_json_returns_nonzero_for_legacy_harness(self):
@@ -97,6 +99,7 @@ class MigrationAuditTests(unittest.TestCase):
         self.assertIn("Migration audit: NEEDS_MIGRATION", text)
         self.assertIn("next:", text)
         self.assertIn("command:", text)
+        self.assertIn("cleanup:", text)
 
     def test_main_writes_markdown_migration_plan_report(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -112,6 +115,7 @@ class MigrationAuditTests(unittest.TestCase):
         self.assertEqual(1, status)
         self.assertIn("# Codex Migration Plan", report_text)
         self.assertIn("Migration readiness: needs-manual-migration", report_text)
+        self.assertIn("### Cleanup Checklist", report_text)
         self.assertIn("codex-harness adoption-plan", report_text)
         self.assertIn("CLAUDE.md", report_text)
 

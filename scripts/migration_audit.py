@@ -161,11 +161,13 @@ def migration_plan(root: Path, findings: list[Finding]) -> dict:
             "manual_steps": [
                 "Review AGENTS.md and .codex/config.toml against the current project before publishing.",
             ],
+            "cleanup_paths": [],
         }
 
     legacy_paths = sorted({finding.path for finding in findings if finding.kind == "legacy_path"})
     missing_codex_paths = sorted({finding.path for finding in findings if finding.kind == "missing_codex_path"})
     legacy_text_paths = sorted({finding.path for finding in findings if finding.kind == "legacy_text"})
+    cleanup_paths = legacy_paths[:]
     blueprint = shlex.quote("/tmp/codex-migration-blueprint")
     report = shlex.quote("/tmp/HARNESS_ADOPTION_PLAN.md")
     copy_script = shlex.quote("/tmp/copy-codex-harness-adds.sh")
@@ -184,11 +186,13 @@ def migration_plan(root: Path, findings: list[Finding]) -> dict:
             "Translate .claude/settings.json into .codex/config.toml instead of copying provider-specific settings verbatim.",
             "Rewrite Claude agents, commands, hooks, and skills into Codex subagents, AGENTS.md routing, explicit validation commands, or .agents/skills.",
             "Review any add-only copy script output before merging conflicts; never overwrite existing project guidance blindly.",
+            "Archive or remove legacy cleanup paths only after their useful content has been translated into Codex-native files.",
             "Run validation after each manual merge phase and record remaining gaps in Docs/Environment/IMPROVEMENT_LOG.md.",
         ],
         "legacy_paths": legacy_paths,
         "missing_codex_paths": missing_codex_paths,
         "legacy_text_paths": legacy_text_paths,
+        "cleanup_paths": cleanup_paths,
     }
 
 
@@ -213,6 +217,8 @@ def print_text(payload: dict) -> None:
             print(f"  next: {step}")
         for command in result["migration_plan"]["commands"]:
             print(f"  command: {command}")
+        for cleanup_path in result["migration_plan"]["cleanup_paths"]:
+            print(f"  cleanup: {cleanup_path}")
 
 
 def write_report(path: Path, payload: dict) -> None:
@@ -257,6 +263,14 @@ def write_report(path: Path, payload: dict) -> None:
         lines.extend(["", "### Manual Steps", ""])
         for step in result["migration_plan"]["manual_steps"]:
             lines.append(f"- {step}")
+        lines.extend(["", "### Cleanup Checklist", ""])
+        if result["migration_plan"]["cleanup_paths"]:
+            lines.append("Archive or remove these legacy paths only after their useful content is translated:")
+            lines.append("")
+            for cleanup_path in result["migration_plan"]["cleanup_paths"]:
+                lines.append(f"- `{cleanup_path}`")
+        else:
+            lines.append("- No legacy cleanup paths detected.")
         lines.append("")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")

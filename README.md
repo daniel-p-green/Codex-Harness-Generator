@@ -331,7 +331,9 @@ python scripts/codex_harness.py migration-audit /path/to/harness \
 
 The report lists legacy paths, missing Codex-native artifacts, legacy
 tool/config wording, and a command sequence for generating a Codex blueprint
-plus a non-destructive adoption plan.
+plus a non-destructive adoption plan. It also includes a cleanup checklist for
+legacy paths to archive or remove after their useful content has been
+translated.
 
 The deterministic generator currently supports the four base starter profiles
 and 16 bundled domain presets listed by:
