@@ -148,6 +148,43 @@ evidence, why it matters, safe remediation, and verification skipped because no
 active testing is authorized. Do not run exploit code or scanners. Verify the
 report file exists before replying.""",
     ),
+    TaskTrial(
+        name="legal-research-synthetic-policy",
+        example="synthetic-legal-research",
+        seed_files=(
+            (
+                "sources/synthetic-policy-excerpt.md",
+                """# Synthetic Remote Work Policy Excerpt
+
+Jurisdiction: Example State
+
+## Section 2. Notice
+
+An employer must give workers a written remote-work equipment policy before
+requiring use of personal devices.
+
+## Section 4. Reimbursement
+
+If the policy requires personal-device use, the employer must reimburse
+reasonable documented business expenses within 30 days of receiving a complete
+expense record.
+
+## Section 8. Exceptions
+
+This excerpt does not address independent contractors, union agreements, or
+tax treatment.
+""",
+            ),
+        ),
+        expected_file="reports/legal-research-note.md",
+        expected_terms=("not legal advice", "Example State", "Section 4"),
+        prompt="""Inspect `sources/synthetic-policy-excerpt.md` and use this
+generated legal research harness to write `reports/legal-research-note.md`.
+Include jurisdiction, source scope, short answer, source-backed analysis with
+citations to section labels, open questions, and a clear `not legal advice`
+boundary. Do not invent statutes, cases, deadlines, parties, or legal standards.
+Verify the report file exists before replying.""",
+    ),
 )
 
 

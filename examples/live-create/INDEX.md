@@ -2,10 +2,10 @@
 
 These examples are checked-in product-proof artifacts for generated Codex
 harnesses. Most were generated through the live model-mediated `/create`
-capture path, sanitized, and checked in. The security-audit example is a
-curated public-safe high-risk task-trial fixture so the same eval, smoke, and
-live task runner can exercise security boundaries without publishing real
-security work.
+capture path, sanitized, and checked in. The security-audit and legal-research
+examples are curated public-safe high-risk task-trial fixtures so the same eval,
+smoke, and live task runner can exercise high-risk boundaries without publishing
+real security or legal work.
 
 Each example includes `Docs/Environment/CREATION_CONTEXT.md`,
 `LIVE_CREATE_CAPTURE.md` or equivalent capture notes, eval score, offline smoke
@@ -17,6 +17,7 @@ result, and public-safe synthetic scope notes.
 | `synthetic-python-cli/` | Python CLI | Markdown TODO scanning and cleanup-summary workflow | `markdown-auditor`, `summary-writer` | `audit-todos`, `write-cleanup-summary` |
 | `synthetic-data-review/` | Data analysis | CSV quality checks, weekly metric summaries, chart-ready notes | `csv-quality-analyst`, `weekly-metrics-summarizer`, `report-note-writer` | `data-quality-check`, `summarize-week`, `chart-notes`, `state-save`, `state-load` |
 | `synthetic-security-audit/` | Security audit | Defensive review of synthetic vulnerable code with explicit high-risk boundaries | `reviewer` | `health-check` |
+| `synthetic-legal-research/` | Legal research | Source-backed synthetic policy note with jurisdiction, uncertainty, and not-legal-advice boundaries | `reviewer` | `health-check` |
 
 Verify all checked-in live examples with:
 
