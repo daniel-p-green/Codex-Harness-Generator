@@ -847,6 +847,8 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.extend(["--pilot-board-report", args.pilot_board_report])
         if args.usage_report:
             command.extend(["--usage-report", args.usage_report])
+        if args.pilot_handoff_out:
+            command.extend(["--pilot-handoff-out", args.pilot_handoff_out])
         if args.pilot_pack_out:
             command.extend(["--pilot-pack-out", args.pilot_pack_out])
         if args.issue_out:
@@ -1465,6 +1467,7 @@ def make_parser() -> argparse.ArgumentParser:
     proof_next.add_argument("--pilot-record-dir", help="Prepared-pilot tracking directory")
     proof_next.add_argument("--pilot-board-report", help="Pilot board Markdown path")
     proof_next.add_argument("--usage-report", help="Usage records Markdown path")
+    proof_next.add_argument("--pilot-handoff-out", help="Pilot handoff output directory")
     proof_next.add_argument("--pilot-pack-out", help="Pilot pack output path for the next prepare command")
     proof_next.add_argument("--issue-out", help="Issue draft output path for the next prepare command")
     proof_next.add_argument("--report", help="Proof-next Markdown path")

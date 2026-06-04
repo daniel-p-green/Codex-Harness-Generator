@@ -19,6 +19,7 @@ DEFAULT_RECORD_DIR_TEXT = "Docs/Environment/usage-records"
 DEFAULT_PILOT_RECORD_DIR_TEXT = "Docs/Environment/pilot-records"
 DEFAULT_PILOT_BOARD_REPORT_TEXT = "Docs/Environment/PILOT_BOARD.md"
 DEFAULT_USAGE_REPORT_TEXT = "Docs/Environment/USAGE_RECORDS.md"
+DEFAULT_PILOT_HANDOFF_OUT_TEXT = "Docs/Environment/pilot-handoffs"
 
 
 def build_prepare_next_command(pilot: dict, args: argparse.Namespace) -> str:
@@ -134,6 +135,18 @@ def build_conversion_commands(pilot: dict, args: argparse.Namespace) -> list[dic
     ]
 
 
+def build_pilot_handoff_command(args: argparse.Namespace) -> str:
+    return (
+        "codex-harness pilot-handoff "
+        f"--record-dir {args.pilot_record_dir} "
+        f"--usage-record-dir {args.record_dir} "
+        f"--usage-report {args.usage_report} "
+        f"--pilot-board-report {args.pilot_board_report} "
+        f"--out {args.pilot_handoff_out} "
+        "--force"
+    )
+
+
 def active_pilot_for_next(gaps_payload: dict, board_payload: dict) -> dict | None:
     next_pilot = (gaps_payload.get("suggested_pilots") or [None])[0]
     if not next_pilot:
@@ -195,6 +208,13 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
                 "purpose": "write reporter-ready outreach copy and maintainer tracking commands for active pilots",
             }
         )
+        commands.append(
+            {
+                "name": "export pilot handoff",
+                "command": build_pilot_handoff_command(args),
+                "purpose": "write shareable per-pilot folders with reporter materials and maintainer commands",
+            }
+        )
         if active_pilot["status"] == "prepared":
             commands.append(
                 {
@@ -244,6 +264,11 @@ def build_command_sequence(gaps_payload: dict, active_pilot: dict | None, args: 
                         f"--report {args.pilot_board_report}"
                     ),
                     "purpose": "verify the prepared pilot is tracked but not counted as usage proof",
+                },
+                {
+                    "name": "export pilot handoff",
+                    "command": build_pilot_handoff_command(args),
+                    "purpose": "write shareable per-pilot folders with reporter materials and maintainer commands",
                 },
             ]
         )
@@ -411,6 +436,7 @@ def main() -> int:
     parser.add_argument("--pilot-record-dir", default=DEFAULT_PILOT_RECORD_DIR_TEXT, help="Prepared-pilot tracking directory")
     parser.add_argument("--pilot-board-report", default=DEFAULT_PILOT_BOARD_REPORT_TEXT, help="Pilot board Markdown path")
     parser.add_argument("--usage-report", default=DEFAULT_USAGE_REPORT_TEXT, help="Usage records Markdown path")
+    parser.add_argument("--pilot-handoff-out", default=DEFAULT_PILOT_HANDOFF_OUT_TEXT, help="Pilot handoff output directory")
     parser.add_argument("--pilot-pack-out", default="/tmp/NEXT_EXTERNAL_PILOT_PACK.md", help="Pilot pack output path for the next prepare command")
     parser.add_argument("--issue-out", default="/tmp/NEXT_EXTERNAL_USAGE_ISSUE_DRAFT.md", help="Issue draft output path for the next prepare command")
     parser.add_argument("--report", default=DEFAULT_REPORT.as_posix(), help="Proof-next Markdown path")
