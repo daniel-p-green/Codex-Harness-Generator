@@ -31,9 +31,21 @@ class UsageEvidenceLintWorkflowTests(unittest.TestCase):
         self.assertIn("--include-comments", text)
         self.assertIn("--lint-only", text)
         self.assertIn('ISSUE_NUMBER="${ISSUE_NUMBER##*/}"', text)
-        self.assertIn("usage-lint-issue-number.txt", text)
+        self.assertIn("usage-lint-results/issues.tsv", text)
+        self.assertIn("usage-lint-results/$ISSUE_NUMBER.json", text)
         self.assertNotIn("--no-write", text)
         self.assertNotIn("--json > usage-lint.json\n          python scripts/codex_harness.py usage-from-github-issue", text)
+
+    def test_workflow_dispatch_can_lint_all_open_pilots(self):
+        text = self.workflow_text()
+
+        self.assertIn("all-open-pilots", text)
+        self.assertIn('if [ "$ISSUE_SELECTOR" = "all-open-pilots" ]; then', text)
+        self.assertIn("gh issue list", text)
+        self.assertIn('--state open', text)
+        self.assertIn('startswith("External usage pilot:")', text)
+        self.assertIn("usage-lint-results/open-pilot-issues.txt", text)
+        self.assertIn("while IFS=$'\\t' read -r ISSUE_NUMBER ISSUE_SELECTOR", text)
 
     def test_workflow_upserts_marker_managed_comment(self):
         text = self.workflow_text()
@@ -41,7 +53,8 @@ class UsageEvidenceLintWorkflowTests(unittest.TestCase):
         self.assertIn("<!-- codex-harness-usage-lint -->", text)
         self.assertIn("gh api -X PATCH", text)
         self.assertIn("gh issue comment", text)
-        self.assertIn("usage-lint-comment.md", text)
+        self.assertIn("usage-lint-results/$ISSUE_NUMBER-comment.md", text)
+        self.assertIn("usage-lint-results/", text)
         self.assertRegex(text, re.compile(r"issues:\s+write"))
 
 

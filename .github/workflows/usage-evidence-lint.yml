@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
     inputs:
       issue:
-        description: GitHub issue number or URL to lint
+        description: GitHub issue number or URL to lint, or all-open-pilots
         required: true
 
 permissions:
@@ -60,41 +60,67 @@ jobs:
           if [ -z "$ISSUE_SELECTOR" ]; then
             ISSUE_SELECTOR="$WORKFLOW_ISSUE"
           fi
-          ISSUE_NUMBER="$ISSUE_SELECTOR"
-          if [[ "$ISSUE_NUMBER" == https://github.com/* ]]; then
-            ISSUE_NUMBER="${ISSUE_NUMBER##*/}"
+          mkdir -p usage-lint-results
+          : > usage-lint-results/issues.tsv
+
+          if [ "$ISSUE_SELECTOR" = "all-open-pilots" ]; then
+            gh issue list \
+              --repo "$GITHUB_REPOSITORY" \
+              --state open \
+              --json number,title \
+              --jq '.[] | select(.title | startswith("External usage pilot:")) | .number' \
+              > usage-lint-results/open-pilot-issues.txt
+            while IFS= read -r ISSUE_NUMBER; do
+              [ -n "$ISSUE_NUMBER" ] || continue
+              printf "%s\t%s\n" "$ISSUE_NUMBER" "$ISSUE_NUMBER" >> usage-lint-results/issues.tsv
+            done < usage-lint-results/open-pilot-issues.txt
+          else
+            ISSUE_NUMBER="$ISSUE_SELECTOR"
+            if [[ "$ISSUE_NUMBER" == https://github.com/* ]]; then
+              ISSUE_NUMBER="${ISSUE_NUMBER##*/}"
+            fi
+            printf "%s\t%s\n" "$ISSUE_NUMBER" "$ISSUE_SELECTOR" >> usage-lint-results/issues.tsv
           fi
-          echo "$ISSUE_SELECTOR" > usage-lint-issue.txt
-          echo "$ISSUE_NUMBER" > usage-lint-issue-number.txt
-          python scripts/codex_harness.py usage-from-github-issue "$ISSUE_SELECTOR" \
-            --repo "$GITHUB_REPOSITORY" \
-            --include-comments \
-            --pilot-record-dir Docs/Environment/pilot-records \
-            --pilot-board-report Docs/Environment/PILOT_BOARD.md \
-            --lint-only \
-            --json > usage-lint.json
-          echo "lint_exit=$?" >> "$GITHUB_ENV"
+
+          while IFS=$'\t' read -r ISSUE_NUMBER ISSUE_SELECTOR; do
+            [ -n "$ISSUE_NUMBER" ] || continue
+            python scripts/codex_harness.py usage-from-github-issue "$ISSUE_SELECTOR" \
+              --repo "$GITHUB_REPOSITORY" \
+              --include-comments \
+              --pilot-record-dir Docs/Environment/pilot-records \
+              --pilot-board-report Docs/Environment/PILOT_BOARD.md \
+              --lint-only \
+              --json > "usage-lint-results/$ISSUE_NUMBER.json"
+            echo "$?" > "usage-lint-results/$ISSUE_NUMBER.exit"
+          done < usage-lint-results/issues.tsv
           exit 0
 
       - name: Format lint comment
-        run: python scripts/format_usage_lint_comment.py usage-lint.json --out usage-lint-comment.md
+        run: |
+          while IFS=$'\t' read -r ISSUE_NUMBER ISSUE_SELECTOR; do
+            [ -n "$ISSUE_NUMBER" ] || continue
+            python scripts/format_usage_lint_comment.py \
+              "usage-lint-results/$ISSUE_NUMBER.json" \
+              --out "usage-lint-results/$ISSUE_NUMBER-comment.md"
+          done < usage-lint-results/issues.tsv
 
       - name: Upsert lint comment
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          ISSUE_SELECTOR="$(cat usage-lint-issue.txt)"
-          ISSUE_NUMBER="$(cat usage-lint-issue-number.txt)"
-          COMMENT_ID="$(gh api "repos/$GITHUB_REPOSITORY/issues/$ISSUE_NUMBER/comments" \
-            --jq '.[] | select(.body | contains("<!-- codex-harness-usage-lint -->")) | .id' | tail -n 1)"
-          if [ -n "$COMMENT_ID" ]; then
-            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$COMMENT_ID" \
-              -f "body=$(cat usage-lint-comment.md)" >/dev/null
-          else
-            gh issue comment "$ISSUE_SELECTOR" \
-              --repo "$GITHUB_REPOSITORY" \
-              --body-file usage-lint-comment.md
-          fi
+          while IFS=$'\t' read -r ISSUE_NUMBER ISSUE_SELECTOR; do
+            [ -n "$ISSUE_NUMBER" ] || continue
+            COMMENT_ID="$(gh api "repos/$GITHUB_REPOSITORY/issues/$ISSUE_NUMBER/comments" \
+              --jq '.[] | select(.body | contains("<!-- codex-harness-usage-lint -->")) | .id' | tail -n 1)"
+            if [ -n "$COMMENT_ID" ]; then
+              gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$COMMENT_ID" \
+                -f "body=$(cat "usage-lint-results/$ISSUE_NUMBER-comment.md")" >/dev/null
+            else
+              gh issue comment "$ISSUE_SELECTOR" \
+                --repo "$GITHUB_REPOSITORY" \
+                --body-file "usage-lint-results/$ISSUE_NUMBER-comment.md"
+            fi
+          done < usage-lint-results/issues.tsv
 
       - name: Upload lint payload
         if: always()
@@ -102,6 +128,5 @@ jobs:
         with:
           name: usage-evidence-lint
           path: |
-            usage-lint.json
-            usage-lint-comment.md
+            usage-lint-results/
           if-no-files-found: ignore
