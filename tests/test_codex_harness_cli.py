@@ -216,6 +216,20 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_usage_validate_delegates_to_validator(self):
+        command, _ = self.run_cli(["usage-validate", "--record-dir", "/tmp/records", "--json"])
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/validate_usage_records.py",
+                "--record-dir",
+                "/tmp/records",
+                "--json",
+            ],
+            command,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

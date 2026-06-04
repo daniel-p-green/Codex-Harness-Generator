@@ -250,6 +250,12 @@ python scripts/codex_harness.py usage-record \
   --privacy-review "No secrets, personal data, proprietary source, or local paths included."
 ```
 
+Validate checked-in usage records before release:
+
+```bash
+python scripts/codex_harness.py usage-validate
+```
+
 The wrapper is intentionally thin. It delegates to the underlying scripts so
 advanced users can still call `scripts/generate_minimal_harness.py`,
 `scripts/run_create_acceptance.py`, `scripts/run_evals.py`, and the individual
@@ -286,6 +292,7 @@ Common subcommands:
 | `source-freshness` | `check_source_freshness.py` | Confirms official OpenAI source URLs are reachable. |
 | `semantic-alignment` | `check_semantic_alignment.py` | Checks local guidance against official Codex doc concepts. |
 | `usage-record` | `record_usage_case.py` | Records sanitized generated-harness usage evidence. |
+| `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema and privacy checks. |
 | `snapshot` | `record_eval_snapshot.py` | Records an eval trend snapshot. |
 
 ## Presets

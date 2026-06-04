@@ -177,6 +177,10 @@ def main() -> int:
                 else []
             ),
             run_step(
+                "usage_records_validate",
+                [python, "scripts/validate_usage_records.py", "--json"],
+            ),
+            run_step(
                 "unit_and_mutation_tests",
                 [python, "-m", "unittest", "discover", "-s", "tests", "-q"],
             ),
@@ -203,6 +207,7 @@ def main() -> int:
                     "scripts/run_live_example_task_trials.py",
                     "scripts/simulate_create_trigger.py",
                     "scripts/smoke_generated_harness.py",
+                    "scripts/validate_usage_records.py",
                     "tests/test_create_acceptance.py",
                     "tests/test_create_trigger_contract.py",
                     "tests/test_codex_harness_cli.py",
@@ -214,6 +219,7 @@ def main() -> int:
                     "tests/test_run_evals.py",
                     "tests/test_semantic_alignment.py",
                     "tests/test_source_freshness.py",
+                    "tests/test_validate_usage_records.py",
                 ],
             ),
         ]

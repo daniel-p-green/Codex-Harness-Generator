@@ -129,6 +129,14 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("record_usage_case.py", command)
 
+    if args.command == "usage-validate":
+        command = []
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.json:
+            command.append("--json")
+        return python_script("validate_usage_records.py", command)
+
     if args.command == "snapshot":
         return python_script("record_eval_snapshot.py", [])
 
@@ -193,6 +201,10 @@ def make_parser() -> argparse.ArgumentParser:
     usage.add_argument("--report", help="Usage-record Markdown report path")
     usage.add_argument("--force", action="store_true", help="Replace existing record with same slug")
     usage.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    usage_validate = subparsers.add_parser("usage-validate", help="Validate checked-in generated-harness usage evidence")
+    usage_validate.add_argument("--record-dir", help="Directory where usage record JSON files are read")
+    usage_validate.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     subparsers.add_parser("snapshot", help="Record an eval trend snapshot")
 
