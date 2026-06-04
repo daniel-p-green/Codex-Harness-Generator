@@ -721,6 +721,30 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("export_pilot_outreach.py", command)
 
+    if args.command == "pilot-handoff":
+        command = []
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.usage_record_dir:
+            command.extend(["--usage-record-dir", args.usage_record_dir])
+        if args.usage_report:
+            command.extend(["--usage-report", args.usage_report])
+        if args.pilot_board_report:
+            command.extend(["--pilot-board-report", args.pilot_board_report])
+        if args.out:
+            command.extend(["--out", args.out])
+        for status in args.status or []:
+            command.extend(["--status", status])
+        for slug in args.slug or []:
+            command.extend(["--slug", slug])
+        if args.force:
+            command.append("--force")
+        if args.no_write:
+            command.append("--no-write")
+        if args.json:
+            command.append("--json")
+        return python_script("export_pilot_handoff.py", command)
+
     if args.command == "beta-exit-audit":
         command = []
         if args.record_dir:
@@ -1360,6 +1384,18 @@ def make_parser() -> argparse.ArgumentParser:
     pilot_outreach.add_argument("--slug", action="append", help="Pilot slug to include; repeatable")
     pilot_outreach.add_argument("--no-write", action="store_true", help="Do not write the Markdown outreach packet")
     pilot_outreach.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    pilot_handoff = subparsers.add_parser("pilot-handoff", help="Write shareable handoff folders from active pilot records")
+    pilot_handoff.add_argument("--record-dir", help="Directory where prepared pilot JSON records are read")
+    pilot_handoff.add_argument("--usage-record-dir", help="Directory where usage record JSON files are read")
+    pilot_handoff.add_argument("--usage-report", help="Usage-record Markdown report path for conversion commands")
+    pilot_handoff.add_argument("--pilot-board-report", help="Pilot-board Markdown report path for tracking commands")
+    pilot_handoff.add_argument("--out", help="Output directory for handoff folders")
+    pilot_handoff.add_argument("--status", choices=["completed", "converted", "dropped", "invited", "prepared"], action="append", help="Pilot status to include; repeatable")
+    pilot_handoff.add_argument("--slug", action="append", help="Pilot slug to include; repeatable")
+    pilot_handoff.add_argument("--force", action="store_true", help="Replace output directory contents")
+    pilot_handoff.add_argument("--no-write", action="store_true", help="Preview without writing handoff folders")
+    pilot_handoff.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     beta_exit_audit = subparsers.add_parser("beta-exit-audit", help="Write a non-gating beta-exit readiness audit")
     beta_exit_audit.add_argument("--record-dir", help="Directory where usage record JSON files are read")

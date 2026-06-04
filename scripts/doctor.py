@@ -166,6 +166,7 @@ def check_installable_cli() -> tuple[dict, dict]:
     pilot_board_step = next((step for step in payload["steps"] if step["name"] == "pilot_board"), {})
     pilot_update_step = next((step for step in payload["steps"] if step["name"] == "pilot_update"), {})
     pilot_outreach_step = next((step for step in payload["steps"] if step["name"] == "pilot_outreach"), {})
+    pilot_handoff_step = next((step for step in payload["steps"] if step["name"] == "pilot_handoff"), {})
     usage_from_issue_pilot_conversion_step = next(
         (step for step in payload["steps"] if step["name"] == "usage_from_issue_pilot_conversion"), {}
     )
@@ -178,7 +179,7 @@ def check_installable_cli() -> tuple[dict, dict]:
     if failed:
         detail = f"failed at {failed['name']}"
     else:
-        detail = "profiles={profiles} doctor={doctor_status} init=pass quickstart={quickstart_status} prepare_pilot={prepare_pilot_status} init_from_project={init_from_project_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} equivalence={equivalence_status} upstream_drift={upstream_drift_status} local_eval={local_eval_status} public_usage_report={public_usage_report_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue_lint={usage_from_issue_lint_status} usage_from_issue_preview={usage_from_issue_preview_status} usage_from_issue={usage_from_issue_status} prepare_next_pilot={prepare_next_pilot_status} prepare_pilot_batch={prepare_pilot_batch_status} pilot_board={pilot_board_status} pilot_update={pilot_update_status} pilot_outreach={pilot_outreach_status} usage_from_issue_pilot_conversion={usage_from_issue_pilot_conversion_status} usage_gaps={usage_gaps_status} beta_exit_audit={beta_exit_audit_status} pilot_campaign={pilot_campaign_status} proof_next={proof_next_status} migration_audit={migration_status} prepare_migration={prepare_migration_status} eval=pass".format(
+        detail = "profiles={profiles} doctor={doctor_status} init=pass quickstart={quickstart_status} prepare_pilot={prepare_pilot_status} init_from_project={init_from_project_status} validate={validate_status} inspect={inspect_status} adoption_plan={adoption_status} equivalence={equivalence_status} upstream_drift={upstream_drift_status} local_eval={local_eval_status} public_usage_report={public_usage_report_status} evidence_packet={evidence_packet_status} pilot_pack={pilot_pack_status} usage_from_harness={usage_from_harness_status} usage_from_issue_lint={usage_from_issue_lint_status} usage_from_issue_preview={usage_from_issue_preview_status} usage_from_issue={usage_from_issue_status} prepare_next_pilot={prepare_next_pilot_status} prepare_pilot_batch={prepare_pilot_batch_status} pilot_board={pilot_board_status} pilot_update={pilot_update_status} pilot_outreach={pilot_outreach_status} pilot_handoff={pilot_handoff_status} usage_from_issue_pilot_conversion={usage_from_issue_pilot_conversion_status} usage_gaps={usage_gaps_status} beta_exit_audit={beta_exit_audit_status} pilot_campaign={pilot_campaign_status} proof_next={proof_next_status} migration_audit={migration_status} prepare_migration={prepare_migration_status} eval=pass".format(
             profiles=profile_step.get("profile_count", "unknown"),
             doctor_status=doctor_step.get("status", "unknown"),
             quickstart_status=quickstart_step.get("status", "unknown"),
@@ -202,6 +203,7 @@ def check_installable_cli() -> tuple[dict, dict]:
             pilot_board_status=pilot_board_step.get("status", "unknown"),
             pilot_update_status=pilot_update_step.get("status", "unknown"),
             pilot_outreach_status=pilot_outreach_step.get("status", "unknown"),
+            pilot_handoff_status=pilot_handoff_step.get("status", "unknown"),
             usage_from_issue_pilot_conversion_status=usage_from_issue_pilot_conversion_step.get("status", "unknown"),
             usage_gaps_status=usage_gaps_step.get("status", "unknown"),
             beta_exit_audit_status=beta_exit_audit_step.get("status", "unknown"),
