@@ -55,7 +55,7 @@ are missing or TOML is invalid.
 for sensitive path restrictions. FAIL if an agent claims to be read-only while
 using a write-capable sandbox.
 
-**3. Skill frontmatter validity**: Every `.agents/skills/*/SKILL.md` must have
+**3. Skill metadata validity**: Every `.agents/skills/*/SKILL.md` must have
 `name` and `description`. Check description quality: states WHAT + WHEN, includes
 3+ trigger phrases, and includes negative triggers if name is ambiguous. FAIL if
 description is too vague or missing required trigger guidance.
@@ -304,7 +304,7 @@ FAIL if cumulative > 250 for any area. WARN if parent > 80.
 **52. Override declarations for name collisions**: For every component name
 that appears both at the parent and in any area (same rule filename, same agent
 name, same skill folder), the per-area version must declare
-`overrides: <parent-component-name>` in frontmatter. FAIL if a collision exists
+`overrides: <parent-component-name>` in its component metadata. FAIL if a collision exists
 without the override declaration. This catches unintentional shadowing.
 
 **53. Cross-area routing discipline**: Per-area routing tables must not contain

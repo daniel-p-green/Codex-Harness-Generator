@@ -55,7 +55,7 @@ These actions are local, reversible, and low-risk:
 - Run linters and formatters (`ruff`, `mypy`, `prettier`)
 - Run build commands (`npm run build`)
 - Search the codebase (grep, glob, find)
-- Search the web for documentation
+- Use configured web or docs sources; ask the parent session before going outside the network allowlist
 - Write to `Docs/` directory (wiki, working state, retro logs)
 - Edit `.codex/` files (rules, agents, skills)
 - Create git branches

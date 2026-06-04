@@ -8,7 +8,7 @@ inlining their content.
 ## Why slim
 
 Profiles must NOT inline agent definitions, rule bodies, skill specs, or full
-permission JSON -- those already live as generator-read templates
+permission-profile TOML -- those already live as generator-read templates
 (`Docs/Templates/Agents|Core|Optional|Skills/`) and the shared
 `Docs/Templates/References/ecosystem-permissions.md`. Inlining them is dead
 duplication the generator never reads. Keep only what is *domain-specific* and

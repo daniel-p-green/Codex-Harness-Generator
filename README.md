@@ -42,7 +42,7 @@ The full run takes about 10-20 minutes including the interview.
 
 | Command | What it does |
 |---------|-------------|
-| `/validate-environment` | Structural + quality check of an existing harness (references resolve, Codex TOML and skill frontmatter are valid, sizes, routing, hub registry) |
+| `/validate-environment` | Structural + quality check of an existing harness (references resolve, Codex TOML and SKILL.md metadata are valid, sizes, routing, hub registry) |
 | `/upgrade-environment` | Audits an existing harness against current best practices, interviews you about pain points, and implements the improvements you approve (including single <-> multi-area-hub conversions) |
 | `/update` | Refreshes the Generator's own best-practices knowledge base (web research, or a local-only mode that just ingests the `ProvideKnowledge` folder) |
 
@@ -88,6 +88,7 @@ your-project/
 |   |-- config.toml              # Model, sandbox, permissions, skills, agents, MCP, hooks
 |   |-- rules/                   # Orchestration, autonomy, context, self-learning, errors
 |   |-- agents/                  # Specialized AI agents for your domain
+|-- .agents/
 |   |-- skills/                  # Triggerable skills: state-save, state-load, update, health-check
 |-- Docs/
     |-- GETTING_STARTED.md       # Plain-language guide for your team
@@ -123,6 +124,18 @@ The Harness Generator uses an orchestrator + subagent pattern with 5 agents:
 
 All agent output is written to disk (artifact-first), keeping the main context lean.
 
+## Quality gates
+
+Run the full eval gate before publishing changes:
+
+```bash
+python scripts/run_evals.py
+```
+
+This runs the static Codex port evaluator, generated-harness fixture evaluator,
+offline generated-harness smoke checks, mutation tests, and compile checks. See
+`Docs/Environment/CONTINUOUS_IMPROVEMENT.md` for the escaped-issue protocol.
+
 ## Project structure
 
 ```
@@ -131,6 +144,7 @@ Codex-Harness-Generator/
 |-- .codex/
 |   |-- rules/                          # 4 rules (creator-core, intake-protocol, generation-standards, quality-gates)
 |   |-- agents/                         # 5 agents (interviewer, architect, generator, validator, upgrade-analyzer)
+|-- .agents/
 |   |-- skills/                         # 4 skills (create, validate-environment, upgrade-environment, update)
 |-- Docs/
     |-- AgentGuidelines/                # Best-practices knowledge base (18 topics)

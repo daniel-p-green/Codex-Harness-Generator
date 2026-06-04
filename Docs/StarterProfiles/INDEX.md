@@ -125,7 +125,7 @@ Profiles are NOT copied verbatim. They provide:
 
 Follow the slim format spec: `PROFILE_FORMAT.md`. In short, a profile is a
 *starting point the architect adapts* -- it lists component **names + template
-pointers** (never inlined agent YAML, rule bodies, or full permission JSON;
+pointers** (never inlined agent TOML, rule bodies, or full permission-profile TOML;
 those live in `Docs/Templates/` and `Docs/Templates/References/ecosystem-permissions.md`),
 plus the domain-specific parts that are NOT derivable from a template: the
 routing table (10-16 rows), self-learning seeds (4-6), customization points, and

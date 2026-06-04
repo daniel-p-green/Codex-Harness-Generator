@@ -35,7 +35,7 @@ The primary command is `/create`. It launches a multi-stage pipeline that takes 
    - **Pass 4 -- Infrastructure:** Memory scaffold, self-learning scaffold, state management templates
    - **Pass 5 -- Documentation:** GETTING_STARTED.md, VERSION.md, cross-reference verification
 
-5. **Validation.** The environment-validator agent runs the validation checklist (see Docs/Templates/References/validation-guide.md -- the single source of truth) covering structural correctness (file references, Codex TOML validity, skill frontmatter validity), routing and logic checks (routing coverage, state-save/load symmetry, contradictions), size and quality checks (line limits, cross-references, no role-setting prompts), and completeness checks (GETTING_STARTED.md, VCS ignore guidance, intent behind rules). The validator also runs a Phase-0 drift audit and boundary-crossing checks. Critical failures trigger a fix-and-revalidate cycle (up to 2 retries).
+5. **Validation.** The environment-validator agent runs the validation checklist (see Docs/Templates/References/validation-guide.md -- the single source of truth) covering structural correctness (file references, Codex TOML validity, SKILL.md metadata validity), routing and logic checks (routing coverage, state-save/load symmetry, contradictions), size and quality checks (line limits, cross-references, no role-setting prompts), and completeness checks (GETTING_STARTED.md, VCS ignore guidance, intent behind rules). The validator also runs a Phase-0 drift audit and boundary-crossing checks. Critical failures trigger a fix-and-revalidate cycle (up to 2 retries).
 
 6. **Summary.** The orchestrator presents what was generated, how to get started, and smoke test instructions (start the environment, send a greeting, try /state-save, try /health-check, ask a domain question, request a small task).
 
@@ -268,7 +268,7 @@ Quality is enforced through four mechanisms:
 
 2. **Quality gates** (`.codex/rules/03-quality-gates.md`) -- Pre-generation checks (directory writability, existing files), a file preview gate before writing, and the post-generation validation checklist (see validation-guide.md).
 
-3. **The validator agent** -- Runs structural checks (file existence, Codex TOML validity, skill frontmatter validity), logic checks (routing coverage, state symmetry, contradictions), size checks, and functional checks (skill triggering tests). Produces a graded report.
+3. **The validator agent** -- Runs structural checks (file existence, Codex TOML validity, SKILL.md metadata validity), logic checks (routing coverage, state symmetry, contradictions), size checks, and functional checks (skill triggering tests). Produces a graded report.
 
 4. **Anti-overengineering** -- A principle enforced throughout: generate only what the intake justifies. If the intake does not mention VCS, no VCS rules. If the user is solo, no team coordination. If the project is simple, use Lite memory tier. Every component must trace back to a stated need or a core best-practice requirement.
 

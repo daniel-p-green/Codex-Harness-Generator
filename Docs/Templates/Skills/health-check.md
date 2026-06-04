@@ -126,7 +126,7 @@ Date: YYYY-MM-DD
 | AGENTS.md references | PASS/WARN/FAIL | ... |
 | .codex/config.toml valid | PASS/WARN/FAIL | ... |
 | Skill folder naming | PASS/WARN/FAIL | ... |
-| Agent frontmatter | PASS/WARN/FAIL | ... |
+| Agent TOML schema | PASS/WARN/FAIL | ... |
 | Wiki index exists | PASS/WARN/FAIL | ... |
 
 ### Semantic Checks (LLM)

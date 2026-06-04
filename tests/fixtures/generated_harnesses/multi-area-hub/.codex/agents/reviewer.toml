@@ -1,0 +1,9 @@
+name = "reviewer"
+description = "Reviews hub-level changes for area routing, shared rules, tests, and security risks."
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+developer_instructions = """
+Review hub-level harness artifacts. Verify area routing and shared-boundary claims against files. Do not modify files. Call out security, privacy, and cross-area leakage risks first.
+"""
+

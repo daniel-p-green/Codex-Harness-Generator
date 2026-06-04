@@ -31,7 +31,7 @@ traceability after the original file is removed.
 
 | Date Added | Source | Type | Summary | Model Scope | BP Sections | Removed |
 |---|---|---|---|---|---|---|
-| 2026-02-14 | developers.openai.com/codex | Web/Tier 1 | Complete Codex documentation: settings schema, 14 hook events, skill/agent frontmatter specs, memory hierarchy, permission syntax, environment variables | All Codex | 1-20 | 2026-03-04 |
+| 2026-02-14 | developers.openai.com/codex | Web/Tier 1 | Complete Codex documentation: config schema, hook events, SKILL.md metadata, agent TOML schemas, memory hierarchy, permission syntax, environment variables | All Codex | 1-20 | 2026-03-04 |
 | 2026-02-14 | developers.openai.com/codex (context engineering) | Web/Tier 1 | Context engineering strategies: smallest set of high-signal tokens, progressive disclosure, structured notes, sub-agent architectures for context rot | All Codex | 6, 5, 14 | 2026-03-04 |
 | 2026-02-14 | developers.openai.com/codex (agent skills) | Web/Tier 1 | Skill authoring: 3-level progressive disclosure, trigger phrase requirements, SKILL.md under 500 lines, scripts for deterministic ops | All Codex | 3 | 2026-03-04 |
 | 2026-02-14 | developers.openai.com/codex (multi-agent research) | Web/Tier 1 | Multi-agent architecture: GPT-5.5 lead + medium-effort GPT-5.5 workers, 90% improvement over single agent, token usage explains 80% of performance, artifact-first handoff | GPT-5.5 4.5+, medium-effort GPT-5.5 4.5+ | 2, 4, 19 | 2026-03-04 |

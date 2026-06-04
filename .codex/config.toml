@@ -8,7 +8,6 @@ default_permissions = "codex-harness-generator"
 
 [features]
 multi_agent = true
-hooks = true
 memories = true
 apps = true
 
@@ -57,12 +56,18 @@ enabled = true
 description = "Workspace write access for generating Codex harness files, with sensitive and destructive operations denied."
 extends = ":workspace"
 
+[permissions.codex-harness-generator.filesystem]
+glob_scan_max_depth = 4
+
 [permissions.codex-harness-generator.filesystem.":workspace_roots"]
 "." = "write"
 "**/.env" = "deny"
 "**/.env.*" = "deny"
 "**/*secret*" = "deny"
 "**/*token*" = "deny"
+"**/*credential*" = "deny"
+"**/*.pem" = "deny"
+"**/*.key" = "deny"
 
 [permissions.codex-harness-generator.network]
 enabled = true

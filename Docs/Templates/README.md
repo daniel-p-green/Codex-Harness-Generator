@@ -31,7 +31,7 @@ Templates/
   README.md              # This file
   Core/                  # 14 core component references (always generated)
   Optional/              # 10 optional component references (generated when applicable)
-  Agents/                # 9 agent templates with full frontmatter
+  Agents/                # 9 agent templates with full TOML schemas
   Skills/                # 5 skill templates with progressive disclosure
 ```
 

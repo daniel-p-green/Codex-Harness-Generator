@@ -63,7 +63,7 @@ metadata:
 
 <!-- DETERMINISTIC LAYER
   WHY: "Code is deterministic; language interpretation isn't." Structural checks
-  (file exists, JSON is valid, frontmatter has required fields) should be done
+  (file exists, TOML parses, SKILL.md metadata has required fields) should be done
   by a script, not by LLM reasoning. Scripts are faster, cheaper, and more reliable.
 -->
 

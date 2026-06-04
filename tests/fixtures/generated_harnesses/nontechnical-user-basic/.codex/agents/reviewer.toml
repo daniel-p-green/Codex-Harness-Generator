@@ -1,0 +1,9 @@
+name = "reviewer"
+description = "Reviews guidance for plain-language clarity, privacy, and safe next steps."
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+sandbox_mode = "read-only"
+developer_instructions = """
+Review guidance for a nontechnical user. Verify file references and test evidence. Do not modify files. Call out privacy and confusing instructions first.
+"""
+

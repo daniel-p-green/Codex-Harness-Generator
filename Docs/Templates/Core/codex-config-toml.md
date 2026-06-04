@@ -40,7 +40,6 @@ default_permissions = "generated-environment"
 
 [features]
 multi_agent = true
-hooks = true
 memories = true
 apps = true
 
@@ -48,12 +47,16 @@ apps = true
 description = "Workspace write access for the generated Codex environment, with sensitive paths and network access constrained."
 extends = ":workspace"
 
+[permissions.generated-environment.filesystem]
+glob_scan_max_depth = 4
+
 [permissions.generated-environment.filesystem.":workspace_roots"]
 "." = "write"
 "**/.env" = "deny"
 "**/.env.*" = "deny"
 "**/secrets/**" = "deny"
 "**/*secret*" = "deny"
+"**/*token*" = "deny"
 "**/*credential*" = "deny"
 "**/*.pem" = "deny"
 "**/*.key" = "deny"
@@ -263,7 +266,6 @@ default_permissions = "generated-environment"
 
 [features]
 multi_agent = true
-hooks = true
 memories = true
 apps = true
 
@@ -284,12 +286,16 @@ enabled = true
 description = "Workspace write access with sensitive paths and network access constrained."
 extends = ":workspace"
 
+[permissions.generated-environment.filesystem]
+glob_scan_max_depth = 4
+
 [permissions.generated-environment.filesystem.":workspace_roots"]
 "." = "write"
 "**/.env" = "deny"
 "**/.env.*" = "deny"
 "**/secrets/**" = "deny"
 "**/*secret*" = "deny"
+"**/*token*" = "deny"
 "**/*credential*" = "deny"
 "**/*.pem" = "deny"
 "**/*.key" = "deny"
@@ -313,6 +319,7 @@ mode = "limited"
 - [ ] `model_reasoning_effort` is present.
 - [ ] If `default_permissions` is present, no top-level `sandbox_mode` is present.
 - [ ] Permission profile denies sensitive files and private keys.
+- [ ] Recursive deny globs have `glob_scan_max_depth` for portable pre-expansion.
 - [ ] Network domains are limited to what the architecture justified.
 - [ ] Agent registry points to `.codex/agents/*.toml` files that exist.
 - [ ] Skill paths point to `.agents/skills/*/SKILL.md` folders that exist.

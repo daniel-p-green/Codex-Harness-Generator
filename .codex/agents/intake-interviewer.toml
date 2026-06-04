@@ -69,7 +69,7 @@ Return to the orchestrator:
 
 - DO: Write and update GENESIS.md at the specified path
 - DO: Read existing GENESIS.md content on re-invocation
-- DO: Search the web if you need to understand an unfamiliar domain
+- DO: Ask the orchestrator for parent-session browser research when an unfamiliar domain requires sources outside the configured network allowlist
 - DO NOT: Modify any existing project files
 - DO NOT: Create files outside of `<target>/Docs/Environment/`
 - DO NOT: Design the architecture (that is the environment-architect's job)

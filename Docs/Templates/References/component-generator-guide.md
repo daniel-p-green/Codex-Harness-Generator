@@ -92,7 +92,7 @@ Key requirements:
 - Each skill folder uses kebab-case naming.
 - NO README.md inside skill folders.
 - SKILL.md must be under 500 lines and 5,000 words.
-- SKILL.md frontmatter must include: `name` and `description` with 3+ trigger phrases
+- SKILL.md metadata must include: `name` and `description` with 3+ trigger phrases
   and clear negative triggers when another skill could be confused.
 - Critical instructions go at the TOP of SKILL.md with ## Critical or ## Important headers.
 - Skills with side effects must state explicit invocation triggers and safety checks.
@@ -213,7 +213,7 @@ Key requirements:
 - Parent AGENTS.md must NOT duplicate instructions that belong in per-area AGENTS.md (area-specific routing, domain vocabulary, etc.).
 - Cross-area routing at the parent must only direct the user to switch focus to a different area -- it must not encode any area's internal file structure.
 
-Per-area passes (pass_number `<area-slug>:1` through `<area-slug>:5`) run the normal Pass 1-5 spec above, writing under `<target>/<area-slug>/` instead of `<target>/`. Any component declared in HUB_ARCHITECTURE.md's Shared Skills/Agents is skipped at the area level unless the area's manifest lists it as an override (frontmatter `overrides: <parent-component-name>`).
+Per-area passes (pass_number `<area-slug>:1` through `<area-slug>:5`) run the normal Pass 1-5 spec above, writing under `<target>/<area-slug>/` instead of `<target>/`. Any component declared in HUB_ARCHITECTURE.md's Shared Skills/Agents is skipped at the area level unless the area's manifest lists it as an override (`overrides: <parent-component-name>` in component metadata).
 
 ## Vocabulary Adaptation
 

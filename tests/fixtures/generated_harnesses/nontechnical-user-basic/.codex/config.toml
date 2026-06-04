@@ -1,0 +1,43 @@
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+model_verbosity = "medium"
+approval_policy = "on-request"
+default_permissions = "nontechnical-user"
+
+[agents]
+max_threads = 3
+max_depth = 1
+
+[agents.reviewer]
+description = "Reviews nontechnical-user outputs for clarity, safety, and privacy risk."
+config_file = "agents/reviewer.toml"
+
+[[skills.config]]
+path = "../.agents/skills/health-check"
+enabled = true
+
+[permissions.nontechnical-user]
+description = "Workspace write access with sensitive files denied."
+extends = ":workspace"
+
+[permissions.nontechnical-user.filesystem]
+glob_scan_max_depth = 4
+
+[permissions.nontechnical-user.filesystem.":workspace_roots"]
+"." = "write"
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"**/*secret*" = "deny"
+"**/*token*" = "deny"
+"**/*credential*" = "deny"
+"**/*.pem" = "deny"
+"**/*.key" = "deny"
+
+[permissions.nontechnical-user.network]
+enabled = true
+mode = "limited"
+
+[permissions.nontechnical-user.network.domains]
+"developers.openai.com" = "allow"
+"docs.github.com" = "allow"
+

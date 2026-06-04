@@ -19,6 +19,8 @@ OFFICIAL_SOURCE_TEXT = """
 - https://developers.openai.com/codex/guides/agents-md
 - https://developers.openai.com/codex/config-reference
 - https://developers.openai.com/codex/subagents
+- https://developers.openai.com/codex/permissions
+- https://developers.openai.com/codex/skills
 - https://developers.openai.com/api/docs/guides/reasoning
 """
 
@@ -84,12 +86,58 @@ def build_green_repo(root: Path) -> None:
         max_threads = 6
         max_depth = 1
 
+        [agents.intake-interviewer]
+        description = "Conducts project intake."
+        config_file = "agents/intake-interviewer.toml"
+
+        [agents.environment-architect]
+        description = "Designs Codex environment architecture."
+        config_file = "agents/environment-architect.toml"
+
+        [agents.component-generator]
+        description = "Generates Codex environment files."
+        config_file = "agents/component-generator.toml"
+
+        [agents.environment-validator]
+        description = "Validates generated Codex environments."
+        config_file = "agents/environment-validator.toml"
+
+        [agents.upgrade-analyzer]
+        description = "Audits existing Codex environments."
+        config_file = "agents/upgrade-analyzer.toml"
+
+        [[skills.config]]
+        path = "../.agents/skills/create"
+        enabled = true
+
+        [[skills.config]]
+        path = "../.agents/skills/validate-environment"
+        enabled = true
+
+        [[skills.config]]
+        path = "../.agents/skills/upgrade-environment"
+        enabled = true
+
+        [[skills.config]]
+        path = "../.agents/skills/update"
+        enabled = true
+
         [permissions.project-default]
         description = "Project permissions."
         extends = ":workspace"
 
+        [permissions.project-default.filesystem]
+        glob_scan_max_depth = 4
+
         [permissions.project-default.filesystem.":workspace_roots"]
         "." = "write"
+        "**/.env" = "deny"
+        "**/.env.*" = "deny"
+        "**/*secret*" = "deny"
+        "**/*token*" = "deny"
+        "**/*credential*" = "deny"
+        "**/*.pem" = "deny"
+        "**/*.key" = "deny"
 
         [permissions.project-default.network]
         enabled = true
@@ -120,7 +168,7 @@ def build_green_repo(root: Path) -> None:
             f"""
             ---
             name: {skill_name}
-            description: Use for Codex harness {skill_name} workflows.
+            description: Runs Codex harness {skill_name} workflows with deterministic setup and validation steps. Use when the user explicitly asks for {skill_name}, harness setup, harness validation, harness upgrade, or knowledge refresh work.
             ---
 
             Run the deterministic workflow for this Codex harness task.
@@ -237,6 +285,88 @@ class EvalCodexPortTests(unittest.TestCase):
             lambda root: write(root / "Docs/Environment/CODEX_PORT_EVALUATION.md", "# Empty\n")
         )
         self.assert_fails_check(failures, "official_source")
+
+    def test_invalid_root_reasoning_effort_fails(self):
+        def mutate(root: Path) -> None:
+            path = root / ".codex/config.toml"
+            text = path.read_text(encoding="utf-8")
+            path.write_text(text.replace('model_reasoning_effort = "medium"', 'model_reasoning_effort = "huge"'), encoding="utf-8")
+
+        failures = self.run_eval(mutate)
+        self.assert_fails_check(failures, "codex_config_reasoning")
+
+    def test_missing_skills_config_target_fails(self):
+        def mutate(root: Path) -> None:
+            path = root / ".codex/config.toml"
+            text = path.read_text(encoding="utf-8")
+            text = text.replace('path = "../.agents/skills/update"', 'path = "../.agents/skills/missing"')
+            path.write_text(text, encoding="utf-8")
+
+        failures = self.run_eval(mutate)
+        self.assert_fails_check(failures, "codex_config_skills")
+
+    def test_missing_agent_registry_target_fails(self):
+        def mutate(root: Path) -> None:
+            path = root / ".codex/config.toml"
+            text = path.read_text(encoding="utf-8")
+            text = text.replace('config_file = "agents/upgrade-analyzer.toml"', 'config_file = "agents/missing.toml"')
+            path.write_text(text, encoding="utf-8")
+
+        failures = self.run_eval(mutate)
+        self.assert_fails_check(failures, "agent_registry")
+
+    def test_agent_name_mismatch_fails(self):
+        def mutate(root: Path) -> None:
+            path = root / ".codex/agents/upgrade-analyzer.toml"
+            text = path.read_text(encoding="utf-8")
+            path.write_text(text.replace('name = "upgrade-analyzer"', 'name = "wrong-agent"'), encoding="utf-8")
+
+        failures = self.run_eval(mutate)
+        self.assert_fails_check(failures, "agent_schema")
+
+    def test_missing_skill_metadata_fails(self):
+        def mutate(root: Path) -> None:
+            write(root / ".agents/skills/update/SKILL.md", "# Update\n")
+
+        failures = self.run_eval(mutate)
+        self.assert_fails_check(failures, "skill_metadata")
+
+    def test_recursive_deny_without_glob_depth_fails(self):
+        def mutate(root: Path) -> None:
+            path = root / ".codex/config.toml"
+            text = path.read_text(encoding="utf-8")
+            text = text.replace("[permissions.project-default.filesystem]\nglob_scan_max_depth = 4\n\n", "")
+            path.write_text(text, encoding="utf-8")
+
+        failures = self.run_eval(mutate)
+        self.assert_fails_check(failures, "codex_config_permissions")
+
+    def test_agent_web_search_requires_broad_network_policy(self):
+        def mutate(root: Path) -> None:
+            path = root / ".codex/agents/intake-interviewer.toml"
+            text = path.read_text(encoding="utf-8")
+            text = text.replace("Do focused Codex work", "Search the web when needed. Do focused Codex work")
+            path.write_text(text, encoding="utf-8")
+
+        failures = self.run_eval(mutate)
+        self.assert_fails_check(failures, "agent_network_policy")
+
+    def test_hooks_enabled_without_hooks_config_fails(self):
+        def mutate(root: Path) -> None:
+            path = root / ".codex/config.toml"
+            text = path.read_text(encoding="utf-8")
+            text = text.replace("[agents]\n", "[features]\nhooks = true\n\n[agents]\n")
+            path.write_text(text, encoding="utf-8")
+
+        failures = self.run_eval(mutate)
+        self.assert_fails_check(failures, "codex_config_hooks")
+
+    def test_legacy_text_in_python_source_fails(self):
+        def mutate(root: Path) -> None:
+            write(root / "scripts/example.py", "print('Use WebSearch here')\n")
+
+        failures = self.run_eval(mutate)
+        self.assert_fails_check(failures, "forbidden_text")
 
 
 if __name__ == "__main__":

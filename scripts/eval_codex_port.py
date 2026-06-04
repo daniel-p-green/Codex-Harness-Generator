@@ -13,20 +13,59 @@ import json
 import os
 import re
 import sys
-import tomllib
 from pathlib import Path
+
+try:
+    import tomllib
+except ModuleNotFoundError:  # Python 3.10 support for the Homebrew pytest shim.
+    import tomli as tomllib
 
 
 TEXT_SUFFIXES = {
+    ".bash",
+    ".cjs",
+    ".fish",
+    ".js",
+    ".jsx",
     ".md",
+    ".mjs",
     ".json",
+    ".ps1",
+    ".py",
+    ".sh",
     ".toml",
+    ".ts",
+    ".tsx",
     ".yaml",
     ".yml",
     ".txt",
+    ".zsh",
 }
 
 SKIP_DIRS = {".git", "__pycache__", ".pytest_cache"}
+SKIP_FORBIDDEN_TEXT_PATHS = {
+    "scripts/eval_codex_port.py",
+    "scripts/eval_generated_harness.py",
+    "tests/test_eval_codex_port.py",
+    "tests/test_generated_harness_contract.py",
+}
+REASONING_EFFORT_VALUES = {"minimal", "low", "medium", "high", "xhigh"}
+MODEL_VERBOSITY_VALUES = {"low", "medium", "high"}
+APPROVAL_POLICY_VALUES = {"untrusted", "on-request", "never"}
+SANDBOX_MODE_VALUES = {"read-only", "workspace-write", "danger-full-access"}
+BUILT_IN_PERMISSION_PROFILES = {":read-only", ":workspace", ":danger-full-access"}
+PROJECT_LOCAL_IGNORED_KEYS = {
+    "openai_base_url",
+    "chatgpt_base_url",
+    "apps_mcp_product_sku",
+    "model_provider",
+    "model_providers",
+    "notify",
+    "profile",
+    "profiles",
+    "experimental_realtime_ws_base_url",
+    "otel",
+}
 
 FORBIDDEN_PATTERNS = [
     (r"\bClaude\b", "Claude naming remains"),
@@ -48,11 +87,15 @@ FORBIDDEN_PATTERNS = [
     (r"\banthropic\b", "legacy lowercase platform reference remains"),
     (r"ANTHROPIC_", "legacy provider environment variable remains"),
     (r"\.codex/\.codex", "duplicated Codex config path remains"),
+    (r"\.codex/skills", "Codex skills must live under .agents/skills"),
     (r"\.codexignore", "unsupported legacy ignore file remains"),
     (r"settings-json", "legacy settings-json check name remains"),
     (r"\.codex/config\.toml[^.\n]*(valid|invalid|contains invalid) JSON", "Codex TOML described as JSON"),
     (r"valid JSON[^.\n]*\.codex/config\.toml", "Codex TOML described as JSON"),
     (r"\bYAML frontmatter\b", "legacy agent YAML schema remains"),
+    (r"\bagent YAML\b", "legacy agent YAML schema remains"),
+    (r"\bagent templates? with full frontmatter\b", "legacy agent frontmatter schema remains"),
+    (r"\bagent frontmatter\b", "legacy agent frontmatter schema remains"),
     (r"\bfrontmatter\b[^.\n]*runtime budget", "legacy agent frontmatter schema remains"),
     (r"\bruntime budget\b", "legacy agent runtime budget field remains"),
     (r"\bdisallowedTools\b", "legacy agent tool blacklist field remains"),
@@ -94,6 +137,7 @@ FORBIDDEN_PATTERNS = [
     (r"Write\(\./", "legacy Write(...) permission syntax remains"),
     (r"Bash\(", "legacy Bash(...) permission syntax remains"),
     (r'"permissions"\s*:', "legacy JSON permissions block remains"),
+    (r"\bpermission JSON\b", "legacy JSON permission schema remains"),
     (r"permissions\.allow", "legacy JSON permissions field remains"),
     (r"\ballow lists?\b", "legacy permission allow-list wording remains"),
     (r"\ballowed commands\b", "legacy command allow-list wording remains"),
@@ -142,6 +186,8 @@ OFFICIAL_DOC_URLS = [
     "https://developers.openai.com/codex/guides/agents-md",
     "https://developers.openai.com/codex/config-reference",
     "https://developers.openai.com/codex/subagents",
+    "https://developers.openai.com/codex/permissions",
+    "https://developers.openai.com/codex/skills",
     "https://developers.openai.com/api/docs/guides/reasoning",
 ]
 
@@ -150,11 +196,22 @@ def rel(path: Path, root: Path) -> str:
     return path.relative_to(root).as_posix()
 
 
+def is_text_candidate(path: Path) -> bool:
+    if path.suffix in TEXT_SUFFIXES:
+        return True
+    if path.suffix:
+        return False
+    try:
+        return path.read_bytes()[:2] == b"#!"
+    except OSError:
+        return False
+
+
 def iter_text_files(root: Path):
     for path in sorted(root.rglob("*")):
         if any(part in SKIP_DIRS for part in path.parts):
             continue
-        if path.is_file() and path.suffix in TEXT_SUFFIXES:
+        if path.is_file() and is_text_candidate(path):
             yield path
 
 
@@ -189,6 +246,9 @@ def check_forbidden_text(root: Path) -> list[dict]:
     failures = []
     compiled = [(re.compile(pattern), message) for pattern, message in FORBIDDEN_PATTERNS]
     for path in iter_text_files(root):
+        relative = rel(path, root)
+        if relative in SKIP_FORBIDDEN_TEXT_PATHS:
+            continue
         text = read_text(path)
         for line_no, line in enumerate(text.splitlines(), 1):
             for pattern, message in compiled:
@@ -196,7 +256,7 @@ def check_forbidden_text(root: Path) -> list[dict]:
                     failures.append(
                         {
                             "check": "forbidden_text",
-                            "path": rel(path, root),
+                            "path": relative,
                             "line": line_no,
                             "message": message,
                             "text": line.strip()[:220],
@@ -249,6 +309,82 @@ def check_official_sources(root: Path) -> list[dict]:
     return failures
 
 
+def parse_skill_metadata(text: str) -> dict[str, str]:
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return {}
+
+    metadata = {}
+    for line in lines[1:]:
+        if line.strip() == "---":
+            return metadata
+        if ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        metadata[key.strip()] = value.strip().strip('"')
+    return {}
+
+
+def check_skill_contracts(root: Path) -> list[dict]:
+    failures = []
+    skills_root = root / ".agents/skills"
+    if not skills_root.exists():
+        return failures
+
+    for skill_path in sorted(skills_root.glob("*/SKILL.md")):
+        relative = rel(skill_path, root)
+        metadata = parse_skill_metadata(read_text(skill_path))
+        name = metadata.get("name")
+        description = metadata.get("description", "")
+
+        if not name:
+            failures.append(
+                {
+                    "check": "skill_metadata",
+                    "path": relative,
+                    "message": "Skill must declare name in its SKILL.md metadata block.",
+                }
+            )
+        elif name != skill_path.parent.name:
+            failures.append(
+                {
+                    "check": "skill_metadata",
+                    "path": relative,
+                    "message": f"Skill name must match directory name: expected {skill_path.parent.name}, found {name}.",
+                }
+            )
+
+        if not description:
+            failures.append(
+                {
+                    "check": "skill_metadata",
+                    "path": relative,
+                    "message": "Skill must declare description in its SKILL.md metadata block.",
+                }
+            )
+        elif len(description) < 80 or "Use when" not in description:
+            failures.append(
+                {
+                    "check": "skill_metadata",
+                    "path": relative,
+                    "message": "Skill description should state what it does and include explicit trigger guidance with 'Use when'.",
+                }
+            )
+
+    return failures
+
+
+def has_broad_web_access(config: dict) -> bool:
+    default_permissions = config.get("default_permissions")
+    if not default_permissions or default_permissions in BUILT_IN_PERMISSION_PROFILES:
+        return default_permissions == ":danger-full-access"
+
+    permissions = config.get("permissions", {})
+    profile = permissions.get(default_permissions, {})
+    domains = profile.get("network", {}).get("domains", {})
+    return domains.get("*") == "allow"
+
+
 def check_toml_contracts(root: Path) -> list[dict]:
     failures = []
     config_path = root / ".codex/config.toml"
@@ -264,6 +400,16 @@ def check_toml_contracts(root: Path) -> list[dict]:
         )
         return failures
 
+    ignored_keys = sorted(PROJECT_LOCAL_IGNORED_KEYS & set(config))
+    for key in ignored_keys:
+        failures.append(
+            {
+                "check": "codex_config_scope",
+                "path": ".codex/config.toml",
+                "message": f"Project-local Codex config cannot override machine-local key: {key}",
+            }
+        )
+
     if config.get("model") != "gpt-5.5":
         failures.append(
             {
@@ -272,12 +418,57 @@ def check_toml_contracts(root: Path) -> list[dict]:
                 "message": "Project config must pin model = \"gpt-5.5\".",
             }
         )
-    if "model_reasoning_effort" not in config:
+    effort = config.get("model_reasoning_effort")
+    if effort is None:
         failures.append(
             {
                 "check": "codex_config_reasoning",
                 "path": ".codex/config.toml",
                 "message": "Project config must set model_reasoning_effort.",
+            }
+        )
+    elif effort not in REASONING_EFFORT_VALUES:
+        failures.append(
+            {
+                "check": "codex_config_reasoning",
+                "path": ".codex/config.toml",
+                "message": f"Invalid model_reasoning_effort: {effort}",
+            }
+        )
+    verbosity = config.get("model_verbosity")
+    if verbosity is not None and verbosity not in MODEL_VERBOSITY_VALUES:
+        failures.append(
+            {
+                "check": "codex_config_model_verbosity",
+                "path": ".codex/config.toml",
+                "message": f"Invalid model_verbosity: {verbosity}",
+            }
+        )
+    approval_policy = config.get("approval_policy")
+    if isinstance(approval_policy, str):
+        if approval_policy not in APPROVAL_POLICY_VALUES:
+            failures.append(
+                {
+                    "check": "codex_config_approval_policy",
+                    "path": ".codex/config.toml",
+                    "message": f"Invalid approval_policy: {approval_policy}",
+                }
+            )
+    elif isinstance(approval_policy, dict):
+        if not isinstance(approval_policy.get("granular"), dict):
+            failures.append(
+                {
+                    "check": "codex_config_approval_policy",
+                    "path": ".codex/config.toml",
+                    "message": "Granular approval_policy must contain a granular table.",
+                }
+            )
+    elif approval_policy is not None:
+        failures.append(
+            {
+                "check": "codex_config_approval_policy",
+                "path": ".codex/config.toml",
+                "message": "approval_policy must be a string or granular policy table.",
             }
         )
     if "sandbox_mode" in config and "default_permissions" in config:
@@ -310,6 +501,106 @@ def check_toml_contracts(root: Path) -> list[dict]:
             }
         )
 
+    permissions = config.get("permissions", {})
+    for profile_name, profile in permissions.items():
+        filesystem = profile.get("filesystem", {}) if isinstance(profile, dict) else {}
+        workspace_rules = filesystem.get(":workspace_roots", {})
+        deny_patterns = [
+            pattern
+            for pattern, access in workspace_rules.items()
+            if isinstance(pattern, str) and access == "deny"
+        ]
+        if any("**" in pattern for pattern in deny_patterns) and "glob_scan_max_depth" not in filesystem:
+            failures.append(
+                {
+                    "check": "codex_config_permissions",
+                    "path": ".codex/config.toml",
+                    "message": f"Permission profile {profile_name} uses recursive deny globs without filesystem.glob_scan_max_depth.",
+                }
+            )
+        joined_patterns = "\n".join(deny_patterns).lower()
+        for sensitive_token in [".env", "secret", "token", "credential", ".pem", ".key"]:
+            if sensitive_token not in joined_patterns:
+                failures.append(
+                    {
+                        "check": "codex_config_permissions",
+                        "path": ".codex/config.toml",
+                        "message": f"Permission profile {profile_name} should deny sensitive pattern containing {sensitive_token}.",
+                    }
+                )
+
+    features = config.get("features", {})
+    if (
+        isinstance(features, dict)
+        and features.get("hooks") is True
+        and "hooks" not in config
+        and not (root / ".codex/hooks.json").exists()
+    ):
+        failures.append(
+            {
+                "check": "codex_config_hooks",
+                "path": ".codex/config.toml",
+                "message": "features.hooks is true but no hooks.json or inline [hooks] config exists.",
+            }
+        )
+
+    skills_config = config.get("skills", {}).get("config", [])
+    if skills_config and not isinstance(skills_config, list):
+        failures.append(
+            {
+                "check": "codex_config_skills",
+                "path": ".codex/config.toml",
+                "message": "skills.config must be an array of skill config objects.",
+            }
+        )
+        skills_config = []
+    for index, skill_config in enumerate(skills_config, 1):
+        if not isinstance(skill_config, dict):
+            failures.append(
+                {
+                    "check": "codex_config_skills",
+                    "path": ".codex/config.toml",
+                    "message": f"skills.config entry {index} must be an object.",
+                }
+            )
+            continue
+        skill_path = skill_config.get("path")
+        enabled = skill_config.get("enabled")
+        if not isinstance(skill_path, str):
+            failures.append(
+                {
+                    "check": "codex_config_skills",
+                    "path": ".codex/config.toml",
+                    "message": f"skills.config entry {index} must include a string path.",
+                }
+            )
+            continue
+        if enabled is not None and not isinstance(enabled, bool):
+            failures.append(
+                {
+                    "check": "codex_config_skills",
+                    "path": ".codex/config.toml",
+                    "message": f"skills.config entry {index} enabled must be boolean when present.",
+                }
+            )
+        resolved_skill_path = (config_path.parent / skill_path).resolve()
+        if not resolved_skill_path.exists():
+            failures.append(
+                {
+                    "check": "codex_config_skills",
+                    "path": ".codex/config.toml",
+                    "message": f"skills.config path does not exist: {skill_path}",
+                }
+            )
+        elif not (resolved_skill_path / "SKILL.md").is_file():
+            failures.append(
+                {
+                    "check": "codex_config_skills",
+                    "path": ".codex/config.toml",
+                    "message": f"skills.config path lacks SKILL.md: {skill_path}",
+                }
+            )
+
     def find_nested_default_permissions(value, path=()):
         nested = []
         if isinstance(value, dict):
@@ -337,6 +628,32 @@ def check_toml_contracts(root: Path) -> list[dict]:
         "model_reasoning_effort",
         "sandbox_mode",
     }
+    agents_section = config.get("agents", {})
+    registry_agent_paths = {}
+    for agent_key, agent_config in agents_section.items():
+        if not isinstance(agent_config, dict):
+            continue
+        config_file = agent_config.get("config_file")
+        if not isinstance(config_file, str):
+            failures.append(
+                {
+                    "check": "agent_registry",
+                    "path": ".codex/config.toml",
+                    "message": f"Agent registry entry {agent_key} must include config_file.",
+                }
+            )
+            continue
+        resolved_agent_path = (config_path.parent / config_file).resolve()
+        registry_agent_paths[resolved_agent_path] = agent_key
+        if not resolved_agent_path.is_file():
+            failures.append(
+                {
+                    "check": "agent_registry",
+                    "path": ".codex/config.toml",
+                    "message": f"Agent registry config_file does not exist for {agent_key}: {config_file}",
+                }
+            )
+
     for agent_path in sorted((root / ".codex/agents").glob("*.toml")):
         relative = rel(agent_path, root)
         try:
@@ -359,12 +676,57 @@ def check_toml_contracts(root: Path) -> list[dict]:
                     "message": f"Missing Codex subagent fields: {', '.join(missing)}",
                 }
             )
+        agent_name = agent.get("name")
+        if agent_name and agent_name != agent_path.stem:
+            failures.append(
+                {
+                    "check": "agent_schema",
+                    "path": relative,
+                    "message": f"Agent name must match filename stem: expected {agent_path.stem}, found {agent_name}.",
+                }
+            )
+        registry_key = registry_agent_paths.get(agent_path.resolve())
+        if registry_key and agent_name and agent_name != registry_key:
+            failures.append(
+                {
+                    "check": "agent_registry",
+                    "path": ".codex/config.toml",
+                    "message": f"Agent registry key {registry_key} does not match agent name {agent_name}.",
+                }
+            )
         if agent.get("model") != "gpt-5.5":
             failures.append(
                 {
                     "check": "agent_model",
                     "path": relative,
                     "message": "Codex subagent must use model = \"gpt-5.5\" unless the port contract is updated.",
+                }
+            )
+        agent_effort = agent.get("model_reasoning_effort")
+        if agent_effort and agent_effort not in REASONING_EFFORT_VALUES:
+            failures.append(
+                {
+                    "check": "agent_schema",
+                    "path": relative,
+                    "message": f"Invalid agent model_reasoning_effort: {agent_effort}",
+                }
+            )
+        sandbox_mode = agent.get("sandbox_mode")
+        if sandbox_mode and sandbox_mode not in SANDBOX_MODE_VALUES:
+            failures.append(
+                {
+                    "check": "agent_schema",
+                    "path": relative,
+                    "message": f"Invalid agent sandbox_mode: {sandbox_mode}",
+                }
+            )
+        instructions = agent.get("developer_instructions", "")
+        if "Search the web" in instructions and not has_broad_web_access(config):
+            failures.append(
+                {
+                    "check": "agent_network_policy",
+                    "path": relative,
+                    "message": "Agent asks to search the web, but the default permission profile does not allow broad web access.",
                 }
             )
     return failures
@@ -390,14 +752,44 @@ def check_embedded_toml_blocks(root: Path) -> list[dict]:
             )
             continue
         for index, block in enumerate(blocks, 1):
+            body = block.group("body")
             try:
-                tomllib.loads(block.group("body"))
+                parsed = tomllib.loads(body)
             except Exception as exc:
                 failures.append(
                     {
                         "check": "embedded_agent_toml",
                         "path": relative,
                         "message": f"Invalid embedded TOML block {index}: {exc}",
+                    }
+                )
+                continue
+            missing = sorted(
+                {
+                    "name",
+                    "description",
+                    "developer_instructions",
+                    "model",
+                    "model_reasoning_effort",
+                    "sandbox_mode",
+                }
+                - set(parsed)
+            )
+            if missing:
+                failures.append(
+                    {
+                        "check": "embedded_agent_toml",
+                        "path": relative,
+                        "message": f"Embedded agent TOML block {index} is missing required fields: {', '.join(missing)}",
+                    }
+                )
+            effort = parsed.get("model_reasoning_effort")
+            if effort and effort not in REASONING_EFFORT_VALUES:
+                failures.append(
+                    {
+                        "check": "embedded_agent_toml",
+                        "path": relative,
+                        "message": f"Embedded agent TOML block {index} has invalid model_reasoning_effort: {effort}",
                     }
                 )
     return failures
@@ -409,6 +801,7 @@ def collect_failures(root: Path) -> list[dict]:
     failures.extend(check_forbidden_text(root))
     failures.extend(check_required_concepts(root))
     failures.extend(check_official_sources(root))
+    failures.extend(check_skill_contracts(root))
     failures.extend(check_toml_contracts(root))
     failures.extend(check_embedded_toml_blocks(root))
     return failures

@@ -13,6 +13,8 @@ The port is grounded in these OpenAI sources:
 - https://developers.openai.com/codex/guides/agents-md
 - https://developers.openai.com/codex/config-reference
 - https://developers.openai.com/codex/subagents
+- https://developers.openai.com/codex/permissions
+- https://developers.openai.com/codex/skills
 - https://developers.openai.com/api/docs/guides/reasoning
 
 ## Required Runtime Surface
@@ -71,6 +73,6 @@ Passing the script is necessary, not sufficient. Before release, manually inspec
 - `AGENTS.md` for concise project instructions without stale platform terms.
 - `.codex/config.toml` for valid TOML and intended model/permission settings.
 - `.codex/agents/*.toml` for valid Codex subagent schemas.
-- `.agents/skills/*/SKILL.md` for Codex skill frontmatter and triggering text.
+- `.agents/skills/*/SKILL.md` for Codex skill metadata and triggering text.
 - `Docs/Templates/Core/*` and `Docs/Templates/References/*` for generated-output
   consistency.

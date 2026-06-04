@@ -19,8 +19,8 @@ adapts*, not a self-contained environment dump. It points at generator-read
 templates rather than inlining their content. Read
 `Docs/StarterProfiles/PROFILE_FORMAT.md` first -- it is the authoritative format
 spec for both collections, and it explains why inlining agent definitions, rule
-bodies, skill specs, or full permission JSON is dead duplication the generator
-never reads.
+bodies, skill specs, or full permission-profile TOML is dead duplication the
+generator never reads.
 
 **To add a profile:**
 

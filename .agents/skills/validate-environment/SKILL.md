@@ -1,6 +1,6 @@
 ---
 name: validate-environment
-description: Validates an existing Codex environment against structural correctness and quality standards (file references resolve, frontmatter is valid, size limits hold, routing is complete, hub registry matches disk). Use when user says "validate environment", "check my environment", "is my setup correct", "validate my config", "audit my environment", "run the validator", or "/validate-environment". Do NOT use for creating new environments or for best-practice upgrade recommendations (use /upgrade-environment for the latter).
+description: Validates an existing Codex environment against structural correctness and quality standards (file references resolve, SKILL.md metadata is valid, size limits hold, routing is complete, hub registry matches disk). Use when user says "validate environment", "check my environment", "is my setup correct", "validate my config", "audit my environment", "run the validator", or "/validate-environment". Do NOT use for creating new environments or for best-practice upgrade recommendations (use /upgrade-environment for the latter).
 ---
 
 ## Critical
