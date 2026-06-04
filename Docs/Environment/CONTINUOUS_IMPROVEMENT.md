@@ -28,6 +28,12 @@ and what remains outside the proven scope.
 
 The GitHub Actions workflow `.github/workflows/evals.yml` runs the same gate on pull requests, pushes to `main`, manual dispatch, and a weekly schedule.
 
+The GitHub Actions workflow `.github/workflows/usage-evidence-lint.yml` runs a
+lint-only public usage-evidence check on `[usage]`, `External usage pilot:`, and
+`usage-evidence` issues/comments. It upserts one marker-managed readiness
+comment with missing fields and evidence counts; it does not write usage records
+or count as adoption proof.
+
 For a local live smoke check against the Codex CLI, run:
 
 ```bash

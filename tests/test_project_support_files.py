@@ -4,6 +4,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ISSUE_TEMPLATE_ROOT = REPO_ROOT / ".github" / "ISSUE_TEMPLATE"
+WORKFLOW_ROOT = REPO_ROOT / ".github" / "workflows"
 ROADMAP = REPO_ROOT / "Docs" / "Environment" / "ROADMAP.md"
 
 
@@ -15,6 +16,20 @@ class ProjectSupportFilesTests(unittest.TestCase):
             "external-usage-report.yml",
         ):
             self.assertTrue((ISSUE_TEMPLATE_ROOT / filename).is_file(), filename)
+
+    def test_usage_evidence_lint_workflow_exists(self):
+        text = (WORKFLOW_ROOT / "usage-evidence-lint.yml").read_text(encoding="utf-8")
+
+        for phrase in (
+            "Usage Evidence Lint",
+            "usage-from-github-issue",
+            "--include-comments",
+            "--lint-only",
+            "format_usage_lint_comment.py",
+            "codex-harness-usage-lint",
+            "issues: write",
+        ):
+            self.assertIn(phrase, text)
 
     def test_bug_report_template_requests_reproduction_and_privacy_review(self):
         text = (ISSUE_TEMPLATE_ROOT / "bug-report.yml").read_text(encoding="utf-8")

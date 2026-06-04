@@ -113,6 +113,10 @@ replacement. What is proven today:
 - GitHub Actions runs the release gate on Python 3.10, 3.11, and 3.12, matching
   the advertised package classifiers, and uploads the JSON gate payload for
   each version.
+- GitHub Actions also lints public usage-evidence issues and reporter comments
+  through `codex-harness usage-from-github-issue --include-comments --lint-only`,
+  then upserts a marker-managed readiness comment without writing usage records
+  or counting lint as adoption proof.
 - `scripts/record_eval_snapshot.py` records eval-gate snapshots under
   `Docs/Environment/eval-history/` and updates `Docs/Environment/EVAL_TRENDS.md`.
 - `scripts/check_source_freshness.py` verifies official OpenAI documentation
@@ -191,6 +195,10 @@ replacement. What is proven today:
   with `gh`, optionally include reporter comments, then reuse the same lint,
   preview, conversion, privacy, and pilot-board validation path as
   `usage-from-issue`.
+- `.github/workflows/usage-evidence-lint.yml` runs that GitHub issue lint path
+  automatically for `[usage]`, `External usage pilot:`, and `usage-evidence`
+  issues/comments, then updates one `codex-harness-usage-lint` comment with
+  missing fields, evidence counts, and the claim boundary.
 - `scripts/prepare_pilot.py` and `codex-harness prepare-pilot` combine
   brief-based quickstart generation with an external pilot pack and issue-body
   draft, so the next beta-exit pilot can be prepared with one command before a
@@ -673,6 +681,10 @@ python scripts/codex_harness.py usage-from-github-issue <issue-number-or-url> \
 follow-up files, and `gh issue comment --body-file ...` commands for waiting
 issues. `pilot-next-action` writes `Docs/Environment/PILOT_NEXT_ACTION.md` and
 prints the single next maintainer command from that same live readiness check.
+The `Usage Evidence Lint` GitHub Action runs the same lint-only importer path on
+public usage issues and reporter comments, updating one marker-managed issue
+comment with readiness, missing fields, and evidence counts. It never writes a
+usage record and does not make the issue adoption proof.
 Post follow-ups only when the selected action is still missing public-safe
 evidence, verification, privacy, or limitation fields. Maintainer follow-ups
 carry a hidden marker so they do not count as reporter evidence and do not get

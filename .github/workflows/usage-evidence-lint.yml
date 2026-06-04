@@ -1,0 +1,98 @@
+name: Usage Evidence Lint
+
+on:
+  issues:
+    types:
+      - opened
+      - edited
+      - labeled
+  issue_comment:
+    types:
+      - created
+      - edited
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: GitHub issue number or URL to lint
+        required: true
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  lint:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      startsWith(github.event.issue.title, 'External usage pilot:') ||
+      startsWith(github.event.issue.title, '[usage]') ||
+      contains(github.event.issue.labels.*.name, 'usage-evidence')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime dependencies
+        run: python -m pip install .
+
+      - name: Lint usage evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW_ISSUE: ${{ inputs.issue }}
+          EVENT_ISSUE: ${{ github.event.issue.number }}
+        run: |
+          set +e
+          ISSUE_SELECTOR="$EVENT_ISSUE"
+          if [ -z "$ISSUE_SELECTOR" ]; then
+            ISSUE_SELECTOR="$WORKFLOW_ISSUE"
+          fi
+          ISSUE_NUMBER="$ISSUE_SELECTOR"
+          if [[ "$ISSUE_NUMBER" == https://github.com/* ]]; then
+            ISSUE_NUMBER="${ISSUE_NUMBER##*/}"
+          fi
+          echo "$ISSUE_SELECTOR" > usage-lint-issue.txt
+          echo "$ISSUE_NUMBER" > usage-lint-issue-number.txt
+          python scripts/codex_harness.py usage-from-github-issue "$ISSUE_SELECTOR" \
+            --repo "$GITHUB_REPOSITORY" \
+            --include-comments \
+            --pilot-record-dir Docs/Environment/pilot-records \
+            --pilot-board-report Docs/Environment/PILOT_BOARD.md \
+            --lint-only \
+            --json > usage-lint.json
+          echo "lint_exit=$?" >> "$GITHUB_ENV"
+          exit 0
+
+      - name: Format lint comment
+        run: python scripts/format_usage_lint_comment.py usage-lint.json --out usage-lint-comment.md
+
+      - name: Upsert lint comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ISSUE_SELECTOR="$(cat usage-lint-issue.txt)"
+          ISSUE_NUMBER="$(cat usage-lint-issue-number.txt)"
+          COMMENT_ID="$(gh api "repos/$GITHUB_REPOSITORY/issues/$ISSUE_NUMBER/comments" \
+            --jq '.[] | select(.body | contains("<!-- codex-harness-usage-lint -->")) | .id' | tail -n 1)"
+          if [ -n "$COMMENT_ID" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$COMMENT_ID" \
+              -f "body=$(cat usage-lint-comment.md)" >/dev/null
+          else
+            gh issue comment "$ISSUE_SELECTOR" \
+              --repo "$GITHUB_REPOSITORY" \
+              --body-file usage-lint-comment.md
+          fi
+
+      - name: Upload lint payload
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: usage-evidence-lint
+          path: |
+            usage-lint.json
+            usage-lint-comment.md
+          if-no-files-found: ignore
