@@ -55,6 +55,7 @@ class ProjectSupportFilesTests(unittest.TestCase):
             "installed `codex-harness init --brief` path",
             "source-freshness",
             "semantic-alignment",
+            "short demo capture",
             "do not claim a milestone is done until the linked",
             "proof exists in this repository",
         ):

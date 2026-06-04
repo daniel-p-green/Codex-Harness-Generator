@@ -31,10 +31,11 @@ class CheckCliInstallTests(unittest.TestCase):
 
         self.assertEqual("pass", payload["status"])
         names = [step["name"] for step in payload["steps"]]
-        self.assertEqual(["create_venv", "install_package", "profiles", "doctor", "init", "validate", "migration_audit", "eval"], names)
+        self.assertEqual(["create_venv", "install_package", "profiles", "doctor", "init", "demo_capture", "validate", "migration_audit", "eval"], names)
         self.assertTrue(any("pip" in command and "install" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "doctor" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "init" in command for command in calls))
+        self.assertTrue(any("codex-harness" in command[0] and "demo-capture" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "validate" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "migration-audit" in command for command in calls))
         self.assertTrue(any("--brief" in command for command in calls))

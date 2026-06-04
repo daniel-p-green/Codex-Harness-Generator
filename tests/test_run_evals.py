@@ -46,6 +46,12 @@ class RunEvalsTests(unittest.TestCase):
         self.assertTrue(any(path.endswith("examples/brief-acceptance/rag-quality") for path in paths))
         self.assertTrue(any(path.endswith("examples/brief-acceptance/security-review") for path in paths))
 
+    def test_demo_capture_example_paths_include_checked_in_demo(self):
+        paths = run_evals.demo_capture_example_paths()
+
+        self.assertEqual(1, len(paths))
+        self.assertTrue(paths[0].endswith("examples/demo-capture/rag-quality"))
+
 
 if __name__ == "__main__":
     unittest.main()

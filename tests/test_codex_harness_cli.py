@@ -241,6 +241,49 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_demo_capture_delegates_to_demo_capture_script(self):
+        command, _ = self.run_cli(
+            [
+                "demo-capture",
+                "/tmp/example",
+                "--brief",
+                "RAG app with evals",
+                "--project-name",
+                "RAG Harness",
+                "--notes",
+                "demo",
+                "--limit",
+                "2",
+                "--allow-low-confidence",
+                "--target-label",
+                "examples/demo",
+                "--force",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/run_demo_capture.py",
+                "/tmp/example",
+                "--brief",
+                "RAG app with evals",
+                "--project-name",
+                "RAG Harness",
+                "--notes",
+                "demo",
+                "--limit",
+                "2",
+                "--allow-low-confidence",
+                "--target-label",
+                "examples/demo",
+                "--force",
+                "--json",
+            ],
+            command,
+        )
+
     def test_gate_can_include_live_profile(self):
         command, _ = self.run_cli(["gate", "--codex-live", "--codex-live-profile", "all"])
 

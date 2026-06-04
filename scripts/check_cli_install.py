@@ -55,6 +55,7 @@ def build_payload() -> dict:
         temp_root = Path(temp_dir)
         venv = temp_root / "venv"
         generated = temp_root / "generated"
+        demo_generated = temp_root / "demo-generated"
 
         commands = [
             ("create_venv", [sys.executable, "-m", "venv", "--system-site-packages", venv.as_posix()]),
@@ -82,6 +83,22 @@ def build_payload() -> dict:
                     "RAG app with prompts, evals, and retrieval checks",
                     "--project-name",
                     "Install Smoke RAG Harness",
+                    "--force",
+                    "--json",
+                ],
+            ),
+            (
+                "demo_capture",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "demo-capture",
+                    demo_generated.as_posix(),
+                    "--brief",
+                    "RAG app with prompts, evals, and retrieval checks",
+                    "--project-name",
+                    "Install Smoke Demo Harness",
+                    "--target-label",
+                    "install-smoke-demo",
                     "--force",
                     "--json",
                 ],

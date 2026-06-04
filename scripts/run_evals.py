@@ -17,6 +17,7 @@ DETERMINISTIC_EXAMPLE_ROOT = REPO_ROOT / "examples" / "deterministic"
 CREATE_ACCEPTANCE_EXAMPLE_ROOT = REPO_ROOT / "examples" / "create-acceptance"
 BRIEF_ACCEPTANCE_EXAMPLE_ROOT = REPO_ROOT / "examples" / "brief-acceptance"
 LIVE_CREATE_EXAMPLE_ROOT = REPO_ROOT / "examples" / "live-create"
+DEMO_CAPTURE_EXAMPLE_ROOT = REPO_ROOT / "examples" / "demo-capture"
 
 
 def run_step(name: str, command: list[str]) -> dict:
@@ -85,6 +86,16 @@ def live_create_example_paths() -> list[str]:
     ]
 
 
+def demo_capture_example_paths() -> list[str]:
+    if not DEMO_CAPTURE_EXAMPLE_ROOT.exists():
+        return []
+    return [
+        path.as_posix()
+        for path in sorted(DEMO_CAPTURE_EXAMPLE_ROOT.iterdir())
+        if path.is_dir()
+    ]
+
+
 def create_acceptance_live_paths(profile: str) -> list[str]:
     paths = create_acceptance_example_paths()
     if profile == "all":
@@ -104,8 +115,10 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as temp_dir:
         create_acceptance_target = Path(temp_dir) / "create-acceptance"
         brief_acceptance_target = Path(temp_dir) / "brief-acceptance"
+        demo_capture_target = Path(temp_dir) / "demo-capture"
         live_paths = create_acceptance_live_paths(args.codex_live_profile)
         live_create_paths = live_create_example_paths()
+        demo_capture_paths = demo_capture_example_paths()
         if args.codex_live and not live_paths:
             parser.error(f"No checked-in create-acceptance example found for --codex-live-profile {args.codex_live_profile!r}")
         steps = [
@@ -170,8 +183,35 @@ def main() -> int:
                 ],
             ),
             run_step(
+                "deterministic_demo_capture",
+                [
+                    python,
+                    "scripts/run_demo_capture.py",
+                    demo_capture_target.as_posix(),
+                    "--brief",
+                    "RAG app with prompts, evals, and retrieval checks",
+                    "--project-name",
+                    "Release Gate Demo Harness",
+                    "--json",
+                ],
+            ),
+            run_step(
                 "create_acceptance_example_eval",
                 [python, "scripts/eval_generated_harness.py", "--json", *create_acceptance_example_paths()],
+            ),
+            *(
+                [
+                    run_step(
+                        "demo_capture_example_eval",
+                        [python, "scripts/eval_generated_harness.py", "--json", *demo_capture_paths],
+                    ),
+                    run_step(
+                        "demo_capture_example_smoke",
+                        [python, "scripts/smoke_generated_harness.py", "--json", *demo_capture_paths],
+                    ),
+                ]
+                if demo_capture_paths
+                else []
             ),
             run_step(
                 "create_acceptance_example_smoke",
@@ -256,6 +296,7 @@ def main() -> int:
                     "scripts/record_usage_case.py",
                     "scripts/run_brief_acceptance.py",
                     "scripts/run_create_acceptance.py",
+                    "scripts/run_demo_capture.py",
                     "scripts/run_evals.py",
                     "scripts/run_live_example_task_trials.py",
                     "scripts/simulate_create_trigger.py",

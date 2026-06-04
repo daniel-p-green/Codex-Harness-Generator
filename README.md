@@ -37,9 +37,14 @@ replacement. What is proven today:
 - `scripts/run_create_acceptance.py` stitches the trigger and preset generator
   together in one target, preserving `CREATION_CONTEXT.md`, writing a complete
   harness, and adding `CREATE_ACCEPTANCE_REPORT.md`.
+- `scripts/run_demo_capture.py` creates a short public-safe demo harness from a
+  brief, writes `Docs/Environment/DEMO_CAPTURE.md`, and validates the result so
+  reviewers can inspect profile selection, `AGENTS.md`, and local checks.
 - `examples/create-acceptance/` contains checked-in snapshots of that
   deterministic preset `/create` acceptance flow for every supported profile and
   bundled domain preset.
+- `examples/demo-capture/` contains a checked-in public-safe walkthrough of the
+  brief-driven demo path.
 - Generated harnesses are required to include architecture, assumptions, source
   mapping, manifests, and validation reports.
 - Generated harnesses include `Docs/Environment/EVAL_PLAN.md`, a portable
@@ -69,7 +74,8 @@ replacement. What is proven today:
   support scenarios.
 - `scripts/codex_harness.py` gives users one thin local entry point for
   profile listing, profile descriptions, generation, acceptance, eval, smoke,
-  migration audit, gate, live-trial, source-freshness, and snapshot workflows.
+  migration audit, gate, demo-capture, live-trial, source-freshness, and
+  snapshot workflows.
 - `pyproject.toml` exposes that wrapper as an installable `codex-harness`
   console command, and the release gate smokes the non-editable install path.
 - `scripts/record_eval_snapshot.py` records eval-gate snapshots under
@@ -184,6 +190,10 @@ python scripts/codex_harness.py profiles --details
 python scripts/codex_harness.py recommend "RAG app with prompts, evals, and retrieval checks"
 python scripts/codex_harness.py profile security-audit
 python scripts/codex_harness.py brief-acceptance /tmp/codex-rag-harness \
+  --brief "RAG app with prompts, evals, and retrieval checks" \
+  --project-name "RAG Quality Harness" \
+  --force
+python scripts/codex_harness.py demo-capture /tmp/codex-demo-harness \
   --brief "RAG app with prompts, evals, and retrieval checks" \
   --project-name "RAG Quality Harness" \
   --force

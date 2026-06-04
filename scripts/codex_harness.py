@@ -110,6 +110,24 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("run_brief_acceptance.py", command)
 
+    if args.command == "demo-capture":
+        command = [args.target, "--brief", args.brief]
+        if args.project_name:
+            command.extend(["--project-name", args.project_name])
+        if args.notes:
+            command.extend(["--notes", args.notes])
+        if args.limit is not None:
+            command.extend(["--limit", str(args.limit)])
+        if args.allow_low_confidence:
+            command.append("--allow-low-confidence")
+        if args.target_label:
+            command.extend(["--target-label", args.target_label])
+        if args.force:
+            command.append("--force")
+        if args.json:
+            command.append("--json")
+        return python_script("run_demo_capture.py", command)
+
     if args.command == "eval":
         return python_script("eval_generated_harness.py", args.paths)
 
@@ -313,6 +331,17 @@ def make_parser() -> argparse.ArgumentParser:
     brief_acceptance.add_argument("--target-label", help="Override the target path written inside CREATION_CONTEXT.md")
     brief_acceptance.add_argument("--force", action="store_true", help="Replace target if it already contains files")
     brief_acceptance.add_argument("--json", action="store_true", help="Emit JSON payload")
+
+    demo_capture = subparsers.add_parser("demo-capture", help="Generate and validate a short public-safe demo capture")
+    demo_capture.add_argument("target", help="Target project directory")
+    demo_capture.add_argument("--brief", required=True, help="Short project brief")
+    demo_capture.add_argument("--project-name", help="Human-readable project name")
+    demo_capture.add_argument("--notes", default="short reproducible demo capture", help="Notes for creation context")
+    demo_capture.add_argument("--limit", type=int, default=3, help="Number of profile recommendations to record")
+    demo_capture.add_argument("--allow-low-confidence", action="store_true", help="Allow generation when no profile scores above zero")
+    demo_capture.add_argument("--target-label", help="Override the target path written inside CREATION_CONTEXT.md")
+    demo_capture.add_argument("--force", action="store_true", help="Replace target if it already contains files")
+    demo_capture.add_argument("--json", action="store_true", help="Emit JSON payload")
 
     evaluate = subparsers.add_parser("eval", help="Evaluate generated harness directories")
     evaluate.add_argument("paths", nargs="+", help="Generated harness directory paths")

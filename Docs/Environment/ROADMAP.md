@@ -23,6 +23,7 @@ Already proven:
   examples.
 - Privacy-checked usage-record validation.
 - External usage-report intake.
+- Short deterministic demo capture through `codex-harness demo-capture`.
 
 Still unproven:
 
@@ -56,9 +57,10 @@ The project can stop calling itself a beta only when all of these are true:
    security audit, legal research, financial modeling, hiring pipeline, and
    customer support.
 
-3. Add a short demo capture.
-   Show `codex-harness init --brief`, inspect `PROFILE_SELECTION.md`, run eval,
-   and open the generated `AGENTS.md`.
+3. Record and maintain the short demo capture.
+   Keep `examples/demo-capture/rag-quality` current as the public-safe walkthrough
+   for `codex-harness init --brief`, profile selection, eval, local check, and
+   `AGENTS.md` inspection.
 
 4. Deepen source drift checks.
    Move beyond concept presence when official Codex docs expose stable
