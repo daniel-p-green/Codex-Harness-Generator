@@ -16,7 +16,7 @@ spec.loader.exec_module(check_cli_install)
 
 
 class CheckCliInstallTests(unittest.TestCase):
-    def test_build_payload_smokes_install_generate_and_eval(self):
+    def test_build_payload_smokes_install_init_and_eval(self):
         calls = []
 
         def fake_run(command, cwd=None):
@@ -31,9 +31,10 @@ class CheckCliInstallTests(unittest.TestCase):
 
         self.assertEqual("pass", payload["status"])
         names = [step["name"] for step in payload["steps"]]
-        self.assertEqual(["create_venv", "install_package", "profiles", "generate", "eval"], names)
+        self.assertEqual(["create_venv", "install_package", "profiles", "init", "eval"], names)
         self.assertTrue(any("pip" in command and "install" in command for command in calls))
-        self.assertTrue(any("codex-harness" in command[0] and "generate" in command for command in calls))
+        self.assertTrue(any("codex-harness" in command[0] and "init" in command for command in calls))
+        self.assertTrue(any("--brief" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "eval" in command for command in calls))
 
     def test_profile_count_mismatch_fails(self):

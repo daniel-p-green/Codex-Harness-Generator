@@ -24,6 +24,32 @@ def add_common_generation_args(parser: argparse.ArgumentParser) -> None:
 
 
 def build_command(args: argparse.Namespace) -> list[str]:
+    if args.command == "init":
+        if args.brief:
+            command = [args.target, "--brief", args.brief]
+            if args.project_name:
+                command.extend(["--project-name", args.project_name])
+            if args.notes:
+                command.extend(["--notes", args.notes])
+            if args.limit is not None:
+                command.extend(["--limit", str(args.limit)])
+            if args.allow_low_confidence:
+                command.append("--allow-low-confidence")
+            if args.target_label:
+                command.extend(["--target-label", args.target_label])
+            if args.force:
+                command.append("--force")
+            if args.json:
+                command.append("--json")
+            return python_script("run_brief_acceptance.py", command)
+
+        command = [args.target, "--profile", args.profile]
+        if args.project_name:
+            command.extend(["--project-name", args.project_name])
+        if args.force:
+            command.append("--force")
+        return python_script("generate_minimal_harness.py", command)
+
     if args.command == "profiles":
         if args.details or args.json:
             command = []
@@ -207,6 +233,18 @@ def make_parser() -> argparse.ArgumentParser:
         description="Run common Codex Harness Generator workflows from one entry point.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    init = subparsers.add_parser("init", help="Generate a starter harness from a brief or explicit profile")
+    init.add_argument("target", help="Target project directory")
+    init.add_argument("--brief", help="Short project brief; when present, recommends a profile and runs acceptance")
+    init.add_argument("--profile", default="software-development", help="Starter profile used when --brief is omitted")
+    init.add_argument("--project-name", help="Human-readable project name")
+    init.add_argument("--notes", default="brief-based deterministic init", help="Notes for creation context when --brief is used")
+    init.add_argument("--limit", type=int, default=3, help="Number of profile recommendations to record when --brief is used")
+    init.add_argument("--allow-low-confidence", action="store_true", help="Allow generation when no profile scores above zero")
+    init.add_argument("--target-label", help="Override the target path written inside CREATION_CONTEXT.md")
+    init.add_argument("--force", action="store_true", help="Replace target if it already contains files")
+    init.add_argument("--json", action="store_true", help="Emit JSON payload when --brief is used")
 
     profiles = subparsers.add_parser("profiles", help="List deterministic starter profiles")
     profiles.add_argument("--details", action="store_true", help="Show profile descriptions, first tasks, and guardrails")

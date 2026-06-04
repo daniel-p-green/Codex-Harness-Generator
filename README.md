@@ -134,6 +134,10 @@ cd Codex-Harness-Generator
 # 2. Optional: install the local helper command
 python -m pip install -e .
 codex-harness --help
+codex-harness init /tmp/codex-rag-harness \
+  --brief "RAG app with prompts, evals, and retrieval checks" \
+  --project-name "RAG Quality Harness" \
+  --force
 
 # 3. Launch Codex in the directory
 codex
@@ -154,6 +158,10 @@ harness deterministically:
 ```bash
 python scripts/codex_harness.py profiles
 codex-harness profiles
+codex-harness init /tmp/codex-rag-harness \
+  --brief "RAG app with prompts, evals, and retrieval checks" \
+  --project-name "RAG Quality Harness" \
+  --force
 python scripts/codex_harness.py profiles --details
 python scripts/codex_harness.py recommend "RAG app with prompts, evals, and retrieval checks"
 python scripts/codex_harness.py profile security-audit
@@ -345,6 +353,7 @@ Common subcommands:
 
 | Subcommand | Delegates to | What it proves |
 |---|---|---|
+| `init <target>` | `generate_minimal_harness.py` or `run_brief_acceptance.py` | One-command starter path; add `--brief` to recommend a profile and record `PROFILE_SELECTION.md`. |
 | `profiles` | `generate_minimal_harness.py --list-profiles` or `profile_catalog.py` | Shows supported deterministic starters; add `--details` or `--json` for a chooser-friendly catalog. |
 | `profile <slug>` | `profile_catalog.py` | Describes one deterministic starter, including first tasks and domain guardrails. |
 | `recommend <brief>` | `profile_catalog.py` | Recommends deterministic starters from a short project brief using explainable keyword matches, confidence labels, and low-confidence guidance. |

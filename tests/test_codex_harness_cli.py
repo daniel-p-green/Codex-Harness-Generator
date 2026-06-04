@@ -36,6 +36,76 @@ class CodexHarnessCliTests(unittest.TestCase):
         self.assertEqual(["/usr/bin/python3", "scripts/generate_minimal_harness.py", "--list-profiles"], command)
         self.assertEqual(codex_harness.REPO_ROOT, kwargs["cwd"])
 
+    def test_init_without_brief_delegates_to_generator(self):
+        command, _ = self.run_cli(
+            [
+                "init",
+                "/tmp/example",
+                "--profile",
+                "knowledge-work",
+                "--project-name",
+                "Research Hub",
+                "--force",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/generate_minimal_harness.py",
+                "/tmp/example",
+                "--profile",
+                "knowledge-work",
+                "--project-name",
+                "Research Hub",
+                "--force",
+            ],
+            command,
+        )
+
+    def test_init_with_brief_delegates_to_brief_acceptance(self):
+        command, _ = self.run_cli(
+            [
+                "init",
+                "/tmp/example",
+                "--brief",
+                "RAG app with prompts and evals",
+                "--project-name",
+                "RAG Harness",
+                "--notes",
+                "trial",
+                "--limit",
+                "2",
+                "--allow-low-confidence",
+                "--target-label",
+                "examples/brief",
+                "--force",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/run_brief_acceptance.py",
+                "/tmp/example",
+                "--brief",
+                "RAG app with prompts and evals",
+                "--project-name",
+                "RAG Harness",
+                "--notes",
+                "trial",
+                "--limit",
+                "2",
+                "--allow-low-confidence",
+                "--target-label",
+                "examples/brief",
+                "--force",
+                "--json",
+            ],
+            command,
+        )
+
     def test_profiles_details_delegates_to_profile_catalog(self):
         command, _ = self.run_cli(["profiles", "--details"])
 
