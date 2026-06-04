@@ -130,6 +130,7 @@ live model-mediated `/create` run:
 
 ```bash
 cd Codex-Harness-Generator
+python scripts/codex_harness.py doctor
 python scripts/codex_harness.py profiles --details
 python scripts/codex_harness.py recommend "RAG app with prompts, evals, and retrieval checks"
 python scripts/codex_harness.py brief-acceptance /tmp/codex-brief-check \

@@ -69,13 +69,15 @@ def check_installable_cli() -> tuple[dict, dict]:
     payload = build_cli_install_payload()
     failed = next((step for step in payload["steps"] if step["status"] != "pass"), None)
     profile_step = next((step for step in payload["steps"] if step["name"] == "profiles"), {})
+    doctor_step = next((step for step in payload["steps"] if step["name"] == "doctor"), {})
     init_step = next((step for step in payload["steps"] if step["name"] == "init"), {})
     eval_step = next((step for step in payload["steps"] if step["name"] == "eval"), {})
     if failed:
         detail = f"failed at {failed['name']}"
     else:
-        detail = "profiles={profiles} init={init_status} eval={eval_status}".format(
+        detail = "profiles={profiles} doctor={doctor_status} init={init_status} eval={eval_status}".format(
             profiles=profile_step.get("profile_count", "unknown"),
+            doctor_status=doctor_step.get("status", "unknown"),
             init_status=init_step.get("status", "unknown"),
             eval_status=eval_step.get("status", "unknown"),
         )

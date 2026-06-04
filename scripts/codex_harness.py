@@ -222,10 +222,28 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.append("--json")
         return python_script("proof_status.py", command)
 
+    if args.command == "doctor":
+        command = []
+        if args.record_dir:
+            command.extend(["--record-dir", args.record_dir])
+        if args.min_usage_records is not None:
+            command.extend(["--min-usage-records", str(args.min_usage_records)])
+        if args.include_install_smoke:
+            command.append("--include-install-smoke")
+        if args.json:
+            command.append("--json")
+        return python_script("doctor.py", command)
+
     if args.command == "snapshot":
         return python_script("record_eval_snapshot.py", [])
 
     raise ValueError(f"Unsupported command: {args.command}")
+
+
+def command_cwd(args: argparse.Namespace) -> Path:
+    if args.command == "doctor" and (Path.cwd() / "scripts" / "doctor.py").is_file():
+        return Path.cwd()
+    return REPO_ROOT
 
 
 def make_parser() -> argparse.ArgumentParser:
@@ -336,6 +354,12 @@ def make_parser() -> argparse.ArgumentParser:
     proof_status.add_argument("--no-write", action="store_true", help="Do not rewrite PROOF_STATUS.md")
     proof_status.add_argument("--json", action="store_true", help="Emit JSON payload")
 
+    doctor = subparsers.add_parser("doctor", help="Run a fast local readiness check")
+    doctor.add_argument("--record-dir", help="Directory where usage record JSON files are read")
+    doctor.add_argument("--min-usage-records", type=int, help="Minimum valid usage records required")
+    doctor.add_argument("--include-install-smoke", action="store_true", help="Also run the slower non-editable CLI install smoke")
+    doctor.add_argument("--json", action="store_true", help="Emit JSON payload")
+
     subparsers.add_parser("snapshot", help="Record an eval trend snapshot")
 
     return parser
@@ -345,7 +369,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = make_parser()
     args = parser.parse_args(argv)
     command = build_command(args)
-    completed = subprocess.run(command, cwd=REPO_ROOT, check=False)
+    completed = subprocess.run(command, cwd=command_cwd(args), check=False)
     return completed.returncode
 
 

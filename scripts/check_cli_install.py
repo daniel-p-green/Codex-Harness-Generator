@@ -71,6 +71,7 @@ def build_payload() -> dict:
                 ],
             ),
             ("profiles", [(venv / "bin" / "codex-harness").as_posix(), "profiles", "--json"]),
+            ("doctor", [(venv / "bin" / "codex-harness").as_posix(), "doctor", "--json"]),
             (
                 "init",
                 [

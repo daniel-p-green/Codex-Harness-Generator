@@ -1,6 +1,6 @@
 # Proof Status
 
-Generated: 2026-06-04T07:20:33Z
+Generated: 2026-06-04T07:38:16Z
 Status: PASS
 Readiness: Codex-equivalent beta with checked-in self-dogfood proof
 
@@ -15,7 +15,7 @@ conservative and should be read with `PROOF_MATRIX.md`.
 | `usage_report` | PASS | Docs/Environment/USAGE_RECORDS.md |
 | `task_trials_report` | PASS | examples/live-create/TASK_TRIALS.md |
 | `checked_in_example_inventory` | PASS | profiles=20 brief_examples=4 failures=0 |
-| `installable_cli` | PASS | profiles=20 init=pass eval=pass |
+| `installable_cli` | PASS | profiles=20 doctor=pass init=pass eval=pass |
 | `live_task_trials` | PASS | 8/8 pass; required >= 8 |
 | `non_synthetic_usage` | PASS | records=2 non_synthetic=2 success=2 |
 

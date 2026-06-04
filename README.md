@@ -136,6 +136,7 @@ cd Codex-Harness-Generator
 # 2. Optional: install the local helper command
 python -m pip install -e .
 codex-harness --help
+codex-harness doctor
 codex-harness init /tmp/codex-rag-harness \
   --brief "RAG app with prompts, evals, and retrieval checks" \
   --project-name "RAG Quality Harness" \
@@ -160,6 +161,7 @@ harness deterministically:
 ```bash
 python scripts/codex_harness.py profiles
 codex-harness profiles
+codex-harness doctor
 codex-harness init /tmp/codex-rag-harness \
   --brief "RAG app with prompts, evals, and retrieval checks" \
   --project-name "RAG Quality Harness" \
@@ -323,8 +325,14 @@ python scripts/codex_harness.py usage-validate \
 Summarize the checked-in product-proof package:
 
 ```bash
+python scripts/codex_harness.py doctor
 python scripts/codex_harness.py proof-status
 ```
+
+`doctor` is the fast first check for a local checkout. It verifies Python,
+required public files, supported profiles, example inventory, usage evidence,
+and the current proof-status report. Add `--include-install-smoke` before
+publishing packaging or console-script changes.
 
 The wrapper is intentionally thin. It delegates to the underlying scripts so
 advanced users can still call `scripts/generate_minimal_harness.py`,
@@ -375,6 +383,7 @@ Common subcommands:
 | `usage-record` | `record_usage_case.py` | Records sanitized generated-harness usage evidence. |
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
 | `proof-status` | `proof_status.py` | Summarizes checked-in proof readiness, live task-trial coverage, and usage evidence. |
+| `doctor` | `doctor.py` | Runs a fast local readiness check and prints the next useful commands. |
 | `snapshot` | `record_eval_snapshot.py` | Records an eval trend snapshot. |
 
 ## Presets

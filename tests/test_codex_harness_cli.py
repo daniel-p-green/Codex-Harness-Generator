@@ -435,6 +435,33 @@ class CodexHarnessCliTests(unittest.TestCase):
             command,
         )
 
+    def test_doctor_delegates_to_doctor_script(self):
+        command, _ = self.run_cli(
+            [
+                "doctor",
+                "--record-dir",
+                "/tmp/records",
+                "--min-usage-records",
+                "5",
+                "--include-install-smoke",
+                "--json",
+            ]
+        )
+
+        self.assertEqual(
+            [
+                "/usr/bin/python3",
+                "scripts/doctor.py",
+                "--record-dir",
+                "/tmp/records",
+                "--min-usage-records",
+                "5",
+                "--include-install-smoke",
+                "--json",
+            ],
+            command,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
