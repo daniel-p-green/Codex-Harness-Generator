@@ -208,6 +208,26 @@ class PilotNextActionTests(unittest.TestCase):
         self.assertIn("Count only converted, validated usage records", text)
         self.assertIn("gh issue comment https://github.com/example/repo/issues/42", text)
 
+    def test_sync_fallback_command_renders_repo_local_paths_as_relative(self):
+        args = argparse.Namespace(
+            record_dir=(REPO_ROOT / "Docs" / "Environment" / "pilot-records").as_posix(),
+            usage_record_dir=(REPO_ROOT / "Docs" / "Environment" / "usage-records").as_posix(),
+            usage_report=(REPO_ROOT / "Docs" / "Environment" / "USAGE_RECORDS.md").as_posix(),
+            pilot_board_report=(REPO_ROOT / "Docs" / "Environment" / "PILOT_BOARD.md").as_posix(),
+            sync_report=(REPO_ROOT / "Docs" / "Environment" / "PILOT_GITHUB_SYNC.md").as_posix(),
+            followup_dir=(REPO_ROOT / "Docs" / "Environment" / "pilot-github-followups").as_posix(),
+            repo=None,
+            gh_bin="gh",
+        )
+
+        command = pilot_next_action.sync_command(args)
+
+        self.assertIn("--record-dir Docs/Environment/pilot-records", command)
+        self.assertIn("--usage-record-dir Docs/Environment/usage-records", command)
+        self.assertIn("--report Docs/Environment/PILOT_GITHUB_SYNC.md", command)
+        self.assertIn("--followup-dir Docs/Environment/pilot-github-followups", command)
+        self.assertNotIn(REPO_ROOT.as_posix(), command)
+
 
 if __name__ == "__main__":
     unittest.main()

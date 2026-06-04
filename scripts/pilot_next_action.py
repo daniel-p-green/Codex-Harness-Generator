@@ -15,6 +15,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REPORT = REPO_ROOT / "Docs" / "Environment" / "PILOT_NEXT_ACTION.md"
 
 
+def display_arg_path(path_text: str) -> str:
+    return sync_pilot_github_issues.display_path(Path(path_text))
+
+
 def first_record(records: list[dict], readiness: str) -> dict | None:
     for record in records:
         if record.get("readiness") == readiness:
@@ -27,17 +31,17 @@ def sync_command(args: argparse.Namespace) -> str:
         "codex-harness",
         "pilot-github-sync",
         "--record-dir",
-        args.record_dir,
+        display_arg_path(args.record_dir),
         "--usage-record-dir",
-        args.usage_record_dir,
+        display_arg_path(args.usage_record_dir),
         "--usage-report",
-        args.usage_report,
+        display_arg_path(args.usage_report),
         "--pilot-board-report",
-        args.pilot_board_report,
+        display_arg_path(args.pilot_board_report),
         "--report",
-        args.sync_report,
+        display_arg_path(args.sync_report),
         "--followup-dir",
-        args.followup_dir,
+        display_arg_path(args.followup_dir),
     ]
     if args.repo:
         parts.extend(["--repo", args.repo])

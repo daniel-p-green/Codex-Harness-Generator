@@ -1,3 +1,5 @@
+<!-- codex-harness-maintainer-followup -->
+
 Thanks for taking this on. The issue is not ready to convert into usage evidence yet.
 
 Please reply with the missing public-safe sections below. Keep the report free of secrets, personal data, private paths, proprietary source, raw logs, and raw private transcripts.

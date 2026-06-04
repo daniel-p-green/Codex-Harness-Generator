@@ -25,6 +25,9 @@ from record_usage_case import (
 )
 
 
+MAINTAINER_FOLLOWUP_MARKER = "<!-- codex-harness-maintainer-followup -->"
+
+
 def fetch_github_issue(issue: str, repo: str = "", gh_bin: str = "gh", *, include_comments: bool = False) -> dict:
     fields = "body,title,url,number,state"
     if include_comments:
@@ -52,6 +55,8 @@ def comment_bodies(payload: dict) -> list[str]:
     bodies = []
     for comment in payload.get("comments") or []:
         body = str(comment.get("body", "")).strip()
+        if MAINTAINER_FOLLOWUP_MARKER in body:
+            continue
         if body:
             bodies.append(body)
     return bodies

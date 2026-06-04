@@ -172,11 +172,34 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertIn("--repo example/repo", record["commands"]["convert"])
         self.assertIn("--gh-bin /tmp/fake-gh", record["commands"]["convert"])
         self.assertIn("Please reply with the missing public-safe sections", record["reporter_followup"])
+        self.assertIn("codex-harness-maintainer-followup", record["reporter_followup"])
         self.assertIn("### Evidence", record["reporter_followup"])
         self.assertIn("at least two public-safe bullets", record["reporter_followup"])
         self.assertTrue(record["followup_file"].endswith("llm-app-pilot-followup.md"))
         self.assertIn("gh issue comment https://github.com/example/repo/issues/42", record["commands"]["comment_followup"])
         self.assertIn("--body-file", record["commands"]["comment_followup"])
+
+    def test_repo_local_default_paths_render_as_relative_commands(self):
+        args = argparse.Namespace(
+            usage_record_dir=(REPO_ROOT / "Docs" / "Environment" / "usage-records").as_posix(),
+            usage_report=(REPO_ROOT / "Docs" / "Environment" / "USAGE_RECORDS.md").as_posix(),
+            record_dir=(REPO_ROOT / "Docs" / "Environment" / "pilot-records").as_posix(),
+            pilot_board_report=(REPO_ROOT / "Docs" / "Environment" / "PILOT_BOARD.md").as_posix(),
+            repo=None,
+            gh_bin="gh",
+        )
+
+        command = sync_pilot_github_issues.conversion_command(
+            "https://github.com/example/repo/issues/42",
+            args,
+            lint_only=True,
+        )
+
+        self.assertIn("--record-dir Docs/Environment/usage-records", command)
+        self.assertIn("--report Docs/Environment/USAGE_RECORDS.md", command)
+        self.assertIn("--pilot-record-dir Docs/Environment/pilot-records", command)
+        self.assertIn("--pilot-board-report Docs/Environment/PILOT_BOARD.md", command)
+        self.assertNotIn(REPO_ROOT.as_posix(), command)
 
     def test_comment_completed_issue_reports_conversion_ready(self):
         with tempfile.TemporaryDirectory() as temp_dir:

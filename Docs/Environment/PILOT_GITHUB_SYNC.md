@@ -1,6 +1,6 @@
 # Pilot GitHub Issue Sync
 
-Generated: 2026-06-04T18:55:30Z
+Generated: 2026-06-04T19:22:01Z
 Status: PASS
 Readiness: waiting-for-reporters
 
@@ -36,15 +36,17 @@ Errors:
 Commands:
 
 ```bash
-codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
-codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
-codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --lint-only --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --no-write --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --json
 gh issue comment https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --body-file Docs/Environment/pilot-github-followups/llm-app-pilot-followup.md
 ```
 
 Reporter follow-up:
 
 ```markdown
+<!-- codex-harness-maintainer-followup -->
+
 Thanks for taking this on. The issue is not ready to convert into usage evidence yet.
 
 Please reply with the missing public-safe sections below. Keep the report free of secrets, personal data, private paths, proprietary source, raw logs, and raw private transcripts.
@@ -95,15 +97,17 @@ Errors:
 Commands:
 
 ```bash
-codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
-codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
-codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --lint-only --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --no-write --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --json
 gh issue comment https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --body-file Docs/Environment/pilot-github-followups/security-audit-pilot-followup.md
 ```
 
 Reporter follow-up:
 
 ```markdown
+<!-- codex-harness-maintainer-followup -->
+
 Thanks for taking this on. The issue is not ready to convert into usage evidence yet.
 
 Please reply with the missing public-safe sections below. Keep the report free of secrets, personal data, private paths, proprietary source, raw logs, and raw private transcripts.
@@ -154,15 +158,17 @@ Errors:
 Commands:
 
 ```bash
-codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
-codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
-codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --lint-only --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --no-write --json
+codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --repo daniel-p-green/Codex-Harness-Generator --json
 gh issue comment https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --body-file Docs/Environment/pilot-github-followups/customer-support-pilot-followup.md
 ```
 
 Reporter follow-up:
 
 ```markdown
+<!-- codex-harness-maintainer-followup -->
+
 Thanks for taking this on. The issue is not ready to convert into usage evidence yet.
 
 Please reply with the missing public-safe sections below. Keep the report free of secrets, personal data, private paths, proprietary source, raw logs, and raw private transcripts.

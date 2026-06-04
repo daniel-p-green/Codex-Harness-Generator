@@ -23,6 +23,7 @@ DEFAULT_RECORD_DIR = pilot_board.DEFAULT_RECORD_DIR
 DEFAULT_REPORT = REPO_ROOT / "Docs" / "Environment" / "PILOT_GITHUB_SYNC.md"
 DEFAULT_FOLLOWUP_DIR = REPO_ROOT / "Docs" / "Environment" / "pilot-github-followups"
 DEFAULT_PILOT_BOARD_REPORT = pilot_board.DEFAULT_REPORT
+MAINTAINER_FOLLOWUP_MARKER = "<!-- codex-harness-maintainer-followup -->"
 
 
 def utc_now() -> str:
@@ -34,6 +35,10 @@ def display_path(path: Path) -> str:
         return path.resolve().relative_to(REPO_ROOT).as_posix()
     except (OSError, ValueError):
         return path.as_posix()
+
+
+def display_arg_path(path_text: str) -> str:
+    return display_path(Path(path_text))
 
 
 def selected_records(records: list[dict], statuses: tuple[str, ...], slugs: tuple[str, ...]) -> list[dict]:
@@ -80,13 +85,13 @@ def conversion_command(issue_url: str, args: argparse.Namespace, *, lint_only: b
         issue_url,
         "--include-comments",
         "--record-dir",
-        args.usage_record_dir,
+        display_arg_path(args.usage_record_dir),
         "--report",
-        args.usage_report,
+        display_arg_path(args.usage_report),
         "--pilot-record-dir",
-        args.record_dir,
+        display_arg_path(args.record_dir),
         "--pilot-board-report",
-        args.pilot_board_report,
+        display_arg_path(args.pilot_board_report),
     ]
     if args.repo:
         parts.extend(["--repo", args.repo])
@@ -139,6 +144,8 @@ def reporter_followup(record: dict) -> str:
         return "Maintainer attention needed before reporter follow-up; check the sync errors for this issue."
 
     lines = [
+        MAINTAINER_FOLLOWUP_MARKER,
+        "",
         "Thanks for taking this on. The issue is not ready to convert into usage evidence yet.",
         "",
         "Please reply with the missing public-safe sections below. Keep the report free of secrets, personal data, private paths, proprietary source, raw logs, and raw private transcripts.",
