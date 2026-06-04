@@ -231,6 +231,10 @@ def reporter_followup(record: dict) -> str:
         "",
         "Please reply with the missing public-safe sections below. Keep the report free of secrets, personal data, private paths, proprietary source, raw logs, and raw private transcripts.",
         "",
+        "## Reporter reply template",
+        "",
+        "Copy this into a new issue comment and replace each guidance line with your public-safe result:",
+        "",
     ]
     fields = missing or ["outcome", "task_summary", "evidence", "verification", "privacy_review", "limitations"]
     for field in fields:
@@ -244,7 +248,13 @@ def reporter_followup(record: dict) -> str:
                 "",
             ]
         )
-    lines.append("Once those sections are present, a maintainer can run `codex-harness pilot-github-sync` again and preview conversion.")
+    lines.extend(
+        [
+            "Once those sections are present, a maintainer can run `codex-harness pilot-github-sync` again and preview conversion.",
+            "",
+            "This follow-up does not count as usage proof; only a converted, validated usage record counts.",
+        ]
+    )
     return "\n".join(lines).strip()
 
 
@@ -270,6 +280,7 @@ def issue_sync_record(
         "github_issue": {},
         "commands": {},
         "reporter_followup": "",
+        "followup_template": "",
         "followup_file": "",
         "display_followup_file": "",
         "maintainer_followup_posted": False,
@@ -323,14 +334,15 @@ def issue_sync_record(
     base["github_issue"] = lint_payload.get("github_issue", {})
     base["reporter_followup"] = reporter_followup(base)
     if base["readiness"] == "waiting-for-reporter":
+        path = followup_path(args, record)
+        base["followup_file"] = path.as_posix()
+        base["display_followup_file"] = display_path(path)
+        base["followup_template"] = base["reporter_followup"]
         if base["maintainer_followup_posted"] and not base["reporter_replies"]["after_latest_maintainer_followup"]:
             base["reporter_followup"] = (
                 "Maintainer follow-up already posted; wait for a reporter reply with the missing public-safe evidence fields."
             )
         else:
-            path = followup_path(args, record)
-            base["followup_file"] = path.as_posix()
-            base["display_followup_file"] = display_path(path)
             base["commands"]["comment_followup"] = gh_issue_comment_command(issue_url, base["display_followup_file"])
     return base
 
@@ -410,8 +422,19 @@ def safe_write(path: Path, text: str, *, label: str) -> None:
 
 def write_followups(payload: dict) -> None:
     for record in payload["records"]:
-        if record.get("followup_file") and record.get("reporter_followup"):
-            safe_write(Path(record["followup_file"]), record["reporter_followup"], label=f"GitHub issue follow-up for {record['slug']}")
+        followup_text = record.get("followup_template") or record.get("reporter_followup")
+        if record.get("followup_file") and followup_text:
+            safe_write(Path(record["followup_file"]), followup_text, label=f"GitHub issue follow-up for {record['slug']}")
+
+
+def followup_action(record: dict) -> str:
+    if not record.get("display_followup_file"):
+        return "not needed"
+    if record.get("commands", {}).get("comment_followup"):
+        return "post generated follow-up comment"
+    if record.get("maintainer_followup_posted"):
+        return "template refreshed; no duplicate public comment"
+    return "template refreshed; rerun sync before posting"
 
 
 def write_report(path: Path, payload: dict) -> None:
@@ -469,6 +492,7 @@ def write_report(path: Path, payload: dict) -> None:
                 f"- Reporter replied after latest maintainer follow-up: `{str(record.get('reporter_replies', {}).get('after_latest_maintainer_followup', False)).lower()}`",
                 f"- Missing fields: {', '.join(record['missing_fields']) if record['missing_fields'] else 'none'}",
                 f"- Follow-up file: `{record['display_followup_file']}`" if record.get("display_followup_file") else "- Follow-up file: not needed",
+                f"- Follow-up action: {followup_action(record)}",
             ]
         )
         if record["errors"]:

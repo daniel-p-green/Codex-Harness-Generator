@@ -4,6 +4,10 @@ Thanks for taking this on. The issue is not ready to convert into usage evidence
 
 Please reply with the missing public-safe sections below. Keep the report free of secrets, personal data, private paths, proprietary source, raw logs, and raw private transcripts.
 
+## Reporter reply template
+
+Copy this into a new issue comment and replace each guidance line with your public-safe result:
+
 ### Outcome
 
 Use `success`, `partial`, `failed`, or `inconclusive`.
@@ -29,3 +33,5 @@ State that the report excludes secrets, personal data, private paths, proprietar
 Add at least one bullet describing the scope limit, such as one task, one repo, one reporter, or incomplete coverage.
 
 Once those sections are present, a maintainer can run `codex-harness pilot-github-sync` again and preview conversion.
+
+This follow-up does not count as usage proof; only a converted, validated usage record counts.

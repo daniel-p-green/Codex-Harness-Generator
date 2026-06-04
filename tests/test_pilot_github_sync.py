@@ -19,6 +19,15 @@ assert spec.loader is not None
 sys.modules[spec.name] = sync_pilot_github_issues
 spec.loader.exec_module(sync_pilot_github_issues)
 
+usage_spec = importlib.util.spec_from_file_location(
+    "usage_from_issue",
+    REPO_ROOT / "scripts" / "usage_from_issue.py",
+)
+usage_from_issue = importlib.util.module_from_spec(usage_spec)
+assert usage_spec.loader is not None
+sys.modules[usage_spec.name] = usage_from_issue
+usage_spec.loader.exec_module(usage_from_issue)
+
 
 INCOMPLETE_BODY = """### Pilot or usage-record slug
 
@@ -173,9 +182,15 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertIn("--repo example/repo", record["commands"]["convert"])
         self.assertIn("--gh-bin /tmp/fake-gh", record["commands"]["convert"])
         self.assertIn("Please reply with the missing public-safe sections", record["reporter_followup"])
+        self.assertIn("Reporter reply template", record["reporter_followup"])
+        self.assertIn("Copy this into a new issue comment", record["reporter_followup"])
+        self.assertIn("converted, validated usage record counts", record["reporter_followup"])
         self.assertIn("codex-harness-maintainer-followup", record["reporter_followup"])
         self.assertIn("### Evidence", record["reporter_followup"])
         self.assertIn("at least two public-safe bullets", record["reporter_followup"])
+        sections = usage_from_issue.parse_issue_sections(record["reporter_followup"])
+        for field in ("outcome", "task_summary", "evidence", "verification", "privacy_review", "limitations"):
+            self.assertIn(field, sections)
         self.assertTrue(record["followup_file"].endswith("llm-app-pilot-followup.md"))
         self.assertIn("gh issue comment https://github.com/example/repo/issues/42", record["commands"]["comment_followup"])
         self.assertIn("--body-file", record["commands"]["comment_followup"])
@@ -218,7 +233,8 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertEqual(72, record["reminder_after_hours"])
         self.assertFalse(record["reminder_due"])
         self.assertEqual("2026-06-07T19:38:17Z", record["next_reminder_at"])
-        self.assertEqual("", record["followup_file"])
+        self.assertTrue(record["followup_file"].endswith("llm-app-pilot-followup.md"))
+        self.assertIn("Reporter reply template", record["followup_template"])
         self.assertNotIn("comment_followup", record["commands"])
         self.assertIn("already posted", record["reporter_followup"])
 
@@ -258,7 +274,8 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertEqual(2, record["github_issue"]["excluded_comment_count"])
         self.assertEqual(0, record["reporter_replies"]["count"])
         self.assertFalse(record["reporter_replies"]["after_latest_maintainer_followup"])
-        self.assertEqual("", record["followup_file"])
+        self.assertTrue(record["followup_file"].endswith("llm-app-pilot-followup.md"))
+        self.assertIn("Reporter reply template", record["followup_template"])
         self.assertNotIn("comment_followup", record["commands"])
 
     def test_unmarked_owner_comment_does_not_count_as_reporter_reply(self):
@@ -297,7 +314,8 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertEqual(2, record["github_issue"]["excluded_comment_count"])
         self.assertEqual(0, record["reporter_replies"]["count"])
         self.assertFalse(record["reporter_replies"]["after_latest_maintainer_followup"])
-        self.assertEqual("", record["followup_file"])
+        self.assertTrue(record["followup_file"].endswith("llm-app-pilot-followup.md"))
+        self.assertIn("Reporter reply template", record["followup_template"])
         self.assertNotIn("comment_followup", record["commands"])
 
     def test_stale_maintainer_followup_flags_reminder_due_without_comment_command(self):
@@ -322,7 +340,8 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertTrue(record["reminder_due"])
         self.assertEqual(76.36, record["maintainer_followup_age_hours"])
         self.assertEqual("2026-06-07T19:38:17Z", record["next_reminder_at"])
-        self.assertEqual("", record["followup_file"])
+        self.assertTrue(record["followup_file"].endswith("llm-app-pilot-followup.md"))
+        self.assertIn("Reporter reply template", record["followup_template"])
         self.assertNotIn("comment_followup", record["commands"])
 
     def test_reporter_reply_after_followup_reenables_targeted_comment(self):
@@ -480,6 +499,30 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertIn("Reporter follow-up:", report)
         self.assertIn("No reporter follow-up needed", report)
 
+    def test_write_report_distinguishes_refreshed_template_from_public_comment(self):
+        maintainer_comment = f"{sync_pilot_github_issues.MAINTAINER_FOLLOWUP_MARKER}\n\nPlease add the missing fields."
+        comment_payload = {
+            "author": {"login": "maintainer"},
+            "body": maintainer_comment,
+            "createdAt": "2026-06-04T19:38:17Z",
+            "url": "https://github.com/example/repo/issues/42#issuecomment-1",
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_pilot_record(root)
+            args = self.args(root)
+            payload = sync_pilot_github_issues.build_payload(
+                args,
+                fetch_issue=lambda *fetch_args, **kwargs: self.github_payload(comments=[comment_payload]),
+            )
+
+            sync_pilot_github_issues.write_report(Path(args.report), payload)
+            report = Path(args.report).read_text(encoding="utf-8")
+
+        self.assertIn("- Follow-up file: `", report)
+        self.assertIn("- Follow-up action: template refreshed; no duplicate public comment", report)
+        self.assertNotIn("gh issue comment", report)
+
     def test_write_followups_writes_waiting_issue_files_only(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
@@ -496,7 +539,38 @@ class PilotGithubSyncTests(unittest.TestCase):
             text = followup.read_text(encoding="utf-8")
 
         self.assertIn("Please reply with the missing public-safe sections", text)
+        self.assertIn("Reporter reply template", text)
+        self.assertIn("Copy this into a new issue comment", text)
         self.assertIn("### Privacy review", text)
+
+    def test_write_followups_refreshes_template_even_after_posted_comment(self):
+        maintainer_comment = f"{sync_pilot_github_issues.MAINTAINER_FOLLOWUP_MARKER}\n\nPlease add the missing fields."
+        comment_payload = {
+            "author": {"login": "maintainer"},
+            "body": maintainer_comment,
+            "createdAt": "2026-06-04T19:38:17Z",
+            "url": "https://github.com/example/repo/issues/42#issuecomment-1",
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_pilot_record(root)
+            args = self.args(root)
+            payload = sync_pilot_github_issues.build_payload(
+                args,
+                fetch_issue=lambda *fetch_args, **kwargs: self.github_payload(comments=[comment_payload]),
+            )
+
+            sync_pilot_github_issues.write_followups(payload)
+
+            record = payload["records"][0]
+            followup = Path(record["followup_file"])
+            text = followup.read_text(encoding="utf-8")
+
+        self.assertTrue(record["maintainer_followup_posted"])
+        self.assertNotIn("comment_followup", record["commands"])
+        self.assertIn("already posted", record["reporter_followup"])
+        self.assertIn("Reporter reply template", text)
+        self.assertIn("converted, validated usage record counts", text)
 
 
 if __name__ == "__main__":

@@ -219,6 +219,14 @@ def build_payload(
     }
 
 
+def waiting_followup_action(item: dict) -> str:
+    if item.get("command"):
+        return "post generated follow-up comment"
+    if item.get("maintainer_followup_posted"):
+        return "wait for reporter reply; do not repost follow-up"
+    return "rerun sync before posting"
+
+
 def write_report(path: Path, payload: dict) -> None:
     action = payload["next_action"]
     lines = [
@@ -283,6 +291,7 @@ def write_report(path: Path, payload: dict) -> None:
                     f"  - Latest reporter reply: {item.get('reporter_replies', {}).get('latest', {}).get('url') or 'none'}",
                     f"  - Reporter replied after latest maintainer follow-up: `{str(item.get('reporter_replies', {}).get('after_latest_maintainer_followup', False)).lower()}`",
                     f"  - Missing fields: {', '.join(item['missing_fields']) if item['missing_fields'] else 'none'}",
+                    f"  - Follow-up action: {waiting_followup_action(item)}",
                     f"  - Command: `{item['command'] or 'wait for reporter reply, then rerun sync'}`",
                 ]
             )

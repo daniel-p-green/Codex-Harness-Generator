@@ -175,11 +175,20 @@ def check_pilot_github_followups(report_path: Path = PILOT_GITHUB_SYNC_REPORT) -
     text = report_path.read_text(encoding="utf-8")
     followup_refs = []
     comment_refs = []
+    already_posted_refs = []
+    section_already_posted = False
     errors = []
     for line in text.splitlines():
+        if line.startswith("### "):
+            section_already_posted = False
+        if line == "- Maintainer follow-up already posted: `true`":
+            section_already_posted = True
         followup_match = FOLLOWUP_FILE_RE.match(line)
         if followup_match:
-            followup_refs.append(followup_match.group("path"))
+            followup_ref = followup_match.group("path")
+            followup_refs.append(followup_ref)
+            if section_already_posted:
+                already_posted_refs.append(followup_ref)
         command_match = FOLLOWUP_COMMAND_RE.match(line)
         if command_match:
             comment_refs.append(command_match.group("path"))
@@ -193,12 +202,12 @@ def check_pilot_github_followups(report_path: Path = PILOT_GITHUB_SYNC_REPORT) -
         if findings:
             errors.append(f"sensitive text in {ref}: {', '.join(findings)}")
 
-    missing_comment_commands = sorted(set(followup_refs) - set(comment_refs))
+    missing_comment_commands = sorted(set(followup_refs) - set(comment_refs) - set(already_posted_refs))
     for ref in missing_comment_commands:
         errors.append(f"missing gh issue comment command for: {ref}")
 
     status = "pass" if not errors else "fail"
-    detail = f"followups={len(followup_refs)} comment_commands={len(comment_refs)}"
+    detail = f"followups={len(followup_refs)} comment_commands={len(comment_refs)} already_posted={len(already_posted_refs)}"
     if errors:
         detail += "; " + "; ".join(errors)
     return {

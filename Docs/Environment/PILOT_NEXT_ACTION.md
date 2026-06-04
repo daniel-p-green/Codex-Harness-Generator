@@ -1,6 +1,6 @@
 # Pilot Next Action
 
-Generated: 2026-06-04T22:09:45Z
+Generated: 2026-06-04T22:44:56Z
 Status: PASS
 Readiness: waiting-for-reporters
 
@@ -28,7 +28,7 @@ This chooses the next public pilot action; it does not prove adoption. Count onl
 - Issue: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3
 - Maintainer follow-up: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3#issuecomment-4625495059
 - Maintainer follow-up posted at: `2026-06-04T19:38:17Z`
-- Maintainer follow-up age: `2.52` hours
+- Maintainer follow-up age: `3.11` hours
 - Reminder threshold: `72.0` hours
 - Reminder due: `false`
 - Next reminder review at: `2026-06-07T19:38:17Z`
@@ -43,43 +43,46 @@ codex-harness pilot-github-sync --record-dir Docs/Environment/pilot-records --us
 ## Waiting Follow-Ups
 
 - `llm-app-pilot`: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3
-  - Follow-up file: `already posted`
+  - Follow-up file: `Docs/Environment/pilot-github-followups/llm-app-pilot-followup.md`
   - Maintainer follow-up already posted: `true`
   - Maintainer follow-up URL: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3#issuecomment-4625495059
   - Maintainer follow-up posted at: `2026-06-04T19:38:17Z`
-  - Maintainer follow-up age: `2.52` hours
+  - Maintainer follow-up age: `3.11` hours
   - Reminder due: `false`
   - Next reminder review at: `2026-06-07T19:38:17Z`
   - Reporter replies: 0
   - Latest reporter reply: none
   - Reporter replied after latest maintainer follow-up: `false`
   - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
+  - Follow-up action: wait for reporter reply; do not repost follow-up
   - Command: `wait for reporter reply, then rerun sync`
 - `security-audit-pilot`: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1
-  - Follow-up file: `already posted`
+  - Follow-up file: `Docs/Environment/pilot-github-followups/security-audit-pilot-followup.md`
   - Maintainer follow-up already posted: `true`
   - Maintainer follow-up URL: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1#issuecomment-4625495203
   - Maintainer follow-up posted at: `2026-06-04T19:38:18Z`
-  - Maintainer follow-up age: `2.52` hours
+  - Maintainer follow-up age: `3.11` hours
   - Reminder due: `false`
   - Next reminder review at: `2026-06-07T19:38:18Z`
   - Reporter replies: 0
   - Latest reporter reply: none
   - Reporter replied after latest maintainer follow-up: `false`
   - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
+  - Follow-up action: wait for reporter reply; do not repost follow-up
   - Command: `wait for reporter reply, then rerun sync`
 - `customer-support-pilot`: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2
-  - Follow-up file: `already posted`
+  - Follow-up file: `Docs/Environment/pilot-github-followups/customer-support-pilot-followup.md`
   - Maintainer follow-up already posted: `true`
   - Maintainer follow-up URL: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2#issuecomment-4625495326
   - Maintainer follow-up posted at: `2026-06-04T19:38:19Z`
-  - Maintainer follow-up age: `2.52` hours
+  - Maintainer follow-up age: `3.11` hours
   - Reminder due: `false`
   - Next reminder review at: `2026-06-07T19:38:19Z`
   - Reporter replies: 0
   - Latest reporter reply: none
   - Reporter replied after latest maintainer follow-up: `false`
   - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
+  - Follow-up action: wait for reporter reply; do not repost follow-up
   - Command: `wait for reporter reply, then rerun sync`
 
 ## Conversion Ready

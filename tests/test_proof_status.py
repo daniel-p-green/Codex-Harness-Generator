@@ -294,6 +294,33 @@ Status: PASS
         self.assertEqual("fail", payload["status"])
         self.assertIn("missing gh issue comment command", payload["detail"])
 
+    def test_pilot_github_followup_check_passes_when_followup_already_posted(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            followup = root / "Docs" / "Environment" / "pilot-github-followups" / "llm-app-pilot-followup.md"
+            followup.parent.mkdir(parents=True, exist_ok=True)
+            followup.write_text("Please reply with public-safe evidence.\n", encoding="utf-8")
+            report = root / "PILOT_GITHUB_SYNC.md"
+            report.write_text(
+                "\n".join(
+                    [
+                        "### llm-app-pilot",
+                        "",
+                        "- Maintainer follow-up already posted: `true`",
+                        "- Follow-up file: `Docs/Environment/pilot-github-followups/llm-app-pilot-followup.md`",
+                        "- Command: `wait for reporter reply, then rerun sync`",
+                        "",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            with patch.object(proof_status, "REPO_ROOT", root):
+                payload = proof_status.check_pilot_github_followups(report)
+
+        self.assertEqual("pass", payload["status"], payload)
+        self.assertIn("already_posted=1", payload["detail"])
+
     def test_build_payload_fails_when_threshold_is_too_high(self):
         with patch.object(proof_status, "build_cli_install_payload", return_value=self.fake_install_payload()):
             payload = proof_status.build_payload(

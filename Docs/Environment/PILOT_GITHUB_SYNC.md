@@ -1,6 +1,6 @@
 # Pilot GitHub Issue Sync
 
-Generated: 2026-06-04T22:09:44Z
+Generated: 2026-06-04T22:44:56Z
 Status: PASS
 Readiness: waiting-for-reporters
 
@@ -36,14 +36,15 @@ Pilot GitHub issue sync checks public intake readiness only; it is not usage pro
 - Maintainer follow-up already posted: `true`
 - Maintainer follow-up URL: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3#issuecomment-4625495059
 - Maintainer follow-up posted at: `2026-06-04T19:38:17Z`
-- Maintainer follow-up age: `2.52` hours
+- Maintainer follow-up age: `3.11` hours
 - Reminder due: `false`
 - Next reminder review at: `2026-06-07T19:38:17Z`
 - Reporter replies: 0
 - Latest reporter reply: none
 - Reporter replied after latest maintainer follow-up: `false`
 - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
-- Follow-up file: not needed
+- Follow-up file: `Docs/Environment/pilot-github-followups/llm-app-pilot-followup.md`
+- Follow-up action: template refreshed; no duplicate public comment
 
 Errors:
 - Missing required issue field(s): outcome, task_summary, evidence, verification, privacy_review, limitations
@@ -77,14 +78,15 @@ Maintainer follow-up already posted; wait for a reporter reply with the missing 
 - Maintainer follow-up already posted: `true`
 - Maintainer follow-up URL: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1#issuecomment-4625495203
 - Maintainer follow-up posted at: `2026-06-04T19:38:18Z`
-- Maintainer follow-up age: `2.52` hours
+- Maintainer follow-up age: `3.11` hours
 - Reminder due: `false`
 - Next reminder review at: `2026-06-07T19:38:18Z`
 - Reporter replies: 0
 - Latest reporter reply: none
 - Reporter replied after latest maintainer follow-up: `false`
 - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
-- Follow-up file: not needed
+- Follow-up file: `Docs/Environment/pilot-github-followups/security-audit-pilot-followup.md`
+- Follow-up action: template refreshed; no duplicate public comment
 
 Errors:
 - Missing required issue field(s): outcome, task_summary, evidence, verification, privacy_review, limitations
@@ -118,14 +120,15 @@ Maintainer follow-up already posted; wait for a reporter reply with the missing 
 - Maintainer follow-up already posted: `true`
 - Maintainer follow-up URL: https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2#issuecomment-4625495326
 - Maintainer follow-up posted at: `2026-06-04T19:38:19Z`
-- Maintainer follow-up age: `2.52` hours
+- Maintainer follow-up age: `3.11` hours
 - Reminder due: `false`
 - Next reminder review at: `2026-06-07T19:38:19Z`
 - Reporter replies: 0
 - Latest reporter reply: none
 - Reporter replied after latest maintainer follow-up: `false`
 - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
-- Follow-up file: not needed
+- Follow-up file: `Docs/Environment/pilot-github-followups/customer-support-pilot-followup.md`
+- Follow-up action: template refreshed; no duplicate public comment
 
 Errors:
 - Missing required issue field(s): outcome, task_summary, evidence, verification, privacy_review, limitations

@@ -334,6 +334,30 @@ class PilotNextActionTests(unittest.TestCase):
         self.assertIn("Count only converted, validated usage records", text)
         self.assertIn("gh issue comment https://github.com/example/repo/issues/42", text)
 
+    def test_write_report_distinguishes_wait_action_from_followup_template(self):
+        maintainer_comment = f"{pilot_next_action.sync_pilot_github_issues.MAINTAINER_FOLLOWUP_MARKER}\n\nPlease add the missing fields."
+        comment_payload = {
+            "author": {"login": "maintainer"},
+            "body": maintainer_comment,
+            "createdAt": "2026-06-04T19:38:17Z",
+            "url": "https://github.com/example/repo/issues/42#issuecomment-1",
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_pilot_record(root)
+            args = self.args(root)
+            payload = pilot_next_action.build_payload(
+                args,
+                fetch_issue=lambda *fetch_args, **kwargs: self.github_payload(comments=[comment_payload]),
+            )
+
+            pilot_next_action.write_report(Path(args.report), payload)
+            text = Path(args.report).read_text(encoding="utf-8")
+
+        self.assertIn("wait-for-reporter-response", text)
+        self.assertIn("Follow-up action: wait for reporter reply; do not repost follow-up", text)
+        self.assertNotIn("gh issue comment", text)
+
     def test_sync_fallback_command_renders_repo_local_paths_as_relative(self):
         args = argparse.Namespace(
             record_dir=(REPO_ROOT / "Docs" / "Environment" / "pilot-records").as_posix(),
