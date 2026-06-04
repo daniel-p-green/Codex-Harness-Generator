@@ -8,8 +8,8 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from record_usage_case import DEFAULT_RECORD_DIR, find_sensitive_text
-from usage_gaps import DEFAULT_TARGETS, build_payload as build_usage_gap_payload
+from record_usage_case import DEFAULT_RECORD_DIR, find_sensitive_text, load_records
+from usage_gaps import DEFAULT_TARGETS, build_payload as build_usage_gap_payload, build_projection
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -24,6 +24,7 @@ def build_payload(
     min_domains: int = DEFAULT_TARGETS["min_domains"],
     min_installed_init_brief: int = DEFAULT_TARGETS["min_installed_init_brief"],
 ) -> dict:
+    generated = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     usage_gaps = build_usage_gap_payload(
         record_dir,
         min_records=min_records,
@@ -32,13 +33,15 @@ def build_payload(
         min_installed_init_brief=min_installed_init_brief,
     )
     suggested_pilots = usage_gaps["suggested_pilots"][:max(max_pilots, 0)]
+    targets = usage_gaps["targets"]
     return {
-        "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "generated": generated,
         "status": usage_gaps["status"],
         "readiness": usage_gaps["readiness"],
         "usage_gaps": usage_gaps,
         "pilot_count": len(suggested_pilots),
         "pilots": suggested_pilots,
+        "coverage_projection": build_projection(load_records(record_dir), suggested_pilots, targets, generated),
     }
 
 
@@ -72,6 +75,24 @@ def write_report(path: Path, payload: dict) -> None:
         f"- External or multi-project records to add: {gaps['external_or_multi_project']}",
         f"- Distinct domains to add: {gaps['domains']}",
         f"- Installed brief-based generation records to add: {gaps['installed_init_brief']}",
+        "",
+        "## Listed Pilot Coverage Projection",
+        "",
+        payload["coverage_projection"]["claim_boundary"],
+        "",
+        f"- Listed pilots in projection: {payload['coverage_projection']['candidate_pilot_count']}",
+        f"- Would satisfy beta-exit usage thresholds: {str(payload['coverage_projection']['would_satisfy_beta_exit_usage_thresholds']).lower()}",
+        f"- Projected usage records: {payload['coverage_projection']['projected_summary']['total']}",
+        f"- Projected external or multi-project records: {payload['coverage_projection']['projected_summary']['external_or_multi_project']}",
+        f"- Projected distinct domains: {payload['coverage_projection']['projected_summary']['distinct_domains']}",
+        f"- Projected installed brief-based generation records: {payload['coverage_projection']['projected_summary']['installed_brief_generation']}",
+        "",
+        "Projected remaining gaps after listed pilots:",
+        "",
+        f"- Usage records: {payload['coverage_projection']['remaining_gaps_after_candidates']['records']}",
+        f"- External or multi-project records: {payload['coverage_projection']['remaining_gaps_after_candidates']['external_or_multi_project']}",
+        f"- Distinct domains: {payload['coverage_projection']['remaining_gaps_after_candidates']['domains']}",
+        f"- Installed brief-based generation records: {payload['coverage_projection']['remaining_gaps_after_candidates']['installed_init_brief']}",
         "",
         "## Pilot Slots",
         "",

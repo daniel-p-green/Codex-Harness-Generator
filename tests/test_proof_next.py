@@ -92,6 +92,8 @@ class ProofNextTests(unittest.TestCase):
         self.assertEqual("pass", payload["status"], payload)
         self.assertEqual("missing-beta-exit-evidence", payload["readiness"])
         self.assertEqual("llm-app", payload["next_pilot"]["profile"])
+        self.assertTrue(payload["coverage_projection"]["would_satisfy_beta_exit_usage_thresholds"])
+        self.assertEqual(4, payload["coverage_projection"]["candidate_pilot_count"])
         commands = [item["command"] for item in payload["command_sequence"]]
         self.assertTrue(any("codex-harness prepare-next-pilot /tmp/next-pilot" in command for command in commands))
         self.assertTrue(any("codex-harness pilot-board" in command for command in commands))
@@ -170,6 +172,9 @@ class ProofNextTests(unittest.TestCase):
             text = report.read_text(encoding="utf-8")
 
         self.assertIn("# Proof Next Actions", text)
+        self.assertIn("## Suggested Pilot Coverage Projection", text)
+        self.assertIn("Would satisfy beta-exit usage thresholds: true", text)
+        self.assertIn("Projection assumes every suggested pilot", text)
         self.assertIn("## Next Pilot", text)
         self.assertIn("codex-harness prepare-next-pilot", text)
         self.assertIn("codex-harness usage-from-harness", text)
@@ -222,6 +227,8 @@ class ProofNextTests(unittest.TestCase):
 
         self.assertEqual("beta-exit-evidence-ready", result["readiness"])
         self.assertIsNone(result["next_pilot"])
+        self.assertEqual(0, result["coverage_projection"]["candidate_pilot_count"])
+        self.assertTrue(result["coverage_projection"]["would_satisfy_beta_exit_usage_thresholds"])
         self.assertFalse(any("prepare-next-pilot" in item["command"] for item in result["command_sequence"]))
 
 

@@ -53,6 +53,11 @@ class PilotCampaignTests(unittest.TestCase):
         self.assertEqual(2, result["pilot_count"])
         self.assertEqual("llm-app", result["pilots"][0]["profile"])
         self.assertEqual("installed-quickstart", result["pilots"][0]["generation_path"])
+        self.assertEqual(2, result["coverage_projection"]["candidate_pilot_count"])
+        self.assertFalse(result["coverage_projection"]["would_satisfy_beta_exit_usage_thresholds"])
+        self.assertEqual(3, result["coverage_projection"]["projected_summary"]["total"])
+        self.assertEqual(2, result["coverage_projection"]["projected_summary"]["external_or_multi_project"])
+        self.assertEqual(2, result["coverage_projection"]["remaining_gaps_after_candidates"]["records"])
 
     def test_write_report_includes_privacy_and_claim_boundaries(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -66,6 +71,8 @@ class PilotCampaignTests(unittest.TestCase):
             text = report.read_text(encoding="utf-8")
 
         self.assertIn("# External Pilot Campaign", text)
+        self.assertIn("## Listed Pilot Coverage Projection", text)
+        self.assertIn("Would satisfy beta-exit usage thresholds: false", text)
         self.assertIn("## Pilot Slots", text)
         self.assertIn("codex-harness prepare-next-pilot", text)
         self.assertIn("codex-harness prepare-pilot", text)
@@ -103,6 +110,8 @@ class PilotCampaignTests(unittest.TestCase):
         self.assertEqual("beta-exit-evidence-ready", result["readiness"])
         self.assertEqual(0, result["pilot_count"])
         self.assertEqual([], result["pilots"])
+        self.assertEqual(0, result["coverage_projection"]["candidate_pilot_count"])
+        self.assertTrue(result["coverage_projection"]["would_satisfy_beta_exit_usage_thresholds"])
 
 
 if __name__ == "__main__":

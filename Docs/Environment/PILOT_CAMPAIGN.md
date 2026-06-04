@@ -1,6 +1,6 @@
 # External Pilot Campaign
 
-Generated: 2026-06-04T13:23:39Z
+Generated: 2026-06-04T15:51:24Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 
@@ -24,6 +24,24 @@ track it with `codex-harness pilot-board`.
 - External or multi-project records to add: 3
 - Distinct domains to add: 3
 - Installed brief-based generation records to add: 2
+
+## Listed Pilot Coverage Projection
+
+Projection assumes every suggested pilot is completed and converted into valid non-synthetic evidence; it is not usage proof.
+
+- Listed pilots in projection: 3
+- Would satisfy beta-exit usage thresholds: true
+- Projected usage records: 5
+- Projected external or multi-project records: 3
+- Projected distinct domains: 4
+- Projected installed brief-based generation records: 3
+
+Projected remaining gaps after listed pilots:
+
+- Usage records: 0
+- External or multi-project records: 0
+- Distinct domains: 0
+- Installed brief-based generation records: 0
 
 ## Pilot Slots
 

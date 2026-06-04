@@ -69,6 +69,11 @@ class UsageGapsTests(unittest.TestCase):
         self.assertEqual("LLM app pilot", result["suggested_pilots"][0]["title"])
         self.assertIn("codex-harness prepare-pilot", result["suggested_pilots"][0]["commands"][0])
         self.assertIn("--domain \"LLM app\"", result["suggested_pilots"][0]["commands"][0])
+        self.assertEqual(4, result["coverage_projection"]["candidate_pilot_count"])
+        self.assertTrue(result["coverage_projection"]["would_satisfy_beta_exit_usage_thresholds"])
+        self.assertEqual(5, result["coverage_projection"]["projected_summary"]["total"])
+        self.assertEqual(4, result["coverage_projection"]["projected_summary"]["external_or_multi_project"])
+        self.assertFalse(any(result["coverage_projection"]["remaining_gaps_after_candidates"].values()))
 
     def test_build_payload_marks_ready_when_targets_are_satisfied(self):
         records = []
@@ -100,6 +105,8 @@ class UsageGapsTests(unittest.TestCase):
         self.assertFalse(any(result["gaps"].values()))
         self.assertIn("Beta-exit usage thresholds are satisfied", result["recommendations"][0])
         self.assertEqual([], result["suggested_pilots"])
+        self.assertEqual(0, result["coverage_projection"]["candidate_pilot_count"])
+        self.assertTrue(result["coverage_projection"]["would_satisfy_beta_exit_usage_thresholds"])
 
     def test_write_report_includes_gap_sections(self):
         payload = self.valid_payload("self-dogfood-docs")
@@ -117,6 +124,9 @@ class UsageGapsTests(unittest.TestCase):
 
         self.assertIn("# Usage Evidence Gaps", text)
         self.assertIn("## Remaining Gaps", text)
+        self.assertIn("## Candidate Coverage Projection", text)
+        self.assertIn("Projection assumes every suggested pilot", text)
+        self.assertIn("Would satisfy beta-exit usage thresholds: true", text)
         self.assertIn("- External or multi-project records: 3", text)
         self.assertIn("## Suggested Pilot Targets", text)
         self.assertIn("codex-harness prepare-pilot", text)
@@ -139,6 +149,18 @@ class UsageGapsTests(unittest.TestCase):
         self.assertEqual("fail", result["status"])
         self.assertEqual("missing-beta-exit-evidence", result["readiness"])
         self.assertTrue(result["validation"]["requirement_errors"])
+
+    def test_build_payload_reports_invalid_records_without_projection_crash(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / "broken.json").write_text(json.dumps({"slug": "broken"}) + "\n", encoding="utf-8")
+
+            result = usage_gaps.build_payload(root)
+
+        self.assertEqual("fail", result["status"])
+        self.assertEqual(1, result["validation"]["record_count"])
+        self.assertTrue(result["coverage_projection"]["projected_summary"]["total"] >= 1)
+        self.assertTrue(result["validation"]["results"][0]["error"])
 
 
 if __name__ == "__main__":

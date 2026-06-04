@@ -133,14 +133,16 @@ replacement. What is proven today:
 - `scripts/usage_gaps.py` and `codex-harness usage-gaps` write
   `Docs/Environment/USAGE_GAPS.md`, a concrete list of the remaining beta-exit
   evidence gaps plus suggested external pilot targets from the supported Codex
-  profile catalog.
+  profile catalog and a coverage projection showing whether those candidates
+  would satisfy beta-exit usage thresholds if completed and converted.
 - `scripts/beta_exit_audit.py` and `codex-harness beta-exit-audit` write
   `Docs/Environment/BETA_EXIT_AUDIT.md`, a non-gating beta-exit readiness audit
   that names missing evidence, source-check state, pilot-board state, and the
   final commands to run before dropping the beta label.
 - `scripts/export_pilot_campaign.py` and `codex-harness pilot-campaign` write
   `Docs/Environment/PILOT_CAMPAIGN.md`, a shareable external-pilot campaign
-  plan derived from the current usage gaps.
+  plan derived from the current usage gaps, including a projection for the
+  listed pilot slots.
 - `scripts/proof_next.py` and `codex-harness proof-next` write
   `Docs/Environment/PROOF_NEXT.md`, a next-action packet that turns the current
   beta-exit gap into exact prepare, board, conversion, audit, and final proof
@@ -555,7 +557,9 @@ python scripts/codex_harness.py usage-gaps
 
 The report includes suggested pilot targets with starter `quickstart` or `init`
 commands plus `pilot-pack` follow-up so maintainers can collect the next records
-by profile, source type, and generation path instead of guessing.
+by profile, source type, and generation path instead of guessing. It also shows
+whether the suggested candidates would satisfy beta-exit usage thresholds if
+they become real converted evidence.
 
 Write a shareable campaign packet from those gaps:
 
@@ -570,8 +574,8 @@ python scripts/codex_harness.py proof-next
 ```
 
 `proof-next` writes `Docs/Environment/PROOF_NEXT.md`. It packages the next
-pilot target, `prepare-next-pilot`, `pilot-board`, preview-first
-`usage-from-harness` and `usage-from-issue` conversion commands,
+pilot target, candidate coverage projection, `prepare-next-pilot`,
+`pilot-board`, preview-first `usage-from-harness` and `usage-from-issue` conversion commands,
 `beta-exit-audit`, and final `proof-status --beta-exit` commands while keeping
 the claim boundary explicit: the packet is a plan, not usage proof. Use the
 copied-harness route when the generated harness directory is available; use the
@@ -683,11 +687,11 @@ Common subcommands:
 | `usage-from-harness` | `usage_from_harness.py` | Converts copied-harness task trials and eval reports into a privacy-checked usage record; add `--no-write` to preview first or `--pilot-record-dir` to prevalidate and convert a matching prepared pilot. |
 | `evidence-packet <path>` | `export_evidence_packet.py` | Exports a public-safe Markdown evidence packet from copied-harness local eval and task trials. |
 | `pilot-pack <path>` | `export_pilot_pack.py` | Writes an external pilot guide and optional GitHub issue-body draft for one privacy-safe generated-harness trial. |
-| `pilot-campaign` | `export_pilot_campaign.py` | Writes a shareable external-pilot campaign plan from current usage evidence gaps. |
+| `pilot-campaign` | `export_pilot_campaign.py` | Writes a shareable external-pilot campaign plan and listed-pilot coverage projection from current usage evidence gaps. |
 | `pilot-board` | `pilot_board.py` | Summarizes prepared pilot records and cross-checks converted pilots against usage records without counting outreach as proof. |
 | `pilot-update <slug>` | `pilot_board.py` | Updates one prepared pilot's status, validates converted usage-record references, and refreshes the pilot board. |
 | `beta-exit-audit` | `beta_exit_audit.py` | Writes a non-gating audit of beta-exit readiness and remaining evidence gaps. |
-| `proof-next` | `proof_next.py` | Writes the next beta-exit proof actions from current usage gaps without counting the plan as evidence. |
+| `proof-next` | `proof_next.py` | Writes the next beta-exit proof actions and candidate coverage projection from current usage gaps without counting the plan as evidence. |
 | `usage-from-issue` | `usage_from_issue.py` | Converts a sanitized external-usage issue body into a privacy-checked usage record; add `--lint-only` to find incomplete issue bodies, `--no-write` to preview first, or `--pilot-record-dir` to prevalidate and convert a matching prepared pilot. |
 | `usage-validate` | `validate_usage_records.py` | Validates checked-in usage evidence schema, privacy checks, and optional non-synthetic proof thresholds. |
 | `usage-gaps` | `usage_gaps.py` | Reports remaining beta-exit usage evidence gaps and writes `Docs/Environment/USAGE_GAPS.md`. |

@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from profile_catalog import catalog_payload
-from record_usage_case import DEFAULT_RECORD_DIR, load_records
+from record_usage_case import DEFAULT_RECORD_DIR, load_records, summarize_records
 from validate_usage_records import validate_record_dir
 
 
@@ -34,6 +34,7 @@ PILOT_PROFILE_PRIORITY = [
     "product-management",
     "knowledge-work",
 ]
+SUMMARY_RECORD_KEYS = {"evidence_type", "outcome", "source_type", "generation_path", "domain"}
 
 
 def record_domains(records: list[dict]) -> list[str]:
@@ -152,6 +153,42 @@ def build_suggested_pilots(domains: list[str], gaps: dict) -> list[dict]:
     return pilots
 
 
+def record_from_pilot(pilot: dict, generated: str) -> dict:
+    return {
+        "slug": pilot["slug"],
+        "title": pilot["title"],
+        "generated": generated,
+        "domain": pilot["domain"],
+        "harness_path": pilot["target"],
+        "task_summary": "Projected completed pilot; not checked usage evidence.",
+        "outcome": "success",
+        "evidence_type": "private-summary",
+        "source_type": pilot["source_type"],
+        "generation_path": pilot["generation_path"],
+        "evidence": ["Projected pilot completion."],
+        "verification": ["Projected pilot conversion."],
+        "privacy_review": "Projection only; no reporter evidence has been collected.",
+        "limitations": ["Projection is not usage proof."],
+    }
+
+
+def build_projection(records: list[dict], pilots: list[dict], targets: dict, generated: str) -> dict:
+    summarizable_records = [record for record in records if SUMMARY_RECORD_KEYS <= set(record)]
+    projected_records = [*summarizable_records, *[record_from_pilot(pilot, generated) for pilot in pilots]]
+    projected_summary = summarize_records(projected_records)
+    remaining_gaps = build_gaps(projected_summary, targets)
+    return {
+        "candidate_pilot_count": len(pilots),
+        "projected_summary": projected_summary,
+        "remaining_gaps_after_candidates": remaining_gaps,
+        "would_satisfy_beta_exit_usage_thresholds": not any(remaining_gaps.values()),
+        "claim_boundary": (
+            "Projection assumes every suggested pilot is completed and converted into valid non-synthetic evidence; "
+            "it is not usage proof."
+        ),
+    }
+
+
 def build_payload(
     record_dir: Path,
     min_records: int = DEFAULT_TARGETS["min_records"],
@@ -165,14 +202,16 @@ def build_payload(
         "min_domains": min_domains,
         "min_installed_init_brief": min_installed_init_brief,
     }
+    generated = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     validation = validate_record_dir(record_dir, require_non_synthetic=True, require_success=True)
     records = load_records(record_dir)
     domains = record_domains(records)
     gaps = build_gaps(validation["summary"], targets)
     ready = validation["status"] == "pass" and not any(gaps.values())
     suggested_pilots = build_suggested_pilots(domains, gaps)
+    projection = build_projection(records, suggested_pilots, targets, generated)
     return {
-        "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "generated": generated,
         "status": validation["status"],
         "readiness": "beta-exit-evidence-ready" if ready else "missing-beta-exit-evidence",
         "targets": targets,
@@ -181,6 +220,7 @@ def build_payload(
         "domains": domains,
         "recommendations": build_recommendations(gaps),
         "suggested_pilots": suggested_pilots,
+        "coverage_projection": projection,
         "validation": validation,
     }
 
@@ -218,6 +258,24 @@ def write_report(path: Path, payload: dict) -> None:
         f"- External or multi-project records: {payload['gaps']['external_or_multi_project']}",
         f"- Distinct domains: {payload['gaps']['domains']}",
         f"- Installed brief-based generation records: {payload['gaps']['installed_init_brief']}",
+        "",
+        "## Candidate Coverage Projection",
+        "",
+        payload["coverage_projection"]["claim_boundary"],
+        "",
+        f"- Suggested pilots in projection: {payload['coverage_projection']['candidate_pilot_count']}",
+        f"- Would satisfy beta-exit usage thresholds: {str(payload['coverage_projection']['would_satisfy_beta_exit_usage_thresholds']).lower()}",
+        f"- Projected usage records: {payload['coverage_projection']['projected_summary']['total']}",
+        f"- Projected external or multi-project records: {payload['coverage_projection']['projected_summary']['external_or_multi_project']}",
+        f"- Projected distinct domains: {payload['coverage_projection']['projected_summary']['distinct_domains']}",
+        f"- Projected installed brief-based generation records: {payload['coverage_projection']['projected_summary']['installed_brief_generation']}",
+        "",
+        "Projected remaining gaps after candidates:",
+        "",
+        f"- Usage records: {payload['coverage_projection']['remaining_gaps_after_candidates']['records']}",
+        f"- External or multi-project records: {payload['coverage_projection']['remaining_gaps_after_candidates']['external_or_multi_project']}",
+        f"- Distinct domains: {payload['coverage_projection']['remaining_gaps_after_candidates']['domains']}",
+        f"- Installed brief-based generation records: {payload['coverage_projection']['remaining_gaps_after_candidates']['installed_init_brief']}",
         "",
         "## Represented Domains",
         "",
