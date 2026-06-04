@@ -697,6 +697,8 @@ def build_payload() -> dict:
                     pilot_board_report.as_posix(),
                     "--report",
                     pilot_github_sync_report.as_posix(),
+                    "--followup-dir",
+                    (temp_root / "pilot-github-followups").as_posix(),
                     "--gh-bin",
                     fake_gh.as_posix(),
                     "--json",

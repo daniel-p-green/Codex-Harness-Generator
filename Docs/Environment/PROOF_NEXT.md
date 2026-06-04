@@ -1,6 +1,6 @@
 # Proof Next Actions
 
-Generated: 2026-06-04T18:41:34Z
+Generated: 2026-06-04T18:55:29Z
 Status: PASS
 Readiness: missing-beta-exit-evidence
 
@@ -112,7 +112,7 @@ codex-harness pilot-github-issues --record-dir Docs/Environment/pilot-records --
 Purpose: fetch live pilot issues and identify which reporter updates are ready to convert
 
 ```bash
-codex-harness pilot-github-sync --record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records --usage-report Docs/Environment/USAGE_RECORDS.md --pilot-board-report Docs/Environment/PILOT_BOARD.md --report Docs/Environment/PILOT_GITHUB_SYNC.md
+codex-harness pilot-github-sync --record-dir Docs/Environment/pilot-records --usage-record-dir Docs/Environment/usage-records --usage-report Docs/Environment/USAGE_RECORDS.md --pilot-board-report Docs/Environment/PILOT_BOARD.md --report Docs/Environment/PILOT_GITHUB_SYNC.md --followup-dir Docs/Environment/pilot-github-followups
 ```
 
 9. mark pilot completed

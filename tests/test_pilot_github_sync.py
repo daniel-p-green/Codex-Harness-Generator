@@ -106,6 +106,7 @@ class PilotGithubSyncTests(unittest.TestCase):
             "usage_report": (root / "USAGE_RECORDS.md").as_posix(),
             "pilot_board_report": (root / "PILOT_BOARD.md").as_posix(),
             "report": (root / "PILOT_GITHUB_SYNC.md").as_posix(),
+            "followup_dir": (root / "pilot-github-followups").as_posix(),
             "repo": None,
             "gh_bin": "gh",
             "generated": "2026-06-04T00:00:00Z",
@@ -173,6 +174,9 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertIn("Please reply with the missing public-safe sections", record["reporter_followup"])
         self.assertIn("### Evidence", record["reporter_followup"])
         self.assertIn("at least two public-safe bullets", record["reporter_followup"])
+        self.assertTrue(record["followup_file"].endswith("llm-app-pilot-followup.md"))
+        self.assertIn("gh issue comment https://github.com/example/repo/issues/42", record["commands"]["comment_followup"])
+        self.assertIn("--body-file", record["commands"]["comment_followup"])
 
     def test_comment_completed_issue_reports_conversion_ready(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -192,6 +196,8 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertEqual([], record["missing_fields"])
         self.assertEqual(1, record["github_issue"]["comment_count"])
         self.assertIn("No reporter follow-up needed", record["reporter_followup"])
+        self.assertEqual("", record["followup_file"])
+        self.assertNotIn("comment_followup", record["commands"])
 
     def test_conversion_ready_issue_can_be_converted_and_updates_pilot_board(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -260,6 +266,24 @@ class PilotGithubSyncTests(unittest.TestCase):
         self.assertIn("usage-from-github-issue https://github.com/example/repo/issues/42", report)
         self.assertIn("Reporter follow-up:", report)
         self.assertIn("No reporter follow-up needed", report)
+
+    def test_write_followups_writes_waiting_issue_files_only(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_pilot_record(root)
+            args = self.args(root)
+            payload = sync_pilot_github_issues.build_payload(
+                args,
+                fetch_issue=lambda *fetch_args, **kwargs: self.github_payload(),
+            )
+
+            sync_pilot_github_issues.write_followups(payload)
+
+            followup = root / "pilot-github-followups" / "llm-app-pilot-followup.md"
+            text = followup.read_text(encoding="utf-8")
+
+        self.assertIn("Please reply with the missing public-safe sections", text)
+        self.assertIn("### Privacy review", text)
 
 
 if __name__ == "__main__":

@@ -807,6 +807,8 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.extend(["--pilot-board-report", args.pilot_board_report])
         if args.report:
             command.extend(["--report", args.report])
+        if args.followup_dir:
+            command.extend(["--followup-dir", args.followup_dir])
         if args.repo:
             command.extend(["--repo", args.repo])
         if args.gh_bin:
@@ -973,6 +975,8 @@ def build_command(args: argparse.Namespace) -> list[str]:
             command.extend(["--pilot-github-issues-report", args.pilot_github_issues_report])
         if args.pilot_github_sync_report:
             command.extend(["--pilot-github-sync-report", args.pilot_github_sync_report])
+        if args.pilot_github_followup_dir:
+            command.extend(["--pilot-github-followup-dir", args.pilot_github_followup_dir])
         if args.pilot_pack_out:
             command.extend(["--pilot-pack-out", args.pilot_pack_out])
         if args.issue_out:
@@ -1554,6 +1558,7 @@ def make_parser() -> argparse.ArgumentParser:
     pilot_github_sync.add_argument("--usage-report", help="Usage-record Markdown report path for conversion commands")
     pilot_github_sync.add_argument("--pilot-board-report", help="Pilot-board Markdown report path for conversion commands")
     pilot_github_sync.add_argument("--report", help="GitHub issue sync Markdown report path")
+    pilot_github_sync.add_argument("--followup-dir", help="Directory for per-issue reporter follow-up Markdown files")
     pilot_github_sync.add_argument("--repo", help="Optional GitHub repository in owner/name form")
     pilot_github_sync.add_argument("--gh-bin", help="GitHub CLI executable")
     pilot_github_sync.add_argument("--generated", help="UTC timestamp override for previewed records")
@@ -1671,6 +1676,7 @@ def make_parser() -> argparse.ArgumentParser:
     proof_next.add_argument("--pilot-github-issues-out", help="Pilot GitHub issue body output directory")
     proof_next.add_argument("--pilot-github-issues-report", help="Pilot GitHub issue queue report path")
     proof_next.add_argument("--pilot-github-sync-report", help="Pilot GitHub issue sync report path")
+    proof_next.add_argument("--pilot-github-followup-dir", help="Pilot GitHub issue follow-up output directory")
     proof_next.add_argument("--pilot-pack-out", help="Pilot pack output path for the next prepare command")
     proof_next.add_argument("--issue-out", help="Issue draft output path for the next prepare command")
     proof_next.add_argument("--report", help="Proof-next Markdown path")

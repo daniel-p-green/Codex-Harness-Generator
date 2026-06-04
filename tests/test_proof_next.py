@@ -50,6 +50,7 @@ class ProofNextTests(unittest.TestCase):
             pilot_github_issues_out="Docs/Environment/pilot-github-issues",
             pilot_github_issues_report="Docs/Environment/PILOT_GITHUB_ISSUES.md",
             pilot_github_sync_report="Docs/Environment/PILOT_GITHUB_SYNC.md",
+            pilot_github_followup_dir="Docs/Environment/pilot-github-followups",
             pilot_pack_out="/tmp/NEXT_EXTERNAL_PILOT_PACK.md",
             issue_out="/tmp/NEXT_EXTERNAL_USAGE_ISSUE_DRAFT.md",
             report=(report or record_dir / "PROOF_NEXT.md").as_posix(),
@@ -107,6 +108,7 @@ class ProofNextTests(unittest.TestCase):
         self.assertTrue(any("codex-harness pilot-handoff" in command and "--out Docs/Environment/pilot-handoffs" in command for command in commands))
         self.assertTrue(any("codex-harness pilot-github-issues" in command for command in commands))
         self.assertTrue(any("codex-harness pilot-github-sync" in command for command in commands))
+        self.assertTrue(any("--followup-dir Docs/Environment/pilot-github-followups" in command for command in commands))
         self.assertTrue(any("codex-harness usage-from-issue" in command for command in commands))
         self.assertTrue(any("codex-harness usage-from-harness <generated-harness>" in command for command in commands))
         self.assertTrue(any("usage-from-issue <completed-issue.md>" in command and "--lint-only --json" in command for command in commands))

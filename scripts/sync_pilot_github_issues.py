@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shlex
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
@@ -20,6 +21,7 @@ from record_usage_case import find_sensitive_text
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_RECORD_DIR = pilot_board.DEFAULT_RECORD_DIR
 DEFAULT_REPORT = REPO_ROOT / "Docs" / "Environment" / "PILOT_GITHUB_SYNC.md"
+DEFAULT_FOLLOWUP_DIR = REPO_ROOT / "Docs" / "Environment" / "pilot-github-followups"
 DEFAULT_PILOT_BOARD_REPORT = pilot_board.DEFAULT_REPORT
 
 
@@ -98,6 +100,15 @@ def conversion_command(issue_url: str, args: argparse.Namespace, *, lint_only: b
     return " ".join(parts)
 
 
+def gh_issue_comment_command(issue_url: str, followup_file: str) -> str:
+    parts = ["gh", "issue", "comment", issue_url, "--body-file", followup_file]
+    return " ".join(shlex.quote(part) for part in parts)
+
+
+def followup_path(args: argparse.Namespace, record: dict) -> Path:
+    return Path(args.followup_dir) / f"{record['slug']}-followup.md"
+
+
 FIELD_LABELS = {
     "outcome": "Outcome",
     "task_summary": "Public-safe task summary",
@@ -171,6 +182,8 @@ def issue_sync_record(
         "github_issue": {},
         "commands": {},
         "reporter_followup": "",
+        "followup_file": "",
+        "display_followup_file": "",
     }
     if not issue_url:
         base["errors"] = ["Pilot record has no live GitHub issue URL in notes or status history."]
@@ -203,6 +216,11 @@ def issue_sync_record(
     base["counts"] = lint_payload.get("counts", {})
     base["github_issue"] = lint_payload.get("github_issue", {})
     base["reporter_followup"] = reporter_followup(base)
+    if base["readiness"] == "waiting-for-reporter":
+        path = followup_path(args, record)
+        base["followup_file"] = path.as_posix()
+        base["display_followup_file"] = display_path(path)
+        base["commands"]["comment_followup"] = gh_issue_comment_command(issue_url, base["display_followup_file"])
     return base
 
 
@@ -244,6 +262,7 @@ def build_payload(args: argparse.Namespace, fetch_issue: Callable[..., dict] = u
         "readiness": readiness,
         "record_dir": args.record_dir,
         "usage_record_dir": args.usage_record_dir,
+        "followup_dir": args.followup_dir,
         "statuses": list(statuses),
         "slugs": list(slugs),
         "summary": summary,
@@ -259,6 +278,20 @@ def build_payload(args: argparse.Namespace, fetch_issue: Callable[..., dict] = u
             "completed evidence is converted into a validated usage record."
         ),
     }
+
+
+def safe_write(path: Path, text: str, *, label: str) -> None:
+    findings = find_sensitive_text(text)
+    if findings:
+        raise SystemExit(f"Refusing to write {label} with sensitive text: " + ", ".join(findings))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text.rstrip() + "\n", encoding="utf-8")
+
+
+def write_followups(payload: dict) -> None:
+    for record in payload["records"]:
+        if record.get("followup_file") and record.get("reporter_followup"):
+            safe_write(Path(record["followup_file"]), record["reporter_followup"], label=f"GitHub issue follow-up for {record['slug']}")
 
 
 def write_report(path: Path, payload: dict) -> None:
@@ -297,6 +330,7 @@ def write_report(path: Path, payload: dict) -> None:
                 f"- GitHub state: `{record.get('github_issue', {}).get('state', 'unknown')}`",
                 f"- Comments included: {record.get('github_issue', {}).get('comment_count', 0)}",
                 f"- Missing fields: {', '.join(record['missing_fields']) if record['missing_fields'] else 'none'}",
+                f"- Follow-up file: `{record['display_followup_file']}`" if record.get("display_followup_file") else "- Follow-up file: not needed",
             ]
         )
         if record["errors"]:
@@ -315,6 +349,7 @@ def write_report(path: Path, payload: dict) -> None:
                     record["commands"]["lint"],
                     record["commands"]["preview"],
                     record["commands"]["convert"],
+                    *([record["commands"]["comment_followup"]] if record["commands"].get("comment_followup") else []),
                     "```",
                 ]
             )
@@ -339,11 +374,7 @@ def write_report(path: Path, payload: dict) -> None:
         ]
     )
     text = "\n".join(lines).rstrip() + "\n"
-    findings = find_sensitive_text(text)
-    if findings:
-        raise SystemExit("Refusing to write GitHub issue sync report with sensitive text: " + ", ".join(findings))
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf-8")
+    safe_write(path, text, label="GitHub issue sync report")
 
 
 def main() -> int:
@@ -353,6 +384,7 @@ def main() -> int:
     parser.add_argument("--usage-report", default=DEFAULT_USAGE_REPORT.as_posix(), help="Usage-record Markdown report path")
     parser.add_argument("--pilot-board-report", default=DEFAULT_PILOT_BOARD_REPORT.as_posix(), help="Pilot-board Markdown report path")
     parser.add_argument("--report", default=DEFAULT_REPORT.as_posix(), help="GitHub issue sync report path")
+    parser.add_argument("--followup-dir", default=DEFAULT_FOLLOWUP_DIR.as_posix(), help="Directory for per-issue reporter follow-up Markdown files")
     parser.add_argument("--repo", help="Optional GitHub repository in owner/name form")
     parser.add_argument("--gh-bin", default="gh", help="GitHub CLI executable")
     parser.add_argument("--generated", default=utc_now(), help="UTC timestamp override for previewed records")
@@ -364,6 +396,7 @@ def main() -> int:
 
     payload = build_payload(args)
     if not args.no_write:
+        write_followups(payload)
         write_report(Path(args.report), payload)
     if args.json:
         print(json.dumps(payload, indent=2))

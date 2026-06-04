@@ -1,6 +1,6 @@
 # Pilot GitHub Issue Sync
 
-Generated: 2026-06-04T18:46:55Z
+Generated: 2026-06-04T18:55:30Z
 Status: PASS
 Readiness: waiting-for-reporters
 
@@ -25,6 +25,7 @@ Pilot GitHub issue sync checks public intake readiness only; it is not usage pro
 - GitHub state: `OPEN`
 - Comments included: 0
 - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
+- Follow-up file: `Docs/Environment/pilot-github-followups/llm-app-pilot-followup.md`
 
 Errors:
 - Missing required issue field(s): outcome, task_summary, evidence, verification, privacy_review, limitations
@@ -38,6 +39,7 @@ Commands:
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+gh issue comment https://github.com/daniel-p-green/Codex-Harness-Generator/issues/3 --body-file Docs/Environment/pilot-github-followups/llm-app-pilot-followup.md
 ```
 
 Reporter follow-up:
@@ -82,6 +84,7 @@ Once those sections are present, a maintainer can run `codex-harness pilot-githu
 - GitHub state: `OPEN`
 - Comments included: 0
 - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
+- Follow-up file: `Docs/Environment/pilot-github-followups/security-audit-pilot-followup.md`
 
 Errors:
 - Missing required issue field(s): outcome, task_summary, evidence, verification, privacy_review, limitations
@@ -95,6 +98,7 @@ Commands:
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+gh issue comment https://github.com/daniel-p-green/Codex-Harness-Generator/issues/1 --body-file Docs/Environment/pilot-github-followups/security-audit-pilot-followup.md
 ```
 
 Reporter follow-up:
@@ -139,6 +143,7 @@ Once those sections are present, a maintainer can run `codex-harness pilot-githu
 - GitHub state: `OPEN`
 - Comments included: 0
 - Missing fields: outcome, task_summary, evidence, verification, privacy_review, limitations
+- Follow-up file: `Docs/Environment/pilot-github-followups/customer-support-pilot-followup.md`
 
 Errors:
 - Missing required issue field(s): outcome, task_summary, evidence, verification, privacy_review, limitations
@@ -152,6 +157,7 @@ Commands:
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --lint-only --json
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --no-write --json
 codex-harness usage-from-github-issue https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --include-comments --record-dir Docs/Environment/usage-records --report Docs/Environment/USAGE_RECORDS.md --pilot-record-dir Docs/Environment/pilot-records --pilot-board-report Docs/Environment/PILOT_BOARD.md --json
+gh issue comment https://github.com/daniel-p-green/Codex-Harness-Generator/issues/2 --body-file Docs/Environment/pilot-github-followups/customer-support-pilot-followup.md
 ```
 
 Reporter follow-up:

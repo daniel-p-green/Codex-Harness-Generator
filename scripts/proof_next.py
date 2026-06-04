@@ -24,6 +24,7 @@ DEFAULT_PILOT_HANDOFF_OUT_TEXT = "Docs/Environment/pilot-handoffs"
 DEFAULT_PILOT_GITHUB_ISSUES_OUT_TEXT = "Docs/Environment/pilot-github-issues"
 DEFAULT_PILOT_GITHUB_ISSUES_REPORT_TEXT = "Docs/Environment/PILOT_GITHUB_ISSUES.md"
 DEFAULT_PILOT_GITHUB_SYNC_REPORT_TEXT = "Docs/Environment/PILOT_GITHUB_SYNC.md"
+DEFAULT_PILOT_GITHUB_FOLLOWUP_DIR_TEXT = "Docs/Environment/pilot-github-followups"
 GITHUB_ISSUE_RE = re.compile(r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/issues/\d+")
 
 
@@ -220,7 +221,8 @@ def build_pilot_github_sync_command(args: argparse.Namespace) -> str:
         f"--usage-record-dir {args.record_dir} "
         f"--usage-report {args.usage_report} "
         f"--pilot-board-report {args.pilot_board_report} "
-        f"--report {args.pilot_github_sync_report}"
+        f"--report {args.pilot_github_sync_report} "
+        f"--followup-dir {args.pilot_github_followup_dir}"
     )
 
 
@@ -553,6 +555,7 @@ def main() -> int:
     parser.add_argument("--pilot-github-issues-out", default=DEFAULT_PILOT_GITHUB_ISSUES_OUT_TEXT, help="Pilot GitHub issue body output directory")
     parser.add_argument("--pilot-github-issues-report", default=DEFAULT_PILOT_GITHUB_ISSUES_REPORT_TEXT, help="Pilot GitHub issue queue report path")
     parser.add_argument("--pilot-github-sync-report", default=DEFAULT_PILOT_GITHUB_SYNC_REPORT_TEXT, help="Pilot GitHub issue sync report path")
+    parser.add_argument("--pilot-github-followup-dir", default=DEFAULT_PILOT_GITHUB_FOLLOWUP_DIR_TEXT, help="Pilot GitHub issue follow-up output directory")
     parser.add_argument("--pilot-pack-out", default="/tmp/NEXT_EXTERNAL_PILOT_PACK.md", help="Pilot pack output path for the next prepare command")
     parser.add_argument("--issue-out", default="/tmp/NEXT_EXTERNAL_USAGE_ISSUE_DRAFT.md", help="Issue draft output path for the next prepare command")
     parser.add_argument("--report", default=DEFAULT_REPORT.as_posix(), help="Proof-next Markdown path")
