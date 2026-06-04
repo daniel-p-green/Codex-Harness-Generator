@@ -61,6 +61,26 @@ def build_summary(items: list[dict]) -> dict[str, int]:
     return summary
 
 
+def post_adoption_checks() -> list[dict[str, str]]:
+    return [
+        {
+            "name": "generated self-check",
+            "command": "python scripts/check-harness.py",
+            "purpose": "verify copied harness files resolve locally",
+        },
+        {
+            "name": "copied local eval",
+            "command": "python scripts/run-harness-evals.py --no-write",
+            "purpose": "run the adopted harness eval without rewriting reports",
+        },
+        {
+            "name": "task trial evidence",
+            "command": "python scripts/record-task-trial.py --help",
+            "purpose": "confirm the task-trial recorder is available before the first real task",
+        },
+    ]
+
+
 def write_report(path: Path, payload: dict) -> Path:
     lines = [
         "# Harness Adoption Plan",
@@ -85,11 +105,22 @@ def write_report(path: Path, payload: dict) -> Path:
         "4. Run the generated `scripts/check-harness.py` after adoption.",
         "5. Record a task trial after the first real Codex task.",
         "",
-        "## File Plan",
+        "## Post-Adoption Checks",
         "",
-        "| Path | Status | Action |",
+        "| Check | Command | Purpose |",
         "|---|---|---|",
     ]
+    for check in payload["post_adoption_checks"]:
+        lines.append(f"| {check['name']} | `{check['command']}` | {check['purpose']} |")
+    lines.extend(
+        [
+            "",
+            "## File Plan",
+            "",
+            "| Path | Status | Action |",
+            "|---|---|---|",
+        ]
+    )
     for item in payload["files"]:
         lines.append(f"| `{item['path']}` | {item['status']} | {item['action']} |")
     lines.extend(
@@ -153,6 +184,10 @@ def write_copy_script(path: Path, payload: dict, blueprint: Path, project: Path)
     lines.extend(
         [
             'echo "Add-only copy complete. Review conflicts manually before merging them."',
+            'echo "Next checks:"',
+            'echo "  python scripts/check-harness.py"',
+            'echo "  python scripts/run-harness-evals.py --no-write"',
+            'echo "  python scripts/record-task-trial.py --help"',
             "",
         ]
     )
@@ -245,6 +280,7 @@ def build_payload(
         "summary": summary,
         "files": files,
         "conflicts": [item for item in files if item["status"] == "conflict"],
+        "post_adoption_checks": post_adoption_checks(),
         "_blueprint_path": blueprint_path,
     }
 
@@ -258,6 +294,7 @@ def format_payload(payload: dict) -> str:
         f"- conflicts: {payload['summary'].get('conflict', 0)}",
         f"- identical: {payload['summary'].get('identical', 0)}",
     ]
+    lines.append("- post-adoption checks: " + ", ".join(check["command"] for check in payload["post_adoption_checks"]))
     if payload["conflicts"]:
         lines.append("")
         lines.append("Conflicts:")

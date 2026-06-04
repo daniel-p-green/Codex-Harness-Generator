@@ -319,7 +319,8 @@ project-local `AGENTS.md`, `.codex/config.toml`, and other existing guidance can
 be merged by hand. When you pass `--blueprint-out` and `--copy-script`, it also
 writes a persistent generated blueprint plus an executable script that copies
 only `add` rows and refuses to overwrite existing project files. Conflict rows
-still require manual review.
+still require manual review. The plan and copy script include post-adoption
+checks for the generated self-check, copied local eval, and task-trial recorder.
 
 To inspect an older harness before manually porting it to Codex-native files:
 

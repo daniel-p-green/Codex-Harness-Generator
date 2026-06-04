@@ -57,6 +57,7 @@ class PlanProjectAdoptionTests(unittest.TestCase):
         self.assertGreater(payload["summary"]["add"], 0)
         self.assertGreaterEqual(payload["summary"]["conflict"], 1)
         self.assertTrue(any(item["path"] == "AGENTS.md" for item in payload["conflicts"]))
+        self.assertTrue(any(check["command"] == "python scripts/check-harness.py" for check in payload["post_adoption_checks"]))
         self.assertNotIn(temp_dir.name, json.dumps(payload))
 
     def test_write_report_lists_conflicts_and_privacy_boundary(self):
@@ -80,6 +81,8 @@ class PlanProjectAdoptionTests(unittest.TestCase):
 
         text = report.read_text(encoding="utf-8")
         self.assertIn("# Harness Adoption Plan", text)
+        self.assertIn("## Post-Adoption Checks", text)
+        self.assertIn("`python scripts/check-harness.py`", text)
         self.assertIn("`AGENTS.md` | conflict", text)
         self.assertIn("It does not include source file contents", text)
 
@@ -118,6 +121,8 @@ class PlanProjectAdoptionTests(unittest.TestCase):
         self.assertTrue(copy_script.stat().st_mode & 0o111)
         script_text = copy_script.read_text(encoding="utf-8")
         self.assertIn("Refusing to overwrite existing path", script_text)
+        self.assertIn("Next checks:", script_text)
+        self.assertIn("python scripts/run-harness-evals.py --no-write", script_text)
         self.assertNotIn("cp \"$BLUEPRINT_DIR\"/AGENTS.md", script_text)
 
         copy_completed = subprocess.run(
@@ -171,6 +176,7 @@ class PlanProjectAdoptionTests(unittest.TestCase):
         self.assertEqual("pass", payload["status"])
         self.assertEqual("llm-app", payload["profile"])
         self.assertGreater(payload["summary"]["add"], 0)
+        self.assertIn("post_adoption_checks", payload)
 
     def test_rejects_missing_project(self):
         completed = subprocess.run(
