@@ -19,6 +19,9 @@ class CodexHarnessCliTests(unittest.TestCase):
         pyproject = (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
         self.assertIn('name = "codex-harness-generator"', pyproject)
+        self.assertIn('license = "MIT"', pyproject)
+        self.assertNotIn('license = { text = "MIT" }', pyproject)
+        self.assertNotIn("License :: OSI Approved :: MIT License", pyproject)
         self.assertIn('codex-harness = "scripts.codex_harness:main"', pyproject)
         self.assertIn('packages = ["scripts"]', pyproject)
         self.assertTrue((REPO_ROOT / "scripts" / "__init__.py").exists())

@@ -8,7 +8,7 @@ version = "1.0.0"
 description = "Generate and validate Codex-native project harnesses."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
 authors = [
   { name = "Daniel Green" }
 ]
@@ -16,7 +16,6 @@ keywords = ["codex", "agents", "harness", "openai", "developer-tools"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
