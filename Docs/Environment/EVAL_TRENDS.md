@@ -6,6 +6,7 @@ without searching CI logs.
 
 | Generated | Label | Status | Passed | Failed | Steps |
 |---|---|---|---:|---:|---:|
+| 2026-06-05T00:06:41Z | `beta-exit-offline` | PASS | 24 | 0 | 24 |
 | 2026-06-04T04:20:00Z | `offline` | PASS | 13 | 0 | 13 |
 
 ## Scope

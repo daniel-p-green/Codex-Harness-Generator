@@ -17,6 +17,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REPORT = REPO_ROOT / "Docs" / "Environment" / "BETA_EXIT_AUDIT.md"
 SOURCE_FRESHNESS_REPORT = REPO_ROOT / "Docs" / "Environment" / "SOURCE_FRESHNESS.md"
 SEMANTIC_ALIGNMENT_REPORT = REPO_ROOT / "Docs" / "Environment" / "SEMANTIC_ALIGNMENT.md"
+PROOF_STATUS_REPORT = REPO_ROOT / "Docs" / "Environment" / "PROOF_STATUS.md"
+EVAL_HISTORY_DIR = REPO_ROOT / "Docs" / "Environment" / "eval-history"
 
 
 def utc_now() -> str:
@@ -33,6 +35,49 @@ def report_status(path: Path) -> dict:
     return {"path": display, "status": "unknown"}
 
 
+def display_path(path: Path) -> str:
+    return path.relative_to(REPO_ROOT).as_posix() if path.is_relative_to(REPO_ROOT) else path.as_posix()
+
+
+def proof_status_report(path: Path = PROOF_STATUS_REPORT) -> dict:
+    payload = report_status(path)
+    payload["mode"] = "unknown"
+    payload["readiness"] = "unknown"
+    if not path.exists():
+        return payload
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("Mode:"):
+            payload["mode"] = line.split(":", 1)[1].strip()
+        if line.startswith("Readiness:"):
+            payload["readiness"] = line.split(":", 1)[1].strip()
+    return payload
+
+
+def latest_eval_snapshot(history_dir: Path = EVAL_HISTORY_DIR) -> dict:
+    if not history_dir.exists():
+        return {"path": display_path(history_dir), "status": "missing"}
+    snapshots = []
+    for path in sorted(history_dir.glob("*.json")):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        payload["path"] = display_path(path)
+        snapshots.append(payload)
+    if not snapshots:
+        return {"path": display_path(history_dir), "status": "missing"}
+    latest = max(snapshots, key=lambda item: item.get("generated", ""))
+    return {
+        "path": latest["path"],
+        "generated": latest.get("generated", "unknown"),
+        "label": latest.get("label", "unknown"),
+        "status": latest.get("status", "unknown"),
+        "passed": latest.get("passed", 0),
+        "failed": latest.get("failed", 0),
+        "step_count": latest.get("step_count", 0),
+    }
+
+
 def criterion(name: str, passed: bool, detail: str, command: str = "") -> dict:
     return {
         "name": name,
@@ -46,6 +91,10 @@ def build_payload(
     record_dir: Path,
     pilot_record_dir: Path,
     usage_record_dir: Path,
+    source_freshness_report: Path = SOURCE_FRESHNESS_REPORT,
+    semantic_alignment_report: Path = SEMANTIC_ALIGNMENT_REPORT,
+    proof_status_path: Path = PROOF_STATUS_REPORT,
+    eval_history_dir: Path = EVAL_HISTORY_DIR,
     min_records: int = usage_gaps.DEFAULT_TARGETS["min_records"],
     min_external_or_multi_project: int = usage_gaps.DEFAULT_TARGETS["min_external_or_multi_project"],
     min_domains: int = usage_gaps.DEFAULT_TARGETS["min_domains"],
@@ -59,8 +108,10 @@ def build_payload(
         min_installed_init_brief=min_installed_init_brief,
     )
     board_payload = pilot_board.build_payload(pilot_record_dir, usage_record_dir=usage_record_dir)
-    source_freshness = report_status(SOURCE_FRESHNESS_REPORT)
-    semantic_alignment = report_status(SEMANTIC_ALIGNMENT_REPORT)
+    source_freshness = report_status(source_freshness_report)
+    semantic_alignment = report_status(semantic_alignment_report)
+    proof_status = proof_status_report(proof_status_path)
+    eval_snapshot = latest_eval_snapshot(eval_history_dir)
     summary = gaps_payload["summary"]
     gaps = gaps_payload["gaps"]
     criteria = [
@@ -102,14 +153,27 @@ def build_payload(
         ),
         criterion(
             "release_gate",
-            False,
-            "Run locally and on CI before dropping the beta label.",
+            eval_snapshot["status"] == "pass",
+            "{path} status={status} generated={generated} label={label} passed={passed} failed={failed} steps={step_count}".format(
+                path=eval_snapshot.get("path", "Docs/Environment/eval-history"),
+                status=eval_snapshot.get("status", "missing"),
+                generated=eval_snapshot.get("generated", "unknown"),
+                label=eval_snapshot.get("label", "unknown"),
+                passed=eval_snapshot.get("passed", 0),
+                failed=eval_snapshot.get("failed", 0),
+                step_count=eval_snapshot.get("step_count", 0),
+            ),
             "codex-harness gate",
         ),
         criterion(
             "beta_exit_proof_status",
-            False,
-            "Run after usage thresholds and source checks are satisfied.",
+            proof_status["status"] == "pass" and proof_status["mode"] == "beta-exit",
+            "{path} status={status} mode={mode} readiness={readiness}".format(
+                path=proof_status.get("path", "Docs/Environment/PROOF_STATUS.md"),
+                status=proof_status.get("status", "missing"),
+                mode=proof_status.get("mode", "unknown"),
+                readiness=proof_status.get("readiness", "unknown"),
+            ),
             "codex-harness proof-status --beta-exit",
         ),
     ]
@@ -129,6 +193,8 @@ def build_payload(
         "pilot_board": board_payload,
         "source_freshness": source_freshness,
         "semantic_alignment": semantic_alignment,
+        "proof_status": proof_status,
+        "eval_snapshot": eval_snapshot,
         "next_actions": gaps_payload["recommendations"],
         "claim_boundary": "This audit reports beta-exit readiness; it does not itself prove external adoption or replace proof-status --beta-exit.",
     }

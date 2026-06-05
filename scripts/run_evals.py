@@ -18,9 +18,17 @@ CREATE_ACCEPTANCE_EXAMPLE_ROOT = REPO_ROOT / "examples" / "create-acceptance"
 BRIEF_ACCEPTANCE_EXAMPLE_ROOT = REPO_ROOT / "examples" / "brief-acceptance"
 LIVE_CREATE_EXAMPLE_ROOT = REPO_ROOT / "examples" / "live-create"
 DEMO_CAPTURE_EXAMPLE_ROOT = REPO_ROOT / "examples" / "demo-capture"
+USAGE_RECORD_DIR = REPO_ROOT / "Docs" / "Environment" / "usage-records"
+
+
+def usage_record_names() -> set[str]:
+    if not USAGE_RECORD_DIR.exists():
+        return set()
+    return {path.name for path in USAGE_RECORD_DIR.glob("*.json")}
 
 
 def run_step(name: str, command: list[str]) -> dict:
+    before_records = usage_record_names()
     completed = subprocess.run(
         command,
         cwd=REPO_ROOT,
@@ -28,13 +36,27 @@ def run_step(name: str, command: list[str]) -> dict:
         capture_output=True,
         check=False,
     )
+    after_records = usage_record_names()
+    added_records = sorted(after_records - before_records)
+    removed_records = sorted(before_records - after_records)
+    mutation_error = ""
+    if added_records or removed_records:
+        for record_name in added_records:
+            record_path = USAGE_RECORD_DIR / record_name
+            if record_path.exists():
+                record_path.unlink()
+        mutation_error = "checked-in usage records changed during eval step"
+        if added_records:
+            mutation_error += f"; added={','.join(added_records)}"
+        if removed_records:
+            mutation_error += f"; removed={','.join(removed_records)}"
     return {
         "name": name,
         "command": command,
-        "returncode": completed.returncode,
-        "status": "pass" if completed.returncode == 0 else "fail",
+        "returncode": 1 if mutation_error else completed.returncode,
+        "status": "fail" if mutation_error or completed.returncode != 0 else "pass",
         "stdout": completed.stdout,
-        "stderr": completed.stderr,
+        "stderr": "\n".join(part for part in [completed.stderr.rstrip(), mutation_error] if part),
     }
 
 

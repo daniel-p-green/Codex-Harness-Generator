@@ -99,7 +99,7 @@ class CheckCliInstallTests(unittest.TestCase):
 
         self.assertEqual("pass", payload["status"])
         names = [step["name"] for step in payload["steps"]]
-        self.assertEqual(["create_venv", "install_package", "profiles", "doctor", "init", "quickstart", "demo_capture", "prepare_pilot", "validate", "inspect", "adoption_plan", "equivalence", "upstream_drift", "init_from_project", "record_task_trial", "local_eval", "public_usage_report", "evidence_packet", "pilot_pack", "usage_from_harness", "usage_from_issue_lint", "usage_from_issue_preview", "usage_from_issue", "prepare_next_pilot", "prepare_pilot_batch_dry_run", "pilot_board", "pilot_update", "pilot_outreach", "pilot_handoff", "pilot_handoff_audit", "pilot_github_issues", "pilot_reporter_replies", "pilot_github_sync", "pilot_next_action", "usage_from_issue_pilot_conversion", "usage_from_github_issue_lint", "usage_gaps", "beta_exit_audit", "beta_status", "pilot_campaign", "proof_next", "migration_audit", "prepare_migration", "eval"], names)
+        self.assertEqual(["create_venv", "install_package", "profiles", "init", "quickstart", "demo_capture", "prepare_pilot", "validate", "inspect", "adoption_plan", "equivalence", "upstream_drift", "init_from_project", "record_task_trial", "local_eval", "public_usage_report", "evidence_packet", "pilot_pack", "usage_from_harness", "usage_from_issue_lint", "usage_from_issue_preview", "usage_from_issue", "doctor", "prepare_next_pilot", "prepare_pilot_batch_dry_run", "pilot_board", "pilot_update", "pilot_outreach", "pilot_handoff", "pilot_handoff_audit", "pilot_github_issues", "pilot_reporter_replies", "pilot_github_sync", "pilot_next_action", "usage_from_issue_pilot_conversion", "usage_from_github_issue_lint", "usage_gaps", "beta_exit_audit", "beta_status", "pilot_campaign", "proof_next", "migration_audit", "prepare_migration", "eval"], names)
         self.assertTrue(any("pip" in command and "install" in command for command in calls))
         create_venv_call = next(command for command in calls if command[0:3] == [sys.executable, "-m", "venv"])
         self.assertNotIn("--system-site-packages", create_venv_call)
@@ -123,6 +123,8 @@ class CheckCliInstallTests(unittest.TestCase):
         self.assertNotEqual(REPO_ROOT.as_posix(), equivalence_step["cwd"])
         self.assertEqual(REPO_ROOT.as_posix(), upstream_step["cwd"])
         self.assertTrue(any("codex-harness" in command[0] and "doctor" in command for command in calls))
+        doctor_call = next(command for command in calls if "codex-harness" in command[0] and "doctor" in command)
+        self.assertNotIn((REPO_ROOT / "Docs" / "Environment" / "usage-records").as_posix(), doctor_call)
         self.assertTrue(any("codex-harness" in command[0] and "init" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "quickstart" in command for command in calls))
         self.assertTrue(any("codex-harness" in command[0] and "demo-capture" in command for command in calls))

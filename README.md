@@ -1,6 +1,6 @@
 # Codex Harness Generator
 
-**v1.0.0** | Codex-equivalent beta | Built for Codex GPT-5.5 (`gpt-5.5`) | MIT
+**v1.0.0** | Codex-equivalent beta-exit candidate | Built for Codex GPT-5.5 (`gpt-5.5`) | MIT
 
 Codex Harness Generator helps you create and validate a project-specific Codex
 harness: `AGENTS.md`, `.codex/config.toml`, `.codex/agents/`, `.agents/skills/`,
@@ -20,10 +20,15 @@ earlier harness-generator architecture. It has been ported to Codex concepts:
 `AGENTS.md`, `.codex/config.toml`, TOML subagents, `.agents/skills/`, Codex
 permission profiles, artifact-first docs, and a local eval gate.
 
-It should still be treated as a **beta**, not a fully battle-tested public
-replacement. What is proven today:
+It should still be treated as a **beta-exit candidate**, not a fully
+battle-tested public replacement. What is proven today:
 
 - The repo is structurally Codex-native and passes the local eval gate.
+- Beta-exit usage thresholds are satisfied by 8 non-synthetic successful usage
+  records: 5 self-dogfood records and 3 maintainer-run multi-project public-repo
+  trials across 7 domains.
+- `proof-status --beta-exit`, `doctor --beta-exit`, and `beta-exit-audit` pass
+  locally, and the latest offline eval-history snapshot passed 24/24 steps.
 - Golden generated-harness fixtures pass contract, smoke, and mutation tests.
 - `scripts/generate_minimal_harness.py` provides a deterministic acceptance path
   for the four base starter profiles and 16 bundled domain presets without
@@ -248,19 +253,23 @@ replacement. What is proven today:
   slug so maintainers can omit `--slug` when the issue body is complete.
   `Docs/Environment/EXTERNAL_USAGE_ISSUE_EXAMPLE.md` is a synthetic,
   importer-tested example of the expected issue shape; it is not usage proof.
-- `Docs/Environment/usage-records/` includes sanitized self-dogfood usage
-  records from this public repo's Codex work. They are useful evidence, but not
-  yet external or longitudinal adoption proof.
+- `Docs/Environment/usage-records/` includes sanitized self-dogfood records from
+  this public repo's Codex work plus three maintainer-run multi-project public
+  repository trials. They satisfy the repo's beta-exit usage thresholds, but
+  they are not broad external reporter adoption or longitudinal private-repo
+  proof.
 - `scripts/proof_status.py` writes `Docs/Environment/PROOF_STATUS.md`, a
   one-command readiness summary tying the proof matrix, installable CLI smoke,
   live task trials, and usage records together without overclaiming.
 
 What still needs product proof:
 
+- Broad external reporter adoption.
 - More real use of generated harnesses on real Codex tasks over time, especially
-  external or multi-project usage, recorded as sanitized or private-summary
-  evidence. External users can start with the GitHub **External usage report**
-  issue template; see `Docs/Environment/EXTERNAL_USAGE_EVIDENCE.md`.
+  external reporter usage and longitudinal private-repo usage, recorded as
+  sanitized or private-summary evidence. External users can start with the GitHub
+  **External usage report** issue template; see
+  `Docs/Environment/EXTERNAL_USAGE_EVIDENCE.md`.
 - More live examples for specialized domains as new public-safe briefs become
   available.
 
@@ -633,20 +642,19 @@ Validate checked-in usage records before release:
 python scripts/codex_harness.py usage-validate
 ```
 
-Report what beta-exit usage evidence is still missing:
+Report beta-exit usage evidence status:
 
 ```bash
 python scripts/codex_harness.py equivalence
 python scripts/codex_harness.py usage-gaps
 ```
 
-The report includes suggested pilot targets with starter `quickstart` or `init`
-commands plus `pilot-pack` follow-up so maintainers can collect the next records
-by profile, source type, and generation path instead of guessing. It also shows
-whether the suggested candidates would satisfy beta-exit usage thresholds if
-they become real converted evidence. Suggested `prepare-pilot` commands include
-`--pilot-record-dir Docs/Environment/pilot-records` so prepared pilots are
-tracked immediately.
+When gaps remain, the report includes suggested pilot targets with starter
+`quickstart` or `init` commands plus `pilot-pack` follow-up so maintainers can
+collect the next records by profile, source type, and generation path instead
+of guessing. In the current checkout, the usage thresholds are satisfied by
+checked-in self-dogfood and multi-project public-repo records, so the report
+shows zero remaining beta-exit usage gaps.
 
 Write a shareable campaign packet from those gaps:
 
@@ -660,14 +668,16 @@ Write the exact next proof commands from those gaps:
 python scripts/codex_harness.py proof-next
 ```
 
-`proof-next` writes `Docs/Environment/PROOF_NEXT.md`. It packages the next
-pilot target, candidate coverage projection, `prepare-next-pilot`,
-`prepare-pilot-batch`, `pilot-board`, `pilot-outreach`, `pilot-handoff`,
-`pilot-handoff-audit`, `pilot-github-issues`, preview-first `usage-from-harness`, `usage-from-issue`, and `usage-from-github-issue` conversion commands,
-`beta-exit-audit`, and final `proof-status --beta-exit` commands while keeping
-the claim boundary explicit: the packet is a plan, not usage proof. Use the
-copied-harness route when the generated harness directory is available; use the
-issue route when the reporter only shared the sanitized issue body.
+`proof-next` writes `Docs/Environment/PROOF_NEXT.md`. When gaps remain, it
+packages the next pilot target, candidate coverage projection,
+`prepare-next-pilot`, `prepare-pilot-batch`, `pilot-board`, `pilot-outreach`,
+`pilot-handoff`, `pilot-handoff-audit`, `pilot-github-issues`, preview-first
+`usage-from-harness`, `usage-from-issue`, and `usage-from-github-issue`
+conversion commands. In the current checkout, it reports no next pilot needed
+from usage gaps and lists the final audit, doctor, and proof-status commands
+instead. Use the copied-harness route when the generated harness directory is
+available; use the issue route when the reporter only shared the sanitized issue
+body.
 
 To collect privacy-safe evidence from outside this repository, use the
 **External usage report** GitHub issue template and
@@ -698,7 +708,7 @@ into issue comments after completing a task. `pilot-github-sync` writes
 `pilot-next-action` writes `Docs/Environment/PILOT_NEXT_ACTION.md` and prints
 the single next maintainer command from that same live readiness check.
 `beta-status` writes `Docs/Environment/BETA_STATUS.md`, combining the current
-usage evidence gap, live pilot queue, per-issue waiting or conversion-ready
+usage evidence state, live pilot queue, per-issue waiting or conversion-ready
 details, next action, and strict beta-exit doctor state without treating waiting
 pilots as proof.
 The `Usage Evidence Lint` GitHub Action runs the same lint-only importer path on

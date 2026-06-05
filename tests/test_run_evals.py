@@ -1,6 +1,9 @@
 import importlib.util
+import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -51,6 +54,27 @@ class RunEvalsTests(unittest.TestCase):
 
         self.assertEqual(1, len(paths))
         self.assertTrue(paths[0].endswith("examples/demo-capture/rag-quality"))
+
+    def test_run_step_fails_and_removes_added_usage_record(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            record_dir = root / "usage-records"
+            record_dir.mkdir()
+            writer = root / "write_record.py"
+            writer.write_text(
+                "from pathlib import Path\n"
+                f"Path({str(record_dir / 'accidental.json')!r}).write_text('{{}}\\n', encoding='utf-8')\n",
+                encoding="utf-8",
+            )
+
+            with patch.object(run_evals, "USAGE_RECORD_DIR", record_dir):
+                result = run_evals.run_step("mutating_step", [sys.executable, writer.as_posix()])
+
+        self.assertEqual("fail", result["status"])
+        self.assertEqual(1, result["returncode"])
+        self.assertIn("checked-in usage records changed", result["stderr"])
+        self.assertIn("accidental.json", result["stderr"])
+        self.assertFalse((record_dir / "accidental.json").exists())
 
 
 if __name__ == "__main__":

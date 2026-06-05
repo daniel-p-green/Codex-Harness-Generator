@@ -52,12 +52,50 @@ class BetaExitAuditTests(unittest.TestCase):
         for slug, domain, source_type, generation_path in records:
             self.write_record(root, self.valid_record(slug, domain, source_type, generation_path))
 
-    def test_build_payload_reports_missing_current_beta_exit_evidence(self):
-        payload = beta_exit_audit.build_payload(
-            REPO_ROOT / "Docs" / "Environment" / "usage-records",
-            pilot_record_dir=REPO_ROOT / "Docs" / "Environment" / "pilot-records",
-            usage_record_dir=REPO_ROOT / "Docs" / "Environment" / "usage-records",
+    def write_status_report(self, path: Path, status: str = "PASS", extra: list[str] | None = None) -> None:
+        lines = ["# Report", "", f"Status: {status}"]
+        if extra:
+            lines.extend(extra)
+        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    def write_eval_snapshot(self, root: Path, status: str) -> None:
+        root.mkdir()
+        (root / "20260604T120000Z-offline.json").write_text(
+            json.dumps(
+                {
+                    "generated": "2026-06-04T12:00:00Z",
+                    "label": "offline",
+                    "status": status,
+                    "passed": 24 if status == "pass" else 22,
+                    "failed": 0 if status == "pass" else 2,
+                    "step_count": 24,
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
         )
+
+    def test_build_payload_reports_missing_beta_exit_evidence(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            record_dir = root / "usage-records"
+            pilot_record_dir = root / "pilot-records"
+            record_dir.mkdir()
+            pilot_record_dir.mkdir()
+            self.write_record(
+                record_dir,
+                self.valid_record("self-dogfood-docs", "Documentation", "self-dogfood", "repo-dogfood"),
+            )
+            payload = beta_exit_audit.build_payload(
+                record_dir,
+                pilot_record_dir=pilot_record_dir,
+                usage_record_dir=record_dir,
+                source_freshness_report=root / "missing-source.md",
+                semantic_alignment_report=root / "missing-semantic.md",
+                proof_status_path=root / "missing-proof.md",
+                eval_history_dir=root / "missing-eval-history",
+            )
 
         self.assertEqual("pass", payload["status"], payload)
         self.assertEqual("missing-beta-exit-evidence", payload["readiness"])
@@ -70,20 +108,40 @@ class BetaExitAuditTests(unittest.TestCase):
             root = Path(temp_dir)
             record_dir = root / "usage-records"
             pilot_record_dir = root / "pilot-records"
+            source_freshness = root / "SOURCE_FRESHNESS.md"
+            semantic_alignment = root / "SEMANTIC_ALIGNMENT.md"
+            proof_status = root / "PROOF_STATUS.md"
+            eval_history = root / "eval-history"
             record_dir.mkdir()
             pilot_record_dir.mkdir()
             self.write_ready_records(record_dir)
+            self.write_status_report(source_freshness)
+            self.write_status_report(semantic_alignment)
+            self.write_status_report(
+                proof_status,
+                extra=[
+                    "Mode: beta-exit",
+                    "Readiness: Beta exit proof complete",
+                ],
+            )
+            self.write_eval_snapshot(eval_history, "pass")
 
             payload = beta_exit_audit.build_payload(
                 record_dir,
                 pilot_record_dir=pilot_record_dir,
                 usage_record_dir=record_dir,
+                source_freshness_report=source_freshness,
+                semantic_alignment_report=semantic_alignment,
+                proof_status_path=proof_status,
+                eval_history_dir=eval_history,
             )
 
         self.assertEqual("pass", payload["status"], payload)
         self.assertEqual("beta-exit-ready-for-final-gate", payload["readiness"])
         self.assertTrue(payload["beta_exit_ready"])
         self.assertEqual("pass", next(item["status"] for item in payload["criteria"] if item["name"] == "external_or_multi_project_records"))
+        self.assertEqual("pass", next(item["status"] for item in payload["criteria"] if item["name"] == "release_gate"))
+        self.assertEqual("pass", next(item["status"] for item in payload["criteria"] if item["name"] == "beta_exit_proof_status"))
 
     def test_write_report_includes_criteria_and_next_actions(self):
         with tempfile.TemporaryDirectory() as temp_dir:

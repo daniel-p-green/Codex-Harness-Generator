@@ -1,0 +1,131 @@
+{
+  "generated": "2026-06-05T00:06:41Z",
+  "label": "beta-exit-offline",
+  "status": "pass",
+  "returncode": 0,
+  "step_count": 24,
+  "passed": 24,
+  "failed": 0,
+  "steps": [
+    {
+      "name": "static_codex_port_eval",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "codex_equivalence_matrix",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "generated_harness_fixture_eval",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "generated_harness_smoke",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "deterministic_profile_generation",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "installable_cli_smoke",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "checked_in_example_inventory",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "deterministic_example_eval",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "deterministic_example_smoke",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "deterministic_create_acceptance",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "deterministic_brief_acceptance",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "deterministic_demo_capture",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "create_acceptance_example_eval",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "demo_capture_example_eval",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "demo_capture_example_smoke",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "create_acceptance_example_smoke",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "brief_acceptance_example_eval",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "brief_acceptance_example_smoke",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "live_create_example_eval",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "live_create_example_smoke",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "usage_records_validate",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "proof_status",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "unit_and_mutation_tests",
+      "status": "pass",
+      "returncode": 0
+    },
+    {
+      "name": "python_compile",
+      "status": "pass",
+      "returncode": 0
+    }
+  ]
+}

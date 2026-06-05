@@ -221,6 +221,24 @@ class DoctorTests(unittest.TestCase):
         self.assertIn("prepare_migration=pass", install_check["detail"])
         self.assertIn("installable_cli", [check["name"] for check in payload["checks"]])
 
+    def test_include_install_smoke_fails_if_smoke_mutates_usage_records(self):
+        def fake_install_payload():
+            record_dir = doctor.DEFAULT_RECORD_DIR
+            added = record_dir / "accidental-doctor-smoke-record.json"
+            added.write_text('{"slug": "accidental-doctor-smoke-record"}\n', encoding="utf-8")
+            self.addCleanup(lambda: added.exists() and added.unlink())
+            return self.fake_install_payload()
+
+        with patch.object(doctor, "build_cli_install_payload", side_effect=fake_install_payload):
+            payload = doctor.build_payload(include_install_smoke=True)
+
+        self.assertEqual("fail", payload["status"])
+        install_check = next(check for check in payload["checks"] if check["name"] == "installable_cli")
+        self.assertEqual("fail", install_check["status"])
+        self.assertIn("mutated checked-in usage records", install_check["detail"])
+        self.assertIn("accidental-doctor-smoke-record.json", install_check["detail"])
+        self.assertFalse((doctor.DEFAULT_RECORD_DIR / "accidental-doctor-smoke-record.json").exists())
+
     def test_main_json_returns_failure_for_unmet_usage_threshold(self):
         output = io.StringIO()
 

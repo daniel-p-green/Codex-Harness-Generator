@@ -22,6 +22,30 @@ spec.loader.exec_module(proof_status)
 
 
 class ProofStatusTests(unittest.TestCase):
+    def write_self_dogfood_usage_record(self, record_dir: Path, slug: str, domain: str = "Codex harness generation") -> None:
+        record_dir.mkdir(parents=True, exist_ok=True)
+        (record_dir / f"{slug}.json").write_text(
+            """{
+  "slug": "%s",
+  "title": "%s",
+  "generated": "2026-06-04T12:00:00Z",
+  "domain": "%s",
+  "harness_path": "temporary self-dogfood harness",
+  "task_summary": "Temporary self-dogfood proof fixture.",
+  "outcome": "success",
+  "evidence_type": "sanitized",
+  "source_type": "self-dogfood",
+  "generation_path": "repo-dogfood",
+  "evidence": ["Temporary fixture evidence."],
+  "verification": ["Temporary fixture verification."],
+  "privacy_review": "Temporary public-safe fixture.",
+  "limitations": ["Temporary fixture."]
+}
+"""
+            % (slug, slug.replace("-", " ").title(), domain),
+            encoding="utf-8",
+        )
+
     def fake_install_payload(self):
         return {
             "status": "pass",
@@ -164,6 +188,22 @@ Status: PASS
         self.assertEqual("pass", payload["status"], payload)
         self.assertIn("python=3.10,3.11,3.12", payload["detail"])
         self.assertIn("eval-gate-python-*", payload["detail"])
+
+    def test_installable_cli_check_fails_if_smoke_mutates_usage_records(self):
+        def fake_install_payload():
+            record_dir = proof_status.DEFAULT_RECORD_DIR
+            added = record_dir / "accidental-smoke-record.json"
+            added.write_text('{"slug": "accidental-smoke-record"}\n', encoding="utf-8")
+            self.addCleanup(lambda: added.exists() and added.unlink())
+            return self.fake_install_payload()
+
+        with patch.object(proof_status, "build_cli_install_payload", side_effect=fake_install_payload):
+            check, _ = proof_status.check_installable_cli()
+
+        self.assertEqual("fail", check["status"])
+        self.assertIn("mutated checked-in usage records", check["detail"])
+        self.assertIn("accidental-smoke-record.json", check["detail"])
+        self.assertFalse((proof_status.DEFAULT_RECORD_DIR / "accidental-smoke-record.json").exists())
 
     def test_ci_workflow_check_fails_when_matrix_drifts_from_classifiers(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -338,17 +378,22 @@ Status: PASS
         self.assertEqual("fail", payload["status"])
         self.assertIn("required >= 99", next(check["detail"] for check in payload["checks"] if check["name"] == "live_task_trials"))
 
-    def test_build_payload_fails_beta_exit_usage_thresholds_for_current_self_dogfood(self):
-        with patch.object(proof_status, "build_cli_install_payload", return_value=self.fake_install_payload()):
-            payload = proof_status.build_payload(
-                min_live_trials=8,
-                min_usage_records=5,
-                record_dir=REPO_ROOT / "Docs" / "Environment" / "usage-records",
-                min_external_or_multi_project=3,
-                min_domains=4,
-                min_installed_init_brief=2,
-                proof_mode="beta-exit",
-            )
+    def test_build_payload_fails_beta_exit_usage_thresholds_for_self_dogfood_only_fixture(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            record_dir = Path(temp_dir) / "usage-records"
+            for index in range(5):
+                self.write_self_dogfood_usage_record(record_dir, f"self-dogfood-{index}")
+
+            with patch.object(proof_status, "build_cli_install_payload", return_value=self.fake_install_payload()):
+                payload = proof_status.build_payload(
+                    min_live_trials=8,
+                    min_usage_records=5,
+                    record_dir=record_dir,
+                    min_external_or_multi_project=3,
+                    min_domains=4,
+                    min_installed_init_brief=2,
+                    proof_mode="beta-exit",
+                )
 
         self.assertEqual("fail", payload["status"])
         self.assertEqual("beta-exit", payload["mode"])
@@ -401,10 +446,15 @@ Status: PASS
 
     def test_main_beta_exit_applies_roadmap_thresholds(self):
         with tempfile.TemporaryDirectory() as temp_dir:
-            report = Path(temp_dir) / "PROOF_STATUS.md"
+            root = Path(temp_dir)
+            report = root / "PROOF_STATUS.md"
+            record_dir = root / "usage-records"
+            for index in range(5):
+                self.write_self_dogfood_usage_record(record_dir, f"self-dogfood-{index}")
+
             with patch.object(proof_status, "build_cli_install_payload", return_value=self.fake_install_payload()):
                 with redirect_stdout(io.StringIO()):
-                    status = proof_status.main(["--beta-exit", "--report", report.as_posix()])
+                    status = proof_status.main(["--beta-exit", "--record-dir", record_dir.as_posix(), "--report", report.as_posix()])
 
             text = report.read_text(encoding="utf-8")
 

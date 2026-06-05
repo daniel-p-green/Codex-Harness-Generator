@@ -1,8 +1,8 @@
 # Usage Evidence Gaps
 
-Generated: 2026-06-04T23:50:19Z
+Generated: 2026-06-05T00:14:19Z
 Status: PASS
-Readiness: missing-beta-exit-evidence
+Readiness: beta-exit-evidence-ready
 
 This report shows what usage evidence is still missing before the repo can
 honestly stop calling itself a beta.
@@ -16,17 +16,17 @@ honestly stop calling itself a beta.
 
 ## Current Summary
 
-- Total usage records: 5
-- Non-synthetic records: 5
-- Successful records: 5
-- External or multi-project records: 0
-- Distinct domains: 4
+- Total usage records: 8
+- Non-synthetic records: 8
+- Successful records: 8
+- External or multi-project records: 3
+- Distinct domains: 7
 - Installed brief-based generation records: 3
 
 ## Remaining Gaps
 
 - Usage records: 0
-- External or multi-project records: 3
+- External or multi-project records: 0
 - Distinct domains: 0
 - Installed brief-based generation records: 0
 
@@ -34,12 +34,12 @@ honestly stop calling itself a beta.
 
 Projection assumes every suggested pilot is completed and converted into valid non-synthetic evidence; it is not usage proof.
 
-- Suggested pilots in projection: 3
+- Suggested pilots in projection: 0
 - Would satisfy beta-exit usage thresholds: true
 - Projected usage records: 8
 - Projected external or multi-project records: 3
 - Projected distinct domains: 7
-- Projected installed brief-based generation records: 6
+- Projected installed brief-based generation records: 3
 
 Projected remaining gaps after candidates:
 
@@ -53,42 +53,15 @@ Projected remaining gaps after candidates:
 - API design
 - Codex harness generation
 - Data analysis
+- Public Python HTTP library
+- Public Python packaging
+- Public Python web framework
 - Security audit
 
 ## Suggested Pilot Targets
 
-### 1. LLM app (`llm-app`)
-
-- Source type: `external`
-- Generation path: `installed-quickstart`
-- Brief: LLM-powered app, RAG, agent, prompt, and eval workflow development with one privacy-safe task, local eval, and public-safe usage evidence
-
-```bash
-codex-harness prepare-pilot /tmp/codex-llm-app-pilot --brief "LLM-powered app, RAG, agent, prompt, and eval workflow development with one privacy-safe task, local eval, and public-safe usage evidence" --project-name "LLM App Workspace Pilot" --domain "LLM app" --slug llm-app-pilot --title "LLM app pilot" --source-type external --generation-path installed-quickstart --pilot-record-dir Docs/Environment/pilot-records --force
-```
-
-### 2. customer support (`customer-support`)
-
-- Source type: `external`
-- Generation path: `installed-quickstart`
-- Brief: customer-support documentation, FAQ, response, escalation, and support-ops work with one privacy-safe task, local eval, and public-safe usage evidence
-
-```bash
-codex-harness prepare-pilot /tmp/codex-customer-support-pilot --brief "customer-support documentation, FAQ, response, escalation, and support-ops work with one privacy-safe task, local eval, and public-safe usage evidence" --project-name "Customer Support Workspace Pilot" --domain "customer support" --slug customer-support-pilot --title "customer support pilot" --source-type external --generation-path installed-quickstart --pilot-record-dir Docs/Environment/pilot-records --force
-```
-
-### 3. legal research (`legal-research`)
-
-- Source type: `external`
-- Generation path: `installed-quickstart`
-- Brief: legal research, policy, contract, source review, and memo support work with one privacy-safe task, local eval, and public-safe usage evidence
-
-```bash
-codex-harness prepare-pilot /tmp/codex-legal-research-pilot --brief "legal research, policy, contract, source review, and memo support work with one privacy-safe task, local eval, and public-safe usage evidence" --project-name "Legal Research Workspace Pilot" --domain "legal research" --slug legal-research-pilot --title "legal research pilot" --source-type external --generation-path installed-quickstart --pilot-record-dir Docs/Environment/pilot-records --force
-```
-
+- none
 
 ## Recommended Next Moves
 
-- Collect 3 more external or multi-project usage record(s).
-- For the next suggested pilot, run `codex-harness prepare-next-pilot <target> --pilot-record-dir Docs/Environment/pilot-records` or copy the suggested `codex-harness prepare-pilot <target> --pilot-record-dir Docs/Environment/pilot-records` command, review the generated pack, track it with `codex-harness pilot-board`, update status with `codex-harness pilot-update`, then convert completed evidence with `usage-from-harness` or `usage-from-issue`.
+- Beta-exit usage thresholds are satisfied; run proof-status with beta-exit thresholds before changing the README status.

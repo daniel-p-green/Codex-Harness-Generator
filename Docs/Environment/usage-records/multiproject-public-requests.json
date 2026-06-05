@@ -1,0 +1,31 @@
+{
+  "slug": "multiproject-public-requests",
+  "title": "Multi-project public Requests harness",
+  "generated": "2026-06-05T00:06:15Z",
+  "domain": "Public Python HTTP library",
+  "harness_path": "multi-project requests harness",
+  "task_summary": "Generated and evaluated a Codex harness from the public psf/requests repository.",
+  "outcome": "success",
+  "evidence_type": "sanitized",
+  "source_type": "multi-project",
+  "generation_path": "installed-init-from-project",
+  "evidence": [
+    "Generated harness local eval report status: PASS.",
+    "Recorded task-trial outcomes: success=1",
+    "Task trial `Review public Requests repository metadata and identify dependency and test verification checks` recorded as success: Used the generated harness to review public psf/requests metadata, dependency files, documentation signals, and test-suite signals.",
+    "Installed CLI generated a harness from public GitHub repo psf/requests.",
+    "Generated harness recorded a privacy-safe task trial and public usage report."
+  ],
+  "verification": [
+    "Copied harness local eval checks: improvements=pass, local_check=pass, task_trials=pass",
+    "Complete task-trial records reviewed: 1.",
+    "Task trial `Review public Requests repository metadata and identify dependency and test verification checks` verification: Generated harness check passed; inspected PROJECT_INSPECTION.md, PROFILE_SELECTION.md, pyproject.toml presence, dependency-file signals, and test-file counts.",
+    "python scripts/check-harness.py passed in the generated harness.",
+    "python scripts/run-harness-evals.py --min-successes 1 passed in the generated harness."
+  ],
+  "privacy_review": "Public-repo multi-project trial only; no secrets, private paths, personal data, or raw local logs are included.",
+  "limitations": [
+    "One public repository metadata review; no private project files or external reporter involved.",
+    "Maintainer-run multi-project public-repo trial; not external reporter adoption evidence."
+  ]
+}

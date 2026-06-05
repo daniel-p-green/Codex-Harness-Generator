@@ -7,7 +7,8 @@ proof exists in this repository.
 
 ## Current State
 
-Status: Codex-equivalent beta with checked-in self-dogfood proof.
+Status: Codex-equivalent beta-exit candidate with checked-in self-dogfood and
+multi-project public-repo proof.
 
 Already proven:
 
@@ -55,6 +56,9 @@ Already proven:
   examples.
 - Privacy-checked usage-record validation.
 - Copied-harness evidence conversion into privacy-checked usage records.
+- Beta-exit usage thresholds satisfied by 8 checked-in non-synthetic successful
+  usage records, including 3 maintainer-run multi-project public-repo trials
+  across 7 total domains.
 - External usage-report intake and issue-body conversion.
 - GitHub-ready external pilot issue export through
   `codex-harness pilot-github-issues`, so active pilots can be opened as public
@@ -75,7 +79,9 @@ Already proven:
   `codex-harness pilot-campaign`.
 - A next-action proof packet through `codex-harness proof-next`, so maintainers
   can move from current gaps to prepare, board, conversion, audit, and final
-  proof commands without treating the packet as evidence.
+  proof commands without treating the packet as evidence. In the current
+  evidence-ready state, it reports no next pilot needed from usage gaps and
+  points at final audit, doctor, and proof-status commands.
 - A non-gating beta-exit audit through `codex-harness beta-exit-audit`, so the
   repo can publish missing criteria without confusing "audit ran" with
   "external adoption is proven."
@@ -112,9 +118,14 @@ The project can stop calling itself a beta only when all of these are true:
   `python scripts/codex_harness.py semantic-alignment` have current PASS reports
   or documented review notes.
 
+Current local status: these criteria pass in this checkout, with the
+external-or-multi-project threshold satisfied by maintainer-run multi-project
+public-repo records rather than external reporter adoption. Keep broad adoption
+claims separate until reporters complete and convert public pilot issues.
+
 ## Near-Term Work
 
-1. Add external usage records.
+1. Collect external reporter adoption records.
    Use `.github/ISSUE_TEMPLATE/external-usage-report.yml` and
    `Docs/Environment/EXTERNAL_USAGE_EVIDENCE.md`. Use
    `codex-harness prepare-pilot` to create the next generated pilot harness,
@@ -153,7 +164,9 @@ The project can stop calling itself a beta only when all of these are true:
    `codex-harness pilot-handoff` plus `codex-harness pilot-handoff-audit`
    before sending reporter materials, `codex-harness pilot-update` after
    outreach or conversion steps, or `codex-harness pilot-campaign` when a
-   shareable outreach packet is useful.
+   shareable outreach packet is useful. The current beta-exit threshold no
+   longer depends on these records, but they remain the most important next
+   product-proof gap.
 
 2. Add more public-safe live examples.
    Prioritize domains where the generated harness has high-risk boundaries:

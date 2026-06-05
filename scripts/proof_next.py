@@ -464,6 +464,24 @@ def build_payload(args: argparse.Namespace) -> dict:
     board_payload = pilot_board.build_payload(Path(args.pilot_record_dir), usage_record_dir=Path(args.record_dir))
     next_pilot = (gaps_payload.get("suggested_pilots") or [None])[0]
     active_pilot = active_pilot_for_next(gaps_payload, board_payload)
+    beta_exit_evidence_ready = gaps_payload["readiness"] == "beta-exit-evidence-ready"
+    claim_boundary = (
+        "This packet summarizes final proof actions from the current evidence; it does not itself prove broad "
+        "external adoption, a release decision, or production suitability."
+        if beta_exit_evidence_ready
+        else (
+            "This packet gives next actions for collecting evidence; it does not itself prove external adoption, "
+            "beta-exit readiness, or production suitability."
+        )
+    )
+    does_not_prove = [
+        "A prepared pilot was completed.",
+        "Broad external reporter adoption.",
+        "Future generated harnesses will work well for every project.",
+    ]
+    if not beta_exit_evidence_ready:
+        does_not_prove.insert(1, "External or multi-project usage evidence exists.")
+        does_not_prove.insert(3, "The README can drop the beta label.")
     return {
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "status": "pass" if gaps_payload["status"] == "pass" and board_payload["status"] == "pass" else "fail",
@@ -481,16 +499,8 @@ def build_payload(args: argparse.Namespace) -> dict:
             "errors": board_payload["errors"],
         },
         "command_sequence": build_command_sequence(gaps_payload, active_pilot, args),
-        "claim_boundary": (
-            "This packet gives next actions for collecting evidence; it does not itself prove external adoption, "
-            "beta-exit readiness, or production suitability."
-        ),
-        "does_not_prove": [
-            "A prepared pilot was completed.",
-            "External or multi-project usage evidence exists.",
-            "The README can drop the beta label.",
-            "Future generated harnesses will work well for every project.",
-        ],
+        "claim_boundary": claim_boundary,
+        "does_not_prove": does_not_prove,
     }
 
 

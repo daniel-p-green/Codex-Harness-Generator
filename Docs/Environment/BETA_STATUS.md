@@ -1,16 +1,16 @@
 # Beta Status
 
-Generated: 2026-06-04T23:50:19Z
+Generated: 2026-06-05T00:14:19Z
 Status: PASS
-Readiness: missing-beta-exit-evidence
+Readiness: beta-exit-ready-for-final-proof
 
 This status report is an operator dashboard. It is not usage proof; only converted, validated usage records count toward beta exit.
 
 ## Evidence Gap
 
-- Usage records: 5 total; 0 still needed
-- External or multi-project records: 0 current; 3 still needed
-- Distinct domains: 4 current; 0 still needed
+- Usage records: 8 total; 0 still needed
+- External or multi-project records: 3 current; 0 still needed
+- Distinct domains: 7 current; 0 still needed
 - Installed brief-based generation records: 3 current; 0 still needed
 
 ## Pilot Queue

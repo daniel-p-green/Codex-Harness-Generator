@@ -254,7 +254,6 @@ def build_payload() -> dict:
                 install_source,
             ),
             ("profiles", [(venv / "bin" / "codex-harness").as_posix(), "profiles", "--json"], None),
-            ("doctor", [(venv / "bin" / "codex-harness").as_posix(), "doctor", "--json"], install_source),
             (
                 "init",
                 [
@@ -553,6 +552,17 @@ def build_payload() -> dict:
                     "--force",
                     "--json",
                 ],
+            ),
+            (
+                "doctor",
+                [
+                    (venv / "bin" / "codex-harness").as_posix(),
+                    "doctor",
+                    "--record-dir",
+                    usage_records.as_posix(),
+                    "--json",
+                ],
+                install_source,
             ),
             (
                 "prepare_next_pilot",
