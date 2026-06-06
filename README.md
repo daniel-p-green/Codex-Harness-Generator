@@ -1,6 +1,6 @@
 # Codex Harness Generator
 
-**v1.0.0** | Codex-equivalent beta-exit candidate | Built for Codex GPT-5.5 (`gpt-5.5`) | MIT
+**Beta** | Codex-native harness generator and proof kit | Built for Codex GPT-5.5 (`gpt-5.5`) | MIT
 
 Codex Harness Generator helps you create and validate a project-specific Codex
 harness: `AGENTS.md`, `.codex/config.toml`, `.codex/agents/`, `.agents/skills/`,
@@ -13,6 +13,43 @@ changed safely, how to save state, and how to verify the setup over time.
 
 [![Tutorial Video](https://img.youtube.com/vi/0R3JPNTEljU/0.jpg)](https://www.youtube.com/watch?v=0R3JPNTEljU)
 
+## Beta Notice
+
+This is a **beta**. It is useful when you want a repeatable, artifact-first
+Codex working environment for a project, but it is not a guarantee that a
+generated harness will be perfect, complete, secure, or production-ready.
+
+Use it for:
+
+- Generating a first Codex harness for a public-safe project or task.
+- Porting older harness conventions into Codex-native files.
+- Creating deterministic starter harnesses for common work domains.
+- Running local evals, smoke checks, and usage-evidence capture around a
+  generated harness.
+- Preparing public-safe pilot packets for people who can report what worked and
+  what failed.
+
+Do not treat it as:
+
+- A fully battle-tested replacement for every existing non-Codex harness.
+- Proof of broad external adoption.
+- A security, legal, financial, hiring, or compliance review system.
+- A tool that can safely publish private source, logs, transcripts, customer
+  data, candidate data, secrets, or local machine paths.
+- Evidence that every future live `/create` run will produce a good result.
+
+Before making public claims from a local checkout, run:
+
+```bash
+python scripts/codex_harness.py doctor --beta-exit
+python scripts/codex_harness.py proof-status --beta-exit
+python scripts/run_evals.py
+```
+
+Want to help prove the project on real external usage? See
+[Docs/Environment/PILOT_RECRUITING.md](Docs/Environment/PILOT_RECRUITING.md)
+for the smallest public-safe pilot ask, reporter path, and conversion loop.
+
 ## Current Status
 
 This repo is the **Codex-native equivalent in structure and intent** of the
@@ -20,15 +57,17 @@ earlier harness-generator architecture. It has been ported to Codex concepts:
 `AGENTS.md`, `.codex/config.toml`, TOML subagents, `.agents/skills/`, Codex
 permission profiles, artifact-first docs, and a local eval gate.
 
-It should still be treated as a **beta-exit candidate**, not a fully
-battle-tested public replacement. What is proven today:
+It should still be treated as a **beta**, not a fully battle-tested public
+replacement. What is proven today:
 
 - The repo is structurally Codex-native and passes the local eval gate.
 - Beta-exit usage thresholds are satisfied by 8 non-synthetic successful usage
   records: 5 self-dogfood records and 3 maintainer-run multi-project public-repo
   trials across 7 domains.
-- `proof-status --beta-exit`, `doctor --beta-exit`, and `beta-exit-audit` pass
-  locally, and the latest offline eval-history snapshot passed 24/24 steps.
+- `proof-status --beta-exit`, `doctor --beta-exit`, and `beta-exit-audit` are
+  the required local readiness checks before dropping the beta label or making
+  stronger public claims.
+- The latest checked-in offline eval-history snapshot passed 24/24 steps.
 - Golden generated-harness fixtures pass contract, smoke, and mutation tests.
 - `scripts/generate_minimal_harness.py` provides a deterministic acceptance path
   for the four base starter profiles and 16 bundled domain presets without

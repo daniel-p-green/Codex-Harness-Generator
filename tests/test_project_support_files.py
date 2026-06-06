@@ -6,6 +6,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 ISSUE_TEMPLATE_ROOT = REPO_ROOT / ".github" / "ISSUE_TEMPLATE"
 WORKFLOW_ROOT = REPO_ROOT / ".github" / "workflows"
 ROADMAP = REPO_ROOT / "Docs" / "Environment" / "ROADMAP.md"
+README = REPO_ROOT / "README.md"
+PILOT_RECRUITING = REPO_ROOT / "Docs" / "Environment" / "PILOT_RECRUITING.md"
 
 
 class ProjectSupportFilesTests(unittest.TestCase):
@@ -16,6 +18,27 @@ class ProjectSupportFilesTests(unittest.TestCase):
             "external-usage-report.yml",
         ):
             self.assertTrue((ISSUE_TEMPLATE_ROOT / filename).is_file(), filename)
+
+    def test_readme_links_public_pilot_recruiting_note(self):
+        text = README.read_text(encoding="utf-8")
+
+        self.assertIn("Docs/Environment/PILOT_RECRUITING.md", text)
+
+    def test_pilot_recruiting_note_has_reporter_and_conversion_paths(self):
+        text = PILOT_RECRUITING.read_text(encoding="utf-8")
+
+        for phrase in (
+            "broad external adoption is still",
+            "unproven",
+            "issues/new?template=external-usage-report.yml",
+            "codex-harness quickstart",
+            "python scripts/check-harness.py",
+            "codex-harness pilot-github-sync",
+            "codex-harness usage-from-github-issue",
+            "Only converted, validated usage",
+            "records count",
+        ):
+            self.assertIn(phrase, text)
 
     def test_usage_evidence_lint_workflow_exists(self):
         text = (WORKFLOW_ROOT / "usage-evidence-lint.yml").read_text(encoding="utf-8")
