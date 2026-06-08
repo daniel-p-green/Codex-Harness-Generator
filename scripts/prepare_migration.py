@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prepare a Codex migration packet for a legacy Claude-style harness."""
+"""Prepare a Codex migration packet for a legacy harness."""
 
 from __future__ import annotations
 
@@ -35,7 +35,7 @@ def write_packet_readme(path: Path, payload: dict) -> Path:
         f"Migration readiness: {payload['migration_readiness']}",
         f"Selected profile: `{payload['profile']}`",
         "",
-        "This packet helps port a Claude-style harness or project into a Codex-native harness. It is intentionally non-destructive.",
+        "This packet helps port a legacy harness or project into a Codex-native harness. It is intentionally non-destructive.",
         "",
         "## Packet Contents",
         "",
@@ -50,7 +50,7 @@ def write_packet_readme(path: Path, payload: dict) -> Path:
         "2. Run the add-only copy script if the add rows look right.",
         "3. Merge conflict rows manually, preserving project-specific instructions.",
         "4. Run the post-adoption checks listed in the adoption plan.",
-        "5. Archive legacy Claude files only after their useful content is translated.",
+        "5. Archive legacy files only after their useful content is translated.",
         "",
         "## Claim Boundary",
         "",
@@ -138,7 +138,7 @@ def print_text(payload: dict) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("source", help="Legacy Claude-style harness or project directory")
+    parser.add_argument("source", help="Legacy harness or project directory")
     parser.add_argument("output", help="Output directory for the migration packet")
     parser.add_argument("--profile", help="Starter profile override; defaults to inspection recommendation")
     parser.add_argument("--project-name", help="Project name for generated blueprint docs")

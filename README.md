@@ -11,8 +11,6 @@ A harness is the operating layer around a project. It tells Codex what the
 project is, which files matter, which subagents and skills exist, what can be
 changed safely, how to save state, and how to verify the setup over time.
 
-[![Tutorial Video](https://img.youtube.com/vi/0R3JPNTEljU/0.jpg)](https://www.youtube.com/watch?v=0R3JPNTEljU)
-
 ## Beta Notice
 
 This is a **beta**. It is useful when you want a repeatable, artifact-first

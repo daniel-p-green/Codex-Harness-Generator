@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit a legacy Claude-style harness for Codex migration work."""
+"""Audit a legacy harness for Codex migration work."""
 
 from __future__ import annotations
 
@@ -184,7 +184,7 @@ def migration_plan(root: Path, findings: list[Finding]) -> dict:
         "manual_steps": [
             "Move durable project instructions from CLAUDE.md into AGENTS.md, preserving source-specific constraints.",
             "Translate .claude/settings.json into .codex/config.toml instead of copying provider-specific settings verbatim.",
-            "Rewrite Claude agents, commands, hooks, and skills into Codex subagents, AGENTS.md routing, explicit validation commands, or .agents/skills.",
+            "Rewrite legacy agents, commands, hooks, and skills into Codex subagents, AGENTS.md routing, explicit validation commands, or .agents/skills.",
             "Review any add-only copy script output before merging conflicts; never overwrite existing project guidance blindly.",
             "Archive or remove legacy cleanup paths only after their useful content has been translated into Codex-native files.",
             "Run validation after each manual merge phase and record remaining gaps in Docs/Environment/IMPROVEMENT_LOG.md.",
